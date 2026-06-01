@@ -10,7 +10,7 @@ import { cityToRow } from "../lib/city-row.js";
 const c = new pg.Client({
   host: "aws-1-us-west-2.pooler.supabase.com", port: 5432,
   user: "postgres.fitjkrmiwkdolxhitroc",
-  password: process.env.SUPABASE_DB_PASSWORD || "vudjyT-vohko5-gyjzaz",
+  password: process.env.SUPABASE_DB_PASSWORD,
   database: "postgres", ssl: { rejectUnauthorized: false },
 });
 
