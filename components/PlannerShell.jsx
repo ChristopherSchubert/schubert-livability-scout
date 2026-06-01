@@ -13,7 +13,27 @@ import {
   surveyComplete,
 } from "../lib/planner-data";
 import { appendBust, resolveImage } from "./PlannerProvider";
+import { getSupabase } from "../lib/supabase";
 import MapEmbed from "./MapEmbed";
+
+// POST a chosen image to the save endpoint with the user's access token
+// (storage upload runs under RLS as that user). `section.folder` is
+// cities/<slug>/hero, so the slug is the second segment.
+async function postSaveHero(section, candidate) {
+  const { data: { session } } = await getSupabase().auth.getSession();
+  const slug = (section.folder || "").split("/")[1];
+  const response = await fetch("/api/images/save", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
+    },
+    body: JSON.stringify({ slug, candidate }),
+  });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.error || "Save failed");
+  return data;
+}
 
 export function CityDetail({ cityItem, imageState }) {
   const heroQuery = cityImageQuery(cityItem.name, cityItem.stayZone, cityItem.heartIntersection);
@@ -571,24 +591,13 @@ function PasteByUrlPanel({ section, setSearchState, onSaved }) {
     setBusy(true);
     setSearchState((current) => ({ ...current, status: "loading", message: "Downloading and saving as hero…" }));
     try {
-      const response = await fetch("/api/images/save", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          key: section.query,
-          folder: section.folder,
-          query: section.query,
-          candidate: {
-            title: title.trim() || "Pasted image",
-            source: "Pasted URL",
-            imageUrl: url.trim(),
-            thumb: url.trim(),
-            landingUrl: url.trim(),
-          },
-        }),
+      const data = await postSaveHero(section, {
+        title: title.trim() || "Pasted image",
+        source: "Pasted URL",
+        imageUrl: url.trim(),
+        thumb: url.trim(),
+        landingUrl: url.trim(),
       });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Save failed");
       onSaved(data);
       if (data.selectedSrc) section.onSelect(data.selectedSrc);
       setUrl("");
@@ -642,17 +651,7 @@ async function saveHero(section, result, searchState, setSearchState, onSaved) {
   };
   setSearchState(next);
   try {
-    const response = await fetch("/api/images/save", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        key: section.query,
-        folder: section.folder,
-        candidate: result,
-      }),
-    });
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.error || "Save failed");
+    const data = await postSaveHero(section, result);
     onSaved(data);
     if (data.selectedSrc) section.onSelect(data.selectedSrc);
     setSearchState({ ...next, status: "ready", message: "Saved as hero.", results: searchState.results });
