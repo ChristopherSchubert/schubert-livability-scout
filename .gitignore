@@ -1,0 +1,13 @@
+.DS_Store
+public/assets/images/_legacy-flat-archive/
+.next/
+node_modules/
+.env
+.env.local
+.env.*.local
+
+# Local editor/agent settings (keep launch.json, ignore the local-only file)
+.claude/settings.local.json
+
+# Input artifacts (already extracted to _files_thread/)
+files.zip

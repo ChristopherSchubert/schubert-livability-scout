@@ -1,0 +1,25 @@
+window.CITY_TRIAL_IMAGES = {
+  "Santa Barbara, CA downtown main street public life people color photo": "./assets/images/cities/santa-barbara-ca/hero/2d77e75a0f5a.jpg",
+  "Ventura, CA downtown main street public life people color photo": "./assets/images/cities/ventura-ca/hero/326ac4ce7f6e.jpg",
+  "San Luis Obispo, CA downtown main street public life people color photo": "./assets/images/cities/san-luis-obispo-ca/hero/0b6594d4f020.jpg",
+  "Santa Cruz, CA downtown main street public life people color photo": "./assets/images/cities/santa-cruz-ca/hero/76c26e5a9aeb.jpg",
+  "Monterey / Pacific Grove, CA downtown main street public life people color photo": "./assets/images/cities/monterey-pacific-grove-ca/hero/f1fd34eba53c.jpg",
+  "Hood River, OR downtown main street public life people color photo": "./assets/images/cities/hood-river-or/hero/dce089bba973.jpg",
+  "Bellingham, WA downtown main street public life people color photo": "./assets/images/cities/bellingham-wa/hero/a8109a6429d8.webp",
+  "Ashland, OR downtown main street public life people color photo": "./assets/images/cities/ashland-or/hero/abc8ed556d63.jpg",
+  "Annapolis, MD downtown main street public life people color photo": "./assets/images/cities/annapolis-md/hero/99706b0329c5.jpg",
+  "Savannah, GA downtown main street public life people color photo": "./assets/images/cities/savannah-ga/hero/81955968155d.jpg",
+  "Charleston, SC downtown main street public life people color photo": "./assets/images/cities/charleston-sc/hero/ac93b396bb39.png",
+  "St. Petersburg, FL downtown main street public life people color photo": "./assets/images/cities/st-petersburg-fl/hero/00e80d5205ed.webp",
+  "Beaufort, SC downtown main street public life people color photo": "./assets/images/cities/beaufort-sc/hero/9aa790eb82a9.jpg",
+  "St. Augustine, FL downtown main street public life people color photo": "./assets/images/cities/st-augustine-fl/hero/d96521e3af84.jpg",
+  "Greenville, SC downtown main street public life people color photo": "./assets/images/cities/greenville-sc/hero/54931143c521.jpg",
+  "Petaluma, CA downtown main street public life people color photo": "./assets/images/cities/petaluma-ca/hero/1859011f10a1.jpg",
+  "Carmel-by-the-Sea, CA downtown main street public life people color photo": "./assets/images/cities/carmel-by-the-sea-ca/hero/97b31587b278.jpg",
+  "Newburyport, MA downtown main street public life people color photo": "./assets/images/cities/newburyport-ma/hero/a6e84afc084a.jpg",
+  "Cape May, NJ downtown main street public life people color photo": "./assets/images/cities/cape-may-nj/hero/44f2739fa8d1.jpg",
+  "Durango, CO downtown main street public life people color photo": "./assets/images/cities/durango-co/hero/6349e874ac8a.jpg",
+  "Charlottesville, VA downtown main street public life people color photo": "./assets/images/cities/charlottesville-va/hero/ae3dd6931d1e.jpg",
+  "Eureka Springs, AR downtown main street public life people color photo": "./assets/images/cities/eureka-springs-ar/hero/3c3cfc6693bf.webp"
+};
+window.CITY_TRIAL_IMAGE_CHOICES = {};
