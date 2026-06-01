@@ -2292,3 +2292,15 @@ button:hover, .button-link:hover {
 .vw-key-crowd { background: rgba(185,28,28,0.45); }
 .vw-source { margin-left: auto; color: #b3a890; }
 @media (max-width: 720px) { .vw-windows { grid-template-columns: 1fr; } .vw-month-temp { display: none; } }
+
+/* ── Auth gate (magic-link sign-in) ────────────────────────────────────── */
+.auth-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--bg); padding: 1.5rem; }
+.auth-card { width: 100%; max-width: 380px; background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 2rem; display: flex; flex-direction: column; gap: 0.75rem; }
+.auth-card h1 { margin: 0.3rem 0 0; font-size: 1.5rem; }
+.auth-card .brand-dot { width: 12px; height: 12px; }
+.auth-muted { color: var(--muted); line-height: 1.5; margin: 0; font-size: 0.95rem; }
+.auth-input { padding: 0.7rem 0.85rem; border: 1px solid var(--border); border-radius: 10px; background: #fffdf8; font: inherit; }
+.auth-primary { background: var(--accent); color: #fff; border: 1px solid var(--accent); border-radius: 10px; padding: 0.7rem 1rem; font-weight: 700; cursor: pointer; }
+.auth-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+.auth-ghost { background: transparent; border: none; color: var(--muted); cursor: pointer; text-decoration: underline; font: inherit; padding: 0; align-self: flex-start; }
+.auth-err { color: #962914; font-size: 0.88rem; margin: 0; }

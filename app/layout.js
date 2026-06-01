@@ -1,4 +1,5 @@
 import "./globals.css";
+import AuthGate from "../components/AuthGate";
 import { PlannerProvider } from "../components/PlannerProvider";
 import { readImageManifest } from "../lib/image-manifest";
 
@@ -13,9 +14,11 @@ export default async function RootLayout({ children }) {
   return (
     <html lang="en">
       <body>
-        <PlannerProvider initialManifest={initialManifest}>
-          {children}
-        </PlannerProvider>
+        <AuthGate>
+          <PlannerProvider initialManifest={initialManifest}>
+            {children}
+          </PlannerProvider>
+        </AuthGate>
       </body>
     </html>
   );
