@@ -11,8 +11,8 @@ place,state,core_neighborhood,lat,lon,drive_hrs_from_PIT,tier,notes
 Piran,Slovenia,Old town / Tartini Sq,45.5285,13.5683,REF,reference,LOVED ~10 ground truth
 Bled,Slovenia,Lakefront / town core,46.3683,14.1133,REF,reference,LOVED ~10 ground truth
 Ljubljana,Slovenia,Old town / Preseren Sq riverfront,46.0510,14.5060,REF,reference,liked ~8 ground truth
-Shadyside,PA,Walnut/Highland near Yardley Way,40.4530,-79.9340,0.3,control,COLD ~3 ground truth
-Lawrenceville,PA,Butler St / Industry Public House,40.4660,-79.9610,0.3,control,COLD ~3 ground truth
+Pittsburgh (Shadyside),PA,Walnut/Highland near Yardley Way,40.4530,-79.9340,0.3,control,COLD ~3 ground truth
+Pittsburgh (Lawrenceville),PA,Butler St / Industry Public House,40.4660,-79.9610,0.3,control,COLD ~3 ground truth
 Sewickley,PA,Beaver St downtown,40.5360,-80.1840,0.4,control,unrated test row
 Oakmont,PA,Allegheny River Blvd shops,40.5220,-79.8430,0.4,control,unrated test row
 Verona,PA,Allegheny River Blvd main st,40.5100,-79.8420,0.4,control,unrated test row

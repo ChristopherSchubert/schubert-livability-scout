@@ -58,7 +58,7 @@ export function CityDetail({ cityItem, imageState }) {
 
       <section className="summary-grid">
         <article className="card card-spacious">
-          <p className="eyebrow">Why It Belongs</p>
+          <p className="eyebrow">Why this could be the place</p>
           <h2>{cityItem.name}</h2>
           <p className="body-copy">{cityItem.why}</p>
         </article>
