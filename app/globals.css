@@ -2304,3 +2304,17 @@ button:hover, .button-link:hover {
 .auth-primary:disabled { opacity: 0.5; cursor: not-allowed; }
 .auth-ghost { background: transparent; border: none; color: var(--muted); cursor: pointer; text-decoration: underline; font: inherit; padding: 0; align-self: flex-start; }
 .auth-err { color: #962914; font-size: 0.88rem; margin: 0; }
+
+/* ── Visit-center map picker (Measured panel) ──────────────────────────── */
+.visit-center-tool { margin-top: 1rem; border-top: 1px dashed #d8ccb3; padding-top: 0.8rem; }
+.visit-center-tool > summary { cursor: pointer; font-weight: 700; font-size: 0.92rem; }
+.visit-center-tool > summary:hover { color: var(--accent); }
+.visit-center-help { color: var(--muted); font-size: 0.88rem; line-height: 1.5; margin: 0.5rem 0 0.75rem; }
+.map-picker { display: flex; flex-direction: column; gap: 0.6rem; }
+.map-picker-canvas { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+.map-picker-bar { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; flex-wrap: wrap; }
+.map-picker-coords { font-family: ui-monospace, monospace; font-size: 0.85rem; color: var(--muted); }
+.map-picker-actions { display: flex; gap: 0.5rem; }
+.map-picker-actions .primary { background: var(--accent); color: #fff; border-color: var(--accent); font-weight: 700; padding: 0.5rem 0.9rem; }
+.map-picker-actions .ghost { background: transparent; border: 1px solid var(--border); padding: 0.5rem 0.9rem; border-radius: 10px; cursor: pointer; }
+.map-picker-msg { margin: 0; font-size: 0.88rem; color: var(--text); background: #fbf6ea; border-radius: 8px; padding: 0.5rem 0.7rem; }

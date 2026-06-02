@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import dynamic from "next/dynamic";
 import {
   cityImageQuery,
   cityVisitWindow,
@@ -117,12 +118,19 @@ export function CityDetail({ cityItem, imageState }) {
   );
 }
 
+// Draggable map loaded client-only (Leaflet needs window).
+const MapPicker = dynamic(() => import("./MapPicker"), { ssr: false });
+
 // MeasuredPanel — the full cited objective taxonomy, grouped by the five
 // axes. Every metric shows its value + as-of date + source, or "not yet
-// measured." Nothing here is hand-entered: values arrive only from the
-// measurement pipeline, each with its own citation.
+// measured." Plus an adjustable visit-center map: move the pin and re-run
+// the measurement routine around the new point.
 function MeasuredPanel({ cityItem }) {
   const metrics = cityItem.measuredMetrics || {};
+  const { updateCity } = usePlanner();
+  const [token, setToken] = useState(null);
+  useEffect(() => { getSupabase().auth.getSession().then(({ data }) => setToken(data.session?.access_token || null)); }, []);
+
   return (
     <section className="panel measured-panel">
       <div className="section-head">
@@ -131,6 +139,22 @@ function MeasuredPanel({ cityItem }) {
           <p>Objective data points, grouped by axis. Each is computed from a single cited source — never hand-scored. Empty until this city is run through the pipeline.</p>
         </div>
       </div>
+
+      <details className="visit-center-tool">
+        <summary>Visit center — {cityItem.lat != null ? `${cityItem.lat.toFixed(4)}, ${cityItem.lon.toFixed(4)}` : "not set"} · drag to adjust & re-measure</summary>
+        <p className="visit-center-help">This pin is where you'd <em>base a visit</em> — the measurement runs in a 700m core around it. Drag it (or click the map) to the spot you'd actually want to stay, then re-measure.</p>
+        <MapPicker
+          cityId={cityItem.id}
+          name={cityItem.name}
+          lat={cityItem.lat}
+          lon={cityItem.lon}
+          accessToken={token}
+          onMeasured={(d) => {
+            // Reflect the new center + composite locally without a reload.
+            if (d.center) updateCity(cityItem.id, { lat: d.center.lat, lon: d.center.lon, measured: d.measured });
+          }}
+        />
+      </details>
       <div className="measured-grid">
         {metricTaxonomy.map((group) => (
           <article key={group.axis} className="measured-group">
