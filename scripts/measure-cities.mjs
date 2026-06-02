@@ -79,25 +79,31 @@ async function relief(lat, lon) {
 
 // ── POIs + street fabric + water, one Overpass call ─────────────────────────
 async function osmMetrics(lat, lon) {
-  const q = `[out:json][timeout:60];
-    (node["amenity"~"^(cafe|restaurant|bar|pub|pharmacy)$"](around:${RADIUS},${lat},${lon});
-     node["shop"~"^(bakery|butcher|greengrocer|supermarket|convenience)$"](around:${RADIUS},${lat},${lon}););
+  // nwr = nodes + ways + relations (POIs are often mapped as building areas,
+  // not just points). Broad tag set: coffee shows up under amenity=cafe,
+  // shop=coffee, and cuisine~coffee; "third places" include bakeries, delis,
+  // tea, ice cream; social includes restaurants/bars/pubs.
+  const q = `[out:json][timeout:90];
+    (nwr["amenity"~"^(cafe|restaurant|bar|pub|biergarten|fast_food|ice_cream|food_court)$"](around:${RADIUS},${lat},${lon});
+     nwr["shop"~"^(coffee|bakery|pastry|tea|deli|greengrocer|supermarket|convenience|butcher|chocolate)$"](around:${RADIUS},${lat},${lon});
+     nwr["cuisine"~"coffee"](around:${RADIUS},${lat},${lon});
+     nwr["amenity"="pharmacy"](around:${RADIUS},${lat},${lon}););
     out tags;
     way["highway"](around:${RADIUS},${lat},${lon});
     out geom;`;
   const d = await overpass(q);
   if (!d) return {};
   const out = {};
-  // POIs
-  let cafe = 0, rest = 0, bar = 0, pharm = 0, grocery = 0, daily = 0;
+  // POIs — classify each element once. Café = the coffee/linger set.
+  let cafe = 0, rest = 0, bar = 0, daily = 0;
   for (const el of d.elements) {
-    const a = el.tags?.amenity, s = el.tags?.shop;
-    if (a === "cafe") cafe++;
-    else if (a === "restaurant") rest++;
-    else if (a === "bar" || a === "pub") bar++;
-    else if (a === "pharmacy") { pharm++; daily++; }
-    if (s === "supermarket" || s === "convenience" || s === "greengrocer") { grocery++; daily++; }
-    if (s === "bakery" || s === "butcher") daily++;
+    if (el.type === "way" && el.geometry) continue; // streets handled below
+    const a = el.tags?.amenity, s = el.tags?.shop, cu = el.tags?.cuisine || "";
+    const isCafe = a === "cafe" || s === "coffee" || s === "tea" || /coffee/.test(cu);
+    if (isCafe) cafe++;
+    else if (a === "restaurant" || a === "fast_food" || a === "food_court") rest++;
+    else if (a === "bar" || a === "pub" || a === "biergarten") bar++;
+    if (["bakery", "pastry", "deli", "greengrocer", "supermarket", "convenience", "butcher"].includes(s) || a === "pharmacy") daily++;
   }
   out.cafe_n = cafe; out.rest_n = rest; out.bar_n = bar; out.daily_needs_n = daily;
   // Streets: length, mean block, car-free fraction, intersection density
@@ -125,11 +131,17 @@ async function osmMetrics(lat, lon) {
 }
 
 async function nearestWater(lat, lon) {
+  // Broad water detection: lakes/ponds (natural=water), the sea
+  // (natural=coastline), tidal rivers & estuaries (waterway=riverbank,
+  // water=river), and bays — so waterfront river towns like Beaufort or
+  // Annapolis aren't mis-measured as landlocked.
   const q = `[out:json][timeout:30];
-    (way["natural"="water"](around:8000,${lat},${lon});
+    (nwr["natural"="water"](around:8000,${lat},${lon});
      way["natural"="coastline"](around:8000,${lat},${lon});
-     relation["natural"="water"](around:8000,${lat},${lon}););
-    out center 30;`;
+     nwr["water"~"river|lake|lagoon|tidal"](around:8000,${lat},${lon});
+     way["waterway"="riverbank"](around:8000,${lat},${lon});
+     nwr["natural"~"bay|strait"](around:8000,${lat},${lon}););
+    out center 40;`;
   const d = await overpass(q);
   if (!d) return null;
   let best = null;
@@ -195,7 +207,9 @@ async function main() {
 
     await c.query("update cities set measured_metrics = measured_metrics || $1::jsonb, measured = $2, measured_at = $3 where id = $4",
       [JSON.stringify(metrics), measured, asOf, city.id]);
-    console.log(`✓ composite ${measured ?? "?"} | café ${osm.cafe_n ?? "?"} relief ${rel.std ?? "?"}m water ${water ?? "?"}m carfree ${osm.carfree_frac ?? "?"}`);
+    const social = (osm.cafe_n || 0) + (osm.rest_n || 0) + (osm.bar_n || 0);
+    const flag = social === 0 ? "  ⚠ ZERO social POIs — almost certainly a bad pin, review coords" : "";
+    console.log(`✓ composite ${measured ?? "?"} | café ${osm.cafe_n ?? "?"} rest ${osm.rest_n ?? "?"} bar ${osm.bar_n ?? "?"} | relief ${rel.std ?? "?"}m water ${water ?? "?"}m carfree ${osm.carfree_frac ?? "?"}${flag}`);
   }
   await c.end();
   console.log("\ndone.");
