@@ -55,22 +55,20 @@ export async function POST(request) {
       }
     }
 
-    // Fast location-core (no keys).
-    const core = await measureAround(center.lat, center.lon, { asOf });
-    let newMetrics = { ...core.metrics };
-
-    // Optional keyed/slow layers.
-    if (full) {
-      const censusKey = process.env.CENSUS_API_KEY;
-      const wsKey = process.env.WALKSCORE_API_KEY;
-      const [cen, ws, cl, bc] = await Promise.all([
-        censusKey ? measureCensus(center.lat, center.lon, censusKey, { asOf }) : Promise.resolve({ metrics: {} }),
-        wsKey ? measureWalkScore(center.lat, center.lon, city.name, wsKey, { asOf }) : Promise.resolve({}),
-        measureClimate(center.lat, center.lon, { asOf }),
-        measureBuildingCoverage(center.lat, center.lon),
-      ]);
-      newMetrics = { ...newMetrics, ...cen.metrics, ...ws, ...cl.metrics, ...bc };
-    }
+    // A moved pin is a new place — re-measure EVERY layer for the new point.
+    // `full:false` can opt down to the no-key core, but default is everything,
+    // and all layers run concurrently so wall-clock ≈ the slowest single call.
+    const doFull = full !== false;
+    const censusKey = process.env.CENSUS_API_KEY;
+    const wsKey = process.env.WALKSCORE_API_KEY;
+    const [core, cen, ws, cl, bc] = await Promise.all([
+      measureAround(center.lat, center.lon, { asOf }),
+      doFull && censusKey ? measureCensus(center.lat, center.lon, censusKey, { asOf }) : Promise.resolve({ metrics: {} }),
+      doFull && wsKey ? measureWalkScore(center.lat, center.lon, city.name, wsKey, { asOf }) : Promise.resolve({}),
+      doFull ? measureClimate(center.lat, center.lon, { asOf }) : Promise.resolve({ metrics: {} }),
+      doFull ? measureBuildingCoverage(center.lat, center.lon) : Promise.resolve({}),
+    ]);
+    const newMetrics = { ...core.metrics, ...cen.metrics, ...ws, ...cl.metrics, ...bc };
 
     // Merge over existing so untouched layers survive; recompute composite.
     const merged = { ...(city.measured_metrics || {}), ...newMetrics };

@@ -44,7 +44,8 @@ export default function MapPicker({ cityId, name, lat, lon, accessToken, onMeasu
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Measure failed");
       if (data.center) setPos([data.center.lat, data.center.lon]);
-      setMsg(`Done — composite ${data.measured ?? "?"} · café ${data.raw?.cafe_n ?? "?"} · water ${data.raw?.water_dist_m ?? "?"}m`);
+      const r = data.raw || {};
+      setMsg(`All metrics refreshed — composite ${data.measured ?? "?"} · Walk Score ${r.walk_score ?? "?"} · café ${r.cafe_n ?? "?"} · water ${r.water_dist_m ?? "?"}m · median ${r.median_price_usd ? "$" + r.median_price_usd.toLocaleString() : "?"}`);
       onMeasured?.(data);
     } catch (e) {
       setMsg(e.message || "Measure failed");
@@ -74,10 +75,10 @@ export default function MapPicker({ cityId, name, lat, lon, accessToken, onMeasu
         <span className="map-picker-coords">{pos[0].toFixed(5)}, {pos[1].toFixed(5)}</span>
         <div className="map-picker-actions">
           <button type="button" className="ghost" disabled={busy} onClick={() => remeasure({ recenter: true })}>
-            Auto-center on nightlife
+            Auto-center on the action
           </button>
           <button type="button" className="primary" disabled={busy} onClick={() => remeasure()}>
-            {busy ? "Measuring…" : "Re-measure here"}
+            {busy ? "Re-measuring all metrics…" : "Re-measure here"}
           </button>
         </div>
       </div>
