@@ -37,16 +37,17 @@ function peakIcon(p) {
 // Fit the map to show the center plus the water target / candidate bodies, so
 // the whole "distance to water" line is visible. Re-fits only when the water
 // data changes (not on pan), and never while editing the center.
-function FitWater({ center, waterPoint, cands, editing }) {
+function FitWater({ center, waterPoint, cands, extra, editing }) {
   const map = useMap();
-  const key = JSON.stringify([waterPoint || null, (cands || []).map((b) => b.point), editing]);
+  const key = JSON.stringify([waterPoint || null, (cands || []).map((b) => b.point), extra || null, editing]);
   useEffect(() => {
     if (editing) return;
     const pts = [center];
     if (waterPoint) pts.push([waterPoint.lat, waterPoint.lon]);
     if (cands) for (const b of cands) pts.push([b.point.lat, b.point.lon]);
+    if (extra) for (const p of extra) pts.push(p);
     if (pts.length < 2) return;
-    map.fitBounds(pts, { padding: [30, 30], maxZoom: 15 });
+    map.fitBounds(pts, { padding: [40, 40], maxZoom: 15 });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [key]);
   return null;
@@ -78,6 +79,12 @@ export default function MapPicker({ cityId, name, lat, lon, accessToken, onMeasu
 
   const move = (la, lo) => { if (editing) { setPos([la, lo]); setSelIdx(null); setMsg(""); } };
   const moved = pos[0] !== committed[0] || pos[1] !== committed[1];
+
+  // Horizon peaks placed around the center: top 6, radius staggered by rank so
+  // same-direction peaks fan out along the bearing rather than stacking.
+  const peakDisplay = (horizon?.peaks || []).slice(0, 6).map((p, i) => ({
+    p, pos: offsetPoint(committed[0], committed[1], p.az, 900 + i * 240),
+  }));
 
   function cancel() { setPos(committed); setEditing(false); setMsg(""); setCandidates(null); setSelIdx(null); }
 
@@ -162,10 +169,12 @@ export default function MapPicker({ cityId, name, lat, lon, accessToken, onMeasu
             </CircleMarker>
           )) : null}
           {/* Horizon compass: visible named peaks ringed around the center by
-              direction (clamped to a readable radius; true distance in label). */}
-          {!editing && horizon?.peaks?.length ? horizon.peaks.map((p, i) => (
-            <Marker key={`pk${i}`} position={offsetPoint(committed[0], committed[1], p.az, 1200)} icon={peakIcon(p)} interactive={false} />
-          )) : null}
+              direction. Radius is staggered by rank so peaks in the same
+              direction fan out along the bearing instead of stacking; true
+              distance is in the label. */}
+          {!editing && peakDisplay.map(({ p, pos }, i) => (
+            <Marker key={`pk${i}`} position={pos} icon={peakIcon(p)} interactive={false} />
+          ))}
           <Marker
             position={pos}
             draggable={editing}
@@ -173,7 +182,7 @@ export default function MapPicker({ cityId, name, lat, lon, accessToken, onMeasu
             eventHandlers={{ dragend: (e) => { const p = e.target.getLatLng(); move(p.lat, p.lng); } }}
           />
           {editing ? <ClickToMove onMove={move} /> : null}
-          <FitWater center={committed} waterPoint={waterPoint} cands={waterCands} editing={editing} />
+          <FitWater center={committed} waterPoint={waterPoint} cands={waterCands} extra={peakDisplay.map((d) => d.pos)} editing={editing} />
         </MapContainer>
         {editing ? <span className="map-picker-editing-tag">Editing — pick a numbered core, drag the pin, or click the map</span> : null}
       </div>
