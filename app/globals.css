@@ -1156,6 +1156,13 @@ button:hover, .button-link:hover {
   padding: 0.4rem 0.85rem;
   font-size: 0.88rem;
 }
+.funnel-header > .primary:disabled {
+  background: #d8ccb3;
+  border-color: #d8ccb3;
+  color: #fffdf8;
+  cursor: not-allowed;
+  opacity: 0.85;
+}
 .funnel-filters {
   display: flex;
   flex-wrap: wrap;

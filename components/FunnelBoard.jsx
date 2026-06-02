@@ -106,10 +106,8 @@ export default function FunnelBoard({ focusStage }) {
         <button
           type="button"
           className="primary"
-          onClick={() => {
-            const next = addCity();
-            router.push(`/cities/${citySlug(next)}`);
-          }}
+          disabled
+          title="Adding candidates is paused"
         >
           + Add candidate
         </button>
