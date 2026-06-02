@@ -734,7 +734,13 @@ function Field({ label, children }) {
 
 
 function placeholderImage(label) {
-  return `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800"><rect width="1200" height="800" fill="#ece3d4"/><text x="60" y="390" font-family="Arial" font-size="42" fill="#5f5a52">${escapeHtml(label.slice(0, 70))}</text></svg>`)}`;
+  // Center the city name in the SVG so it stays visible even when the hero is
+  // cropped by `object-fit: cover` on narrow viewports. Shrink the font for
+  // longer names so a 30-character title like "Cincinnati (Over-the-Rhine), OH"
+  // still fits comfortably within the 1200×800 canvas.
+  const text = escapeHtml((label || "").slice(0, 70));
+  const fontSize = label.length > 28 ? 36 : label.length > 20 ? 44 : 56;
+  return `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800"><rect width="1200" height="800" fill="#ece3d4"/><text x="600" y="410" text-anchor="middle" font-family="Arial" font-size="${fontSize}" fill="#5f5a52">${text}</text></svg>`)}`;
 }
 
 function escapeHtml(value) {
