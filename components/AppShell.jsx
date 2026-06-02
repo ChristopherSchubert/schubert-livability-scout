@@ -11,7 +11,7 @@ import { usePlanner } from "./PlannerProvider";
 // not a stage filter.
 const NAV_MODES = [
   { id: "board",     href: "/board",     label: "Board",     help: "Kanban view of where every candidate stands.", stageId: null },
-  { id: "calibrate", href: "/calibrate", label: "Calibrate", help: "Tune weights, see candidates ranked against benchmarks.", stageId: "calibrate" },
+  { id: "calibrate", href: "/calibrate", label: "Ranking",   help: "Sortable table of candidates ranked by measured fit.", stageId: "calibrate" },
   { id: "visit",     href: "/visit",     label: "Visit",     help: "Trips you've planned or are on.", stageId: "visit" },
   { id: "decide",    href: "/decide",    label: "Decide",    help: "Cities back from a trip, awaiting their survey.", stageId: "decide" },
   { id: "decided",   href: "/decided",   label: "Decided",   help: "Archive of verdicts you've made.", stageId: "decided" },
@@ -61,7 +61,7 @@ export default function AppShell({ activeMode, activeStage, cityItem, cityNav, c
 }
 
 function TopBar({ activeMode }) {
-  const { planner, exportPlanner, replacePlanner, saveState, hydrated } = usePlanner();
+  const { exportPlanner, replacePlanner, saveState, hydrated } = usePlanner();
 
   return (
     <header className="topbar-v2">
@@ -75,11 +75,6 @@ function TopBar({ activeMode }) {
 
       <nav className="stage-nav" aria-label="Workflow modes">
         {NAV_MODES.map((mode) => {
-          // Board has no count (it's everything). Other modes count cities in
-          // their corresponding stage so you see "Visit 3" / "Decide 1".
-          const count = mode.stageId
-            ? planner.cities.filter((cityItem) => cityStage(cityItem) === mode.stageId).length
-            : null;
           const active = mode.id === activeMode;
           const stageClass = mode.stageId ? `stage-${mode.stageId}` : "stage-board";
           return (
@@ -90,7 +85,6 @@ function TopBar({ activeMode }) {
               title={mode.help}
             >
               <span className="stage-tab-label">{mode.label}</span>
-              {count !== null ? <span className="stage-tab-count">{count}</span> : null}
             </Link>
           );
         })}
