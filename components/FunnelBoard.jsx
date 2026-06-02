@@ -1,53 +1,68 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import {
   STAGES,
-  averageScore,
   cityImageQuery,
   cityStage,
   citySlug,
-  normalizeMatrix,
+  weightedAxisScore,
 } from "../lib/planner-data";
 import AppShell from "./AppShell";
 import { appendBust, resolveImage, usePlanner } from "./PlannerProvider";
 
 /**
- * FunnelBoard — the new home screen.
+ * FunnelBoard — kanban over the funnel stages.
  *
- * The current Selection Board treats every city as equal. But the user's real
- * question is "where is each candidate in my thinking?" — so the board's
- * columns are the funnel stages themselves. A city's stage is derived from
- * the existing status/decision fields; advance/eliminate buttons rewrite
- * those fields through the provider, so we get the new IA without a schema
- * migration.
+ * Each stage is a drop column; cards are draggable between them (drops call
+ * setCityStage). Calibration/reference places are hidden by default (toggle to
+ * show). Cards are compact so 60+ candidates don't crowd; ranking inside each
+ * column is by the measured Overall score, same engine as Calibrate.
  */
 export default function FunnelBoard({ focusStage }) {
   const router = useRouter();
   const { planner, imageState, addCity, advanceCityStage, setCityStage, updateCity } = usePlanner();
   const [query, setQuery] = useState("");
+  const [hideCalibration, setHideCalibration] = useState(true);
+  const [dragOver, setDragOver] = useState(null);
+
+  const calCount = planner.cities.filter((c) => c.isCalibration).length;
+  const visibleCities = hideCalibration ? planner.cities.filter((c) => !c.isCalibration) : planner.cities;
 
   const grouped = useMemo(() => {
     const buckets = Object.fromEntries(STAGES.map((stage) => [stage.id, []]));
-    planner.cities.forEach((cityItem) => {
-      buckets[cityStage(cityItem)].push(cityItem);
-    });
-    Object.values(buckets).forEach((bucket) => {
-      bucket.sort((a, b) => averageScore(normalizeMatrix(b.matrix, b.name)) - averageScore(normalizeMatrix(a.matrix, a.name)));
-    });
+    for (const cityItem of visibleCities) buckets[cityStage(cityItem)].push(cityItem);
+    // Sort each column by Overall (measured), highest first; unscored to the bottom.
+    const equal = Object.fromEntries(["setting","aliveness","fabric","realness","january"].map((k) => [k, 1]));
+    for (const list of Object.values(buckets)) {
+      list.sort((a, b) => (weightedAxisScore(b, equal) ?? -1) - (weightedAxisScore(a, equal) ?? -1));
+    }
     return buckets;
-  }, [planner.cities]);
+  }, [visibleCities]);
 
   const visibleStages = focusStage ? STAGES.filter((stage) => stage.id === focusStage) : STAGES;
-  const totalForFocus = focusStage ? (grouped[focusStage] || []).length : planner.cities.length;
+  const totalForFocus = focusStage ? (grouped[focusStage] || []).length : visibleCities.length;
 
   const matches = useMemo(() => {
     if (!query.trim()) return null;
     const needle = query.trim().toLowerCase();
-    return planner.cities.filter((cityItem) => cityItem.name.toLowerCase().includes(needle));
-  }, [query, planner.cities]);
+    return visibleCities.filter((cityItem) => cityItem.name.toLowerCase().includes(needle));
+  }, [query, visibleCities]);
+
+  // Drag handlers — set/clear the dataTransfer, highlight column under cursor,
+  // and on drop, move the card by writing the column's stage onto the city.
+  function onCardDragStart(e, cityItem) {
+    e.dataTransfer.setData("text/plain", cityItem.id);
+    e.dataTransfer.effectAllowed = "move";
+  }
+  function onColDragOver(e, stageId) { e.preventDefault(); e.dataTransfer.dropEffect = "move"; setDragOver(stageId); }
+  function onColDragLeave(stageId) { setDragOver((s) => (s === stageId ? null : s)); }
+  function onColDrop(e, stageId) {
+    e.preventDefault(); setDragOver(null);
+    const id = e.dataTransfer.getData("text/plain");
+    if (id) setCityStage(id, stageId);
+  }
 
   return (
     <AppShell activeMode="board">
@@ -57,8 +72,8 @@ export default function FunnelBoard({ focusStage }) {
           <h1>{focusStage ? STAGES.find((stage) => stage.id === focusStage)?.label : "Where each candidate stands"}</h1>
           <p className="canvas-sub">
             {focusStage
-              ? `${totalForFocus} ${totalForFocus === 1 ? "city" : "cities"} in this stage. Advance to move it forward in the funnel, or open it to keep working.`
-              : `${planner.cities.length} candidates across ${STAGES.length} stages. Scan the columns to see where your thinking really is.`}
+              ? `${totalForFocus} ${totalForFocus === 1 ? "city" : "cities"} in this stage. Drag a card to another column to move it.`
+              : `${visibleCities.length} candidates across ${STAGES.length} stages. Drag a card to move it; click to open.`}
           </p>
         </div>
         <div className="funnel-tools">
@@ -82,6 +97,13 @@ export default function FunnelBoard({ focusStage }) {
         </div>
       </section>
 
+      {calCount > 0 ? (
+        <label className="cal-toggle">
+          <input type="checkbox" checked={hideCalibration} onChange={(e) => setHideCalibration(e.target.checked)} />
+          Hide calibration / reference places ({calCount})
+        </label>
+      ) : null}
+
       {matches ? (
         <section className="search-results">
           {matches.length === 0 ? (
@@ -96,7 +118,7 @@ export default function FunnelBoard({ focusStage }) {
                   onOpen={() => router.push(`/cities/${citySlug(cityItem)}`)}
                   onAdvance={() => advanceCityStage(cityItem.id)}
                   onSendBack={() => setCityStage(cityItem.id, "shortlist")}
-                  onCycleHero={(src) => updateCity(cityItem.id, { heroImage: src })}
+                  onDragStart={(e) => onCardDragStart(e, cityItem)}
                 />
               ))}
             </div>
@@ -107,8 +129,15 @@ export default function FunnelBoard({ focusStage }) {
           {visibleStages.map((stage) => {
             const cities = grouped[stage.id] || [];
             const isEmpty = cities.length === 0;
+            const isOver = dragOver === stage.id;
             return (
-              <article key={stage.id} className={`funnel-column stage-${stage.id}${isEmpty ? " funnel-column-empty-slim" : ""}`}>
+              <article
+                key={stage.id}
+                className={`funnel-column stage-${stage.id}${isEmpty ? " funnel-column-empty-slim" : ""}${isOver ? " drag-over" : ""}`}
+                onDragOver={(e) => onColDragOver(e, stage.id)}
+                onDragLeave={() => onColDragLeave(stage.id)}
+                onDrop={(e) => onColDrop(e, stage.id)}
+              >
                 <header className="funnel-column-head">
                   <div>
                     <h2>{stage.label}</h2>
@@ -128,7 +157,7 @@ export default function FunnelBoard({ focusStage }) {
                         onOpen={() => router.push(`/cities/${citySlug(cityItem)}`)}
                         onAdvance={() => advanceCityStage(cityItem.id)}
                         onSendBack={() => setCityStage(cityItem.id, "shortlist")}
-                        onCycleHero={(src) => updateCity(cityItem.id, { heroImage: src })}
+                        onDragStart={(e) => onCardDragStart(e, cityItem)}
                         stage={stage.id}
                       />
                     ))}
@@ -143,25 +172,30 @@ export default function FunnelBoard({ focusStage }) {
   );
 }
 
-function CityCard({ cityItem, imageState, onOpen, onAdvance, onSendBack, stage }) {
-  const scores = normalizeMatrix(cityItem.matrix, cityItem.name);
+// Compact draggable kanban card.
+function CityCard({ cityItem, imageState, onOpen, onAdvance, onSendBack, onDragStart, stage }) {
   const heroQuery = cityImageQuery(cityItem.name, cityItem.stayZone, cityItem.heartIntersection);
   const heroSrc = resolveImage(cityItem.heroImage, heroQuery, imageState);
-  const avg = averageScore(scores).toFixed(1);
+  const equal = { setting: 1, aliveness: 1, fabric: 1, realness: 1, january: 1 };
+  const score = weightedAxisScore(cityItem, equal);
   const stageId = stage || cityStage(cityItem);
   const isDecided = stageId === "decided";
 
   return (
-    <article className={`funnel-card stage-${stageId}`}>
+    <article
+      className={`funnel-card stage-${stageId}`}
+      draggable
+      onDragStart={onDragStart}
+    >
       <button type="button" className="funnel-card-body" onClick={onOpen}>
-        <div className="funnel-card-media">
-          {heroSrc ? <img className="funnel-card-image" src={appendBust(heroSrc, imageState.version)} alt="" /> : <div className="funnel-card-placeholder" aria-hidden="true">{cityItem.name.slice(0, 1)}</div>}
-          <span className="funnel-card-score" title="Unweighted average">{avg}</span>
-        </div>
+        {heroSrc
+          ? <img className="funnel-card-image" src={appendBust(heroSrc, imageState.version)} alt="" />
+          : <div className="funnel-card-placeholder" aria-hidden="true">{cityItem.name.slice(0, 1)}</div>}
         <div className="funnel-card-copy">
           <strong>{cityItem.name}</strong>
-          <span className="funnel-card-meta">{cityItem.stayZone || "No stay zone"}</span>
+          <span className="funnel-card-meta">{cityItem.stayZone || "—"}</span>
         </div>
+        <span className="funnel-card-score" title="Overall measured score (equal weights)">{score != null ? score.toFixed(1) : "—"}</span>
       </button>
       <footer className="funnel-card-foot">
         {isDecided ? (
@@ -169,7 +203,7 @@ function CityCard({ cityItem, imageState, onOpen, onAdvance, onSendBack, stage }
         ) : (
           <>
             <button type="button" className="ghost" onClick={onSendBack} title="Send back to Shortlist">↺</button>
-            <button type="button" className="advance" onClick={onAdvance} title="Advance to next stage">Advance →</button>
+            <button type="button" className="advance" onClick={onAdvance} title="Advance to next stage">→</button>
           </>
         )}
       </footer>
@@ -180,14 +214,8 @@ function CityCard({ cityItem, imageState, onOpen, onAdvance, onSendBack, stage }
 function EmptyColumn({ stage }) {
   return (
     <div className="funnel-column-empty">
-      <p>Nothing in {stage.label.toLowerCase()} yet.</p>
+      <p>Drop a card here or use Advance →</p>
       <small>{stage.help}</small>
     </div>
   );
-}
-
-function truncate(value, max) {
-  const text = String(value || "");
-  if (text.length <= max) return text;
-  return `${text.slice(0, max - 1).trimEnd()}…`;
 }

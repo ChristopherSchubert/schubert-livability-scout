@@ -1181,10 +1181,11 @@ button:hover, .button-link:hover {
    column with many cards renders as a comfortable 2- or 3-card row instead
    of an infinite vertical stack. */
 .funnel-column-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 0.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
 }
+.funnel-column.drag-over { background: #f1f7f2; box-shadow: 0 0 0 2px var(--accent) inset; }
 .funnel-column.stage-shortlist { border-top-color: var(--stage-shortlist); }
 .funnel-column.stage-calibrate { border-top-color: var(--stage-calibrate); }
 .funnel-column.stage-visit     { border-top-color: var(--stage-visit); }
@@ -1228,87 +1229,81 @@ button:hover, .button-link:hover {
 .funnel-column-empty p { margin: 0; font-weight: 600; color: var(--text); font-size: 0.85rem; }
 .funnel-column-empty small { display: block; margin-top: 0.15rem; font-size: 0.74rem; }
 
+/* Compact draggable kanban card — thumb left, copy middle, score right. */
 .funnel-card {
   display: flex;
   flex-direction: column;
   background: #fffdf8;
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 10px;
   overflow: hidden;
+  cursor: grab;
 }
+.funnel-card:active { cursor: grabbing; }
 .funnel-card-body {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  gap: 0.55rem;
   text-align: left;
   background: transparent;
   border: none;
-  padding: 0;
+  padding: 0.4rem 0.55rem;
   cursor: pointer;
   width: 100%;
 }
-.funnel-card-body:hover .funnel-card-copy { background: #fbf3e0; }
-.funnel-card-media {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 16 / 10;
-  background: #f1ead9;
-  overflow: hidden;
-}
-.funnel-card-image {
-  width: 100%;
-  height: 100%;
+.funnel-card-body:hover { background: #fbf3e0; }
+.funnel-card-image, .funnel-card-placeholder {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
   object-fit: cover;
-  display: block;
-}
-.funnel-card-placeholder {
-  width: 100%;
-  height: 100%;
+  background: #f1ead9;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 700;
-  font-size: 1.4rem;
   color: var(--muted);
-}
-.funnel-card-score {
-  position: absolute;
-  top: 0.45rem;
-  right: 0.45rem;
-  font-weight: 800;
-  background: rgba(255, 253, 248, 0.94);
-  color: var(--accent);
-  padding: 0.18rem 0.55rem;
-  border-radius: 999px;
-  font-size: 0.85rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
 }
 .funnel-card-copy {
   display: flex;
   flex-direction: column;
-  gap: 0.15rem;
-  padding: 0.55rem 0.7rem 0.65rem;
+  gap: 0.05rem;
+  flex: 1;
   min-width: 0;
 }
 .funnel-card-copy strong {
-  font-size: 0.95rem;
+  font-size: 0.86rem;
   line-height: 1.25;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 .funnel-card-meta {
-  font-size: 0.76rem;
+  font-size: 0.72rem;
   color: var(--muted);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+.funnel-card-score {
+  flex: none;
+  font-weight: 700;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.86rem;
+  background: #f1f7f2;
+  padding: 0.15rem 0.45rem;
+  border-radius: 6px;
+  min-width: 2.2em;
+  text-align: center;
 }
 .funnel-card-foot {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 0.4rem;
-  padding: 0.35rem 0.55rem;
+  padding: 0.2rem 0.45rem;
   border-top: 1px solid #f0e6d0;
   background: #fbf6ea;
 }
@@ -1324,12 +1319,14 @@ button:hover, .button-link:hover {
 .funnel-card-foot .advance {
   background: var(--accent);
   color: white;
-  border-color: var(--accent);
+  border: 1px solid var(--accent);
   font-weight: 700;
-  padding: 0.3rem 0.7rem;
-  font-size: 0.85rem;
-  border-radius: 8px;
+  padding: 0.15rem 0.55rem;
+  font-size: 0.78rem;
+  border-radius: 6px;
+  cursor: pointer;
 }
+.funnel-card-foot .ghost { padding: 0.15rem 0.4rem; font-size: 0.85rem; }
 .decision-chip {
   font-size: 0.78rem;
   font-weight: 700;
