@@ -12,8 +12,8 @@ import {
   imageResearchBrief,
   metricTaxonomy,
   metricMethod,
-  metricFieldStats,
-  relGoodness,
+  metricScore,
+  metricScoreBands,
   axisRollup,
   surveyComplete,
 } from "../lib/planner-data";
@@ -135,12 +135,10 @@ function MeasuredPanel({ cityItem }) {
   const [token, setToken] = useState(null);
   useEffect(() => { getSupabase().auth.getSession().then(({ data }) => setToken(data.session?.access_token || null)); }, []);
 
-  // Distribution of every metric across the whole candidate field, so each
-  // value can be placed in context. Axis rollups average the relative
-  // goodness of that axis's measured metrics (0–10, relative to the field).
-  const stats = useMemo(() => metricFieldStats(planner.cities), [planner.cities]);
-  const rollup = useMemo(() => axisRollup(cityItem, stats), [cityItem, stats]);
-  const fieldN = planner.cities.length;
+  // Each metric scores 0–10 against a FIXED absolute threshold (with a ceiling),
+  // not the candidate field — appreciation saturates, so a big-enough value is
+  // full marks regardless of what rivals score. Axis rollups average those.
+  const rollup = useMemo(() => axisRollup(cityItem), [cityItem]);
 
   // Shared between the map (draws them) and the water picker (lists them).
   const [waterCands, setWaterCands] = useState(null);
@@ -152,7 +150,7 @@ function MeasuredPanel({ cityItem }) {
       <div className="section-head">
         <div>
           <h2>Measured metrics</h2>
-          <p>Objective data points, grouped by axis. Each is computed from one cited source — never hand-scored. The strip shows where this city falls against the other {fieldN} candidates; green = a relative strength, red = a relative weakness. Expand any metric to see how it's computed and what it found here.</p>
+          <p>Objective data points, grouped by axis. Each is computed from one cited source — never hand-scored. The bar is its <strong>0–10 score against a fixed threshold</strong> (not a ranking) — it fills to "good as it matters" and then saturates, so a big-enough value is full marks. Expand any metric for how it's computed and where it lands.</p>
         </div>
       </div>
 
@@ -192,7 +190,8 @@ function MeasuredPanel({ cityItem }) {
               {group.metrics.map((m) => {
                 const dp = metrics[m.key];
                 const value = dp && dp.value != null ? dp.value : null;
-                const st = stats[m.key];
+                const score = metricScore(value, m.key);
+                const band = metricScoreBands[m.key];
                 return (
                   <details key={m.key} className="metric-row">
                     <summary>
@@ -200,7 +199,7 @@ function MeasuredPanel({ cityItem }) {
                       <span className="metric-value">
                         {value != null ? formatMetric(value, m.unit) : <span className="measured-empty">—</span>}
                       </span>
-                      <MetricStrip value={value} metric={m} st={st} unit={m.unit} />
+                      <MetricGauge score={score} />
                       <span className="metric-caret" aria-hidden="true">›</span>
                     </summary>
                     <div className="metric-detail">
@@ -209,9 +208,8 @@ function MeasuredPanel({ cityItem }) {
                         {value != null ? (
                           <>
                             <span>This city: <strong>{formatMetric(value, m.unit)}</strong></span>
-                            {st && st.max !== st.min ? (
-                              <span> · field {formatMetric(st.min, m.unit)}–{formatMetric(st.max, m.unit)}</span>
-                            ) : null}
+                            {score != null ? <span> · scores <strong>{score.toFixed(1)}</strong>/10</span> : null}
+                            {band ? <span> · full at {m.dir >= 0 ? "≥" : "≤"} {formatMetric(band[1], m.unit)}</span> : null}
                             {dp.asOf ? <span> · as of {dp.asOf}</span> : null}
                           </>
                         ) : (
@@ -349,27 +347,16 @@ function AxisScore({ score }) {
   );
 }
 
-// MetricStrip — places this city's value on the min→max range of the whole
-// candidate field. Faint ticks are the other candidates; the bold marker is
-// this city. Tone is direction-aware (green when on the good end for this
-// metric, red on the bad end), so a glance reads strength vs weakness.
-function MetricStrip({ value, metric, st, unit }) {
-  if (value == null) return <span className="mstrip mstrip-na">not measured</span>;
-  if (!st || st.max === st.min) return <span className="mstrip mstrip-solo">only value</span>;
-  const t = (value - st.min) / (st.max - st.min);
-  const g = relGoodness(value, metric, st);
-  const tone = g >= 0.66 ? "good" : g <= 0.34 ? "weak" : "mid";
+// MetricGauge — the metric's ABSOLUTE 0–10 score against its fixed threshold,
+// shown as a fill that saturates at "good as it matters." Not a ranking against
+// other cities; a value at or beyond the threshold reads full, period.
+function MetricGauge({ score }) {
+  if (score == null) return <span className="mgauge mgauge-na">not measured</span>;
+  const tone = score >= 6.6 ? "good" : score <= 3.4 ? "weak" : "mid";
   return (
-    <span
-      className={`mstrip mstrip-${tone}`}
-      title={`${formatMetric(value, unit)} — ${Math.round(g * 100)}th percentile of ${st.values.length} candidates (${metric.dir >= 0 ? "higher" : "lower"} is better)`}
-    >
-      <span className="mstrip-track">
-        {st.values.map((v, i) => (
-          <span key={i} className="mstrip-tick" style={{ left: `${((v - st.min) / (st.max - st.min)) * 100}%` }} />
-        ))}
-        <span className="mstrip-marker" style={{ left: `${t * 100}%` }} />
-      </span>
+    <span className={`mgauge mgauge-${tone}`} title={`scores ${score.toFixed(1)}/10 against a fixed threshold`}>
+      <span className="mgauge-track"><span className="mgauge-fill" style={{ width: `${score * 10}%` }} /></span>
+      <span className="mgauge-num">{score.toFixed(1)}</span>
     </span>
   );
 }

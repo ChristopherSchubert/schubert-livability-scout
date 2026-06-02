@@ -2275,7 +2275,7 @@ button:hover, .button-link:hover {
 .metric-rows { display: flex; flex-direction: column; }
 .metric-row { border-bottom: 1px solid #f1ead9; }
 .metric-row:last-child { border-bottom: none; }
-.metric-row > summary { display: grid; grid-template-columns: minmax(0, 1fr) auto 110px 14px; align-items: center; gap: 0.5rem; padding: 0.4rem 0.1rem; cursor: pointer; list-style: none; font-size: 0.88rem; }
+.metric-row > summary { display: grid; grid-template-columns: minmax(0, 1fr) auto 124px 14px; align-items: center; gap: 0.5rem; padding: 0.4rem 0.1rem; cursor: pointer; list-style: none; font-size: 0.88rem; }
 .metric-row > summary::-webkit-details-marker { display: none; }
 .metric-label { color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .metric-value { font-variant-numeric: tabular-nums; font-weight: 600; color: var(--text); text-align: right; white-space: nowrap; }
@@ -2288,14 +2288,16 @@ button:hover, .button-link:hover {
 .metric-prov a { color: var(--accent); text-decoration: underline; text-decoration-color: #cfe0db; }
 
 /* Distribution strip */
-.mstrip { display: block; }
-.mstrip-track { position: relative; display: block; height: 18px; border-radius: 999px; background: #f0e9d8; }
-.mstrip-tick { position: absolute; top: 50%; width: 1px; height: 7px; transform: translate(-0.5px, -50%); background: #cdbf9f; }
-.mstrip-marker { position: absolute; top: 50%; width: 10px; height: 10px; border-radius: 50%; transform: translate(-5px, -50%); border: 2px solid #fffdf8; box-shadow: 0 0 0 1px rgba(0,0,0,0.08); }
-.mstrip-good .mstrip-marker { background: #4f9d6f; }
-.mstrip-weak .mstrip-marker { background: #cf8b6b; }
-.mstrip-mid .mstrip-marker { background: #c9a94f; }
-.mstrip-na, .mstrip-solo { font-size: 0.72rem; color: #c4b89e; text-align: center; }
+/* Absolute-score gauge: a fill toward the fixed threshold + the score. */
+.mgauge { display: inline-flex; align-items: center; gap: 0.4rem; }
+.mgauge-track { position: relative; flex: 1; height: 7px; border-radius: 999px; background: #f0e9d8; overflow: hidden; }
+.mgauge-fill { position: absolute; inset: 0 auto 0 0; height: 100%; border-radius: 999px; background: #c9a94f; }
+.mgauge-num { font-variant-numeric: tabular-nums; font-size: 0.76rem; font-weight: 600; color: var(--muted); min-width: 1.9em; text-align: right; }
+.mgauge-good .mgauge-fill { background: #4f9d6f; }
+.mgauge-good .mgauge-num { color: #3c7d57; }
+.mgauge-weak .mgauge-fill { background: #cf8b6b; }
+.mgauge-weak .mgauge-num { color: #b86a47; }
+.mgauge-na { font-size: 0.72rem; color: #c4b89e; }
 @media (max-width: 900px) { .measured-grid { grid-template-columns: 1fr; } }
 
 /* ── Visit window (when to visit) ──────────────────────────────────────── */

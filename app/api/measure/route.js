@@ -113,6 +113,7 @@ export async function POST(request) {
       doFull ? measureHorizonPeaks(center.lat, center.lon, { asOf }).catch(() => null) : Promise.resolve(null),
     ]);
     const newMetrics = { ...core.metrics, ...cen.metrics, ...ws, ...cl.metrics, ...bc, ...sky.metrics };
+    if (horizon) newMetrics.mtn_horizon_pct = { value: horizon.occupancyPct, asOf, source: "Open-Meteo elevation + OSM peaks" };
 
     // If a water target is set, the center moved — re-route water to THAT body
     // rather than auto-nearest, so the user's choice persists across re-measures.
