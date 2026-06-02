@@ -151,9 +151,12 @@ function MeasuredPanel({ cityItem }) {
         </div>
       </div>
 
-      <details className="visit-center-tool">
-        <summary>Visit center — {cityItem.lat != null ? `${cityItem.lat.toFixed(4)}, ${cityItem.lon.toFixed(4)}` : "not set"} · drag to adjust & re-measure</summary>
-        <p className="visit-center-help">This pin is where you'd <em>base a visit</em> — the measurement runs in a 700m core around it. Drag it (or click the map) to the spot you'd actually want to stay, then re-measure.</p>
+      <div className="visit-center-tool">
+        <div className="visit-center-head">
+          <strong>Visit center</strong>
+          <span>{cityItem.lat != null ? `${cityItem.lat.toFixed(4)}, ${cityItem.lon.toFixed(4)}` : "not set"}</span>
+        </div>
+        <p className="visit-center-help">This pin is where you'd <em>base a visit</em> — every metric is measured in a 700m core around it. Pan and zoom freely; to move it, hit <strong>Edit center</strong>, drag the pin (or click the map), then <strong>Save new center</strong> to re-measure.</p>
         <MapPicker
           cityId={cityItem.id}
           name={cityItem.name}
@@ -165,7 +168,7 @@ function MeasuredPanel({ cityItem }) {
             if (d.center) updateCity(cityItem.id, { lat: d.center.lat, lon: d.center.lon, measured: d.measured });
           }}
         />
-      </details>
+      </div>
 
       <div className="measured-grid">
         {metricTaxonomy.map((group) => (

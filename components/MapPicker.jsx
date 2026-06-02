@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -19,18 +19,30 @@ function ClickToMove({ onMove }) {
 }
 
 /**
- * MapPicker — drag the marker (or click the map) to set the visit center,
- * then "Re-measure here" runs the measurement routine around the new point
- * via /api/measure and reports the fresh composite. The point you place is
- * "where you'd base a visit," not the admin centroid.
+ * MapPicker — view the visit center on a pannable map. The pin is locked by
+ * default so you can freely pan/zoom; hit "Edit center" to make it draggable
+ * (or click-to-place), then "Save new center" runs the measurement routine
+ * around the new point via /api/measure and reports the fresh composite. The
+ * point you place is "where you'd base a visit," not the admin centroid.
  */
 export default function MapPicker({ cityId, name, lat, lon, accessToken, onMeasured }) {
   const start = (lat != null && lon != null) ? [lat, lon] : [39.5, -98.35];
-  const [pos, setPos] = useState(start);
+  const [committed, setCommitted] = useState(start); // last saved center
+  const [pos, setPos] = useState(start);             // current (maybe-unsaved) pin
+  const [editing, setEditing] = useState(false);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState("");
 
-  const move = (la, lo) => { setPos([la, lo]); setMsg(""); };
+  // Re-sync if the city (or its saved center) changes underneath us.
+  useEffect(() => {
+    setCommitted(start); setPos(start); setEditing(false); setMsg("");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cityId, lat, lon]);
+
+  const move = (la, lo) => { if (editing) { setPos([la, lo]); setMsg(""); } };
+  const moved = pos[0] !== committed[0] || pos[1] !== committed[1];
+
+  function cancel() { setPos(committed); setEditing(false); setMsg(""); }
 
   async function remeasure(opts = {}) {
     setBusy(true); setMsg("Measuring around this point…");
@@ -43,9 +55,10 @@ export default function MapPicker({ cityId, name, lat, lon, accessToken, onMeasu
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Measure failed");
-      if (data.center) setPos([data.center.lat, data.center.lon]);
+      const next = data.center ? [data.center.lat, data.center.lon] : pos;
+      setPos(next); setCommitted(next); setEditing(false);
       const r = data.raw || {};
-      setMsg(`All metrics refreshed — composite ${data.measured ?? "?"} · Walk Score ${r.walk_score ?? "?"} · café ${r.cafe_n ?? "?"} · water ${r.water_dist_m ?? "?"}m · median ${r.median_price_usd ? "$" + r.median_price_usd.toLocaleString() : "?"}`);
+      setMsg(`Saved & re-measured — composite ${data.measured ?? "?"} · Walk Score ${r.walk_score ?? "?"} · café ${r.cafe_n ?? "?"} · water ${r.water_dist_m ?? "?"}m · median ${r.median_price_usd ? "$" + r.median_price_usd.toLocaleString() : "?"}`);
       onMeasured?.(data);
     } catch (e) {
       setMsg(e.message || "Measure failed");
@@ -55,31 +68,44 @@ export default function MapPicker({ cityId, name, lat, lon, accessToken, onMeasu
   }
 
   return (
-    <div className="map-picker">
+    <div className={`map-picker${editing ? " editing" : ""}`}>
       <div className="map-picker-canvas">
-        <MapContainer center={start} zoom={15} style={{ height: "320px", width: "100%" }} scrollWheelZoom>
+        <MapContainer center={start} zoom={15} style={{ height: "340px", width: "100%" }} scrollWheelZoom>
           <TileLayer
             attribution='&copy; OpenStreetMap'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
           <Marker
             position={pos}
-            draggable
+            draggable={editing}
             icon={icon}
             eventHandlers={{ dragend: (e) => { const p = e.target.getLatLng(); move(p.lat, p.lng); } }}
           />
-          <ClickToMove onMove={move} />
+          {editing ? <ClickToMove onMove={move} /> : null}
         </MapContainer>
+        {editing ? <span className="map-picker-editing-tag">Editing — drag the pin or click the map</span> : null}
       </div>
       <div className="map-picker-bar">
-        <span className="map-picker-coords">{pos[0].toFixed(5)}, {pos[1].toFixed(5)}</span>
+        <span className="map-picker-coords">
+          {pos[0].toFixed(5)}, {pos[1].toFixed(5)}
+          {editing && moved ? <em className="map-picker-unsaved"> · unsaved</em> : null}
+        </span>
         <div className="map-picker-actions">
-          <button type="button" className="ghost" disabled={busy} onClick={() => remeasure({ recenter: true })}>
-            Auto-center on the action
-          </button>
-          <button type="button" className="primary" disabled={busy} onClick={() => remeasure()}>
-            {busy ? "Re-measuring all metrics…" : "Re-measure here"}
-          </button>
+          {!editing ? (
+            <button type="button" className="primary" onClick={() => { setMsg(""); setEditing(true); }}>
+              Edit center
+            </button>
+          ) : (
+            <>
+              <button type="button" className="ghost" disabled={busy} onClick={cancel}>Cancel</button>
+              <button type="button" className="ghost" disabled={busy} onClick={() => remeasure({ recenter: true })}>
+                Auto-center on the action
+              </button>
+              <button type="button" className="primary" disabled={busy} onClick={() => remeasure()}>
+                {busy ? "Saving…" : "Save new center"}
+              </button>
+            </>
+          )}
         </div>
       </div>
       {msg ? <p className="map-picker-msg">{msg}</p> : null}

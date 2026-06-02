@@ -2339,11 +2339,15 @@ button:hover, .button-link:hover {
 
 /* ── Visit-center map picker (Measured panel) ──────────────────────────── */
 .visit-center-tool { margin-top: 1rem; border-top: 1px dashed #d8ccb3; padding-top: 0.8rem; }
-.visit-center-tool > summary { cursor: pointer; font-weight: 700; font-size: 0.92rem; }
-.visit-center-tool > summary:hover { color: var(--accent); }
+.visit-center-head { display: flex; align-items: baseline; gap: 0.6rem; }
+.visit-center-head strong { font-size: 0.95rem; }
+.visit-center-head span { font-family: ui-monospace, monospace; font-size: 0.82rem; color: var(--muted); }
 .visit-center-help { color: var(--muted); font-size: 0.88rem; line-height: 1.5; margin: 0.5rem 0 0.75rem; }
 .map-picker { display: flex; flex-direction: column; gap: 0.6rem; }
-.map-picker-canvas { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+.map-picker-canvas { position: relative; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+.map-picker.editing .map-picker-canvas { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(60,125,87,0.18); }
+.map-picker-editing-tag { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); z-index: 500; background: var(--accent); color: #fff; font-size: 0.76rem; font-weight: 600; padding: 0.3rem 0.65rem; border-radius: 999px; box-shadow: 0 2px 8px rgba(0,0,0,0.18); pointer-events: none; }
+.map-picker-unsaved { color: #b86a47; font-style: normal; font-weight: 600; }
 .map-picker-bar { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; flex-wrap: wrap; }
 .map-picker-coords { font-family: ui-monospace, monospace; font-size: 0.85rem; color: var(--muted); }
 .map-picker-actions { display: flex; gap: 0.5rem; }
