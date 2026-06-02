@@ -1116,27 +1116,38 @@ button:hover, .button-link:hover {
 .funnel-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-end;
-  gap: 1.5rem;
+  align-items: center;
+  gap: 1rem;
+  margin-top: -0.5rem;
 }
+.funnel-meta {
+  margin: 0;
+  color: var(--text);
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+.funnel-meta-hint { color: var(--muted); font-weight: 400; }
 .funnel-tools {
   display: flex;
   align-items: center;
   gap: 0.6rem;
 }
+.funnel-tools .cal-toggle { margin: 0; }
 .funnel-search {
-  width: 220px;
-  padding: 0.55rem 0.8rem;
+  width: 200px;
+  padding: 0.4rem 0.75rem;
   border: 1px solid var(--border);
   border-radius: 999px;
   background: #fffdf8;
+  font-size: 0.88rem;
 }
 .funnel-tools .primary {
   background: var(--accent);
   color: white;
   border-color: var(--accent);
   font-weight: 700;
-  padding: 0.55rem 0.95rem;
+  padding: 0.4rem 0.85rem;
+  font-size: 0.88rem;
 }
 
 /* Flex-based layout so empty columns can collapse to a slim rail and full

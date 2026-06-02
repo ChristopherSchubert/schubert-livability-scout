@@ -68,16 +68,19 @@ export default function FunnelBoard({ focusStage }) {
   return (
     <AppShell activeMode="board">
       <section className="funnel-header">
-        <div>
-          <p className="canvas-eyebrow">{focusStage ? STAGES.find((stage) => stage.id === focusStage)?.help : "Decision journal"}</p>
-          <h1>{focusStage ? STAGES.find((stage) => stage.id === focusStage)?.label : "Where each candidate stands"}</h1>
-          <p className="canvas-sub">
-            {focusStage
-              ? `${totalForFocus} ${totalForFocus === 1 ? "city" : "cities"} in this stage. Drag a card to another column to move it.`
-              : `${visibleCities.length} candidates across ${STAGES.length} stages. Drag a card to move it; click to open.`}
-          </p>
-        </div>
+        <p className="funnel-meta">
+          {focusStage
+            ? `${totalForFocus} ${totalForFocus === 1 ? "city" : "cities"} in ${STAGES.find((stage) => stage.id === focusStage)?.label}`
+            : `${visibleCities.length} candidates`}
+          <span className="funnel-meta-hint"> · drag to move · click to open</span>
+        </p>
         <div className="funnel-tools">
+          {calCount > 0 ? (
+            <label className="cal-toggle">
+              <input type="checkbox" checked={hideCalibration} onChange={(e) => setHideCalibration(e.target.checked)} />
+              Hide calibration ({calCount})
+            </label>
+          ) : null}
           <input
             className="funnel-search"
             value={query}
@@ -97,13 +100,6 @@ export default function FunnelBoard({ focusStage }) {
           </button>
         </div>
       </section>
-
-      {calCount > 0 ? (
-        <label className="cal-toggle">
-          <input type="checkbox" checked={hideCalibration} onChange={(e) => setHideCalibration(e.target.checked)} />
-          Hide calibration / reference places ({calCount})
-        </label>
-      ) : null}
 
       {matches ? (
         <section className="search-results">
