@@ -4,7 +4,7 @@ import {
   measureAround, findVisitCenter, findVisitCenters, nearestWaterMulti,
   rankedWaterBodies, distanceToTarget, nearestWater, geocodeHeart,
   measureCensus, measureWalkScore, measureClimate, measureBuildingCoverage, measureSkyline,
-  measureHorizonPeaks, measureWaterHorizon, composite,
+  measureHorizonPeaks, composite,
 } from "../../../lib/measure";
 
 // A few external calls; allow up to the plan ceiling.
@@ -103,7 +103,7 @@ export async function POST(request) {
     const doFull = full !== false;
     const censusKey = process.env.CENSUS_API_KEY;
     const wsKey = process.env.WALKSCORE_API_KEY;
-    const [core, cen, ws, cl, bc, sky, horizon, wh] = await Promise.all([
+    const [core, cen, ws, cl, bc, sky, horizon] = await Promise.all([
       measureAround(center.lat, center.lon, { asOf }),
       doFull && censusKey ? measureCensus(center.lat, center.lon, censusKey, { asOf }) : Promise.resolve({ metrics: {} }),
       doFull && wsKey ? measureWalkScore(center.lat, center.lon, city.name, wsKey, { asOf }) : Promise.resolve({}),
@@ -111,9 +111,8 @@ export async function POST(request) {
       doFull ? measureBuildingCoverage(center.lat, center.lon) : Promise.resolve({}),
       doFull ? measureSkyline(center.lat, center.lon, { asOf }) : Promise.resolve({ metrics: {} }),
       doFull ? measureHorizonPeaks(center.lat, center.lon, { asOf }).catch(() => null) : Promise.resolve(null),
-      doFull ? measureWaterHorizon(center.lat, center.lon, { asOf }).catch(() => ({ metrics: {} })) : Promise.resolve({ metrics: {} }),
     ]);
-    const newMetrics = { ...core.metrics, ...cen.metrics, ...ws, ...cl.metrics, ...bc, ...sky.metrics, ...wh.metrics };
+    const newMetrics = { ...core.metrics, ...cen.metrics, ...ws, ...cl.metrics, ...bc, ...sky.metrics };
     if (horizon) newMetrics.mtn_horizon_pct = { value: horizon.occupancyPct, asOf, source: "Open-Meteo elevation + OSM peaks" };
 
     // If a water target is set, the center moved — re-route water to THAT body
