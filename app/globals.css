@@ -2538,3 +2538,19 @@ button:hover, .button-link:hover {
 .vw-month.now { position: relative; }
 .vw-month.now::before { content: "now"; position: absolute; top: -16px; left: 50%; transform: translateX(-50%); font-size: 0.62rem; font-weight: 700; color: var(--accent); letter-spacing: 0.04em; }
 .vw-month.now .vw-month-label { color: var(--accent); font-weight: 700; }
+
+/* Calibrate filter toolbar */
+.rank-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem 0.8rem; margin: 0 0 0.8rem; padding: 0.7rem 0.85rem; background: #fffdf8; border: 1px solid var(--border); border-radius: 12px; }
+.rank-search { flex: 1 1 220px; min-width: 180px; padding: 0.45rem 0.7rem; border: 1px solid var(--border); border-radius: 8px; font: inherit; background: #fbf6ea; }
+.rank-search:focus { outline: none; border-color: var(--accent); background: #fffdf8; }
+.rank-axis-min { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.78rem; color: var(--muted); padding: 0.2rem 0.45rem; border: 1px solid transparent; border-radius: 8px; cursor: pointer; }
+.rank-axis-min.active { color: var(--text); background: #f1f7f2; border-color: #cfe3d5; }
+.rank-axis-min input[type="range"] { width: 70px; accent-color: var(--accent); cursor: pointer; }
+.rank-axis-min-label { white-space: nowrap; }
+.rank-axis-min-value { font-variant-numeric: tabular-nums; font-weight: 600; min-width: 2.4em; text-align: right; }
+.rank-toggle { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.82rem; color: var(--muted); cursor: pointer; }
+.rank-toggle input { accent-color: var(--accent); }
+.rank-clear { background: transparent; border: 1px solid var(--border); padding: 0.3rem 0.7rem; border-radius: 8px; font-size: 0.8rem; cursor: pointer; color: var(--text); }
+.rank-clear:hover { border-color: var(--accent); color: var(--accent); }
+.rank-count { font-size: 0.78rem; color: var(--muted); padding: 0.5rem 0.85rem 0.3rem; }
+.rt-empty { text-align: center; color: var(--muted); padding: 1.5rem; font-size: 0.9rem; }
