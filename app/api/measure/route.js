@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import {
-  measureAround, findVisitCenter, findVisitCenters, nearestWaterMulti, geocodeHeart,
+  measureAround, findVisitCenter, findVisitCenters, nearestWaterMulti,
+  rankedWaterBodies, distanceToTarget, nearestWater, geocodeHeart,
   measureCensus, measureWalkScore, measureClimate, measureBuildingCoverage, composite,
 } from "../../../lib/measure";
 
@@ -21,7 +22,7 @@ export const maxDuration = 60;
  */
 export async function POST(request) {
   try {
-    const { cityId, lat, lon, recenter, full, scout } = await request.json();
+    const { cityId, lat, lon, recenter, full, scout, water, setWaterTarget } = await request.json();
     if (!cityId) throw new Error("Missing cityId.");
     const auth = request.headers.get("authorization") || "";
     const token = auth.startsWith("Bearer ") ? auth.slice(7) : null;
@@ -34,7 +35,7 @@ export async function POST(request) {
     });
 
     const { data: city, error: readErr } = await supabase.from("cities")
-      .select("id,name,heart_intersection,lat,lon,measured_metrics").eq("id", cityId).single();
+      .select("id,name,heart_intersection,lat,lon,measured_metrics,water_target").eq("id", cityId).single();
     if (readErr) throw new Error(readErr.message);
 
     // Scout mode: return candidate cores (with water distance each) so the user
@@ -50,7 +51,33 @@ export async function POST(request) {
       return NextResponse.json({ ok: true, scout: true, current: { lat: city.lat, lon: city.lon }, candidates });
     }
 
+    // Water mode: list nearby major water bodies around the current center so
+    // the user can choose which one "distance to water" targets. No DB write.
+    if (water) {
+      if (city.lat == null) throw new Error("Set a visit center first.");
+      const bodies = await rankedWaterBodies(city.lat, city.lon);
+      return NextResponse.json({ ok: true, water: true, current: city.water_target || null, bodies });
+    }
+
     const asOf = new Date().toISOString().slice(0, 10);
+
+    // Set/clear the water target: recompute only the water metric to the chosen
+    // body (or auto-nearest when cleared), persist, and return — no full re-run.
+    if (setWaterTarget !== undefined) {
+      if (city.lat == null) throw new Error("Set a visit center first.");
+      const target = setWaterTarget || null;
+      const dist = target
+        ? await distanceToTarget(city.lat, city.lon, target)
+        : await nearestWater(city.lat, city.lon);
+      const merged = { ...(city.measured_metrics || {}) };
+      merged.water_dist_m = { value: dist, asOf, source: target ? `OpenStreetMap — target: ${target.name}` : "OpenStreetMap (Overpass)" };
+      const raw = {}; for (const [k, v] of Object.entries(merged)) raw[k] = v?.value;
+      const measured = composite(raw);
+      const { error: wErr } = await supabase.from("cities")
+        .update({ measured_metrics: merged, measured, water_target: target }).eq("id", cityId);
+      if (wErr) throw new Error(wErr.message);
+      return NextResponse.json({ ok: true, waterTarget: target, water_dist_m: dist, measured, measuredMetrics: merged });
+    }
     let center, geoSource;
     if (Number.isFinite(lat) && Number.isFinite(lon)) {
       center = { lat, lon }; geoSource = "manual (placed by user)";
@@ -82,6 +109,13 @@ export async function POST(request) {
       doFull ? measureBuildingCoverage(center.lat, center.lon) : Promise.resolve({}),
     ]);
     const newMetrics = { ...core.metrics, ...cen.metrics, ...ws, ...cl.metrics, ...bc };
+
+    // If a water target is set, the center moved — re-route water to THAT body
+    // rather than auto-nearest, so the user's choice persists across re-measures.
+    if (city.water_target && newMetrics.water_dist_m) {
+      const td = await distanceToTarget(center.lat, center.lon, city.water_target);
+      if (td != null) newMetrics.water_dist_m = { value: td, asOf, source: `OpenStreetMap — target: ${city.water_target.name}` };
+    }
 
     // Merge over existing so untouched layers survive; recompute composite.
     const merged = { ...(city.measured_metrics || {}), ...newMetrics };

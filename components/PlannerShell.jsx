@@ -168,6 +168,7 @@ function MeasuredPanel({ cityItem }) {
             if (d.center) updateCity(cityItem.id, { lat: d.center.lat, lon: d.center.lon, measured: d.measured });
           }}
         />
+        <WaterTargetPicker cityItem={cityItem} accessToken={token} updateCity={updateCity} />
       </div>
 
       <div className="measured-grid">
@@ -220,6 +221,83 @@ function MeasuredPanel({ cityItem }) {
         ))}
       </div>
     </section>
+  );
+}
+
+// WaterTargetPicker — "distance to water" auto-targets the nearest major body,
+// but the user can override which body it measures to (e.g. the ocean vs a
+// nearby lake). Lists nearby bodies; picking one recomputes just the water
+// metric and persists the choice (honored on future re-measures).
+function WaterTargetPicker({ cityItem, accessToken, updateCity }) {
+  const [bodies, setBodies] = useState(null);
+  const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState("");
+  const target = cityItem.waterTarget || null;
+  const waterVal = cityItem.measuredMetrics?.water_dist_m?.value ?? null;
+  const fmtM = (m) => (m == null ? "—" : m >= 1000 ? `${(m / 1000).toFixed(1)} km` : `${m} m`);
+  const kindLabel = { sea: "Sea", river: "River", lake: "Lake" };
+
+  async function post(body) {
+    const r = await fetch("/api/measure", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}) },
+      body: JSON.stringify(body),
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || "Request failed");
+    return d;
+  }
+  async function load() {
+    setBusy(true); setMsg("Finding nearby water bodies…");
+    try { const d = await post({ cityId: cityItem.id, water: true }); setBodies(d.bodies || []); setMsg(""); }
+    catch (e) { setMsg(e.message); } finally { setBusy(false); }
+  }
+  async function choose(body) {
+    setBusy(true); setMsg(body ? `Targeting ${body.name}…` : "Reverting to nearest…");
+    try {
+      const d = await post({ cityId: cityItem.id, setWaterTarget: body });
+      updateCity(cityItem.id, { waterTarget: d.waterTarget || null, measuredMetrics: d.measuredMetrics, measured: d.measured });
+      setBodies(null);
+      setMsg(`Water now ${fmtM(d.water_dist_m)} → ${d.waterTarget ? d.waterTarget.name : "nearest major water"}.`);
+    } catch (e) { setMsg(e.message); } finally { setBusy(false); }
+  }
+
+  return (
+    <div className="water-target">
+      <div className="water-target-head">
+        <span className="water-target-now">
+          <strong>Water target:</strong> {target ? target.name : "Auto — nearest major water"}
+          {waterVal != null ? <em> · {fmtM(waterVal)}</em> : null}
+        </span>
+        {bodies
+          ? <button type="button" className="ghost" disabled={busy} onClick={() => setBodies(null)}>Close</button>
+          : <button type="button" className="ghost" disabled={busy} onClick={load}>{busy ? "…" : "Change"}</button>}
+      </div>
+      {bodies ? (
+        <ul className="water-options">
+          <li>
+            <button type="button" className={`water-option${!target ? " selected" : ""}`} disabled={busy} onClick={() => choose(null)}>
+              <span className="water-kind auto">Auto</span>
+              <span className="water-main"><strong>Nearest major water</strong><span className="water-sub">whichever body is closest</span></span>
+              {!target ? <span className="water-check">✓</span> : <span className="water-pick">Use</span>}
+            </button>
+          </li>
+          {bodies.map((b, i) => {
+            const sel = target && target.name === b.name && target.point?.lat === b.point.lat;
+            return (
+              <li key={i}>
+                <button type="button" className={`water-option${sel ? " selected" : ""}`} disabled={busy} onClick={() => choose(b)}>
+                  <span className={`water-kind ${b.kind}`}>{kindLabel[b.kind] || b.kind}</span>
+                  <span className="water-main"><strong>{b.name}</strong><span className="water-sub">{fmtM(b.dist)} away</span></span>
+                  {sel ? <span className="water-check">✓</span> : <span className="water-pick">Target</span>}
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      ) : null}
+      {msg ? <p className="map-picker-msg">{msg}</p> : null}
+    </div>
   );
 }
 

@@ -2370,4 +2370,22 @@ button:hover, .button-link:hover {
 .leaflet-tooltip.center-rank { background: transparent; border: none; box-shadow: none; color: #fff; font-weight: 700; font-size: 0.8rem; padding: 0; }
 .leaflet-tooltip.center-rank::before { display: none; }
 
+/* Water-target picker */
+.water-target { margin-top: 0.75rem; border-top: 1px dashed #d8ccb3; padding-top: 0.7rem; }
+.water-target-head { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; }
+.water-target-now { font-size: 0.9rem; color: var(--text); }
+.water-target-now em { color: var(--muted); font-style: normal; }
+.water-target-head .ghost { background: transparent; border: 1px solid var(--border); padding: 0.4rem 0.8rem; border-radius: 10px; cursor: pointer; font-size: 0.85rem; }
+.water-options { list-style: none; margin: 0.6rem 0 0; padding: 0; display: flex; flex-direction: column; gap: 0.4rem; }
+.water-option { width: 100%; display: flex; align-items: center; gap: 0.7rem; text-align: left; background: #fffdf8; border: 1px solid var(--border); border-radius: 12px; padding: 0.5rem 0.7rem; cursor: pointer; transition: border-color 0.12s, background 0.12s; }
+.water-option:hover { border-color: #3a78c2; }
+.water-option.selected { border-color: #3a78c2; background: #eef4fb; box-shadow: 0 0 0 1px #3a78c2 inset; }
+.water-kind { flex: none; min-width: 48px; text-align: center; font-size: 0.72rem; font-weight: 700; color: #3a78c2; background: #e7f0fa; border-radius: 8px; padding: 0.25rem 0.4rem; }
+.water-kind.auto { color: var(--muted); background: #f0ece2; }
+.water-main { display: flex; flex-direction: column; gap: 0.1rem; flex: 1; min-width: 0; font-size: 0.9rem; }
+.water-main strong { font-weight: 600; }
+.water-sub { color: var(--muted); font-size: 0.78rem; }
+.water-pick { color: #3a78c2; font-weight: 600; font-size: 0.8rem; flex: none; }
+.water-check { color: #3a78c2; font-weight: 700; font-size: 0.9rem; flex: none; }
+
 .map-embed-note { font-size: 0.72rem; color: #b3a890; margin-top: 0.2rem; }
