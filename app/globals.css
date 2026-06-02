@@ -2388,11 +2388,16 @@ button:hover, .button-link:hover {
 .water-pick { color: #3a78c2; font-weight: 600; font-size: 0.8rem; flex: none; }
 .water-check { color: #3a78c2; font-weight: 700; font-size: 0.9rem; flex: none; }
 
-/* Horizon peaks — map compass markers */
-.peak-div { background: transparent; border: none; }
-.peak-pin { transform: translate(-50%, -100%); display: flex; flex-direction: column; align-items: center; white-space: nowrap; pointer-events: none; }
-.peak-tri { color: #7a5c3a; font-size: 13px; line-height: 1; text-shadow: 0 0 2px #fff, 0 0 2px #fff; }
-.peak-lbl { font-size: 9.5px; line-height: 1.1; color: #5a4630; background: rgba(255,253,248,0.82); border-radius: 4px; padding: 0 3px; text-align: center; }
+/* Horizon peaks — compass dial overlaid on the map corner */
+.peak-compass { position: absolute; top: 10px; right: 10px; z-index: 600; width: 108px; height: 108px; background: rgba(255,253,248,0.86); border: 1px solid #e7dcc6; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.12); backdrop-filter: blur(2px); }
+.peak-compass svg { display: block; }
+.pc-ring { fill: none; stroke: #d8ccb3; stroke-width: 1; }
+.pc-card { fill: #b3a890; font-size: 8px; font-weight: 700; text-anchor: middle; }
+.pc-ray { stroke: #d8ccb3; stroke-width: 0.75; }
+.pc-peak { fill: #7a5c3a; stroke: #fffdf8; stroke-width: 0.75; }
+.pc-center { fill: #3c7d57; }
+.pc-occ { position: absolute; bottom: 6px; left: 0; right: 0; text-align: center; font-size: 0.62rem; font-weight: 700; color: #5a4630; line-height: 1; }
+.pc-occ small { display: block; font-size: 0.5rem; font-weight: 500; color: #b3a890; letter-spacing: 0.04em; }
 
 /* Horizon peaks — panel readout */
 .horizon-readout { margin-top: 0.75rem; border-top: 1px dashed #d8ccb3; padding-top: 0.7rem; }

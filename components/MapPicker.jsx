@@ -19,19 +19,40 @@ function ClickToMove({ onMove }) {
 }
 
 // Point `dM` metres from (lat,lon) along compass azimuth `az` (degrees).
-function offsetPoint(lat, lon, az, dM) {
-  const R = 6371000, ad = dM / R, a = az * Math.PI / 180, la = lat * Math.PI / 180, lo = lon * Math.PI / 180;
-  const la2 = Math.asin(Math.sin(la) * Math.cos(ad) + Math.cos(la) * Math.sin(ad) * Math.cos(a));
-  const lo2 = lo + Math.atan2(Math.sin(a) * Math.sin(ad) * Math.cos(la), Math.cos(ad) - Math.sin(la) * Math.sin(la2));
-  return [la2 * 180 / Math.PI, lo2 * 180 / Math.PI];
-}
-function peakIcon(p) {
-  const km = p.dist_m >= 1000 ? `${(p.dist_m / 1000).toFixed(0)} km` : `${p.dist_m} m`;
-  return L.divIcon({
-    className: "peak-div",
-    html: `<div class="peak-pin"><span class="peak-tri">▲</span><span class="peak-lbl">${p.name}<br><b>${p.angle}°</b> · ${km} ${p.dir}</span></div>`,
-    iconSize: [0, 0], iconAnchor: [0, 0],
-  });
+// PeakCompass — a small dial overlaid on the map showing visible peaks by
+// bearing (where to look), sized by how much each looms, staggered radially so
+// same-direction peaks spread out. Occupancy % in the center. Named detail
+// lives in the readout list below the map; here it's direction-at-a-glance.
+function PeakCompass({ peaks, occupancyPct }) {
+  if (!peaks?.length) return null;
+  const S = 108, c = S / 2, ring = 40;
+  const maxAng = Math.max(...peaks.map((p) => p.angle), 1);
+  const list = peaks.slice(0, 8);
+  return (
+    <div className="peak-compass" title="Visible peaks, by direction">
+      <svg width={S} height={S} aria-hidden="true">
+        <circle cx={c} cy={c} r={ring} className="pc-ring" />
+        {["N", "E", "S", "W"].map((d, i) => {
+          const a = (i * 90) * Math.PI / 180;
+          return <text key={d} x={c + (ring + 8) * Math.sin(a)} y={c - (ring + 8) * Math.cos(a) + 3} className="pc-card">{d}</text>;
+        })}
+        {list.map((p, i) => {
+          const a = p.az * Math.PI / 180;
+          const r = ring * (0.95 - 0.5 * (i / Math.max(1, list.length - 1))); // strongest outermost
+          const x = c + r * Math.sin(a), y = c - r * Math.cos(a);
+          const sz = 2.5 + 3.5 * (p.angle / maxAng);
+          return (
+            <g key={i}>
+              <line x1={c} y1={c} x2={x} y2={y} className="pc-ray" />
+              <circle cx={x} cy={y} r={sz} className="pc-peak"><title>{`${p.name} · ${p.angle}° · ${p.dir}`}</title></circle>
+            </g>
+          );
+        })}
+        <circle cx={c} cy={c} r={2.5} className="pc-center" />
+      </svg>
+      <span className="pc-occ">{occupancyPct}%<small>horizon</small></span>
+    </div>
+  );
 }
 
 // Fit the map to show the center plus the water target / candidate bodies, so
@@ -79,12 +100,6 @@ export default function MapPicker({ cityId, name, lat, lon, accessToken, onMeasu
 
   const move = (la, lo) => { if (editing) { setPos([la, lo]); setSelIdx(null); setMsg(""); } };
   const moved = pos[0] !== committed[0] || pos[1] !== committed[1];
-
-  // Horizon peaks placed around the center: top 6, radius staggered by rank so
-  // same-direction peaks fan out along the bearing rather than stacking.
-  const peakDisplay = (horizon?.peaks || []).slice(0, 6).map((p, i) => ({
-    p, pos: offsetPoint(committed[0], committed[1], p.az, 900 + i * 240),
-  }));
 
   function cancel() { setPos(committed); setEditing(false); setMsg(""); setCandidates(null); setSelIdx(null); }
 
@@ -168,13 +183,6 @@ export default function MapPicker({ cityId, name, lat, lon, accessToken, onMeasu
               <Tooltip direction="top">{b.name} · {b.dist >= 1000 ? `${(b.dist / 1000).toFixed(1)} km` : `${b.dist} m`}</Tooltip>
             </CircleMarker>
           )) : null}
-          {/* Horizon compass: visible named peaks ringed around the center by
-              direction. Radius is staggered by rank so peaks in the same
-              direction fan out along the bearing instead of stacking; true
-              distance is in the label. */}
-          {!editing && peakDisplay.map(({ p, pos }, i) => (
-            <Marker key={`pk${i}`} position={pos} icon={peakIcon(p)} interactive={false} />
-          ))}
           <Marker
             position={pos}
             draggable={editing}
@@ -182,9 +190,10 @@ export default function MapPicker({ cityId, name, lat, lon, accessToken, onMeasu
             eventHandlers={{ dragend: (e) => { const p = e.target.getLatLng(); move(p.lat, p.lng); } }}
           />
           {editing ? <ClickToMove onMove={move} /> : null}
-          <FitWater center={committed} waterPoint={waterPoint} cands={waterCands} extra={peakDisplay.map((d) => d.pos)} editing={editing} />
+          <FitWater center={committed} waterPoint={waterPoint} cands={waterCands} editing={editing} />
         </MapContainer>
         {editing ? <span className="map-picker-editing-tag">Editing — pick a numbered core, drag the pin, or click the map</span> : null}
+        {!editing && horizon?.peaks?.length ? <PeakCompass peaks={horizon.peaks} occupancyPct={horizon.occupancyPct} /> : null}
       </div>
 
       {editing && candidates?.length ? (
