@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import {
   STAGES,
+  STAGE_INDEX,
   cityImageQuery,
   cityStage,
   citySlug,
@@ -180,6 +181,8 @@ function CityCard({ cityItem, imageState, onOpen, onAdvance, onSendBack, onDragS
   const score = weightedAxisScore(cityItem, equal);
   const stageId = stage || cityStage(cityItem);
   const isDecided = stageId === "decided";
+  const nextStage = STAGES[STAGE_INDEX[stageId] + 1];
+  const advanceLabel = nextStage ? `${nextStage.label} →` : null;
 
   return (
     <article
@@ -188,22 +191,26 @@ function CityCard({ cityItem, imageState, onOpen, onAdvance, onSendBack, onDragS
       onDragStart={onDragStart}
     >
       <button type="button" className="funnel-card-body" onClick={onOpen}>
-        {heroSrc
-          ? <img className="funnel-card-image" src={appendBust(heroSrc, imageState.version)} alt="" />
-          : <div className="funnel-card-placeholder" aria-hidden="true">{cityItem.name.slice(0, 1)}</div>}
+        <div className="funnel-card-hero">
+          {heroSrc
+            ? <img className="funnel-card-image" src={appendBust(heroSrc, imageState.version)} alt="" />
+            : <div className="funnel-card-placeholder" aria-hidden="true">{cityItem.name.slice(0, 1)}</div>}
+          <span className="funnel-card-score" title="Overall measured score (equal weights)">{score != null ? score.toFixed(1) : "—"}</span>
+        </div>
         <div className="funnel-card-copy">
           <strong>{cityItem.name}</strong>
           <span className="funnel-card-meta">{cityItem.stayZone || "—"}</span>
         </div>
-        <span className="funnel-card-score" title="Overall measured score (equal weights)">{score != null ? score.toFixed(1) : "—"}</span>
       </button>
       <footer className="funnel-card-foot">
         {isDecided ? (
           <span className={`decision-chip ${cityItem.decision?.toLowerCase().replace(/\s+/g, "-") || "decided"}`}>{cityItem.decision || "Decided"}</span>
         ) : (
           <>
-            <button type="button" className="ghost" onClick={onSendBack} title="Send back to Shortlist">↺</button>
-            <button type="button" className="advance" onClick={onAdvance} title="Advance to next stage">→</button>
+            {stageId !== "shortlist" ? (
+              <button type="button" className="ghost" onClick={onSendBack} title="Send back to Shortlist">← Shortlist</button>
+            ) : <span aria-hidden="true" />}
+            <button type="button" className="advance" onClick={onAdvance} title={`Move to ${nextStage?.label || "next stage"}`}>{advanceLabel}</button>
           </>
         )}
       </footer>

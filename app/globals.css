@@ -1229,81 +1229,99 @@ button:hover, .button-link:hover {
 .funnel-column-empty p { margin: 0; font-weight: 600; color: var(--text); font-size: 0.85rem; }
 .funnel-column-empty small { display: block; margin-top: 0.15rem; font-size: 0.74rem; }
 
-/* Compact draggable kanban card — thumb left, copy middle, score right. */
+/* Image-forward draggable kanban card — big hero on top so the column
+   reads as a wall of places, not a list of names. Copy + score sit under
+   the image; the score floats on the image as a subtle pill. */
 .funnel-card {
   display: flex;
   flex-direction: column;
   background: #fffdf8;
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: 12px;
   overflow: hidden;
   cursor: grab;
+  box-shadow: 0 1px 0 rgba(60, 45, 20, 0.04);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
+.funnel-card:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(60, 45, 20, 0.10); }
 .funnel-card:active { cursor: grabbing; }
 .funnel-card-body {
   display: flex;
-  align-items: center;
-  gap: 0.55rem;
+  flex-direction: column;
   text-align: left;
   background: transparent;
   border: none;
-  padding: 0.4rem 0.55rem;
+  padding: 0;
   cursor: pointer;
   width: 100%;
 }
-.funnel-card-body:hover { background: #fbf3e0; }
-.funnel-card-image, .funnel-card-placeholder {
-  flex: none;
-  width: 40px;
-  height: 40px;
-  border-radius: 6px;
-  object-fit: cover;
+.funnel-card-hero {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
   background: #f1ead9;
+  overflow: hidden;
+}
+.funnel-card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.funnel-card-placeholder {
+  width: 100%;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 700;
-  color: var(--muted);
+  font-size: 2.4rem;
+  color: #b9a87a;
+  background: linear-gradient(135deg, #f1ead9 0%, #e7dcc0 100%);
+}
+.funnel-card-score {
+  position: absolute;
+  top: 0.45rem;
+  right: 0.45rem;
+  font-weight: 700;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.82rem;
+  background: rgba(255, 253, 248, 0.94);
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  min-width: 2.2em;
+  text-align: center;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+  backdrop-filter: blur(4px);
 }
 .funnel-card-copy {
   display: flex;
   flex-direction: column;
-  gap: 0.05rem;
-  flex: 1;
+  gap: 0.1rem;
+  padding: 0.5rem 0.65rem 0.55rem;
   min-width: 0;
 }
 .funnel-card-copy strong {
-  font-size: 0.86rem;
+  font-size: 0.92rem;
   line-height: 1.25;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 .funnel-card-meta {
-  font-size: 0.72rem;
+  font-size: 0.74rem;
   color: var(--muted);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-.funnel-card-score {
-  flex: none;
-  font-weight: 700;
-  color: var(--accent);
-  font-variant-numeric: tabular-nums;
-  font-size: 0.86rem;
-  background: #f1f7f2;
-  padding: 0.15rem 0.45rem;
-  border-radius: 6px;
-  min-width: 2.2em;
-  text-align: center;
 }
 .funnel-card-foot {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 0.4rem;
-  padding: 0.2rem 0.45rem;
+  padding: 0.3rem 0.5rem;
   border-top: 1px solid #f0e6d0;
   background: #fbf6ea;
 }
