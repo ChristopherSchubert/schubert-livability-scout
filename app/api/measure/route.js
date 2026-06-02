@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import {
-  measureAround, findVisitCenter, geocodeHeart,
+  measureAround, findVisitCenter, findVisitCenters, nearestWaterMulti, geocodeHeart,
   measureCensus, measureWalkScore, measureClimate, measureBuildingCoverage, composite,
 } from "../../../lib/measure";
 
@@ -21,7 +21,7 @@ export const maxDuration = 60;
  */
 export async function POST(request) {
   try {
-    const { cityId, lat, lon, recenter, full } = await request.json();
+    const { cityId, lat, lon, recenter, full, scout } = await request.json();
     if (!cityId) throw new Error("Missing cityId.");
     const auth = request.headers.get("authorization") || "";
     const token = auth.startsWith("Bearer ") ? auth.slice(7) : null;
@@ -36,6 +36,19 @@ export async function POST(request) {
     const { data: city, error: readErr } = await supabase.from("cities")
       .select("id,name,heart_intersection,lat,lon,measured_metrics").eq("id", cityId).single();
     if (readErr) throw new Error(readErr.message);
+
+    // Scout mode: return candidate cores (with water distance each) so the user
+    // can choose which one to base a visit around. No measuring, no DB write.
+    if (scout) {
+      let anchor = (city.lat != null && city.lon != null) ? { lat: city.lat, lon: city.lon } : null;
+      if (!anchor) anchor = await geocodeHeart(city.heart_intersection, city.name);
+      if (!anchor) throw new Error("Could not locate this city — set a point manually.");
+      const cands = await findVisitCenters(anchor.lat, anchor.lon);
+      // ONE water fetch around the anchor, then distance per candidate locally.
+      const waters = await nearestWaterMulti(anchor.lat, anchor.lon, cands);
+      const candidates = cands.map((c, i) => ({ ...c, water_dist_m: waters[i] }));
+      return NextResponse.json({ ok: true, scout: true, current: { lat: city.lat, lon: city.lon }, candidates });
+    }
 
     const asOf = new Date().toISOString().slice(0, 10);
     let center, geoSource;

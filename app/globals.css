@@ -2355,4 +2355,19 @@ button:hover, .button-link:hover {
 .map-picker-actions .ghost { background: transparent; border: 1px solid var(--border); padding: 0.5rem 0.9rem; border-radius: 10px; cursor: pointer; }
 .map-picker-msg { margin: 0; font-size: 0.88rem; color: var(--text); background: #fbf6ea; border-radius: 8px; padding: 0.5rem 0.7rem; }
 
+/* Candidate-core options */
+.center-options { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.4rem; }
+.center-option { width: 100%; display: flex; align-items: center; gap: 0.7rem; text-align: left; background: #fffdf8; border: 1px solid var(--border); border-radius: 12px; padding: 0.55rem 0.7rem; cursor: pointer; transition: border-color 0.12s, background 0.12s; }
+.center-option:hover { border-color: #c08457; }
+.center-option.selected { border-color: var(--accent); background: #f1f7f2; box-shadow: 0 0 0 1px var(--accent) inset; }
+.center-option-rank { flex: none; width: 26px; height: 26px; display: grid; place-items: center; border-radius: 50%; background: #c08457; color: #fff; font-weight: 700; font-size: 0.85rem; }
+.center-option.selected .center-option-rank { background: var(--accent); }
+.center-option-main { display: flex; flex-direction: column; gap: 0.1rem; flex: 1; min-width: 0; font-size: 0.9rem; }
+.center-option-main strong { font-weight: 600; }
+.center-option-sub { color: var(--muted); font-size: 0.78rem; }
+.center-option-pick { color: var(--accent); font-weight: 600; font-size: 0.8rem; flex: none; }
+.center-option-check { color: var(--accent); font-weight: 700; font-size: 0.8rem; flex: none; }
+.leaflet-tooltip.center-rank { background: transparent; border: none; box-shadow: none; color: #fff; font-weight: 700; font-size: 0.8rem; padding: 0; }
+.leaflet-tooltip.center-rank::before { display: none; }
+
 .map-embed-note { font-size: 0.72rem; color: #b3a890; margin-top: 0.2rem; }

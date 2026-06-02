@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, CircleMarker, Tooltip, useMapEvents } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
@@ -32,17 +32,43 @@ export default function MapPicker({ cityId, name, lat, lon, accessToken, onMeasu
   const [editing, setEditing] = useState(false);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState("");
+  const [candidates, setCandidates] = useState(null); // suggested cores
+  const [selIdx, setSelIdx] = useState(null);
 
   // Re-sync if the city (or its saved center) changes underneath us.
   useEffect(() => {
     setCommitted(start); setPos(start); setEditing(false); setMsg("");
+    setCandidates(null); setSelIdx(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cityId, lat, lon]);
 
-  const move = (la, lo) => { if (editing) { setPos([la, lo]); setMsg(""); } };
+  const move = (la, lo) => { if (editing) { setPos([la, lo]); setSelIdx(null); setMsg(""); } };
   const moved = pos[0] !== committed[0] || pos[1] !== committed[1];
 
-  function cancel() { setPos(committed); setEditing(false); setMsg(""); }
+  function cancel() { setPos(committed); setEditing(false); setMsg(""); setCandidates(null); setSelIdx(null); }
+
+  function pickCandidate(c, i) { setPos([c.lat, c.lon]); setSelIdx(i); setMsg(""); }
+
+  async function scout() {
+    setBusy(true); setMsg("Scanning a 5 km net for candidate cores…");
+    try {
+      const res = await fetch("/api/measure", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}) },
+        body: JSON.stringify({ cityId, scout: true }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Scout failed");
+      setCandidates(data.candidates || []);
+      setMsg(`${(data.candidates || []).length} candidate cores — pick one (or drag your own), then save.`);
+    } catch (e) {
+      setMsg(e.message || "Scout failed");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  const fmtM = (m) => (m == null ? "—" : m >= 1000 ? `${(m / 1000).toFixed(1)} km` : `${m} m`);
 
   async function remeasure(opts = {}) {
     setBusy(true); setMsg("Measuring around this point…");
@@ -56,7 +82,7 @@ export default function MapPicker({ cityId, name, lat, lon, accessToken, onMeasu
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Measure failed");
       const next = data.center ? [data.center.lat, data.center.lon] : pos;
-      setPos(next); setCommitted(next); setEditing(false);
+      setPos(next); setCommitted(next); setEditing(false); setCandidates(null); setSelIdx(null);
       const r = data.raw || {};
       setMsg(`Saved & re-measured — composite ${data.measured ?? "?"} · Walk Score ${r.walk_score ?? "?"} · café ${r.cafe_n ?? "?"} · water ${r.water_dist_m ?? "?"}m · median ${r.median_price_usd ? "$" + r.median_price_usd.toLocaleString() : "?"}`);
       onMeasured?.(data);
@@ -75,6 +101,17 @@ export default function MapPicker({ cityId, name, lat, lon, accessToken, onMeasu
             attribution='&copy; OpenStreetMap'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
+          {editing && candidates ? candidates.map((c, i) => (
+            <CircleMarker
+              key={i}
+              center={[c.lat, c.lon]}
+              radius={selIdx === i ? 13 : 10}
+              pathOptions={{ color: "#fffdf8", weight: 2, fillColor: selIdx === i ? "#3c7d57" : "#c08457", fillOpacity: 0.92 }}
+              eventHandlers={{ click: () => pickCandidate(c, i) }}
+            >
+              <Tooltip permanent direction="center" className="center-rank">{i + 1}</Tooltip>
+            </CircleMarker>
+          )) : null}
           <Marker
             position={pos}
             draggable={editing}
@@ -83,8 +120,29 @@ export default function MapPicker({ cityId, name, lat, lon, accessToken, onMeasu
           />
           {editing ? <ClickToMove onMove={move} /> : null}
         </MapContainer>
-        {editing ? <span className="map-picker-editing-tag">Editing — drag the pin or click the map</span> : null}
+        {editing ? <span className="map-picker-editing-tag">Editing — pick a numbered core, drag the pin, or click the map</span> : null}
       </div>
+
+      {editing && candidates?.length ? (
+        <ul className="center-options">
+          {candidates.map((c, i) => (
+            <li key={i}>
+              <button
+                type="button"
+                className={`center-option${selIdx === i ? " selected" : ""}`}
+                onClick={() => pickCandidate(c, i)}
+              >
+                <span className="center-option-rank">{i + 1}</span>
+                <span className="center-option-main">
+                  <strong>{c.n} social spots</strong> within 500 m
+                  <span className="center-option-sub">{fmtM(c.water_dist_m)} to water · {fmtM(c.moved)} from current center</span>
+                </span>
+                {selIdx === i ? <span className="center-option-check">✓ selected</span> : <span className="center-option-pick">Use this</span>}
+              </button>
+            </li>
+          ))}
+        </ul>
+      ) : null}
       <div className="map-picker-bar">
         <span className="map-picker-coords">
           {pos[0].toFixed(5)}, {pos[1].toFixed(5)}
@@ -98,8 +156,8 @@ export default function MapPicker({ cityId, name, lat, lon, accessToken, onMeasu
           ) : (
             <>
               <button type="button" className="ghost" disabled={busy} onClick={cancel}>Cancel</button>
-              <button type="button" className="ghost" disabled={busy} onClick={() => remeasure({ recenter: true })}>
-                Auto-center on the action
+              <button type="button" className="ghost" disabled={busy} onClick={scout}>
+                Suggest cores
               </button>
               <button type="button" className="primary" disabled={busy} onClick={() => remeasure()}>
                 {busy ? "Saving…" : "Save new center"}
