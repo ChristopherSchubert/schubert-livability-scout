@@ -21,35 +21,64 @@ import { appendBust, resolveImage, usePlanner } from "./PlannerProvider";
  * show). Cards are compact so 60+ candidates don't crowd; ranking inside each
  * column is by the measured Overall score, same engine as Calibrate.
  */
+const EQUAL_WEIGHTS = { setting: 1, aliveness: 1, fabric: 1, realness: 1, january: 1 };
+
+// City names are formatted "City, ST" (US) or "City, Country" — the last
+// comma-separated segment is the region token we filter on.
+function cityRegion(cityItem) {
+  const parts = (cityItem.name || "").split(",");
+  return parts.length > 1 ? parts[parts.length - 1].trim() : "";
+}
+
 export default function FunnelBoard({ focusStage }) {
   const router = useRouter();
   const { planner, imageState, addCity, advanceCityStage, setCityStage, updateCity } = usePlanner();
   const [query, setQuery] = useState("");
+  const [region, setRegion] = useState("");
+  const [minScore, setMinScore] = useState("");
   const [hideCalibration, setHideCalibration] = useState(true);
   const [dragOver, setDragOver] = useState(null);
 
   const calCount = planner.cities.filter((c) => c.isCalibration).length;
-  const visibleCities = hideCalibration ? planner.cities.filter((c) => !c.isCalibration) : planner.cities;
+
+  const regionOptions = useMemo(() => {
+    const set = new Set();
+    for (const c of planner.cities) {
+      if (hideCalibration && c.isCalibration) continue;
+      const r = cityRegion(c);
+      if (r) set.add(r);
+    }
+    return Array.from(set).sort();
+  }, [planner.cities, hideCalibration]);
+
+  const filteredCities = useMemo(() => {
+    const needle = query.trim().toLowerCase();
+    const min = minScore === "" ? null : Number(minScore);
+    return planner.cities.filter((c) => {
+      if (hideCalibration && c.isCalibration) return false;
+      if (needle && !c.name.toLowerCase().includes(needle)) return false;
+      if (region && cityRegion(c) !== region) return false;
+      if (min != null && !Number.isNaN(min)) {
+        const score = weightedAxisScore(c, EQUAL_WEIGHTS);
+        if (score == null || score < min) return false;
+      }
+      return true;
+    });
+  }, [planner.cities, hideCalibration, query, region, minScore]);
 
   const grouped = useMemo(() => {
     const buckets = Object.fromEntries(STAGES.map((stage) => [stage.id, []]));
-    for (const cityItem of visibleCities) buckets[cityStage(cityItem)].push(cityItem);
-    // Sort each column by Overall (measured), highest first; unscored to the bottom.
-    const equal = Object.fromEntries(["setting","aliveness","fabric","realness","january"].map((k) => [k, 1]));
+    for (const cityItem of filteredCities) buckets[cityStage(cityItem)].push(cityItem);
     for (const list of Object.values(buckets)) {
-      list.sort((a, b) => (weightedAxisScore(b, equal) ?? -1) - (weightedAxisScore(a, equal) ?? -1));
+      list.sort((a, b) => (weightedAxisScore(b, EQUAL_WEIGHTS) ?? -1) - (weightedAxisScore(a, EQUAL_WEIGHTS) ?? -1));
     }
     return buckets;
-  }, [visibleCities]);
+  }, [filteredCities]);
 
   const visibleStages = focusStage ? STAGES.filter((stage) => stage.id === focusStage) : STAGES;
-  const totalForFocus = focusStage ? (grouped[focusStage] || []).length : visibleCities.length;
-
-  const matches = useMemo(() => {
-    if (!query.trim()) return null;
-    const needle = query.trim().toLowerCase();
-    return visibleCities.filter((cityItem) => cityItem.name.toLowerCase().includes(needle));
-  }, [query, visibleCities]);
+  const totalForFocus = focusStage ? (grouped[focusStage] || []).length : filteredCities.length;
+  const hasFilters = Boolean(query || region || minScore);
+  function clearFilters() { setQuery(""); setRegion(""); setMinScore(""); }
 
   // Drag handlers — set/clear the dataTransfer, highlight column under cursor,
   // and on drop, move the card by writing the column's stage onto the city.
@@ -71,58 +100,60 @@ export default function FunnelBoard({ focusStage }) {
         <p className="funnel-meta">
           {focusStage
             ? `${totalForFocus} ${totalForFocus === 1 ? "city" : "cities"} in ${STAGES.find((stage) => stage.id === focusStage)?.label}`
-            : `${visibleCities.length} candidates`}
+            : `${filteredCities.length} of ${planner.cities.filter((c) => !hideCalibration || !c.isCalibration).length} candidates`}
           <span className="funnel-meta-hint"> · drag to move · click to open</span>
         </p>
-        <div className="funnel-tools">
-          {calCount > 0 ? (
-            <label className="cal-toggle">
-              <input type="checkbox" checked={hideCalibration} onChange={(e) => setHideCalibration(e.target.checked)} />
-              Hide calibration ({calCount})
-            </label>
-          ) : null}
-          <input
-            className="funnel-search"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Jump to a city…"
-            aria-label="Search cities"
-          />
-          <button
-            type="button"
-            className="primary"
-            onClick={() => {
-              const next = addCity();
-              router.push(`/cities/${citySlug(next)}`);
-            }}
-          >
-            + Add candidate
-          </button>
-        </div>
+        <button
+          type="button"
+          className="primary"
+          onClick={() => {
+            const next = addCity();
+            router.push(`/cities/${citySlug(next)}`);
+          }}
+        >
+          + Add candidate
+        </button>
       </section>
 
-      {matches ? (
-        <section className="search-results">
-          {matches.length === 0 ? (
-            <p>No cities match “{query}”.</p>
-          ) : (
-            <div className="search-grid">
-              {matches.map((cityItem) => (
-                <CityCard
-                  key={cityItem.id}
-                  cityItem={cityItem}
-                  imageState={imageState}
-                  onOpen={() => router.push(`/cities/${citySlug(cityItem)}`)}
-                  onAdvance={() => advanceCityStage(cityItem.id)}
-                  onSendBack={() => setCityStage(cityItem.id, "shortlist")}
-                  onDragStart={(e) => onCardDragStart(e, cityItem)}
-                />
-              ))}
-            </div>
-          )}
-        </section>
-      ) : (
-        <section className="funnel-grid">
+      <section className="funnel-filters" aria-label="Filter candidates">
+        <input
+          className="funnel-search"
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          placeholder="Search name…"
+          aria-label="Filter by name"
+        />
+        <label className="funnel-filter">
+          <span>Region</span>
+          <select value={region} onChange={(e) => setRegion(e.target.value)}>
+            <option value="">All</option>
+            {regionOptions.map((r) => <option key={r} value={r}>{r}</option>)}
+          </select>
+        </label>
+        <label className="funnel-filter">
+          <span>Min score</span>
+          <input
+            type="number"
+            min="0"
+            max="10"
+            step="0.5"
+            value={minScore}
+            onChange={(e) => setMinScore(e.target.value)}
+            placeholder="—"
+          />
+        </label>
+        {calCount > 0 ? (
+          <label className="cal-toggle">
+            <input type="checkbox" checked={hideCalibration} onChange={(e) => setHideCalibration(e.target.checked)} />
+            Hide calibration ({calCount})
+          </label>
+        ) : null}
+        {hasFilters ? (
+          <button type="button" className="funnel-filter-clear" onClick={clearFilters}>Clear</button>
+        ) : null}
+      </section>
+
+      <section className="funnel-grid">
           {visibleStages.map((stage) => {
             const cities = grouped[stage.id] || [];
             const isEmpty = cities.length === 0;
@@ -163,8 +194,7 @@ export default function FunnelBoard({ focusStage }) {
               </article>
             );
           })}
-        </section>
-      )}
+      </section>
     </AppShell>
   );
 }

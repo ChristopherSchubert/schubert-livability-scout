@@ -1084,6 +1084,9 @@ button:hover, .button-link:hover {
   align-items: flex-end;
   gap: 1.5rem;
 }
+/* Let the heading column actually stretch — otherwise a long city-title
+   input (a flex item) shrinks to its intrinsic content and gets clipped. */
+.canvas-header > div { flex: 1 1 auto; min-width: 0; }
 .canvas-header h1 { margin: 0; font-size: 1.85rem; letter-spacing: -0.01em; }
 .city-title-large {
   font-size: 1.85rem;
@@ -1095,7 +1098,10 @@ button:hover, .button-link:hover {
   padding: 0.1rem 0.4rem;
   margin-left: -0.4rem;
   width: 100%;
-  max-width: 28rem;
+  /* Was capped at 28rem, which clipped long names like
+     "Cincinnati (Over-the-Rhine), OH". Let it stretch to the canvas. */
+  max-width: 100%;
+  box-sizing: border-box;
 }
 .city-title-large:hover, .city-title-large:focus { border-color: var(--border); background: #fffdf8; outline: none; }
 .canvas-eyebrow {
@@ -1141,7 +1147,8 @@ button:hover, .button-link:hover {
   background: #fffdf8;
   font-size: 0.88rem;
 }
-.funnel-tools .primary {
+.funnel-tools .primary,
+.funnel-header > .primary {
   background: var(--accent);
   color: white;
   border-color: var(--accent);
@@ -1149,6 +1156,46 @@ button:hover, .button-link:hover {
   padding: 0.4rem 0.85rem;
   font-size: 0.88rem;
 }
+.funnel-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  padding: 0.5rem 0.75rem;
+  background: #fbf6ea;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  margin-top: -0.75rem;
+}
+.funnel-filters .cal-toggle { margin: 0; }
+.funnel-filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+.funnel-filter > span { font-weight: 600; }
+.funnel-filter select,
+.funnel-filter input[type="number"] {
+  border: 1px solid var(--border);
+  background: #fffdf8;
+  border-radius: 6px;
+  padding: 0.25rem 0.45rem;
+  font-size: 0.85rem;
+  color: var(--text);
+}
+.funnel-filter input[type="number"] { width: 5em; font-variant-numeric: tabular-nums; }
+.funnel-filter-clear {
+  background: transparent;
+  border: none;
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 0.82rem;
+  cursor: pointer;
+  padding: 0.2rem 0.4rem;
+}
+.funnel-filter-clear:hover { text-decoration: underline; }
 
 /* Flex-based layout so empty columns can collapse to a slim rail and full
    columns absorb the remaining horizontal space. Solves the "everything in
