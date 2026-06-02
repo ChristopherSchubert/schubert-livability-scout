@@ -171,12 +171,14 @@ function MeasuredPanel({ cityItem }) {
           waterPoint={waterPoint}
           waterName={waterName}
           waterCands={waterCands}
+          horizon={cityItem.horizonFeatures}
           onMeasured={(d) => {
             // Reflect the new center + composite locally without a reload.
             if (d.center) updateCity(cityItem.id, { lat: d.center.lat, lon: d.center.lon, measured: d.measured });
           }}
         />
         <WaterTargetPicker cityItem={cityItem} accessToken={token} updateCity={updateCity} bodies={waterCands} setBodies={setWaterCands} />
+        <HorizonReadout horizon={cityItem.horizonFeatures} />
       </div>
 
       <div className="measured-grid">
@@ -229,6 +231,30 @@ function MeasuredPanel({ cityItem }) {
         ))}
       </div>
     </section>
+  );
+}
+
+// HorizonReadout — the visible named peaks (with how much they loom + which way
+// to look) and how much of the horizon they fill. Mirrors the map's compass.
+function HorizonReadout({ horizon }) {
+  if (!horizon?.peaks?.length) return null;
+  const km = (m) => (m >= 1000 ? `${(m / 1000).toFixed(0)} km` : `${m} m`);
+  return (
+    <div className="horizon-readout">
+      <div className="horizon-head">
+        <strong>Visible peaks</strong>
+        <span className="horizon-occ">mountains fill ~{horizon.occupancyPct}% of the horizon</span>
+      </div>
+      <ul className="horizon-list">
+        {horizon.peaks.map((p, i) => (
+          <li key={i}>
+            <span className="horizon-tri">▲</span>
+            <span className="horizon-name">{p.name}</span>
+            <span className="horizon-meta">{p.angle}° · {km(p.dist_m)} {p.dir} · {p.ele} m</span>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
 

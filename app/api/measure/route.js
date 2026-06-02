@@ -3,7 +3,8 @@ import { createClient } from "@supabase/supabase-js";
 import {
   measureAround, findVisitCenter, findVisitCenters, nearestWaterMulti,
   rankedWaterBodies, distanceToTarget, nearestWater, geocodeHeart,
-  measureCensus, measureWalkScore, measureClimate, measureBuildingCoverage, measureSkyline, composite,
+  measureCensus, measureWalkScore, measureClimate, measureBuildingCoverage, measureSkyline,
+  measureHorizonPeaks, composite,
 } from "../../../lib/measure";
 
 // A few external calls; allow up to the plan ceiling.
@@ -101,13 +102,14 @@ export async function POST(request) {
     const doFull = full !== false;
     const censusKey = process.env.CENSUS_API_KEY;
     const wsKey = process.env.WALKSCORE_API_KEY;
-    const [core, cen, ws, cl, bc, sky] = await Promise.all([
+    const [core, cen, ws, cl, bc, sky, horizon] = await Promise.all([
       measureAround(center.lat, center.lon, { asOf }),
       doFull && censusKey ? measureCensus(center.lat, center.lon, censusKey, { asOf }) : Promise.resolve({ metrics: {} }),
       doFull && wsKey ? measureWalkScore(center.lat, center.lon, city.name, wsKey, { asOf }) : Promise.resolve({}),
       doFull ? measureClimate(center.lat, center.lon, { asOf }) : Promise.resolve({ metrics: {} }),
       doFull ? measureBuildingCoverage(center.lat, center.lon) : Promise.resolve({}),
       doFull ? measureSkyline(center.lat, center.lon, { asOf }) : Promise.resolve({ metrics: {} }),
+      doFull ? measureHorizonPeaks(center.lat, center.lon, { asOf }).catch(() => null) : Promise.resolve(null),
     ]);
     const newMetrics = { ...core.metrics, ...cen.metrics, ...ws, ...cl.metrics, ...bc, ...sky.metrics };
 
@@ -130,11 +132,12 @@ export async function POST(request) {
       lat: center.lat, lon: center.lon, geocoded_at: asOf,
     };
     if (geoSource) patch.geo_source = geoSource;
+    if (horizon) patch.horizon_features = horizon; // visible named peaks + occupancy
 
     const { error: writeErr } = await supabase.from("cities").update(patch).eq("id", cityId);
     if (writeErr) throw new Error(writeErr.message);
 
-    return NextResponse.json({ ok: true, center, geoSource, measured: patch.measured, raw, full: !!full });
+    return NextResponse.json({ ok: true, center, geoSource, measured: patch.measured, raw, horizon, full: !!full });
   } catch (error) {
     return NextResponse.json({ error: error.message || "Measure failed" }, { status: 500 });
   }

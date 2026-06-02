@@ -18,6 +18,22 @@ function ClickToMove({ onMove }) {
   return null;
 }
 
+// Point `dM` metres from (lat,lon) along compass azimuth `az` (degrees).
+function offsetPoint(lat, lon, az, dM) {
+  const R = 6371000, ad = dM / R, a = az * Math.PI / 180, la = lat * Math.PI / 180, lo = lon * Math.PI / 180;
+  const la2 = Math.asin(Math.sin(la) * Math.cos(ad) + Math.cos(la) * Math.sin(ad) * Math.cos(a));
+  const lo2 = lo + Math.atan2(Math.sin(a) * Math.sin(ad) * Math.cos(la), Math.cos(ad) - Math.sin(la) * Math.sin(la2));
+  return [la2 * 180 / Math.PI, lo2 * 180 / Math.PI];
+}
+function peakIcon(p) {
+  const km = p.dist_m >= 1000 ? `${(p.dist_m / 1000).toFixed(0)} km` : `${p.dist_m} m`;
+  return L.divIcon({
+    className: "peak-div",
+    html: `<div class="peak-pin"><span class="peak-tri">▲</span><span class="peak-lbl">${p.name}<br><b>${p.angle}°</b> · ${km} ${p.dir}</span></div>`,
+    iconSize: [0, 0], iconAnchor: [0, 0],
+  });
+}
+
 // Fit the map to show the center plus the water target / candidate bodies, so
 // the whole "distance to water" line is visible. Re-fits only when the water
 // data changes (not on pan), and never while editing the center.
@@ -43,7 +59,7 @@ function FitWater({ center, waterPoint, cands, editing }) {
  * around the new point via /api/measure and reports the fresh composite. The
  * point you place is "where you'd base a visit," not the admin centroid.
  */
-export default function MapPicker({ cityId, name, lat, lon, accessToken, onMeasured, waterPoint, waterName, waterCands }) {
+export default function MapPicker({ cityId, name, lat, lon, accessToken, onMeasured, waterPoint, waterName, waterCands, horizon }) {
   const start = (lat != null && lon != null) ? [lat, lon] : [39.5, -98.35];
   const [committed, setCommitted] = useState(start); // last saved center
   const [pos, setPos] = useState(start);             // current (maybe-unsaved) pin
@@ -144,6 +160,11 @@ export default function MapPicker({ cityId, name, lat, lon, accessToken, onMeasu
             <CircleMarker key={`w${i}`} center={[b.point.lat, b.point.lon]} radius={5} pathOptions={{ color: "#fffdf8", weight: 1.5, fillColor: "#7aa7d8", fillOpacity: 0.9 }}>
               <Tooltip direction="top">{b.name} · {b.dist >= 1000 ? `${(b.dist / 1000).toFixed(1)} km` : `${b.dist} m`}</Tooltip>
             </CircleMarker>
+          )) : null}
+          {/* Horizon compass: visible named peaks ringed around the center by
+              direction (clamped to a readable radius; true distance in label). */}
+          {!editing && horizon?.peaks?.length ? horizon.peaks.map((p, i) => (
+            <Marker key={`pk${i}`} position={offsetPoint(committed[0], committed[1], p.az, 1200)} icon={peakIcon(p)} interactive={false} />
           )) : null}
           <Marker
             position={pos}
