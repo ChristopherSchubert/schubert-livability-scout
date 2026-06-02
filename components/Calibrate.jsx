@@ -3,13 +3,11 @@
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import {
-  averageScore,
-  benchmarkPlaces,
+  axisRollup,
+  calibrateAxes,
   cityImageQuery,
   citySlug,
-  matrixDimensions,
-  normalizeMatrix,
-  weightedScore,
+  weightedAxisScore,
 } from "../lib/planner-data";
 import AppShell from "./AppShell";
 import { appendBust, resolveImage, usePlanner } from "./PlannerProvider";
@@ -17,11 +15,11 @@ import { appendBust, resolveImage, usePlanner } from "./PlannerProvider";
 /**
  * Calibrate — purpose-built ranking workspace.
  *
- * The ranking is the page. Weights are an occasional adjustment, so they
- * collapse into a compact summary strip above the ranking that shows what
- * you've set and unfolds the sliders inline on demand. Default-collapsed
- * because most visits to this page are "show me the ranking," not "let me
- * re-tune the weights."
+ * Ranks candidates by their MEASURED fit: the five axis rollups (Setting,
+ * Aliveness, Fabric, Realness, January), each an absolute 0–10 score from the
+ * cited metrics, combined with per-axis weights you can tune. No hand-scored
+ * matrix — the ranking is built from the same measured numbers as the detail
+ * page. Weights collapse into a compact strip; the ranking is the page.
  */
 export default function Calibrate() {
   const router = useRouter();
@@ -30,40 +28,30 @@ export default function Calibrate() {
 
   const ranking = useMemo(() => {
     const candidates = planner.cities.map((cityItem) => {
-      const matrix = normalizeMatrix(cityItem.matrix, cityItem.name);
-      const weighted = weightedScore(matrix, weights);
-      const unweighted = averageScore(matrix);
-      // Top three dimensions by absolute score — the city's own character,
-      // not its proximity to anything. Lets you read "what is this place
-      // good at" without the misleading X-like framing.
-      const topDims = matrixDimensions
-        .map(([key, label]) => ({ key, label, value: Number(matrix[key] || 0) }))
-        .sort((a, b) => b.value - a.value)
-        .slice(0, 3);
-      return { cityItem, matrix, weighted, unweighted, topDims };
+      const roll = axisRollup(cityItem);
+      const present = calibrateAxes
+        .map(([key, label]) => ({ key, label, value: roll[key] }))
+        .filter((a) => a.value != null);
+      const weighted = weightedAxisScore(cityItem, weights);
+      const unweighted = present.length ? present.reduce((s, a) => s + a.value, 0) / present.length : null;
+      // Top three axes by score — the city's measured strengths.
+      const topAxes = [...present].sort((a, b) => b.value - a.value).slice(0, 3);
+      return { cityItem, weighted, unweighted, topAxes, measured: present.length > 0 };
     });
-    return candidates.sort((a, b) => b.weighted - a.weighted);
+    // Measured cities first, ranked high→low; unmeasured fall to the bottom.
+    return candidates.sort((a, b) => (b.weighted ?? -1) - (a.weighted ?? -1));
   }, [planner.cities, weights]);
 
-  const benchmarkRows = useMemo(() => {
-    return benchmarkPlaces.map((bench) => ({
-      bench,
-      weighted: weightedScore(bench.matrix, weights),
-    })).sort((a, b) => b.weighted - a.weighted);
-  }, [weights]);
-
-  // A weight set is "default" if every dimension is at 1.0. The strip
-  // labels itself differently when the user has actually tuned something.
-  const isDefault = matrixDimensions.every(([key]) => Math.abs(Number(weights[key] ?? 1) - 1) < 0.01);
+  const isDefault = calibrateAxes.every(([key]) => Math.abs(Number(weights[key] ?? 1) - 1) < 0.01);
 
   return (
     <AppShell activeMode="calibrate">
       <section className="canvas-header">
         <div>
           <p className="canvas-eyebrow stage-calibrate-text">Calibrate</p>
-          <h1>Rank against the benchmarks</h1>
+          <h1>Rank by measured fit</h1>
           <p className="canvas-sub">
-            Cities ranked by weighted fit. Each row shows its top three dimensions so you can read the city's character at a glance.
+            Candidates ranked by their measured 0–10 scores across the five axes, weighted by how much each matters to you. Built from the cited metrics — never hand-scored.
           </p>
         </div>
       </section>
@@ -72,7 +60,6 @@ export default function Calibrate() {
         weights={weights}
         setWeight={setWeight}
         resetWeights={resetWeights}
-        benchmarkRows={benchmarkRows}
         open={weightsOpen}
         onToggle={() => setWeightsOpen((v) => !v)}
         isDefault={isDefault}
@@ -102,13 +89,15 @@ export default function Calibrate() {
                     <span>{row.cityItem.stayZone || "—"}</span>
                   </div>
                   <div className="ranking-deltas">
-                    {row.topDims.map((dim) => (
-                      <span key={dim.key} className="dim-chip">{dim.label} <b>{dim.value}</b></span>
-                    ))}
+                    {row.measured
+                      ? row.topAxes.map((axis) => (
+                          <span key={axis.key} className="dim-chip">{shortLabel(axis.label)} <b>{axis.value.toFixed(1)}</b></span>
+                        ))
+                      : <span className="dim-chip dim-chip-empty">not yet measured</span>}
                   </div>
                   <div className="ranking-score">
-                    <strong>{row.weighted.toFixed(2)}</strong>
-                    <span>avg {row.unweighted.toFixed(1)}</span>
+                    <strong>{row.weighted != null ? row.weighted.toFixed(2) : "—"}</strong>
+                    <span>{row.unweighted != null ? `avg ${row.unweighted.toFixed(1)}` : "no data"}</span>
                   </div>
                 </button>
               </li>
@@ -120,18 +109,18 @@ export default function Calibrate() {
   );
 }
 
-function WeightsStrip({ weights, setWeight, resetWeights, benchmarkRows, open, onToggle, isDefault }) {
+function WeightsStrip({ weights, setWeight, resetWeights, open, onToggle, isDefault }) {
   return (
     <section className={`weights-strip${open ? " open" : ""}`}>
       <header className="weights-strip-head">
         <button type="button" className="weights-strip-toggle" onClick={onToggle} aria-expanded={open}>
           <span className="weights-strip-caret" aria-hidden="true">{open ? "▾" : "▸"}</span>
-          <span>Weights</span>
+          <span>Axis weights</span>
           <span className="weights-strip-status">{isDefault ? "all 1.0× (default)" : "tuned"}</span>
         </button>
         {!open ? (
           <div className="weights-strip-summary">
-            {matrixDimensions.map(([key, label]) => {
+            {calibrateAxes.map(([key, label]) => {
               const value = Number(weights[key] ?? 1);
               const tuned = Math.abs(value - 1) > 0.01;
               return (
@@ -149,12 +138,12 @@ function WeightsStrip({ weights, setWeight, resetWeights, benchmarkRows, open, o
       {open ? (
         <div className="weights-strip-body">
           <div className="weight-list weight-list-grid">
-            {matrixDimensions.map(([key, label, help]) => {
+            {calibrateAxes.map(([key, label]) => {
               const value = Number(weights[key] ?? 1);
               return (
                 <div key={key} className="weight-row">
                   <div className="weight-row-head">
-                    <strong title={help}>{label}</strong>
+                    <strong>{label}</strong>
                     <span className="weight-row-value">{value.toFixed(1)}×</span>
                   </div>
                   <input
@@ -170,32 +159,12 @@ function WeightsStrip({ weights, setWeight, resetWeights, benchmarkRows, open, o
               );
             })}
           </div>
-          <div className="benchmark-summary benchmark-summary-inline">
-            <span>Benchmarks at these weights:</span>
-            {benchmarkRows.map(({ bench, weighted }) => (
-              <span key={bench.id} className="benchmark-pill">
-                {bench.name.split(",")[0]} <b>{weighted.toFixed(2)}</b>
-              </span>
-            ))}
-          </div>
         </div>
       ) : null}
     </section>
   );
 }
 
-// Compact label used in the collapsed pill row, so 8 dimensions fit in a
-// single line without wrapping at typical viewport widths.
 function shortLabel(label) {
-  const map = {
-    "Public realm": "Public",
-    "Setting drama": "Setting",
-    "Walkable daily life": "Walkable",
-    "Cafe culture": "Cafe",
-    "Winter public life": "Winter",
-    "Realness": "Real",
-    "Nature access": "Nature",
-    "Value fit": "Value",
-  };
-  return map[label] || label;
+  return { "January test": "January" }[label] || label;
 }
