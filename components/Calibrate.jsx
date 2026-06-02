@@ -25,13 +25,19 @@ export default function Calibrate() {
   const router = useRouter();
   const { planner } = usePlanner();
   const [sort, setSort] = useState({ key: "overall", dir: "desc" });
+  const [hideCalibration, setHideCalibration] = useState(true);
+
+  // Calibration places (loved/known references + controls) anchor the gut
+  // regression but aren't candidates to visit, so they're hidden by default.
+  const calCount = planner.cities.filter((c) => c.isCalibration).length;
+  const visibleCities = hideCalibration ? planner.cities.filter((c) => !c.isCalibration) : planner.cities;
 
   const learned = useMemo(() => learnedAxisWeights(planner.cities), [planner.cities]);
   const equalWeights = useMemo(() => Object.fromEntries(calibrateAxes.map(([k]) => [k, 1])), []);
   const weights = learned.weights || equalWeights;
 
   const rows = useMemo(() => {
-    const data = planner.cities.map((cityItem) => {
+    const data = visibleCities.map((cityItem) => {
       const roll = axisRollup(cityItem);
       return {
         cityItem,
@@ -50,7 +56,7 @@ export default function Calibrate() {
       if (typeof av === "string") return av.localeCompare(bv) * dir;
       return (av - bv) * dir;
     });
-  }, [planner.cities, weights, sort]);
+  }, [visibleCities, weights, sort]);
 
   const clickSort = (key) => setSort((s) => (s.key === key ? { key, dir: s.dir === "desc" ? "asc" : "desc" } : { key, dir: key === "city" ? "asc" : "desc" }));
   const arrow = (key) => (sort.key === key ? (sort.dir === "desc" ? " ↓" : " ↑") : "");
@@ -68,6 +74,13 @@ export default function Calibrate() {
       </section>
 
       <WeightNote learned={learned} />
+
+      {calCount > 0 ? (
+        <label className="cal-toggle">
+          <input type="checkbox" checked={hideCalibration} onChange={(e) => setHideCalibration(e.target.checked)} />
+          Hide calibration / reference places ({calCount})
+        </label>
+      ) : null}
 
       <section className="rank-table-wrap">
         <table className="rank-table">

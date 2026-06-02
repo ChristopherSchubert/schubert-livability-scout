@@ -2426,3 +2426,6 @@ button:hover, .button-link:hover {
 .weight-note { font-size: 0.86rem; color: var(--muted); margin: 0 0 1rem; line-height: 1.5; background: #fbf6ea; border: 1px solid #efe7d6; border-radius: 10px; padding: 0.6rem 0.8rem; }
 .weight-note-learned { background: #f1f7f2; border-color: #cfe3d5; }
 .weight-note strong { color: var(--text); }
+
+.cal-toggle { display: inline-flex; align-items: center; gap: 0.45rem; font-size: 0.85rem; color: var(--muted); margin: 0 0 0.8rem; cursor: pointer; }
+.cal-toggle input { accent-color: var(--accent); }
