@@ -2433,3 +2433,18 @@ button:hover, .button-link:hover {
 /* Visit-now column — informational, set apart from the fit columns */
 .rank-table th.rt-visitnow, .rank-table td.rt-visitnow { border-left: 2px solid #e7dcc6; }
 .rank-table th.rt-visitnow { color: #3a78c2; }
+
+/* Visit-now badge on the When-to-visit panel */
+.visit-now-badge { display: flex; flex-direction: column; align-items: flex-end; gap: 0.1rem; padding: 0.55rem 0.85rem; border: 1px solid #cfe0db; border-radius: 12px; background: #f1f7f6; min-width: 180px; }
+.visit-now-badge.urgent { border-color: #d8b25a; background: #fbf2dc; box-shadow: 0 0 0 1px #d8b25a inset; }
+.visit-now-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+.visit-now-badge strong { font-size: 1.5rem; font-weight: 700; color: var(--text); font-variant-numeric: tabular-nums; }
+.visit-now-badge strong small { font-size: 0.7rem; font-weight: 500; color: var(--muted); margin-left: 0.1rem; }
+.visit-now-trend { font-size: 0.74rem; color: #b86a47; font-weight: 600; }
+.visit-now-trend.rising { color: #3c7d57; }
+.visit-now-trend.steady { color: var(--muted); font-weight: 500; }
+
+/* Today's month in the 12-month strip */
+.vw-month.now { position: relative; }
+.vw-month.now::before { content: "now"; position: absolute; top: -16px; left: 50%; transform: translateX(-50%); font-size: 0.62rem; font-weight: 700; color: var(--accent); letter-spacing: 0.04em; }
+.vw-month.now .vw-month-label { color: var(--accent); font-weight: 700; }

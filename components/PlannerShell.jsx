@@ -4,7 +4,10 @@ import { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import {
   cityImageQuery,
+  MONTHS,
   cityVisitWindow,
+  monthlyComfortScores,
+  visitNowScore,
   cityZones,
   citySlug,
   feltScore,
@@ -82,6 +85,8 @@ export function CityDetail({ cityItem, imageState }) {
       </section>
 
       <MeasuredPanel cityItem={cityItem} />
+
+      <VisitWindowPanel cityItem={cityItem} />
 
       <section className="panel">
         <div className="section-head compact">
@@ -365,6 +370,12 @@ function VisitWindowPanel({ cityItem }) {
     );
   }
   const maxComfort = 5;
+  const nowIdx = new Date().getMonth();
+  const series = monthlyComfortScores(cityItem);
+  const now = visitNowScore(cityItem, nowIdx);
+  const baseNow = series?.[nowIdx];
+  const trend = (baseNow != null && now != null) ? now - baseNow : 0; // urgency boost
+  const dontMiss = baseNow != null && baseNow >= 6 && trend >= 1;
   return (
     <section className="panel visit-window">
       <div className="section-head">
@@ -372,6 +383,15 @@ function VisitWindowPanel({ cityItem }) {
           <h2>When to visit</h2>
           <p>Two diagnostic trips. A candidate should pass both before it advances.</p>
         </div>
+        {now != null ? (
+          <div className={`visit-now-badge${dontMiss ? " urgent" : ""}`}>
+            <span className="visit-now-label">Visit now · {MONTHS[nowIdx]}</span>
+            <strong>{now.toFixed(1)}<small>/10</small></strong>
+            {trend >= 0.3 ? <span className="visit-now-trend">↓ trending down — don't miss it</span>
+              : trend <= -0.3 ? <span className="visit-now-trend rising">↑ improving — peak later</span>
+              : <span className="visit-now-trend steady">→ stable over the next 2 months</span>}
+          </div>
+        ) : null}
       </div>
 
       <div className="vw-windows">
@@ -391,9 +411,10 @@ function VisitWindowPanel({ cityItem }) {
         {win.months.map((mo) => {
           const isCharm = win.charm && mo.idx === win.charm.idx;
           const isTruth = win.truth && mo.idx === win.truth.idx;
+          const isNow = mo.idx === nowIdx;
           const h = mo.comfort == null ? 0 : (mo.comfort / maxComfort) * 100;
           return (
-            <div key={mo.idx} className={`vw-month${isCharm ? " charm" : ""}${isTruth ? " truth" : ""}`}>
+            <div key={mo.idx} className={`vw-month${isCharm ? " charm" : ""}${isTruth ? " truth" : ""}${isNow ? " now" : ""}`}>
               <div className="vw-bar-track">
                 <span className="vw-bar" style={{ height: `${h}%` }} />
                 {mo.crowd != null ? <span className="vw-crowd" style={{ height: `${(mo.crowd / 5) * 100}%` }} title={`Crowd ${mo.crowd}/5`} /> : null}
