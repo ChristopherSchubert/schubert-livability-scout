@@ -139,6 +139,7 @@ export async function POST(request) {
     };
     if (geoSource) patch.geo_source = geoSource;
     if (horizon) patch.horizon_features = horizon; // visible named peaks + occupancy
+    if (cl.visitClimate) patch.visit_climate = cl.visitClimate; // 12-month normals
 
     const { error: writeErr } = await supabase.from("cities").update(patch).eq("id", cityId);
     if (writeErr) throw new Error(writeErr.message);

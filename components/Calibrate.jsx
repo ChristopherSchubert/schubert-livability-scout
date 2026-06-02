@@ -3,10 +3,12 @@
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import {
+  MONTHS,
   axisRollup,
   calibrateAxes,
   citySlug,
   learnedAxisWeights,
+  visitNowScore,
   weightedAxisScore,
 } from "../lib/planner-data";
 import AppShell from "./AppShell";
@@ -26,6 +28,7 @@ export default function Calibrate() {
   const { planner } = usePlanner();
   const [sort, setSort] = useState({ key: "overall", dir: "desc" });
   const [hideCalibration, setHideCalibration] = useState(true);
+  const [nowMonth] = useState(() => new Date().getMonth());
 
   // Calibration places (loved/known references + controls) anchor the gut
   // regression but aren't candidates to visit, so they're hidden by default.
@@ -43,10 +46,11 @@ export default function Calibrate() {
         cityItem,
         roll,
         overall: weightedAxisScore(cityItem, weights),
+        visitNow: visitNowScore(cityItem, nowMonth),
         measured: calibrateAxes.some(([k]) => roll[k] != null),
       };
     });
-    const val = (row) => (sort.key === "overall" ? row.overall : sort.key === "city" ? row.cityItem.name : row.roll[sort.key]);
+    const val = (row) => (sort.key === "overall" ? row.overall : sort.key === "visitnow" ? row.visitNow : sort.key === "city" ? row.cityItem.name : row.roll[sort.key]);
     const dir = sort.dir === "asc" ? 1 : -1;
     return data.sort((a, b) => {
       const av = val(a), bv = val(b);
@@ -56,7 +60,7 @@ export default function Calibrate() {
       if (typeof av === "string") return av.localeCompare(bv) * dir;
       return (av - bv) * dir;
     });
-  }, [visibleCities, weights, sort]);
+  }, [visibleCities, weights, sort, nowMonth]);
 
   const clickSort = (key) => setSort((s) => (s.key === key ? { key, dir: s.dir === "desc" ? "asc" : "desc" } : { key, dir: key === "city" ? "asc" : "desc" }));
   const arrow = (key) => (sort.key === key ? (sort.dir === "desc" ? " ↓" : " ↑") : "");
@@ -95,6 +99,9 @@ export default function Calibrate() {
                 </th>
               ))}
               <th className="rt-overall sortable" onClick={() => clickSort("overall")}>Overall{arrow("overall")}</th>
+              <th className="rt-visitnow sortable" onClick={() => clickSort("visitnow")} title="How good this month is to visit, by climate comfort. Not part of the fit score.">
+                Visit now<span className="rt-weight">{MONTHS[nowMonth]}</span>{arrow("visitnow")}
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -111,6 +118,7 @@ export default function Calibrate() {
                     <td key={key} className="rt-axis"><ScoreCell value={row.roll[key]} /></td>
                   ))}
                   <td className="rt-overall">{row.overall != null ? row.overall.toFixed(2) : "—"}</td>
+                  <td className="rt-visitnow"><ScoreCell value={row.visitNow} /></td>
                 </tr>
               );
             })}
