@@ -1258,7 +1258,7 @@ button:hover, .button-link:hover {
 .funnel-card-hero {
   position: relative;
   width: 100%;
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 16 / 9;
   background: #f1ead9;
   overflow: hidden;
 }
