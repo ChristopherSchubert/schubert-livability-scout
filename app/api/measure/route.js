@@ -66,11 +66,11 @@ export async function POST(request) {
     if (setWaterTarget !== undefined) {
       if (city.lat == null) throw new Error("Set a visit center first.");
       const target = setWaterTarget || null;
-      const dist = target
+      const { dist, point } = target
         ? await distanceToTarget(city.lat, city.lon, target)
         : await nearestWater(city.lat, city.lon);
       const merged = { ...(city.measured_metrics || {}) };
-      merged.water_dist_m = { value: dist, asOf, source: target ? `OpenStreetMap — target: ${target.name}` : "OpenStreetMap (Overpass)" };
+      merged.water_dist_m = { value: dist, asOf, source: target ? `OpenStreetMap — target: ${target.name}` : "OpenStreetMap (Overpass)", point: point || null };
       const raw = {}; for (const [k, v] of Object.entries(merged)) raw[k] = v?.value;
       const measured = composite(raw);
       const { error: wErr } = await supabase.from("cities")
@@ -114,7 +114,7 @@ export async function POST(request) {
     // rather than auto-nearest, so the user's choice persists across re-measures.
     if (city.water_target && newMetrics.water_dist_m) {
       const td = await distanceToTarget(center.lat, center.lon, city.water_target);
-      if (td != null) newMetrics.water_dist_m = { value: td, asOf, source: `OpenStreetMap — target: ${city.water_target.name}` };
+      if (td.dist != null) newMetrics.water_dist_m = { value: td.dist, asOf, source: `OpenStreetMap — target: ${city.water_target.name}`, point: td.point };
     }
 
     // Merge over existing so untouched layers survive; recompute composite.

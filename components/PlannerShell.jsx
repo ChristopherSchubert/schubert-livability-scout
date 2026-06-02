@@ -142,6 +142,11 @@ function MeasuredPanel({ cityItem }) {
   const rollup = useMemo(() => axisRollup(cityItem, stats), [cityItem, stats]);
   const fieldN = planner.cities.length;
 
+  // Shared between the map (draws them) and the water picker (lists them).
+  const [waterCands, setWaterCands] = useState(null);
+  const waterPoint = cityItem.measuredMetrics?.water_dist_m?.point || cityItem.waterTarget?.point || null;
+  const waterName = cityItem.waterTarget?.name || null;
+
   return (
     <section className="panel measured-panel">
       <div className="section-head">
@@ -163,12 +168,15 @@ function MeasuredPanel({ cityItem }) {
           lat={cityItem.lat}
           lon={cityItem.lon}
           accessToken={token}
+          waterPoint={waterPoint}
+          waterName={waterName}
+          waterCands={waterCands}
           onMeasured={(d) => {
             // Reflect the new center + composite locally without a reload.
             if (d.center) updateCity(cityItem.id, { lat: d.center.lat, lon: d.center.lon, measured: d.measured });
           }}
         />
-        <WaterTargetPicker cityItem={cityItem} accessToken={token} updateCity={updateCity} />
+        <WaterTargetPicker cityItem={cityItem} accessToken={token} updateCity={updateCity} bodies={waterCands} setBodies={setWaterCands} />
       </div>
 
       <div className="measured-grid">
@@ -228,8 +236,7 @@ function MeasuredPanel({ cityItem }) {
 // but the user can override which body it measures to (e.g. the ocean vs a
 // nearby lake). Lists nearby bodies; picking one recomputes just the water
 // metric and persists the choice (honored on future re-measures).
-function WaterTargetPicker({ cityItem, accessToken, updateCity }) {
-  const [bodies, setBodies] = useState(null);
+function WaterTargetPicker({ cityItem, accessToken, updateCity, bodies, setBodies }) {
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState("");
   const target = cityItem.waterTarget || null;

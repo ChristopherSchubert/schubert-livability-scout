@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { MapContainer, TileLayer, Marker, CircleMarker, Tooltip, useMapEvents } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, CircleMarker, Polyline, Tooltip, useMap, useMapEvents } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
@@ -18,6 +18,24 @@ function ClickToMove({ onMove }) {
   return null;
 }
 
+// Fit the map to show the center plus the water target / candidate bodies, so
+// the whole "distance to water" line is visible. Re-fits only when the water
+// data changes (not on pan), and never while editing the center.
+function FitWater({ center, waterPoint, cands, editing }) {
+  const map = useMap();
+  const key = JSON.stringify([waterPoint || null, (cands || []).map((b) => b.point), editing]);
+  useEffect(() => {
+    if (editing) return;
+    const pts = [center];
+    if (waterPoint) pts.push([waterPoint.lat, waterPoint.lon]);
+    if (cands) for (const b of cands) pts.push([b.point.lat, b.point.lon]);
+    if (pts.length < 2) return;
+    map.fitBounds(pts, { padding: [30, 30], maxZoom: 15 });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key]);
+  return null;
+}
+
 /**
  * MapPicker — view the visit center on a pannable map. The pin is locked by
  * default so you can freely pan/zoom; hit "Edit center" to make it draggable
@@ -25,7 +43,7 @@ function ClickToMove({ onMove }) {
  * around the new point via /api/measure and reports the fresh composite. The
  * point you place is "where you'd base a visit," not the admin centroid.
  */
-export default function MapPicker({ cityId, name, lat, lon, accessToken, onMeasured }) {
+export default function MapPicker({ cityId, name, lat, lon, accessToken, onMeasured, waterPoint, waterName, waterCands }) {
   const start = (lat != null && lon != null) ? [lat, lon] : [39.5, -98.35];
   const [committed, setCommitted] = useState(start); // last saved center
   const [pos, setPos] = useState(start);             // current (maybe-unsaved) pin
@@ -112,6 +130,21 @@ export default function MapPicker({ cityId, name, lat, lon, accessToken, onMeasu
               <Tooltip permanent direction="center" className="center-rank">{i + 1}</Tooltip>
             </CircleMarker>
           )) : null}
+          {/* Water target: dashed line from the center to the body we measure to. */}
+          {waterPoint ? (
+            <>
+              <Polyline positions={[committed, [waterPoint.lat, waterPoint.lon]]} pathOptions={{ color: "#3a78c2", weight: 2.5, dashArray: "6 5" }} />
+              <CircleMarker center={[waterPoint.lat, waterPoint.lon]} radius={6} pathOptions={{ color: "#fffdf8", weight: 2, fillColor: "#3a78c2", fillOpacity: 0.95 }}>
+                <Tooltip direction="top">{waterName || "Nearest water"}</Tooltip>
+              </CircleMarker>
+            </>
+          ) : null}
+          {/* Candidate water bodies shown while choosing a target. */}
+          {waterCands ? waterCands.map((b, i) => (
+            <CircleMarker key={`w${i}`} center={[b.point.lat, b.point.lon]} radius={5} pathOptions={{ color: "#fffdf8", weight: 1.5, fillColor: "#7aa7d8", fillOpacity: 0.9 }}>
+              <Tooltip direction="top">{b.name} · {b.dist >= 1000 ? `${(b.dist / 1000).toFixed(1)} km` : `${b.dist} m`}</Tooltip>
+            </CircleMarker>
+          )) : null}
           <Marker
             position={pos}
             draggable={editing}
@@ -119,6 +152,7 @@ export default function MapPicker({ cityId, name, lat, lon, accessToken, onMeasu
             eventHandlers={{ dragend: (e) => { const p = e.target.getLatLng(); move(p.lat, p.lng); } }}
           />
           {editing ? <ClickToMove onMove={move} /> : null}
+          <FitWater center={committed} waterPoint={waterPoint} cands={waterCands} editing={editing} />
         </MapContainer>
         {editing ? <span className="map-picker-editing-tag">Editing — pick a numbered core, drag the pin, or click the map</span> : null}
       </div>
