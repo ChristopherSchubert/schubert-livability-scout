@@ -5,44 +5,55 @@ import { useMemo, useState } from "react";
 import {
   axisRollup,
   calibrateAxes,
-  cityImageQuery,
   citySlug,
+  learnedAxisWeights,
   weightedAxisScore,
 } from "../lib/planner-data";
 import AppShell from "./AppShell";
-import { appendBust, resolveImage, usePlanner } from "./PlannerProvider";
+import { usePlanner } from "./PlannerProvider";
 
 /**
- * Calibrate — purpose-built ranking workspace.
+ * Calibrate — a sortable ranking TABLE.
  *
- * Ranks candidates by their MEASURED fit: the five axis rollups (Setting,
- * Aliveness, Fabric, Realness, January), each an absolute 0–10 score from the
- * cited metrics, combined with per-axis weights you can tune. No hand-scored
- * matrix — the ranking is built from the same measured numbers as the detail
- * page. Weights collapse into a compact strip; the ranking is the page.
+ * Columns are the five measured axes (each an absolute 0–10 from the cited
+ * metrics) plus an Overall = weighted average. Click any column header to sort
+ * by it. The Overall weights are LEARNED from the owner's gut (how well each
+ * axis predicts the felt Slovenia score) once ≥6 places are rated; until then
+ * the axes count equally and the page says so — never invented.
  */
 export default function Calibrate() {
   const router = useRouter();
-  const { planner, imageState, weights, setWeight, resetWeights } = usePlanner();
-  const [weightsOpen, setWeightsOpen] = useState(false);
+  const { planner } = usePlanner();
+  const [sort, setSort] = useState({ key: "overall", dir: "desc" });
 
-  const ranking = useMemo(() => {
-    const candidates = planner.cities.map((cityItem) => {
+  const learned = useMemo(() => learnedAxisWeights(planner.cities), [planner.cities]);
+  const equalWeights = useMemo(() => Object.fromEntries(calibrateAxes.map(([k]) => [k, 1])), []);
+  const weights = learned.weights || equalWeights;
+
+  const rows = useMemo(() => {
+    const data = planner.cities.map((cityItem) => {
       const roll = axisRollup(cityItem);
-      const present = calibrateAxes
-        .map(([key, label]) => ({ key, label, value: roll[key] }))
-        .filter((a) => a.value != null);
-      const weighted = weightedAxisScore(cityItem, weights);
-      const unweighted = present.length ? present.reduce((s, a) => s + a.value, 0) / present.length : null;
-      // Top three axes by score — the city's measured strengths.
-      const topAxes = [...present].sort((a, b) => b.value - a.value).slice(0, 3);
-      return { cityItem, weighted, unweighted, topAxes, measured: present.length > 0 };
+      return {
+        cityItem,
+        roll,
+        overall: weightedAxisScore(cityItem, weights),
+        measured: calibrateAxes.some(([k]) => roll[k] != null),
+      };
     });
-    // Measured cities first, ranked high→low; unmeasured fall to the bottom.
-    return candidates.sort((a, b) => (b.weighted ?? -1) - (a.weighted ?? -1));
-  }, [planner.cities, weights]);
+    const val = (row) => (sort.key === "overall" ? row.overall : sort.key === "city" ? row.cityItem.name : row.roll[sort.key]);
+    const dir = sort.dir === "asc" ? 1 : -1;
+    return data.sort((a, b) => {
+      const av = val(a), bv = val(b);
+      if (av == null && bv == null) return 0;
+      if (av == null) return 1; // unmeasured always last
+      if (bv == null) return -1;
+      if (typeof av === "string") return av.localeCompare(bv) * dir;
+      return (av - bv) * dir;
+    });
+  }, [planner.cities, weights, sort]);
 
-  const isDefault = calibrateAxes.every(([key]) => Math.abs(Number(weights[key] ?? 1) - 1) < 0.01);
+  const clickSort = (key) => setSort((s) => (s.key === key ? { key, dir: s.dir === "desc" ? "asc" : "desc" } : { key, dir: key === "city" ? "asc" : "desc" }));
+  const arrow = (key) => (sort.key === key ? (sort.dir === "desc" ? " ↓" : " ↑") : "");
 
   return (
     <AppShell activeMode="calibrate">
@@ -51,117 +62,75 @@ export default function Calibrate() {
           <p className="canvas-eyebrow stage-calibrate-text">Calibrate</p>
           <h1>Rank by measured fit</h1>
           <p className="canvas-sub">
-            Candidates ranked by their measured 0–10 scores across the five axes, weighted by how much each matters to you. Built from the cited metrics — never hand-scored.
+            Each column is a measured axis scored 0–10 from the cited metrics. <strong>Overall</strong> is their weighted average. Click any header to sort.
           </p>
         </div>
       </section>
 
-      <WeightsStrip
-        weights={weights}
-        setWeight={setWeight}
-        resetWeights={resetWeights}
-        open={weightsOpen}
-        onToggle={() => setWeightsOpen((v) => !v)}
-        isDefault={isDefault}
-      />
+      <WeightNote learned={learned} />
 
-      <section className="calibrate-ranking calibrate-ranking-full">
-        <header className="calibrate-ranking-head">
-          <h2>Ranking</h2>
-          <span className="calibrate-count">{ranking.length} candidates</span>
-        </header>
-        <ol className="ranking-list">
-          {ranking.map((row, index) => {
-            const slug = citySlug(row.cityItem);
-            const heroQuery = cityImageQuery(row.cityItem.name, row.cityItem.stayZone, row.cityItem.heartIntersection);
-            const heroSrc = resolveImage(row.cityItem.heroImage, heroQuery, imageState);
-            return (
-              <li key={row.cityItem.id} className="ranking-row">
-                <button type="button" className="ranking-body" onClick={() => router.push(`/cities/${slug}`)}>
-                  <span className="ranking-num">{index + 1}</span>
-                  <div className="ranking-thumb">
-                    {heroSrc
-                      ? <img src={appendBust(heroSrc, imageState.version)} alt="" />
-                      : <span>{row.cityItem.name.slice(0, 1)}</span>}
-                  </div>
-                  <div className="ranking-meta">
+      <section className="rank-table-wrap">
+        <table className="rank-table">
+          <thead>
+            <tr>
+              <th className="rt-rank">#</th>
+              <th className="rt-city sortable" onClick={() => clickSort("city")}>City{arrow("city")}</th>
+              {calibrateAxes.map(([key, label]) => (
+                <th key={key} className="rt-axis sortable" onClick={() => clickSort(key)} title={label}>
+                  {shortLabel(label)}{arrow(key)}
+                  {learned.weights ? <span className="rt-weight">×{(weights[key] ?? 1).toFixed(1)}</span> : null}
+                </th>
+              ))}
+              <th className="rt-overall sortable" onClick={() => clickSort("overall")}>Overall{arrow("overall")}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((row, i) => {
+              const slug = citySlug(row.cityItem);
+              return (
+                <tr key={row.cityItem.id} className="rt-row" onClick={() => router.push(`/cities/${slug}`)}>
+                  <td className="rt-rank">{i + 1}</td>
+                  <td className="rt-city">
                     <strong>{row.cityItem.name}</strong>
                     <span>{row.cityItem.stayZone || "—"}</span>
-                  </div>
-                  <div className="ranking-deltas">
-                    {row.measured
-                      ? row.topAxes.map((axis) => (
-                          <span key={axis.key} className="dim-chip">{shortLabel(axis.label)} <b>{axis.value.toFixed(1)}</b></span>
-                        ))
-                      : <span className="dim-chip dim-chip-empty">not yet measured</span>}
-                  </div>
-                  <div className="ranking-score">
-                    <strong>{row.weighted != null ? row.weighted.toFixed(2) : "—"}</strong>
-                    <span>{row.unweighted != null ? `avg ${row.unweighted.toFixed(1)}` : "no data"}</span>
-                  </div>
-                </button>
-              </li>
-            );
-          })}
-        </ol>
+                  </td>
+                  {calibrateAxes.map(([key]) => (
+                    <td key={key} className="rt-axis"><ScoreCell value={row.roll[key]} /></td>
+                  ))}
+                  <td className="rt-overall">{row.overall != null ? row.overall.toFixed(2) : "—"}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
       </section>
     </AppShell>
   );
 }
 
-function WeightsStrip({ weights, setWeight, resetWeights, open, onToggle, isDefault }) {
-  return (
-    <section className={`weights-strip${open ? " open" : ""}`}>
-      <header className="weights-strip-head">
-        <button type="button" className="weights-strip-toggle" onClick={onToggle} aria-expanded={open}>
-          <span className="weights-strip-caret" aria-hidden="true">{open ? "▾" : "▸"}</span>
-          <span>Axis weights</span>
-          <span className="weights-strip-status">{isDefault ? "all 1.0× (default)" : "tuned"}</span>
-        </button>
-        {!open ? (
-          <div className="weights-strip-summary">
-            {calibrateAxes.map(([key, label]) => {
-              const value = Number(weights[key] ?? 1);
-              const tuned = Math.abs(value - 1) > 0.01;
-              return (
-                <span key={key} className={`weights-pill${tuned ? " tuned" : ""}`} title={label}>
-                  {shortLabel(label)} <b>{value.toFixed(1)}×</b>
-                </span>
-              );
-            })}
-          </div>
-        ) : (
-          <button type="button" className="ghost" onClick={resetWeights}>Reset</button>
-        )}
-      </header>
+// Heatmap score cell — number tinted red→amber→green by its 0–10 value.
+function ScoreCell({ value }) {
+  if (value == null) return <span className="rt-na">—</span>;
+  const hue = Math.round(value * 12); // 0 red → 120 green
+  return <span className="rt-score" style={{ background: `hsl(${hue} 55% 92%)`, color: `hsl(${hue} 45% 30%)` }}>{value.toFixed(1)}</span>;
+}
 
-      {open ? (
-        <div className="weights-strip-body">
-          <div className="weight-list weight-list-grid">
-            {calibrateAxes.map(([key, label]) => {
-              const value = Number(weights[key] ?? 1);
-              return (
-                <div key={key} className="weight-row">
-                  <div className="weight-row-head">
-                    <strong>{label}</strong>
-                    <span className="weight-row-value">{value.toFixed(1)}×</span>
-                  </div>
-                  <input
-                    type="range"
-                    min={0}
-                    max={3}
-                    step={0.1}
-                    value={value}
-                    onChange={(event) => setWeight(key, event.target.value)}
-                    aria-label={`Weight for ${label}`}
-                  />
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      ) : null}
-    </section>
+// Honest weight state: learned from gut, or equal pending enough ratings.
+function WeightNote({ learned }) {
+  if (learned.weights) {
+    return (
+      <p className="weight-note weight-note-learned">
+        <strong>Overall weights learned from your {learned.n} gut ratings</strong> — how well each axis predicts your felt Slovenia score:{" "}
+        {calibrateAxes.map(([k, l], i) => (
+          <span key={k}>{i ? " · " : ""}{shortLabel(l)} ×{(learned.weights[k] ?? 1).toFixed(1)}</span>
+        ))}
+      </p>
+    );
+  }
+  return (
+    <p className="weight-note">
+      Axes count <strong>equally</strong> for now. Rate ≥{learned.need} places by gut on the <strong>Baseline</strong> tab (the 5 axes + a 0–10 Slovenia score) and Overall will learn how much each axis actually matters to you — {learned.n}/{learned.need} so far.
+    </p>
   );
 }
 
