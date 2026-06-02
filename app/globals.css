@@ -2401,11 +2401,5 @@ button:hover, .button-link:hover {
 .pc-occ { position: absolute; bottom: 6px; left: 0; right: 0; text-align: center; font-size: 0.62rem; font-weight: 700; color: #5a4630; line-height: 1; }
 .pc-occ small { display: block; font-size: 0.5rem; font-weight: 500; color: #b3a890; letter-spacing: 0.04em; }
 
-/* Horizon peaks — list inside the "Mountains on the horizon" metric expander */
-.horizon-list { list-style: none; margin: 0.35rem 0 0; padding: 0; display: flex; flex-direction: column; gap: 0.25rem; }
-.horizon-list li { display: flex; align-items: baseline; gap: 0.5rem; font-size: 0.86rem; }
-.horizon-tri { color: #7a5c3a; flex: none; }
-.horizon-name { color: var(--text); font-weight: 600; }
-.horizon-meta { color: var(--muted); font-size: 0.78rem; }
 
 .map-embed-note { font-size: 0.72rem; color: #b3a890; margin-top: 0.2rem; }

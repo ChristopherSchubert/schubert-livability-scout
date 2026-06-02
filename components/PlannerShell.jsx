@@ -220,7 +220,10 @@ function MeasuredPanel({ cityItem }) {
                           : <span>{m.source}</span>}
                       </p>
                       {m.key === "mtn_horizon_pct" && cityItem.horizonFeatures?.peaks?.length ? (
-                        <HorizonPeakList peaks={cityItem.horizonFeatures.peaks} />
+                        <p className="metric-how">
+                          Visible: {cityItem.horizonFeatures.peaks.slice(0, 6).map((p) => `${p.name} (${p.angle}° ${p.dir})`).join(", ")}
+                          {cityItem.horizonFeatures.peaks.length > 6 ? `, +${cityItem.horizonFeatures.peaks.length - 6} more` : ""}.
+                        </p>
                       ) : null}
                     </div>
                   </details>
@@ -231,25 +234,6 @@ function MeasuredPanel({ cityItem }) {
         ))}
       </div>
     </section>
-  );
-}
-
-// HorizonPeakList — the named peaks behind the "Mountains on the horizon"
-// metric: which peaks, how much each looms, which way to look. Shown inside
-// that metric's expander (the "what we found here"), mirroring the map compass.
-function HorizonPeakList({ peaks }) {
-  if (!peaks?.length) return null;
-  const km = (m) => (m >= 1000 ? `${(m / 1000).toFixed(0)} km` : `${m} m`);
-  return (
-    <ul className="horizon-list">
-      {peaks.map((p, i) => (
-        <li key={i}>
-          <span className="horizon-tri">▲</span>
-          <span className="horizon-name">{p.name}</span>
-          <span className="horizon-meta">{p.angle}° · {km(p.dist_m)} {p.dir} · {p.ele} m</span>
-        </li>
-      ))}
-    </ul>
   );
 }
 
