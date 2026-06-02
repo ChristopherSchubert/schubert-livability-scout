@@ -60,7 +60,9 @@ export function CityDetail({ cityItem, imageState }) {
         <article className="card card-spacious">
           <p className="eyebrow">Why this could be the place</p>
           <h2>{cityItem.name}</h2>
-          <p className="body-copy">{cityItem.why}</p>
+          {(cityItem.why || "").split(/\n\n+/).map((para, i) => (
+            <p key={i} className="body-copy">{para}</p>
+          ))}
         </article>
 
         <article className="card">
