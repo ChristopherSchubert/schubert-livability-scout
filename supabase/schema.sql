@@ -56,6 +56,11 @@ create table if not exists cities (
   matrix             jsonb default '{}',        -- legacy seed scores
   measured           numeric,                   -- objective 0-10, null until measured
   measured_metrics   jsonb default '{}',        -- { key: { value, asOf } }
+  measured_at        date,                      -- when the pipeline last ran
+  lat                double precision,          -- geocoded heart (persisted, reused)
+  lon                double precision,
+  geo_source         text,                      -- provenance of lat/lon
+  geocoded_at        date,
   visit_climate      jsonb,                     -- [12] monthly normals
   crowd_season       jsonb,                     -- [12] 0-5
   season_notes       jsonb,                     -- { charm, truth }
