@@ -907,7 +907,9 @@ button:hover, .button-link:hover {
 .topbar-v2 {
   position: sticky;
   top: 0;
-  z-index: 30;
+  /* Above Leaflet's control layer (z-index 1000) so the map can't punch
+     through the sticky nav when the city detail scrolls. */
+  z-index: 1100;
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem 1.25rem;
@@ -1003,7 +1005,8 @@ button:hover, .button-link:hover {
   padding: 0.5rem;
   width: 220px;
   box-shadow: var(--shadow);
-  z-index: 40;
+  /* Above the topbar so the dropdown isn't clipped by it. */
+  z-index: 1110;
 }
 .backup-pop button, .backup-import {
   text-align: left;
@@ -1023,7 +1026,8 @@ button:hover, .button-link:hover {
 .city-context {
   position: sticky;
   top: 64px;
-  z-index: 20;
+  /* Above Leaflet (1000), below the topbar (1100). */
+  z-index: 1090;
   display: flex;
   align-items: center;
   justify-content: space-between;
