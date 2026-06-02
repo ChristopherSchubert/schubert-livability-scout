@@ -2216,7 +2216,13 @@ button:hover, .button-link:hover {
   .calibrate-grid { grid-template-columns: 1fr; }
   .calibrate-weights { position: relative; top: auto; }
   .weight-row-help { display: block; }
-  .canvas-header, .funnel-header { flex-direction: column; align-items: flex-start; }
+  .canvas-header, .funnel-header { flex-direction: column; align-items: stretch; }
+  /* In column layout the title input would otherwise sit at its intrinsic
+     width and clip a long name; stretching the column makes it fill the page. */
+  .canvas-header > div, .funnel-header > div { width: 100%; }
+  /* Long city names need to shrink to fit on narrow screens — the input has
+     no wrap option, so we just reduce the font size. */
+  .city-title-large { font-size: 1.45rem; }
   .decide-suggestion { flex-direction: column; align-items: flex-start; }
   .ranking-body { grid-template-columns: 90px 1fr; }
   .ranking-deltas, .ranking-score { grid-column: 1 / -1; justify-content: flex-start; }
