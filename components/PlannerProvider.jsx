@@ -203,7 +203,7 @@ export function PlannerProvider({ children, initialManifest }) {
 
 // Whitelist the shared fields updateCityWith may persist (drops transient keys).
 function mapWritable(obj) {
-  const allow = ["name","stayZone","heartIntersection","tripWeek","why","ifWins","ifFails","blocks","status","decision","heroImage","arriveDate","departDate","tripLength","flightDetails","carDetails","lodgingDetails","logisticsNotes","days","checklists","matrix","measured","measuredMetrics","visitClimate","crowdSeason","seasonNotes"];
+  const allow = ["name","stayZone","stayZoneBoundary","heartIntersection","tripWeek","why","ifWins","ifFails","blocks","status","decision","heroImage","arriveDate","departDate","tripLength","flightDetails","carDetails","lodgingDetails","logisticsNotes","days","checklists","matrix","measured","measuredMetrics","visitClimate","crowdSeason","seasonNotes"];
   const out = {};
   for (const k of allow) if (k in obj) out[k] = obj[k];
   return out;

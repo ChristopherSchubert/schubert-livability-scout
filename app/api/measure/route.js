@@ -4,7 +4,7 @@ import {
   measureAround, findVisitCenter, findVisitCenters, nearestWaterMulti,
   rankedWaterBodies, distanceToTarget, nearestWater, geocodeHeart,
   measureCensus, measureWalkScore, measureClimate, measureBuildingCoverage, measureSkyline,
-  measureHorizonPeaks, composite,
+  measureHorizonPeaks, composite, fetchStayZoneBoundary,
 } from "../../../lib/measure";
 
 // A few external calls; allow up to the plan ceiling.
@@ -36,20 +36,39 @@ export async function POST(request) {
     });
 
     const { data: city, error: readErr } = await supabase.from("cities")
-      .select("id,name,heart_intersection,lat,lon,measured_metrics,water_target").eq("id", cityId).single();
+      .select("id,name,stay_zone,stay_zone_boundary,heart_intersection,lat,lon,measured_metrics,water_target").eq("id", cityId).single();
     if (readErr) throw new Error(readErr.message);
 
     // Scout mode: return candidate cores (with water distance each) so the user
-    // can choose which one to base a visit around. No measuring, no DB write.
+    // can choose which one to base a visit around. No measuring of metrics, but
+    // we DO lazily fetch and persist the stay-zone polygon on first scout so
+    // candidates can be clipped to the neighborhood the user picked.
     if (scout) {
       let anchor = (city.lat != null && city.lon != null) ? { lat: city.lat, lon: city.lon } : null;
       if (!anchor) anchor = await geocodeHeart(city.heart_intersection, city.name);
       if (!anchor) throw new Error("Could not locate this city — set a point manually.");
-      const cands = await findVisitCenters(anchor.lat, anchor.lon);
+      let boundary = city.stay_zone_boundary || null;
+      let boundaryFetched = false;
+      if (!boundary && city.stay_zone) {
+        boundary = await fetchStayZoneBoundary(city.stay_zone, city.name);
+        if (boundary) {
+          boundaryFetched = true;
+          // Best-effort persist; don't fail the scout if the write errors.
+          await supabase.from("cities").update({ stay_zone_boundary: boundary }).eq("id", cityId);
+        }
+      }
+      const cands = await findVisitCenters(anchor.lat, anchor.lon, { boundary });
       // ONE water fetch around the anchor, then distance per candidate locally.
       const waters = await nearestWaterMulti(anchor.lat, anchor.lon, cands);
       const candidates = cands.map((c, i) => ({ ...c, water_dist_m: waters[i] }));
-      return NextResponse.json({ ok: true, scout: true, current: { lat: city.lat, lon: city.lon }, candidates });
+      return NextResponse.json({
+        ok: true, scout: true,
+        current: { lat: city.lat, lon: city.lon },
+        candidates,
+        boundary: boundary || null,
+        boundaryFetched,
+        boundarySource: boundary ? "OpenStreetMap (Nominatim)" : null,
+      });
     }
 
     // Water mode: list nearby major water bodies around the current center so

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { MapContainer, TileLayer, Marker, CircleMarker, Polyline, Tooltip, useMap, useMapEvents } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, CircleMarker, Polyline, Polygon, Tooltip, useMap, useMapEvents } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
@@ -12,6 +12,15 @@ const icon = L.icon({
   shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
   iconSize: [25, 41], iconAnchor: [12, 41],
 });
+
+// GeoJSON Polygon/MultiPolygon → array of Leaflet polygon position arrays.
+// GeoJSON is [lon, lat]; Leaflet wants [lat, lon]. Each top-level entry in the
+// return value is the positions for one <Polygon>; holes ride as nested rings.
+function geojsonToLeafletPolys(geojson) {
+  if (!geojson) return [];
+  const polys = geojson.type === "MultiPolygon" ? geojson.coordinates : [geojson.coordinates];
+  return polys.map((rings) => rings.map((ring) => ring.map(([lon, lat]) => [lat, lon])));
+}
 
 function ClickToMove({ onMove }) {
   useMapEvents({ click(e) { onMove(e.latlng.lat, e.latlng.lng); } });
@@ -81,7 +90,7 @@ function FitWater({ center, waterPoint, cands, extra, editing }) {
  * around the new point via /api/measure and reports the fresh composite. The
  * point you place is "where you'd base a visit," not the admin centroid.
  */
-export default function MapPicker({ cityId, name, lat, lon, accessToken, onMeasured, waterPoint, waterName, waterCands, horizon }) {
+export default function MapPicker({ cityId, name, lat, lon, accessToken, onMeasured, waterPoint, waterName, waterCands, horizon, stayZoneBoundary }) {
   const start = (lat != null && lon != null) ? [lat, lon] : [39.5, -98.35];
   const [committed, setCommitted] = useState(start); // last saved center
   const [pos, setPos] = useState(start);             // current (maybe-unsaved) pin
@@ -90,13 +99,18 @@ export default function MapPicker({ cityId, name, lat, lon, accessToken, onMeasu
   const [msg, setMsg] = useState("");
   const [candidates, setCandidates] = useState(null); // suggested cores
   const [selIdx, setSelIdx] = useState(null);
+  const [boundary, setBoundary] = useState(stayZoneBoundary || null);
 
   // Re-sync if the city (or its saved center) changes underneath us.
   useEffect(() => {
     setCommitted(start); setPos(start); setEditing(false); setMsg("");
     setCandidates(null); setSelIdx(null);
+    setBoundary(stayZoneBoundary || null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cityId, lat, lon]);
+
+  // Pick up a boundary that arrives later (parent re-fetch after scout).
+  useEffect(() => { setBoundary(stayZoneBoundary || null); }, [stayZoneBoundary]);
 
   const move = (la, lo) => { if (editing) { setPos([la, lo]); setSelIdx(null); setMsg(""); } };
   const moved = pos[0] !== committed[0] || pos[1] !== committed[1];
@@ -116,7 +130,12 @@ export default function MapPicker({ cityId, name, lat, lon, accessToken, onMeasu
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Scout failed");
       setCandidates(data.candidates || []);
-      setMsg(`${(data.candidates || []).length} candidate cores — pick one (or drag your own), then save.`);
+      if (data.boundary) setBoundary(data.boundary);
+      const n = (data.candidates || []).length;
+      const bTag = data.boundary
+        ? (data.boundaryFetched ? " (boundary fetched + saved)" : " (clipped to stay zone)")
+        : " (no stay-zone polygon found — falling back to 1.2 km cap)";
+      setMsg(`${n} candidate cores — pick one (or drag your own), then save.${bTag}`);
     } catch (e) {
       setMsg(e.message || "Scout failed");
     } finally {
@@ -157,6 +176,16 @@ export default function MapPicker({ cityId, name, lat, lon, accessToken, onMeasu
             attribution='&copy; OpenStreetMap'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
+          {/* Stay-zone polygon — the boundary candidate cores are clipped to.
+              Drawn always (not just while editing) so the user can see the
+              region the metrics + suggestions are anchored on. */}
+          {boundary ? geojsonToLeafletPolys(boundary).map((rings, i) => (
+            <Polygon
+              key={`b${i}`}
+              positions={rings}
+              pathOptions={{ color: "#3c7d57", weight: 2, dashArray: "4 4", fillColor: "#3c7d57", fillOpacity: 0.06 }}
+            />
+          )) : null}
           {editing && candidates ? candidates.map((c, i) => (
             <CircleMarker
               key={i}

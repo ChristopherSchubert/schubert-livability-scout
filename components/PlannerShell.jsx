@@ -18,6 +18,7 @@ import {
   metricScore,
   metricScoreBands,
   axisRollup,
+  weightedAxisScore,
   surveyComplete,
 } from "../lib/planner-data";
 import { appendBust, resolveImage, usePlanner } from "./PlannerProvider";
@@ -49,6 +50,9 @@ export function CityDetail({ cityItem, imageState }) {
   const stayMapQuery = formatMapSearchQuery(cityItem.name, cityItem.heartIntersection || cityItem.stayZone || cityItem.name);
   const zones = cityZones(cityItem);
   const felt = surveyComplete(cityItem.survey) ? feltScore(cityItem.survey) : null;
+  // Single source of truth for the Measured score — same engine as Calibrate +
+  // Board. Equal weights here; Calibrate applies any learned per-axis weights.
+  const measured = weightedAxisScore(cityItem, { setting: 1, aliveness: 1, fabric: 1, realness: 1, january: 1 });
 
   return (
     <>
@@ -75,8 +79,8 @@ export function CityDetail({ cityItem, imageState }) {
         <article className="card score-card-twin">
           <div className="twin-score">
             <p className="eyebrow">Measured</p>
-            <strong>{cityItem.measured != null ? Number(cityItem.measured).toFixed(1) : "—"}</strong>
-            <span>{cityItem.measured != null ? "from data" : "not yet measured"}</span>
+            <strong>{measured != null ? measured.toFixed(1) : "—"}</strong>
+            <span>{measured != null ? "from data" : "not yet measured"}</span>
           </div>
           <div className="twin-score">
             <p className="eyebrow">Felt</p>
@@ -177,6 +181,7 @@ function MeasuredPanel({ cityItem }) {
           waterName={waterName}
           waterCands={waterCands}
           horizon={cityItem.horizonFeatures}
+          stayZoneBoundary={cityItem.stayZoneBoundary}
           onMeasured={(d) => {
             // Reflect the new center + composite locally without a reload.
             if (d.center) updateCity(cityItem.id, { lat: d.center.lat, lon: d.center.lon, measured: d.measured });
