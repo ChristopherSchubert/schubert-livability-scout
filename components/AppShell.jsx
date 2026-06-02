@@ -132,9 +132,11 @@ function SavePill({ saveState, hydrated }) {
   }, []);
   if (!hydrated) return <span className="save-pill saving">loading</span>;
   if (saveState.status === "saving") return <span className="save-pill saving">saving…</span>;
+  // Nothing saved yet this session (at===0) → just "synced", no bogus age.
+  if (!saveState.at) return <span className="save-pill saved" title="Synced with the cloud">synced</span>;
   const ago = Math.max(0, Math.round((Date.now() - saveState.at) / 1000));
   const label = ago < 5 ? "saved" : ago < 60 ? `saved ${ago}s ago` : `saved ${Math.round(ago / 60)}m ago`;
-  return <span className="save-pill saved" title="Autosaved to this browser">{label}</span>;
+  return <span className="save-pill saved" title="Saved to the cloud">{label}</span>;
 }
 
 function BackupMenu({ onExport, onImport }) {

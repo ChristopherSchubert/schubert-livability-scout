@@ -109,8 +109,26 @@ function SignIn() {
       <button type="submit" className="auth-primary" disabled={busy || !email.trim()}>
         {busy ? "Sending…" : "Send me a link"}
       </button>
+      {process.env.NODE_ENV !== "production" ? (
+        <button type="button" className="auth-ghost" onClick={devSignIn}>Dev sign-in (localhost only)</button>
+      ) : null}
     </form>
   );
+
+  // Local-only: adopt a session minted by the prod-disabled /api/dev-login.
+  async function devSignIn() {
+    setErr("");
+    try {
+      const r = await fetch("/api/dev-login", { method: "POST" });
+      const d = await r.json();
+      if (!r.ok) throw new Error(d.error || "dev login unavailable");
+      const { error } = await getSupabase().auth.setSession({ access_token: d.access_token, refresh_token: d.refresh_token });
+      if (error) throw error;
+      // onAuthStateChange in AuthGate flips the gate to "in".
+    } catch (e2) {
+      setErr(e2.message || "Dev sign-in failed");
+    }
+  }
 }
 
 function FullScreen({ children }) {

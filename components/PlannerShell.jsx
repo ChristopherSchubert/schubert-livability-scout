@@ -13,7 +13,7 @@ import {
   metricTaxonomy,
   surveyComplete,
 } from "../lib/planner-data";
-import { appendBust, resolveImage } from "./PlannerProvider";
+import { appendBust, resolveImage, usePlanner } from "./PlannerProvider";
 import { getSupabase } from "../lib/supabase";
 import MapEmbed from "./MapEmbed";
 
