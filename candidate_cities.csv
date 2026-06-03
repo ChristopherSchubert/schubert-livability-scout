@@ -70,3 +70,14 @@ Bellingham,WA,Fairhaven,48.7210,-122.5070,FLY,outlier,Salish Sea + Mt Baker; gra
 Bend,OR,Downtown / Drake Park,44.0580,-121.3150,FLY,outlier,high desert; Cascades; verify off-season
 Boulder,CO,Pearl St / Mapleton Hill,40.0190,-105.2800,FLY,outlier,Flatirons; sunny winter; wealthy
 Santa Fe,NM,Eastside / Plaza,35.6870,-105.9380,FLY,outlier,adobe; high desert; arts
+
+# ---- EASTERN SEABOARD ADDITIONS (added 2026-06-02 to fill state gaps) ----
+Old Town Alexandria,VA,King St / Market Square,38.8048,-77.0469,4.0,in_range,Potomac waterfront; year-round; verify against DC commute economy
+Lewes,DE,Second St / Lewes Beach,38.7745,-75.1394,5.5,in_range,closest US analog to Piran-scale Atlantic seaport; off-season test critical
+New Castle,DE,Delaware St / The Strand,39.6620,-75.5660,5.0,in_range,intact colonial grid; very small; off-season test
+Mystic,CT,W Main St / Bascule Bridge,41.3543,-71.9665,7.5,in_range,seaport split by river + drawbridge; off-season test
+Litchfield,CT,Litchfield Green / North St,41.7475,-73.1900,7.0,in_range,archetypal NE town green; rural Litchfield Hills
+Essex,CT,Main St / Steamboat Dock,41.3540,-72.3915,7.5,in_range,compact CT River village; very small
+Northampton,MA,Main St / Pleasant St,42.3170,-72.6310,8.5,stretch,Five-college pedestrian downtown; Mill River + Mt Tom
+Newport,RI,Thames St / Bowen's Wharf,41.4870,-71.3120,9.5,stretch,historic peninsula + Cliff Walk; summer-tourism risk
+Bristol,RI,Hope St / Bristol Harbor,41.6770,-71.2670,9.5,stretch,Hope St spine + East Bay Bike Path; between Providence and Newport
