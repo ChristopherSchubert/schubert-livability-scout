@@ -92,6 +92,15 @@ async function cachedFetch(endpoint, query, params) {
 
 // ── Domain helpers ──────────────────────────────────────────────────────────
 
+// Great-circle distance in meters between two lat/lon pairs.
+function haversine(lat1, lon1, lat2, lon2) {
+  const R = 6371000;
+  const p = (x) => (x * Math.PI) / 180;
+  const dphi = p(lat2 - lat1), dl = p(lon2 - lon1);
+  const x = Math.sin(dphi / 2) ** 2 + Math.cos(p(lat1)) * Math.cos(p(lat2)) * Math.sin(dl / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(x));
+}
+
 // Does this polygon's bbox contain (lat, lon)? We use bbox (not the precise
 // rings) on purpose — Nominatim's saved center is often just outside the OSM
 // boundary by a few meters but should still count as "in the right place."
@@ -224,10 +233,20 @@ async function pickBoundary(city) {
       if (poly && bboxAreaKm2(poly) <= MAX_KM2) return { poly, source: `reverse-geocode:${n}` };
     }
   }
-  // Stage 3: Point fallback (small circle around an OSM node for a token)
+  // Stage 3: Point fallback (small circle around an OSM node for a token).
+  // Require the Point to be within ~3 km of the saved center — otherwise
+  // Nominatim's top hit for "Historic Hill, Newport, RI" silently lands on
+  // a Historic Hill in some other Rhode Island town and we draw the boundary
+  // 5 km from where the user actually pinned.
+  const MAX_POINT_DIST_M = 3000;
   for (const q of queries) {
     const pt = await searchFirstPoint(q);
-    if (pt) return { poly: circlePolygon(pt.lat, pt.lon, 700), source: `point-circle:${q}` };
+    if (!pt) continue;
+    if (city.lat != null && city.lon != null) {
+      const dist = haversine(pt.lat, pt.lon, city.lat, city.lon);
+      if (dist > MAX_POINT_DIST_M) continue;
+    }
+    return { poly: circlePolygon(pt.lat, pt.lon, 700), source: `point-circle:${q}` };
   }
   // Stage 4: anchor circle (no constraint info found anywhere — keep cores
   // close to where the user pinned)
