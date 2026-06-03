@@ -177,15 +177,22 @@ export default function MapPicker({ cityId, name, lat, lon, accessToken, onMeasu
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
           {/* Stay-zone polygon — the boundary candidate cores are clipped to.
-              Drawn always (not just while editing) so the user can see the
-              region the metrics + suggestions are anchored on. */}
-          {boundary ? geojsonToLeafletPolys(boundary).map((rings, i) => (
+              Drawn as a two-layer stroke: a thick white halo underneath so the
+              boundary reads clearly over any map texture (streets, water,
+              parks), then a bold accent stroke on top. The fill is tinted just
+              enough to make the interior obviously the "inside." */}
+          {boundary ? geojsonToLeafletPolys(boundary).flatMap((rings, i) => [
             <Polygon
-              key={`b${i}`}
+              key={`b${i}-halo`}
               positions={rings}
-              pathOptions={{ color: "#3c7d57", weight: 2, dashArray: "4 4", fillColor: "#3c7d57", fillOpacity: 0.06 }}
-            />
-          )) : null}
+              pathOptions={{ color: "#ffffff", weight: 7, opacity: 0.85, fill: false }}
+            />,
+            <Polygon
+              key={`b${i}-edge`}
+              positions={rings}
+              pathOptions={{ color: "#1f5e3f", weight: 3.5, opacity: 1, fillColor: "#3c7d57", fillOpacity: 0.16 }}
+            />,
+          ]) : null}
           {editing && candidates ? candidates.map((c, i) => (
             <CircleMarker
               key={i}
