@@ -190,7 +190,7 @@ export default function MapPicker({ cityId, name, lat, lon, accessToken, onMeasu
             <Polygon
               key={`b${i}-edge`}
               positions={rings}
-              pathOptions={{ color: "#1f5e3f", weight: 3.5, opacity: 1, fillColor: "#3c7d57", fillOpacity: 0.16 }}
+              pathOptions={{ color: "#1d8cf8", weight: 3.5, opacity: 1, fillColor: "#1d8cf8", fillOpacity: 0.12 }}
             />,
           ]) : null}
           {editing && candidates ? candidates.map((c, i) => (
