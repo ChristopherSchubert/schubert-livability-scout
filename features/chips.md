@@ -26,26 +26,31 @@ and every city re-evaluates on the next load with no migration.
 
 ### Vocabulary
 
-30 chips across 8 groups, defined in [lib/chips.js](../lib/chips.js):
+28 chips across 8 groups, defined in [lib/chips.js](../lib/chips.js):
 
 | Group | Chips | Driven by |
 |---|---|---|
 | Water | Island, Peninsula, Bayfront, Harbor town, Coastal, Riverfront, Lakefront | `osm_context.*`, `water_dist_m.meta` |
 | Terrain | Mountain, Foothills, Valley, Plateau, Plains, Forested, Desert | `terrain.*`, `osm_context.forest_frac_10km`, `climate_extremes.annual_precip_in` |
-| Urban form | Stroll-grade, Walkable, Pedestrian street, Square-centered, Historic fabric, Compact | `walk_score`, `osm_context.*`, `core_density` |
-| Public life | College town, Tourist-heavy, Year-round, Café-rich | `osm_context.university_within_2km`, `seasonal_vac_pct`, `cafe_n` |
+| Urban form | Walkable, Pedestrian street, Square-centered, Historic, Compact | `walk_score`, `osm_context.*`, `core_density` |
+| Public life | College town, Tourist-heavy, Year-round, Cafés | `osm_context.university_within_2km`, `seasonal_vac_pct`, `cafe_n` |
 | Winter | Snowy, Real winter, Mild winter | `climate_extremes.annual_snow_in` *(currently null)*, `climate_extremes.jan_mean_f` |
 | Summer | Humid summer, Dry summer, Cool summer | `climate_extremes.jul_dewpoint_f`, `climate_extremes.jul_mean_f` |
-| Outdoors | Trails out the door, Skiable, Bikeable | `osm_context.hiking_route_within_5km`, `ski_resort_within_50km`, `cycleway_km_within_700m` |
+| Outdoors | Hiking nearby, Skiable, Bikeable | `osm_context.hiking_route_within_5km`, `ski_resort_within_50km`, `cycleway_km_within_700m` |
 | Admin | State capital | `admin.state_capital` |
 
 ### Selection rules
 
 - **Within a group**, the most-specific firing chip wins. Peninsula beats
-  Coastal; Mountain beats Foothills; Real-winter beats nothing.
+  Coastal; Mountain beats Foothills; Snowy beats Real winter.
 - **Across groups**, display order is fixed (water → terrain → urban-form
   → public-life → outdoors → winter → summer → admin).
 - **Cap at 4 chips per city** so the strip stays readable.
+- **Climate slot reservation**: climate-winter and climate-summer are
+  editorially important — the strip should not silently drop "Mild winter"
+  on Charleston just because four earlier-group chips happened to fire.
+  When a climate chip is capped out, it evicts the lowest-specificity
+  non-climate winner. See `chipsFor` in [lib/chips.js](../lib/chips.js).
 
 Missing signal → chip silently doesn't fire. That's by design — an unseen
 metric is "not yet measured", never "false".
