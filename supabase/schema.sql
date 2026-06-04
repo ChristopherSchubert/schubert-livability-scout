@@ -41,6 +41,7 @@ create table if not exists cities (
   if_wins            text,
   if_fails           text,
   blocks             jsonb default '[]',
+  block_geometries   jsonb default '[]',        -- per-block { name, lat, lon, accuracy, source, meta, asOf } — populated by lib/measurers/blocks.js
   status             text default 'Idea',
   decision           text default 'Undecided',
   is_calibration     boolean not null default false,  -- cohort flag: baseline place, not a candidate
@@ -81,7 +82,12 @@ alter table cities add column if not exists stay_zone_boundary jsonb;
 alter table cities add column if not exists boundary_source    text;
 alter table cities add column if not exists boundary_set_at    date;
 alter table cities add column if not exists horizon_features   jsonb;
-alter table cities add column if not exists eu_lau             jsonb;
+alter table cities add column if not exists population_total    integer;
+alter table cities add column if not exists population_source   text;
+alter table cities add column if not exists crowd_season_source text;
+alter table cities add column if not exists crowd_intensity     int;
+alter table cities add column if not exists block_geometries    jsonb default '[]';
+alter table cities add column if not exists eu_lau              jsonb;
 
 -- ── felt_surveys (PER-USER) ────────────────────────────────────────────────
 -- Each person's post-visit survey for a city. Readable by both (to compare),

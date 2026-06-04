@@ -857,10 +857,13 @@
       margin-bottom: 1rem;
     }
 .cd-root .walk-leaflet { position: absolute; inset: 0; }
+.cd-root .walk-leaflet .leaflet-container { width: 100%; height: 100%; background: var(--paper); }
 .cd-root .walk-leaflet .leaflet-tile-pane img {
       filter: saturate(0.88) sepia(0.06) contrast(1.04) brightness(1.0);
     }
 .cd-root .walk-leaflet .leaflet-control-attribution { display: none; }
+/* Click overlay sits above the tiles so the whole card deep-links to Maps. */
+.cd-root .walk-leaflet-link { position: absolute; inset: 0; z-index: 400; }
 .cd-root .walk-num {
       position: absolute;
       top: 0.7rem; left: 0.7rem;

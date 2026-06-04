@@ -15,6 +15,12 @@ const WhereMap = dynamic(() => import("./WhereMap"), {
   loading: () => <div className="leaflet-where" aria-hidden="true" />,
 });
 
+// One small read-only Leaflet map per "Six blocks" card. Also client-only.
+const BlockMap = dynamic(() => import("./BlockMap"), {
+  ssr: false,
+  loading: () => null,
+});
+
 const HOMEBASE_SLUG = "allison-park-pa";
 
 // Chapter-based, magazine-format city detail. Renders the same six chapters as
@@ -90,7 +96,7 @@ export default function MagazineDetail({ cityItem }) {
       <ChapterWhen view={view} homebase={homebase} />
 
       {/* Chapter VI — where to walk */}
-      <ChapterWalks cityItem={cityItem} blocks={view.blocks} />
+      <ChapterWalks cityItem={cityItem} blocks={view.blocks} blockGeometries={view.blockGeometries} />
     </div>
   );
 }
@@ -121,37 +127,77 @@ function ChapterWhy({ view }) {
   );
 }
 
-// Chapter VI — six blocks. The city carries block *names* (no coordinates), so
-// each card links to a map search rather than rendering a precise pin — see
-// features/six-blocks.md for the coordinate-backed follow-up.
-function ChapterWalks({ cityItem, blocks }) {
+// Chapter VI — six blocks. Each card embeds a read-only Leaflet mini-map
+// (BlockMap) when block_geometries[i] has a confident coord; otherwise
+// it falls back to a paper-colored placeholder. The whole .walk-map
+// area is overlaid by a transparent link that deep-links to Google
+// Maps search for the block.
+//
+// Confidence rules (see lib/measurers/blocks.js):
+//   - exact / between / near / feature / nominatim → render the map
+//   - heart-snap / manual → render the map (highest trust)
+//   - unresolved (or null lat) → render the placeholder card
+// The measurer's integrity gate already rejected anything outside the
+// stay-zone polygon, so any non-unresolved entry is safe to render.
+function ChapterWalks({ cityItem, blocks, blockGeometries }) {
   if (!blocks?.length) return null;
+  const geoms = Array.isArray(blockGeometries) ? blockGeometries : [];
   return (
     <section id="walks" className="walks" aria-label="Where to walk">
       <div className="walks-head">
         <h2>Six blocks</h2>
-        <p className="sub">Worth pacing on a regular Tuesday, in the order a resident would probably do them.</p>
+        <p className="sub">Six walks through the stay zone, ordered as a resident might do them.</p>
       </div>
       <div className="walks-grid">
-        {blocks.map((block, i) => (
-          <article className="walk" key={`${block}-${i}`}>
-            <div className="walk-map">
-              <a
-                className="walk-leaflet walk-leaflet-link"
-                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(formatMapSearchQuery(cityItem.name, block))}`}
-                target="_blank"
-                rel="noreferrer"
-                aria-label={`Open map for ${block}`}
-              />
-              <div className="walk-num">{i + 1}</div>
-            </div>
-            <h3 className="walk-name">{block}</h3>
-            <p className="walk-start"><strong>In</strong> {cityItem.name}</p>
-          </article>
-        ))}
+        {blocks.map((block, i) => {
+          const g = geoms[i];
+          const showMap = g && g.lat != null && g.lon != null && g.accuracy !== "unresolved";
+          const zoom = zoomForAccuracy(g?.accuracy);
+          const href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(formatMapSearchQuery(cityItem.name, block))}`;
+          return (
+            <article className="walk" key={`${block}-${i}`}>
+              <div className="walk-map">
+                {showMap ? (
+                  <div className="walk-leaflet">
+                    <BlockMap lat={g.lat} lon={g.lon} zoom={zoom} />
+                  </div>
+                ) : null}
+                <a
+                  className="walk-leaflet-link"
+                  href={href}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label={`Open map for ${block}`}
+                />
+                <div className="walk-num">{i + 1}</div>
+              </div>
+              <h3 className="walk-name">{block}</h3>
+              <p className="walk-start"><strong>In</strong> {cityItem.name}</p>
+            </article>
+          );
+        })}
       </div>
     </section>
   );
+}
+
+// Tighter zoom for high-precision accuracy tiers; wider for landmarks
+// and Nominatim fallback hits that are typically less pinpoint.
+function zoomForAccuracy(accuracy) {
+  switch (accuracy) {
+    case "exact":
+    case "between":
+    case "heart-snap":
+    case "manual":
+      return 18;
+    case "near":
+      return 17;
+    case "feature":
+    case "nominatim":
+      return 16;
+    default:
+      return 17;
+  }
 }
 
 function splitName(name) {

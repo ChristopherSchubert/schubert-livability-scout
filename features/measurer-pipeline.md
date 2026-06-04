@@ -71,7 +71,7 @@ doesn't block the cheap ones.
 | `horizon` | Open-Meteo elev + OSM peaks | `mtn_horizon_pct` | `horizon_features` |
 | `skyline` | Open-Meteo elevation | `skyline_deg` | — |
 | `admin` | hand-coded + Census | — | `admin` envelope (state capital flag; population TODO) |
-| `blocks` | OSM (Overpass) | — | `block_geometries` (per-block coords for the map) |
+| `blocks` | OSM (Overpass) + Nominatim fallback | — | `block_geometries` (per-block coords for the map, polygon-gated; see [features/six-blocks.md](six-blocks.md)) |
 | `census` | US Census ACS 5-year | `core_density`, `owner_occ_pct`, `seasonal_vac_pct`, `median_price_usd`, `pre1940_pct` | `median_income_usd`, `walk_transit_commute_pct`, `price_to_income_ratio` |
 | `eurostat_lau` | Eurostat GISCO LAU 2021 (Nominatim reverse-geocode) | `core_density` (EU only — self-skips US coords) | `eu_lau` envelope (LAU id, name, population, area, density per km²) |
 | `walkscore` | walkscore.com | `walk_score` | — |
