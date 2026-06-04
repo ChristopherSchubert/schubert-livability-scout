@@ -17,6 +17,18 @@ it must come from a cited source identical across all cities.
 Corollary: do not attribute the model's outputs to the owner's gut. The owner's
 judgment enters in exactly one place — the felt-score questionnaire (Track 2).
 
+Corollary 2 — **zero is not null**. The OSM pipeline's failure mode (fixed
+2026-06-04) was that Overpass returning HTTP 200 with a `remark: "Query timed
+out..."` and an empty body got counted as "zero of everything," then those
+zeros got persisted to the DB. The symptom was Bled / Ljubljana / Piran
+showing `cafe_n=0, street_km=0, …` despite OSM having dozens of cafés around
+the cluster center. `osmMetrics()` in `lib/measure.js` now detects this
+(remark field check + street_km==0 sanity check) and returns `{}` instead, so
+existing values are preserved. When you write any new Overpass-backed
+measurer, follow the same pattern: a non-null response is not the same as a
+successful response. Real cities have streets — if you got back zero of
+those, the query lied.
+
 ## Supabase is the source of truth
 
 **All city/place data lives in Supabase.** No CSVs in the repo, no in-source
