@@ -72,6 +72,7 @@ doesn't block the cheap ones.
 | `admin` | hand-coded + Census | — | `admin` envelope (state capital flag; population TODO) |
 | `blocks` | OSM (Overpass) | — | `block_geometries` (per-block coords for the map) |
 | `census` | US Census ACS 5-year | `core_density`, `owner_occ_pct`, `seasonal_vac_pct`, `median_price_usd`, `pre1940_pct` | `median_income_usd`, `walk_transit_commute_pct`, `price_to_income_ratio` |
+| `eurostat_lau` | Eurostat GISCO LAU 2021 (Nominatim reverse-geocode) | `core_density` (EU only — self-skips US coords) | `eu_lau` envelope (LAU id, name, population, area, density per km²) |
 | `walkscore` | walkscore.com | `walk_score` | — |
 
 That covers **23 of 23** taxonomy keys plus the chip / sidecar layer.
@@ -204,6 +205,22 @@ team is comfortable with the unified runner.
 - **`str_share_pct`** was retired (no source met the "identical ruler"
   bar). `seasonal_vac_pct` from `census` is the canonical hollowing
   signal now.
+- **EU realness beyond `core_density`.** `eurostat_lau` fills density
+  for any EU municipality, but the other realness metrics
+  (`owner_occ_pct`, `seasonal_vac_pct`, `median_price_usd`,
+  `price_to_income_ratio`) currently land empty for EU cities.
+  Eurostat Census 2021 publishes tenure and vacancy at NUTS region —
+  too coarse to map cleanly to LAU. The realistic fill path is one
+  per-country adapter at a time: Slovenia via SURS pxweb (housing
+  tenure by občina) and GURS ETN (€/m² transactions), with similar
+  per-country sources elsewhere.
+- **GEOSTAT 1 km grid for densest-cluster density.** Today's
+  `eurostat_lau` returns whole-LAU density, which understates dense
+  in-town cores in rural communes like Bled (294 /sqmi LAU-wide vs
+  much denser in the actual town centre). A follow-up could sample
+  the Eurostat 1 km grid inside the stay-zone polygon and return the
+  busiest cell, matching the US ACS tract-of-the-cluster approach.
+  Needs a ~100 MB download + per-cell spatial lookup.
 - **Schema validation on `measured_metrics`.** Today it's free-form jsonb;
   a Postgres `check` constraint or a writer-side schema validator would
   prevent bare scalars from sneaking in.

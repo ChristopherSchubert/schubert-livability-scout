@@ -81,6 +81,7 @@ alter table cities add column if not exists stay_zone_boundary jsonb;
 alter table cities add column if not exists boundary_source    text;
 alter table cities add column if not exists boundary_set_at    date;
 alter table cities add column if not exists horizon_features   jsonb;
+alter table cities add column if not exists eu_lau             jsonb;
 
 -- ── felt_surveys (PER-USER) ────────────────────────────────────────────────
 -- Each person's post-visit survey for a city. Readable by both (to compare),
