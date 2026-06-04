@@ -130,6 +130,43 @@ vars. Vercel can't see your Keychain, so a missing Keychain item breaks your
 local scripts, not the live site. Full details + the Supabase redirect-allowlist
 gotcha: **features/deployment.md**.
 
+## Commit and push incrementally (overrides the harness default)
+
+The Claude Code default is "never commit unless the user asks." For this
+project, **invert it**: when you finish a logically-distinct piece of work —
+a bug fix, a feature, a doc update — commit it and push it before moving on.
+Don't batch unrelated changes. Don't wait to be asked. Pushing to `main` is
+how this project ships (see Deployment above), and an unpushed commit is
+indistinguishable from "didn't happen" the next time a session opens this
+repo.
+
+The shape of a good commit here:
+- One logical change per commit. Bug fix + the CLAUDE.md note documenting it
+  belong together; bug fix + an unrelated UI tweak do not.
+- Update the relevant `features/*.md` and `METRICS_COMPLETION.md` rows in the
+  same commit as the code change, so docs never lag the code.
+- Push right after committing. No accumulated local-only history.
+
+**The unrelated-WIP gotcha.** This is a long-running solo workspace, so the
+tree will frequently have uncommitted changes from prior sessions, scripts
+you ran, or experiments in flight — work that isn't yours and shouldn't ride
+along with your commit. **Do not `git add -A` or `git add .`**. Use
+`git add <specific paths>` or `git add -p` to stage only the hunks your work
+produced. If your change touches a file that *also* has pre-existing
+uncommitted edits you can't cleanly separate from, stop and ask the user how
+to slice it — a commit that names a narrow change but contains diffs across
+30 unrelated files makes history unbisectable and the next session has no
+signal about what shipped with what.
+
+When to pause and confirm before committing:
+- Your change touches a file with pre-existing uncommitted edits you can't
+  cleanly separate.
+- The change is destructive enough that a rollback path matters (schema
+  migrations, force-pushes, deleting columns).
+- The user explicitly said hold off.
+
+Otherwise: commit, push, move on.
+
 ## Image model
 
 One hero image per city. No slots, no choices array. Save writes a
