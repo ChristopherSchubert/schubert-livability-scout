@@ -16,8 +16,6 @@ export default function ChapterData({ axes, horizonFeatures }) {
         </p>
       </div>
 
-      {horizonFeatures?.peaks?.length ? <HorizonStrip horizon={horizonFeatures} /> : null}
-
       <div className="axes">
         {(axes || []).map((axis) => (
           <div className="axis-col" key={axis.axis}>
@@ -26,7 +24,15 @@ export default function ChapterData({ axes, horizonFeatures }) {
               {axis.score != null ? <>{axis.score.toFixed(1)}<small>/10</small></> : "—"}
             </p>
             {axis.metrics.map((m) => (
-              <MetricRow key={m.key} m={m} />
+              <MetricRow
+                key={m.key}
+                m={m}
+                addon={
+                  m.key === "mtn_horizon_pct" && horizonFeatures ? (
+                    <HorizonStrip horizon={horizonFeatures} />
+                  ) : null
+                }
+              />
             ))}
           </div>
         ))}
@@ -35,7 +41,7 @@ export default function ChapterData({ axes, horizonFeatures }) {
   );
 }
 
-function MetricRow({ m }) {
+function MetricRow({ m, addon }) {
   return (
     <div className="metric">
       <div className="metric-top">
@@ -53,6 +59,7 @@ function MetricRow({ m }) {
       <div className={m.direction < 0 ? "metric-bar negative" : "metric-bar"}>
         <span style={{ width: m.barPct != null ? `${m.barPct}%` : 0 }} />
       </div>
+      {addon}
       {m.source ? <div className="metric-source">{m.source}</div> : null}
     </div>
   );
