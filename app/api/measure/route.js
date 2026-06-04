@@ -183,7 +183,12 @@ export async function POST(request) {
     if (city.water_target && newMetrics.water_dist_m) {
       const td = await distanceToTarget(measureLat, measureLon, city.water_target);
       if (td.dist != null) {
-        newMetrics.water_dist_m = { value: td.dist, asOf, source: `OpenStreetMap — target: ${city.water_target.name}`, point: td.point };
+        newMetrics.water_dist_m = {
+          value: td.dist, asOf,
+          source: `OpenStreetMap — target: ${city.water_target.name}`,
+          point: td.point,
+          ...(city.water_target.kind ? { kind: city.water_target.kind } : {}),
+        };
         if (td.extentKm2 != null) newMetrics.water_extent_km2 = { value: td.extentKm2, asOf, source: "OpenStreetMap (Overpass)" };
       }
     }
