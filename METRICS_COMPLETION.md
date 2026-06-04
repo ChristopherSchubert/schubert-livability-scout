@@ -38,7 +38,7 @@ when its `value` is non-null.
 | Year-round | `days_below_freeze` | **78/78** ✅ | Open-Meteo archive | `scripts/measure-climate-bldg.mjs` |
 | Year-round | `hot_days` | 25/78 | Open-Meteo archive | `scripts/measure-climate-bldg.mjs` |
 | Year-round | `clear_days` | **78/78** ✅ | Open-Meteo archive | `scripts/measure-climate-bldg.mjs` |
-| Year-round | `snowfall_in_yr` | **73/78** | NOAA NCEI 1991-2020 US Climate Normals | `scripts/onboard.mjs --measurer snowfall` |
+| Year-round | `snowfall_in_yr` | **76/78** | NOAA NCEI 1991-2020 Normals (US, when a station within 60 km carries `ANN-SNOW-NORMAL`); Open-Meteo archive ERA5 2019-2023 (global fallback) | `scripts/onboard.mjs --measurer snowfall,snowfall_open_meteo` |
 
 Auxiliary fields (not in `measured_metrics`):
 

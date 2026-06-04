@@ -62,7 +62,8 @@ doesn't block the cheap ones.
 | Measurer | Source | Taxonomy keys filled | Other writes |
 |---|---|---|---|
 | `climate` | NASA POWER (MERRA-2) | `pleasant_days`, `days_below_freeze`, `hot_days`, `clear_days` | `climate_extremes`, `visit_climate` |
-| `snowfall` | NOAA NCEI 1991–2020 Normals | — | `snowfall_in_yr` (chip) |
+| `snowfall` | NOAA NCEI 1991–2020 Normals | `snowfall_in_yr` (US only — no-output when no nearby station) | — |
+| `snowfall_open_meteo` | Open-Meteo archive (ERA5) 2019–2023 | `snowfall_in_yr` (global fallback — runs only when `snowfall` left it null) | — |
 | `water` | OSM (Overpass) | `water_dist_m`, `water_extent_km2` | — |
 | `osm_context` | OSM (Overpass) | — | `osm_context` envelope (chip signals: coastline, island, harbour, forest, historic, pedestrian, square, university, hiking, ski, cycleway) |
 | `osm_core` | OSM (Overpass) | `cafe_n`, `bar_n`, `rest_n`, `daily_needs_n`, `intersection_den`, `mean_block_m`, `carfree_frac`, `street_km`, `bldg_coverage` | — |
