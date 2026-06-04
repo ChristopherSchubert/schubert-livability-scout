@@ -74,6 +74,7 @@ doesn't block the cheap ones.
 | `blocks` | OSM (Overpass) + Nominatim fallback | — | `block_geometries` (per-block coords for the map, polygon-gated; see [features/six-blocks.md](six-blocks.md)) |
 | `census` | US Census ACS 5-year | `core_density`, `owner_occ_pct`, `seasonal_vac_pct`, `median_price_usd`, `pre1940_pct` | `median_income_usd`, `walk_transit_commute_pct`, `price_to_income_ratio` |
 | `eurostat_lau` | Eurostat GISCO LAU 2021 (Nominatim reverse-geocode) | `core_density` (EU only — self-skips US coords) | `eu_lau` envelope (LAU id, name, population, area, density per km²) |
+| `surs_obcina` | SURS PxWeb (tables 0861102, 0861110) | `owner_occ_pct` (SI, 2021), `seasonal_vac_pct` (SI, 2018) — reads `prior.core_density.meta.lau_id` to detect Slovenia; no-output otherwise | — |
 | `walkscore` | walkscore.com | `walk_score` | — |
 
 That covers **23 of 23** taxonomy keys plus the chip / sidecar layer.
@@ -206,15 +207,15 @@ team is comfortable with the unified runner.
 - **`str_share_pct`** was retired (no source met the "identical ruler"
   bar). `seasonal_vac_pct` from `census` is the canonical hollowing
   signal now.
-- **EU realness beyond `core_density`.** `eurostat_lau` fills density
-  for any EU municipality, but the other realness metrics
-  (`owner_occ_pct`, `seasonal_vac_pct`, `median_price_usd`,
-  `price_to_income_ratio`) currently land empty for EU cities.
-  Eurostat Census 2021 publishes tenure and vacancy at NUTS region —
-  too coarse to map cleanly to LAU. The realistic fill path is one
-  per-country adapter at a time: Slovenia via SURS pxweb (housing
-  tenure by občina) and GURS ETN (€/m² transactions), with similar
-  per-country sources elsewhere.
+- **EU realness beyond `core_density` + Slovenia tenure/vacancy.**
+  `eurostat_lau` fills density for any EU municipality and
+  `surs_obcina` fills owner-occ + seasonal-vacancy for Slovenian
+  občine specifically. Still empty for EU: `median_price_usd` and
+  `price_to_income_ratio`. For Slovenia those need a GURS ETN
+  adapter (annual €/m² transaction report, Excel/PDF download per
+  občina, EUR→USD at the report `asOf` date). Other EU countries
+  beyond Slovenia would need their own per-NSO adapters (France
+  DVF, UK HMRC Price Paid, NL Kadaster, IT OMI, DE BORIS).
 - **GEOSTAT 1 km grid for densest-cluster density.** Today's
   `eurostat_lau` returns whole-LAU density, which understates dense
   in-town cores in rural communes like Bled (294 /sqmi LAU-wide vs

@@ -32,7 +32,8 @@ when its `value` is non-null.
 | Fabric | `street_km` | 33/78 | OSM (osmnx) | `scripts/measure-cities.mjs` |
 | Realness | `daily_needs_n` | 33/78 | OSM (osmnx) | `scripts/measure-cities.mjs` |
 | Realness | `core_density` | **78/78** ✅ | US Census ACS (tract) for US; Eurostat GISCO LAU 2021 for EU | `scripts/onboard.mjs --measurer census,eurostat_lau` |
-| Realness | `seasonal_vac_pct` | **75/78** | US Census ACS (B25004) | `scripts/onboard.mjs --measurer census`. EU coverage: no pan-EU LAU-granular source yet — Eurostat Census 2021 ships tenure at NUTS region only, and national stats offices (Slovenia: SURS pxweb) would need per-country adapters |
+| Realness | `owner_occ_pct` | **78/78** ✅ | US Census ACS (B25003) for US; SURS PxWeb table 0861102 (2021) for SI | `scripts/onboard.mjs --measurer census,surs_obcina` |
+| Realness | `seasonal_vac_pct` | **78/78** ✅ | US Census ACS (B25004) for US; SURS PxWeb table 0861110 (2018 — most recent year with seasonal/secondary breakdown) for SI | `scripts/onboard.mjs --measurer census,surs_obcina`. Other EU countries still need per-NSO adapters |
 | Realness | `median_price_usd` | **75/78** | US Census ACS (B25077) | `scripts/onboard.mjs --measurer census`. EU coverage: no pan-EU equivalent — needs per-country price registries (Slovenia: GURS ETN; France: DVF; UK: HMRC Price Paid) |
 | Year-round | `pleasant_days` | 25/78 | Open-Meteo archive 2019–2023 | `scripts/measure-climate-bldg.mjs` |
 | Year-round | `days_below_freeze` | **78/78** ✅ | Open-Meteo archive | `scripts/measure-climate-bldg.mjs` |
