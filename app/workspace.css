@@ -7,6 +7,86 @@
  * eyebrow/label caps system from the city-detail page. Same components, same
  * data; this is the editorial skin that makes the whole app feel of-a-piece. */
 
+/* ── Top navigation: an editorial masthead, not a pill switcher ─────────── */
+.topbar-v2 {
+  padding: 0.7rem 1.5rem;
+  gap: 0.75rem 2rem;
+  background: rgba(251, 246, 234, 0.92);
+}
+.brand-mark {
+  font-family: var(--font-display);
+  font-variation-settings: "opsz" 40, "SOFT" 50, "wght" 580;
+  font-weight: 580;
+  font-size: 1.12rem;
+  letter-spacing: -0.01em;
+}
+.save-pill {
+  background: transparent;
+  color: var(--muted);
+  font-family: var(--font-ui);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.62rem;
+  font-weight: 600;
+  padding: 0.18rem 0;
+}
+.save-pill.saving { background: transparent; color: #946700; }
+
+/* The tab row loses its beige pill; tabs become tracked caps with a green
+   underline on the active one. */
+.stage-nav {
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
+  gap: 1.6rem;
+}
+.stage-tab {
+  padding: 0.35rem 0;
+  border-radius: 0;
+  font-family: var(--font-ui);
+  text-transform: uppercase;
+  letter-spacing: 0.11em;
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--muted);
+  border-bottom: 2px solid transparent;
+  gap: 0.45rem;
+}
+.stage-tab:hover { color: var(--text); }
+.stage-tab.active {
+  background: transparent;
+  color: var(--text);
+  box-shadow: none;
+  border-bottom-color: var(--accent);
+}
+.stage-tab.stage-board.active { box-shadow: none; }
+.stage-tab-count {
+  background: transparent;
+  color: var(--muted);
+  font-size: 0.68rem;
+  letter-spacing: 0;
+  padding: 0;
+}
+.stage-tab.active .stage-tab-count { background: transparent; color: var(--accent); }
+.backup-trigger { border-radius: 999px; }
+
+/* City-context strip: align the per-city tabs with the masthead language. */
+.city-context-name {
+  font-family: var(--font-display);
+  font-variation-settings: "opsz" 32, "SOFT" 60, "wght" 540;
+}
+.city-context-stage { font-family: var(--font-ui); letter-spacing: 0.13em; }
+.city-context-tab {
+  font-family: var(--font-ui);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.72rem;
+  font-weight: 600;
+  border-radius: 0;
+  border-bottom: 2px solid transparent;
+}
+.city-context-tab.active { background: transparent; border-bottom-color: var(--accent); color: var(--text); }
+
 /* ── Page headers: an eyebrow + a big Fraunces title over a hairline ─────── */
 .canvas { gap: 2rem; padding-top: 2.25rem; }
 
