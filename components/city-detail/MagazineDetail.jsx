@@ -65,7 +65,7 @@ export default function MagazineDetail({ cityItem }) {
       {/* Chapter III — where you'd live */}
       <section id="where" className="where" aria-label="Where you'd live">
         <div className="where-head">
-          <h2>Where you'd live</h2>
+          <h2>Stay zone</h2>
           <p className="note">The stay zone is the broader walkable area; the green field is the best 700 m within it — where the measurements are actually taken.</p>
         </div>
         <div className="where-map-wrap">
@@ -106,14 +106,14 @@ function ChapterWhy({ view }) {
   if (!paras.length && !view.ifWins && !view.ifFails) {
     return (
       <article id="why" className="why">
-        <p className="eyebrow">Why this could be the place</p>
+        <p className="eyebrow">The case for this place</p>
         <p className="why-lead">No editorial written for {view.name} yet — add the case for this place on the detail editor, and it appears here as the lead.</p>
       </article>
     );
   }
   return (
     <article id="why" className="why">
-      <p className="eyebrow">Why this could be the place</p>
+      <p className="eyebrow">The case for this place</p>
       {paras.map((p, i) => (
         i === 0 ? <p key={i} className="why-lead">{p}</p> : <p key={i}>{p}</p>
       ))}

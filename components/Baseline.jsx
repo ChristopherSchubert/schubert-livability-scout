@@ -40,10 +40,10 @@ export default function Baseline() {
     <AppShell activeMode="baseline">
       <section className="canvas-header">
         <div>
-          <p className="page-eyebrow">The answer key</p>
+          <p className="page-eyebrow">Baseline</p>
           <h1>Rate the places you already know</h1>
           <p className="canvas-sub">
-            These are the answer key. Rate them from memory using the same questionnaire you'll use after every visit — that's what makes new places comparable. Bled and Piran should land near 10; your own suburb near 0.
+            These are the answer key. Rate them from memory using the same questionnaire you'll use after every visit — that's what makes new places comparable. Bled and Piran are the high end of the scale; a familiar place with none of the qualities is the low end.
           </p>
         </div>
         <div className="felt-headline">

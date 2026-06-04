@@ -87,7 +87,7 @@ function SignIn() {
       <div className="auth-card">
         <span className="auth-eyebrow">Livability Scout</span>
         <h1 className="auth-title">Check your <em>email</em></h1>
-        <p className="auth-muted">A sign-in link is on its way to <strong>{email}</strong>. Open it on this device and you’re in — and you’ll stay signed in.</p>
+        <p className="auth-muted">A sign-in link is on its way to <strong>{email}</strong>. Open it on this device to sign in. You’ll stay signed in afterward.</p>
         <button type="button" className="auth-ghost" onClick={() => setSent(false)}>Use a different email</button>
       </div>
     );
@@ -96,8 +96,8 @@ function SignIn() {
   return (
     <form className="auth-card" onSubmit={send}>
       <span className="auth-eyebrow">Livability Scout</span>
-      <h1 className="auth-title">Find the next place that feels like <em>home</em>.</h1>
-      <p className="auth-muted">A quiet tool for the two of us — chasing the feeling of Bled and Piran across walkable American towns. Sign in with your email; we’ll send a one-tap link. No password to remember.</p>
+      <h1 className="auth-title">Find the next place to live <em>part-time</em>.</h1>
+      <p className="auth-muted">A tool for finding a US place that reproduces the feeling of Bled and Piran: walkable, alive year-round. Sign in with your email — we’ll send a one-tap link. No password to remember.</p>
       <label className="auth-field">
         <span className="auth-field-label">Your email</span>
         <input
@@ -162,7 +162,7 @@ function FullScreen({ children }) {
       <aside className="auth-scene" style={{ backgroundImage: `url(${scene.src})` }} aria-hidden="true">
         <div className="auth-scene-grad" />
         <div className="auth-scene-copy">
-          <p className="auth-scene-kicker">The feeling we’re looking for</p>
+          <p className="auth-scene-kicker">The benchmark</p>
           <p className="auth-scene-place">{scene.place}<span>, {scene.region}</span></p>
           <p className="auth-scene-note">{scene.note}</p>
         </div>

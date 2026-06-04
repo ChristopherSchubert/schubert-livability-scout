@@ -44,7 +44,7 @@ export default function ChapterWhen({ view, homebase }) {
       <div className="when-inner">
         <div className="when-head">
           <h2>When to go</h2>
-          <p className="sub">Two ribbons of the calendar year — comfort rising above the line{crowd ? ", crowds falling below" : ""}. The visits worth taking sit tall above and shallow beneath.</p>
+          <p className="sub">Climate comfort{crowd ? " and tourist crowd" : ""} plotted across the calendar year. The best visit windows are months with high comfort{crowd ? " and low crowd" : ""}.</p>
         </div>
 
         <div className="climate" aria-label="Monthly climate comfort vs tourist crowd density">
@@ -100,7 +100,7 @@ export default function ChapterWhen({ view, homebase }) {
 
         <div className="climate-foot">
           {vw?.charm ? <span><strong>Charm visit</strong> · {MONTH_LONG[vw.charm.idx]} — comfortable weather, after the crowds thin.</span> : null}
-          {vw?.truth ? <span><strong>Off-season visit</strong> · {MONTH_LONG[vw.truth.idx]} — coldest, quietest; does real life persist when tourists are gone?</span> : null}
+          {vw?.truth ? <span><strong>Off-season visit</strong> · {MONTH_LONG[vw.truth.idx]} — coldest and quietest month; the test of whether public life persists off-season.</span> : null}
         </div>
       </div>
     </section>

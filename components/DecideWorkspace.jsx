@@ -29,12 +29,12 @@ export default function DecideWorkspace() {
     <AppShell activeMode="decide">
       <section className="canvas-header">
         <div>
-          <p className="page-eyebrow">The reckoning</p>
+          <p className="page-eyebrow">Decide</p>
           <h1>Back from the trip</h1>
           <p className="canvas-sub">
             {queue.length === 0
               ? "No cities back from a trip yet. They show up here once you mark a Visit complete."
-              : `${queue.length} ${queue.length === 1 ? "city" : "cities"} to survey. Run the questionnaire while it's fresh.`}
+              : `${queue.length} ${queue.length === 1 ? "city" : "cities"} to survey. Run the questionnaire soon after the trip while the impression is fresh.`}
           </p>
         </div>
       </section>

@@ -98,7 +98,7 @@ export default function FunnelBoard({ focusStage }) {
     <AppShell activeMode="board">
       <section className="funnel-header">
         <div className="funnel-header-titles">
-          <p className="page-eyebrow">The board</p>
+          <p className="page-eyebrow">Board</p>
           <h1>Every candidate, by stage</h1>
           <p className="funnel-meta">
             {focusStage

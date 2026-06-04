@@ -118,7 +118,7 @@ export default function Calibrate() {
     <AppShell activeMode="calibrate">
       <section className="canvas-header">
         <div>
-          <p className="page-eyebrow">The ranking</p>
+          <p className="page-eyebrow">Ranking</p>
           <h1>Rank by measured fit</h1>
           <p className="canvas-sub">
             Each column is a measured axis scored 0–10 from the cited metrics. <strong>Overall</strong> is their weighted average. Click a header to sort; <strong>shift-click</strong> to add a secondary sort.
