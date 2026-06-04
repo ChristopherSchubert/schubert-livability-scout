@@ -2,12 +2,11 @@
 
 import Link from "next/link";
 import AppShell, { defaultCityNav, modeForCity } from "./AppShell";
-import { CityDetail } from "./PlannerShell";
-import { usePlanner, usePlannerCity } from "./PlannerProvider";
+import MagazineDetail from "./city-detail/MagazineDetail";
+import { usePlannerCity } from "./PlannerProvider";
 
 export default function CityDetailRoute({ slug }) {
   const cityItem = usePlannerCity(slug);
-  const { imageState } = usePlanner();
 
   if (!cityItem) {
     return (
@@ -25,7 +24,7 @@ export default function CityDetailRoute({ slug }) {
 
   return (
     <AppShell activeMode={modeForCity(cityItem)} cityItem={cityItem} cityNav={defaultCityNav(cityItem, "detail")}>
-      <CityDetail cityItem={cityItem} imageState={imageState} />
+      <MagazineDetail cityItem={cityItem} />
     </AppShell>
   );
 }
