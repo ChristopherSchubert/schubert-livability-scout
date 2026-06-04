@@ -48,6 +48,7 @@ export default function DecidedArchive() {
     <AppShell activeMode="decided">
       <section className="canvas-header">
         <div>
+          <p className="page-eyebrow">The portfolio</p>
           <h1>Verdict archive</h1>
           <p className="canvas-sub">{decided.length === 0 ? "No verdicts in yet. Decisions you make on the Decide page land here." : `${decided.length} ${decided.length === 1 ? "verdict" : "verdicts"} on record. Filter by outcome to see the portfolio.`}</p>
         </div>

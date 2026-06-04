@@ -1,0 +1,277 @@
+/* Editorial rebuild of the workspace pages (Board, Ranking, Visit, Decide,
+ * Decided, Baseline). Imported AFTER globals.css so these win on order.
+ *
+ * The move: trade the dashboard's elevated cards + boxed tables for a magazine
+ * language — generous whitespace, hairline rules instead of borders/shadows,
+ * Fraunces serif for titles, names, and every number that matters, and the
+ * eyebrow/label caps system from the city-detail page. Same components, same
+ * data; this is the editorial skin that makes the whole app feel of-a-piece. */
+
+/* ── Page headers: an eyebrow + a big Fraunces title over a hairline ─────── */
+.canvas { gap: 2rem; padding-top: 2.25rem; }
+
+.canvas-header,
+.funnel-header {
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 1.25rem;
+  align-items: flex-end;
+}
+.canvas-header h1,
+.funnel-header h1 {
+  font-family: var(--font-display);
+  font-variation-settings: "opsz" 60, "SOFT" 60, "wght" 480;
+  font-size: clamp(2.1rem, 3.6vw, 2.9rem);
+  line-height: 1.04;
+  letter-spacing: -0.018em;
+  margin: 0;
+}
+.funnel-header-titles { display: flex; flex-direction: column; gap: 0.35rem; }
+.funnel-header .funnel-meta { margin: 0.3rem 0 0; }
+/* An eyebrow injected before each page title (markup adds .page-eyebrow). */
+.page-eyebrow {
+  font-family: var(--font-ui);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--accent);
+  margin: 0 0 0.5rem;
+}
+.canvas-sub { font-size: 1rem; color: var(--muted); line-height: 1.6; max-width: 60ch; }
+
+/* ============================================================== */
+/* RANKING (Calibrate) — the centerpiece, an editorial ranked list */
+/* ============================================================== */
+
+.rank-table-wrap {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  padding: 0;
+}
+.rank-count {
+  font-family: var(--font-ui);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 0.6rem;
+}
+.rank-table { border-collapse: collapse; width: 100%; }
+.rank-table thead th {
+  font-family: var(--font-ui);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.64rem;
+  font-weight: 600;
+  color: var(--muted);
+  border-bottom: 1.5px solid var(--text);
+  padding: 0 0.5rem 0.6rem;
+  background: transparent;
+}
+.rank-table tbody td {
+  border-bottom: 1px solid var(--border);
+  padding: 0.85rem 0.5rem;
+  background: transparent;
+}
+.rt-row { transition: background 0.12s ease; }
+.rt-row:hover td { background: #fffaf0; }
+.rt-rank {
+  font-family: var(--font-display);
+  font-variation-settings: "opsz" 72, "SOFT" 40, "wght" 500;
+  font-size: 1.5rem;
+  color: #c3b59a;
+  width: 2.5rem;
+}
+.rt-city strong {
+  font-family: var(--font-display);
+  font-variation-settings: "opsz" 40, "SOFT" 60, "wght" 540;
+  font-size: 1.18rem;
+  letter-spacing: -0.01em;
+  display: block;
+  line-height: 1.15;
+}
+.rt-city span { color: var(--muted); font-size: 0.84rem; }
+.rt-overall {
+  font-family: var(--font-display);
+  font-variation-settings: "opsz" 90, "SOFT" 40, "wght" 600;
+  font-size: 1.5rem;
+  color: var(--accent);
+}
+.rt-empty { color: var(--muted); padding: 2rem 0.5rem; }
+.weight-note {
+  background: var(--panel-strong);
+  border: 0;
+  border-left: 2px solid var(--accent);
+  border-radius: 0;
+  font-size: 0.9rem;
+  padding: 0.8rem 1rem;
+}
+.weight-note-learned { border-left-color: var(--accent); }
+
+/* ============================================================== */
+/* BOARD — folio columns, hairline cards                           */
+/* ============================================================== */
+
+.funnel-column {
+  background: transparent;
+  border: 0;
+  border-top: 2px solid var(--border);
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0.9rem 0.6rem 0.6rem;
+}
+.funnel-column.stage-shortlist { border-top-color: var(--stage-shortlist); }
+.funnel-column.stage-calibrate { border-top-color: var(--stage-calibrate); }
+.funnel-column.stage-visit     { border-top-color: var(--stage-visit); }
+.funnel-column.stage-decide    { border-top-color: var(--stage-decide); }
+.funnel-column.stage-decided   { border-top-color: var(--stage-decided); }
+.funnel-column.drag-over { background: #f1f7f2; box-shadow: none; outline: 2px dashed var(--accent); outline-offset: -4px; }
+.funnel-column-head h2 {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-variation-settings: "opsz" 24, "SOFT" 80, "wght" 520;
+  font-size: 1.15rem;
+}
+.funnel-column-count {
+  font-family: var(--font-display);
+  font-variation-settings: "opsz" 40, "wght" 500;
+  background: transparent;
+  color: var(--muted);
+  font-size: 1.1rem;
+}
+.funnel-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: none;
+}
+.funnel-card:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(60, 45, 20, 0.08); border-color: #c4b393; }
+.funnel-card-score {
+  font-family: var(--font-display);
+  font-variation-settings: "opsz" 60, "SOFT" 40, "wght" 600;
+}
+.funnel-card-copy strong {
+  font-family: var(--font-display);
+  font-variation-settings: "opsz" 32, "SOFT" 50, "wght" 540;
+  font-size: 1.02rem;
+  letter-spacing: -0.005em;
+}
+
+/* ============================================================== */
+/* VISIT — trips as an editorial dossier list                     */
+/* ============================================================== */
+
+.trip-list { gap: 0; }
+.trip-row {
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
+  padding: 1.4rem 0.25rem;
+  gap: 1.4rem;
+}
+.trip-row.trip-active { background: #fff7e8; border-left: 0; padding-left: 1rem; box-shadow: inset 3px 0 0 #b45309; }
+.trip-media { width: 168px; border-radius: 8px; }
+.trip-name {
+  font-family: var(--font-display);
+  font-variation-settings: "opsz" 40, "SOFT" 60, "wght" 540;
+  font-size: 1.5rem;
+  letter-spacing: -0.012em;
+}
+.trip-score {
+  font-family: var(--font-display);
+  font-variation-settings: "opsz" 60, "wght" 600;
+  font-size: 1.2rem;
+  background: transparent;
+  color: var(--accent);
+  padding: 0;
+}
+.trip-dates { font-family: var(--font-ui); text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.74rem; }
+
+/* ============================================================== */
+/* DECIDED — a verdict index                                      */
+/* ============================================================== */
+
+.archive-list { gap: 0; }
+.archive-row {
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
+  padding: 1.25rem 0.25rem;
+}
+.archive-media { width: 84px; border-radius: 8px; }
+.archive-name {
+  font-family: var(--font-display);
+  font-variation-settings: "opsz" 40, "SOFT" 60, "wght" 540;
+  font-size: 1.3rem;
+  letter-spacing: -0.01em;
+}
+.archive-score {
+  font-family: var(--font-display);
+  font-variation-settings: "opsz" 60, "wght" 600;
+  font-size: 1.05rem;
+  background: transparent;
+  color: var(--accent);
+  padding: 0;
+}
+
+/* ============================================================== */
+/* DECIDE — survey queue as a dossier list                        */
+/* ============================================================== */
+
+.verdict-list { gap: 0; }
+.verdict-row {
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
+  padding: 1.25rem 0.25rem;
+}
+.verdict-name {
+  font-family: var(--font-display);
+  font-variation-settings: "opsz" 40, "SOFT" 60, "wght" 540;
+  font-size: 1.3rem;
+  letter-spacing: -0.01em;
+}
+
+/* ============================================================== */
+/* BASELINE — the answer key, an editorial roster                 */
+/* ============================================================== */
+
+.baseline-list { gap: 0; }
+.baseline-row {
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
+  padding: 1.15rem 0.25rem;
+}
+.baseline-main strong,
+.baseline-main > strong {
+  font-family: var(--font-display);
+  font-variation-settings: "opsz" 36, "SOFT" 60, "wght" 540;
+  font-size: 1.2rem;
+  letter-spacing: -0.008em;
+}
+.felt-headline {
+  font-family: var(--font-display);
+  font-variation-settings: "opsz" 100, "SOFT" 40, "wght" 600;
+}
+
+/* Shared: the empty-state card stays gently elevated but warms up. */
+.empty-state, .workspace-empty {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+.empty-state h2, .workspace-empty h2 {
+  font-family: var(--font-display);
+  font-variation-settings: "opsz" 40, "SOFT" 60, "wght" 520;
+}

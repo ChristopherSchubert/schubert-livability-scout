@@ -97,12 +97,16 @@ export default function FunnelBoard({ focusStage }) {
   return (
     <AppShell activeMode="board">
       <section className="funnel-header">
-        <p className="funnel-meta">
-          {focusStage
-            ? `${totalForFocus} ${totalForFocus === 1 ? "city" : "cities"} in ${STAGES.find((stage) => stage.id === focusStage)?.label}`
-            : `${filteredCities.length} of ${planner.cities.filter((c) => !hideCalibration || !c.isCalibration).length} candidates`}
-          <span className="funnel-meta-hint"> · drag to move · click to open</span>
-        </p>
+        <div className="funnel-header-titles">
+          <p className="page-eyebrow">The board</p>
+          <h1>Every candidate, by stage</h1>
+          <p className="funnel-meta">
+            {focusStage
+              ? `${totalForFocus} ${totalForFocus === 1 ? "city" : "cities"} in ${STAGES.find((stage) => stage.id === focusStage)?.label}`
+              : `${filteredCities.length} of ${planner.cities.filter((c) => !hideCalibration || !c.isCalibration).length} candidates`}
+            <span className="funnel-meta-hint"> · drag to move · click to open</span>
+          </p>
+        </div>
         <button
           type="button"
           className="primary"

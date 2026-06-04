@@ -29,6 +29,7 @@ export default function DecideWorkspace() {
     <AppShell activeMode="decide">
       <section className="canvas-header">
         <div>
+          <p className="page-eyebrow">The reckoning</p>
           <h1>Back from the trip</h1>
           <p className="canvas-sub">
             {queue.length === 0
