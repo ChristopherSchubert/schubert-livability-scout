@@ -23,6 +23,7 @@ docs are worse than no feature docs.
 | Visit window (Charm + Truth months) | [visit-window.md](visit-window.md) | stub — live but mockup adds year-shape + curves |
 | Baseline comparison (vs Allison Park) | [baseline-comparison.md](baseline-comparison.md) | stub — only in mockup |
 | Six blocks (curated walk list) | [six-blocks.md](six-blocks.md) | stub — data live, UI pending |
+| Deployment (Vercel auto-deploy from `main`) | [deployment.md](deployment.md) | documented |
 | Funnel board (5-stage kanban) | _todo_ | undocumented |
 | Calibrate (weighted ranking + learned weights) | _todo_ | undocumented |
 | Visit plan (logistics, days, checklists) | _todo_ | undocumented |

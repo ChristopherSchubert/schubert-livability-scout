@@ -98,6 +98,19 @@ this rule exists to prevent. Existing in-source seeds (e.g.
   search (Unsplash → Openverse → Commons) and content-addressable hero save.
   One hero per city; filename is `sha256(bytes).slice(0,12)`.
 
+## Deployment (Vercel — pushing to `main` IS deploying)
+
+Hosted on **Vercel**, auto-deploying from `main` via the Vercel GitHub App.
+**Production: https://schubert-livability-scout.vercel.app** — there is no
+`vercel.json` / `.vercel/` / CI workflow in the repo (the link lives in the
+Vercel dashboard), so don't go looking for deploy config files; their absence
+is expected. Every push to `main` triggers a `next build` + production deploy
+(~1–3 min) — no separate deploy step. Live env vars are set in the Vercel
+dashboard, not the repo (mirror any new var into both `.env.local` and Vercel).
+"The live site looks unchanged" almost always = deploy still building, a stale
+CDN/tab cache, or a genuinely subtle change — never a skipped manual step.
+Full details + the Supabase redirect-allowlist gotcha: **features/deployment.md**.
+
 ## Image model
 
 One hero image per city. No slots, no choices array. Save writes a
