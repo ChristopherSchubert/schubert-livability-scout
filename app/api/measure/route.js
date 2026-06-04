@@ -3,8 +3,9 @@ import { createClient } from "@supabase/supabase-js";
 import {
   measureAround, findVisitCenters, nearestWaterMulti,
   rankedWaterBodies, distanceToTarget, nearestWater, geocodeHeart,
-  measureCensus, measureWalkScore, measureClimate, measureBuildingCoverage, measureSkyline,
+  measureCensus, measureWalkScore, measureClimate, measureSkyline,
   measureHorizonPeaks, composite, fetchStayZoneBoundary,
+  syntheticWalkScore,
 } from "../../../lib/measure";
 
 // A few external calls; allow up to the plan ceiling.
@@ -150,18 +151,45 @@ export async function POST(request) {
     const wsKey = process.env.WALKSCORE_API_KEY;
     const core = await measureAround(center.lat, center.lon, { asOf, boundary: b.poly });
     const measureLat = core.center.lat, measureLon = core.center.lon;
-    const [cen, ws, cl, bc, sky, horizon] = await Promise.all([
+    // bldg_coverage now comes from measureAround (land-clipped via the disk's
+    // water mask), so there's no separate measureBuildingCoverage call here —
+    // a second un-clipped call would clobber the clipped value in the merge.
+    const [cen, ws, cl, sky, horizon] = await Promise.all([
       doFull && censusKey ? measureCensus(measureLat, measureLon, censusKey, { asOf }) : Promise.resolve({ metrics: {} }),
       doFull && wsKey ? measureWalkScore(measureLat, measureLon, city.name, wsKey, { asOf }) : Promise.resolve({}),
       doFull ? measureClimate(measureLat, measureLon, { asOf }) : Promise.resolve({ metrics: {} }),
-      doFull ? measureBuildingCoverage(measureLat, measureLon) : Promise.resolve({}),
       doFull ? measureSkyline(measureLat, measureLon, { asOf }) : Promise.resolve({ metrics: {} }),
       doFull ? measureHorizonPeaks(measureLat, measureLon, { asOf }).catch(() => null) : Promise.resolve(null),
     ]);
+    // Out of Walk Score coverage (or its API returned nothing usable) → compute
+    // the synthetic OSM proxy from the core metrics measureAround just produced,
+    // so non-US cities (Piran et al.) get a real walkability number instead of
+    // the API's out-of-coverage noise. See lib/measure.js syntheticWalkScore.
+    if (doFull && (ws.outOfCoverage || !ws.walk_score)) {
+      const m = core.metrics || {};
+      const v = (k) => m?.[k]?.value ?? null;
+      const value = syntheticWalkScore({
+        cafe_n: v("cafe_n"), bar_n: v("bar_n"), rest_n: v("rest_n"),
+        daily_needs_n: v("daily_needs_n"), intersection_den: v("intersection_den"),
+        mean_block_m: v("mean_block_m"), carfree_frac: v("carfree_frac"),
+      });
+      if (v("intersection_den") != null || v("cafe_n") != null) {
+        ws.walk_score = {
+          value, asOf,
+          source: "synthetic OSM proxy (Walk Score-style)",
+          sourceUrl: "https://www.openstreetmap.org",
+          meta: { synthetic: true, reason: ws.outOfCoverage ? "outside Walk Score coverage (US/CA/AU/NZ)" : "Walk Score API returned no usable value" },
+        };
+      }
+    }
     const geoSource = b.poly
       ? `best 700 m inside stay zone (${core.clusterN ?? "?"} POIs, ${core.drift ?? 0} m from pin)`
       : (userMovedPin ? "manual (placed by user)" : (city.lat != null ? undefined : "Nominatim (heart intersection)"));
-    const newMetrics = { ...core.metrics, ...cen.metrics, ...ws, ...cl.metrics, ...bc, ...sky.metrics };
+    // Spread ws.walk_score only — `ws` may also carry an `outOfCoverage` flag
+    // that must not leak into measured_metrics. bldg_coverage is already in
+    // core.metrics (land-clipped), so there's no separate `bc` to merge.
+    const wsMetric = ws.walk_score ? { walk_score: ws.walk_score } : {};
+    const newMetrics = { ...core.metrics, ...cen.metrics, ...wsMetric, ...cl.metrics, ...sky.metrics };
     if (horizon) {
       newMetrics.mtn_horizon_pct = { value: horizon.occupancyPct, asOf, source: "Open-Meteo elevation + OSM peaks" };
       // Upgrade skyline_deg if the best named peak beats the ray-sampled value
