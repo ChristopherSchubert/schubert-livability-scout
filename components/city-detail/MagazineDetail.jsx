@@ -84,7 +84,7 @@ export default function MagazineDetail({ cityItem }) {
       </section>
 
       {/* Chapter IV — by the numbers */}
-      <ChapterData axes={view.axes} />
+      <ChapterData axes={view.axes} horizonFeatures={view.horizonFeatures} />
 
       {/* Chapter V — when to go */}
       <ChapterWhen view={view} homebase={homebase} />

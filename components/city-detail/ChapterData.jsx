@@ -1,19 +1,22 @@
 import { formatMetricNumber } from "./format";
+import HorizonStrip from "./HorizonStrip";
 
 // Chapter IV — By the numbers. Five axis columns, each with its 0–10 rollup and
 // its constituent metric rows, rebuilt straight from the snapshot so only real
 // taxonomy metrics render and every value carries its cited source (or "—" when
 // not yet measured — never a fabricated number).
-export default function ChapterData({ axes }) {
+export default function ChapterData({ axes, horizonFeatures }) {
   return (
     <section id="data" className="data" aria-label="By the numbers">
       <div className="data-head">
         <h2>By the numbers</h2>
         <p className="note">
           Cited metrics grouped under five axes. Each bar fills against a fixed threshold —
-          good as it matters, not relative to the other candidates.
+          an absolute scale, not relative to the other cities.
         </p>
       </div>
+
+      {horizonFeatures?.peaks?.length ? <HorizonStrip horizon={horizonFeatures} /> : null}
 
       <div className="axes">
         {(axes || []).map((axis) => (

@@ -434,6 +434,26 @@
       line-height: 1.5;
       text-align: right;
     }
+.cd-root .horizon-strip {
+      margin: 0 0 2.4rem;
+      padding: 0;
+      border: 1px solid rgba(0,0,0,0.08);
+      background: #efe9dc;
+    }
+.cd-root .horizon-strip svg {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+.cd-root .horizon-strip figcaption {
+      padding: 0.5rem 0.9rem 0.7rem;
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 0.74rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--ink-mute);
+      border-top: 1px solid rgba(0,0,0,0.06);
+    }
 .cd-root .axes {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
