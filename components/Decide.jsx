@@ -41,15 +41,10 @@ export default function Decide({ cityItem }) {
 
   return (
     <AppShell activeMode="decide" cityItem={cityItem} cityNav={cityNav}>
-      <section className="canvas-header">
-        <div>
-          <p className="canvas-eyebrow stage-decide-text">After the visit</p>
-          <h1>{cityItem.name}</h1>
-          <p className="canvas-sub">Surveyed {survey.takenAt || "recently"}. The gut number is the verdict; the axes explain it.</p>
-        </div>
+      <section className="survey-result-head">
         <div className="felt-headline">
           <strong>{feltScore(survey).toFixed(0)}</strong>
-          <span>Slovenia score</span>
+          <span>Slovenia score · surveyed {survey.takenAt || "recently"}</span>
         </div>
       </section>
 

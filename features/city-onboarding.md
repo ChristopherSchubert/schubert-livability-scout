@@ -48,19 +48,28 @@ the actual heart — a wrong pin measures the wrong place.
 
 ### 3. Run the measurement pipeline
 
-Each script reads from / writes to Supabase directly. Run any subset; nothing
-is order-dependent except that the city must already have `lat`/`lon`.
+One command, one entrypoint. The script iterates the measurer registry
+([lib/measurers/_registry.js](../lib/measurers/_registry.js)) and runs every
+measurer for the city, idempotently — anything already populated is
+skipped, anything missing is computed and merged into the row. Order isn't
+sensitive except that `lat`/`lon` must already be set.
 
 ```bash
-node scripts/onboard.mjs --slug <slug>    # runs every measurer in the registry
-                                          # (climate, snowfall, water, osm-context,
-                                          #  terrain, horizon, admin) — idempotent
-node scripts/measure-cities.mjs           # OSM: cafe/bar/rest/fabric/water/daily-needs
-node scripts/measure-walkscore.mjs        # walkscore.com
-node scripts/measure-census.mjs           # ACS tract metrics
-node scripts/measure-climate-bldg.mjs     # Open-Meteo + building coverage + visit_climate
-node scripts/backfill-skyline-and-grandeur.mjs
+# everything missing, all measurers, this one city
+OVERPASS_URL=http://localhost:12345/api/interpreter \
+DBPW=$(security find-generic-password -a livability-scout -s supabase-db-password -w) \
+node scripts/onboard.mjs --slug <slug>
 ```
+
+`OVERPASS_URL` routes every OSM call (water, osm_context, osm_core,
+horizon, blocks) through the local container — required for a corpus run
+since public mirrors throttle at ~1 query / 5 s. For a single-city onboard
+you can omit it and the public mirrors will work, just slower.
+
+The 12 measurers in the registry collectively cover every taxonomy key plus
+the chip / sidecar layer. See
+[features/measurer-pipeline.md](measurer-pipeline.md) for the full
+contract, the registry table, and how the runner decides what to skip.
 
 The **snowfall** measurer is US-only (NOAA NCEI 1991-2020 normals); foreign
 cities and a handful of warm-climate US stations without `ANN-SNOW-NORMAL`
@@ -69,16 +78,16 @@ will leave `snowfall_in_yr` as `null` — that is the correct outcome.
 Anything the pipeline couldn't source stays `null`. **Do not hand-enter a
 value to fill a gap.**
 
-For the live per-metric coverage and which script fills which metric, see
-[METRICS_COMPLETION.md](../METRICS_COMPLETION.md).
+For the live per-metric coverage table and which measurer fills which key,
+see [METRICS_COMPLETION.md](../METRICS_COMPLETION.md).
 
 ### 4. Seed the visit window if needed
 
-`measure-climate-bldg.mjs` writes `visit_climate` (12 months of NOAA-derived
-normals). If the city is foreign or coverage failed, write the months
-directly into the row. Crowd season and notes are qualitative — they go in
-the same row's `crowd_season` (12 ints 0–5) and `season_notes`
-(`{ charm, truth }`).
+The `climate` measurer writes `visit_climate` (12 months of NASA-POWER-derived
+normals) as part of step 3. If a city is somewhere POWER can't reach (very
+small islands, etc.) the column stays null and you write the months directly
+into the row. Crowd season and notes are qualitative — they go in the same
+row's `crowd_season` (12 ints 0–5) and `season_notes` (`{ charm, truth }`).
 
 ### 5. Set `drive_hrs_from_pit`
 
@@ -113,18 +122,20 @@ Update the coverage column there so the next session sees an honest snapshot.
 ## Status
 
 - **UI add path** — works.
-- **Script add path** (`scripts/onboard.mjs`) — works.
-- **Pipeline scripts** — most work; 44 of 78 cities still missing the OSM
-  batch (blocked on TODO #1's local Nominatim/Overpass stack).
+- **Script add path** (`scripts/onboard.mjs`) — works; one entrypoint covers
+  every measurer (see [measurer-pipeline.md](measurer-pipeline.md)).
+- **Pipeline coverage** — every taxonomy key has a registry measurer; corpus
+  population is tracked in [METRICS_COMPLETION.md](../METRICS_COMPLETION.md).
 - **Hero image flow** — works.
-- **Drive-hours hand-entry** — 18/78 seeded; remaining 60 need a person
-  to make the call.
+- **Drive-hours hand-entry** — 18/78 seeded; remaining 60 need a person to
+  make the call (or the derived-metric idea below).
 
 ## TODOs / future direction
 
-- **One-command onboarding.** Wrap insert + geocode + every measure-*.mjs +
-  hero-search into a single `scripts/onboard.mjs <Name>, <ST>` invocation
-  so a new city graduates to *complete* in one step.
+- **Single-command bootstrap.** Today `onboard.mjs` handles the measurement
+  step but row insert + geocode + hero-search are still separate. Wrap them
+  into one invocation: `scripts/onboard.mjs --new "Annapolis, MD" --stay-zone "..." --heart "..."` →
+  insert → geocode → measure → suggest hero.
 - **Boundary auto-fetch on insert.** Boundaries are now lazy-fetched by
   `/api/measure` via `fetchStayZoneBoundary` in
   [lib/measure.js](../lib/measure.js) — Census Place → OSM → Tract → NRHP
@@ -134,10 +145,6 @@ Update the coverage column there so the next session sees an honest snapshot.
   routing API (OSRM, Google Distance Matrix) instead of hand-entry — would
   eliminate the manual step and make it consistent. Trade-off: API cost +
   another external dependency.
-- **Schema validation on `measured_metrics`.** Today it's a free-form jsonb
-  bag — nothing prevents writing `cafe_n: 12` (bare) instead of
-  `cafe_n: { value: 12, asOf: "2026-06-03" }`. A Postgres `check` constraint
-  or a writer-side helper would lock the convention.
-- **Felt score is per-user** but most of the rest is shared. For 2 users that's
-  fine; if the slate grows past two, the Calibrate page's "whose felt scores
-  are we regressing against" needs to be a setting.
+- **Felt score is per-user** but most of the rest is shared. For 2 users
+  that's fine; if the slate grows past two, the Calibrate page's "whose felt
+  scores are we regressing against" needs to be a setting.

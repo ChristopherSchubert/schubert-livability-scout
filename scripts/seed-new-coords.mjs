@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Push lat/lon for the 9 eastern-seaboard additions into Supabase so
-// measure-new.mjs picks them up. Coords match the candidate_cities.csv
-// pins — approximate core-of-neighborhood from general knowledge.
+// measure-new.mjs picks them up. Coords are approximate core-of-neighborhood
+// pins from general knowledge.
 // After this, run: node measure-new.mjs
 
 import { readFile } from "node:fs/promises";

@@ -299,6 +299,107 @@ button:hover, .button-link:hover {
   gap: 1rem;
 }
 
+/* Two-card variant used on the city detail page after "Why" was promoted
+   to its own full-width lead section. Stay Zone gets a bit more room than
+   the twin-score card; both align to top so neither stretches awkwardly. */
+.summary-grid-two {
+  grid-template-columns: 1.2fr 0.8fr;
+  align-items: start;
+}
+
+/* ── Editorial lead (city detail page) ────────────────────────────────────
+   Treats the top of the city page like a magazine article opener:
+   cinematic hero, then a single readable column for the prose with
+   magazine type and a drop cap, then a callout for the gut gates. */
+
+.lead-hero {
+  margin: 0 0 1.5rem;
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--panel);
+}
+.lead-hero-image {
+  width: 100%;
+  height: clamp(360px, 50vh, 520px);
+  object-fit: cover;
+  display: block;
+}
+
+.city-from-pit {
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-2, var(--ink));
+  opacity: 0.7;
+  margin: -0.25rem 0 0.4rem;
+}
+.city-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  list-style: none;
+  margin: -0.5rem 0 1.5rem;
+  padding: 0;
+}
+.city-chip {
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+  padding: 0.28rem 0.7rem;
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--ink-2, var(--ink));
+  border: 1px solid var(--rule, rgba(0, 0, 0, 0.08));
+}
+
+.lead-prose {
+  max-width: 64ch;
+  margin: 0.25rem auto 2.25rem;
+  padding: 0 0.25rem;
+}
+.lead-prose .eyebrow {
+  margin: 0 0 0.9rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.09em;
+}
+.lead-paragraph {
+  font-size: 1.1rem;
+  line-height: 1.72;
+  color: var(--text);
+  margin: 0 0 1.05rem;
+}
+.lead-paragraph:last-child { margin-bottom: 0; }
+.lead-paragraph-first::first-letter {
+  font-size: 3.4rem;
+  line-height: 0.85;
+  float: left;
+  margin: 0.35rem 0.55rem 0 0;
+  font-weight: 800;
+  color: var(--accent);
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+.lead-callout {
+  margin: 1.6rem 0 0;
+  padding: 0.95rem 1.1rem 1rem;
+  border-left: 3px solid var(--accent);
+  background: rgba(255, 253, 248, 0.7);
+  border-radius: 0 10px 10px 0;
+  font-size: 0.98rem;
+}
+.lead-callout p { margin: 0.35rem 0; line-height: 1.55; }
+.lead-callout p:first-child { margin-top: 0; }
+.lead-callout p:last-child { margin-bottom: 0; }
+.lead-callout-label {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+  margin-right: 0.5rem;
+}
+.lead-callout-label-warn { color: var(--stage-decide); }
+
 .card {
   padding: 1rem;
 }
@@ -1063,6 +1164,21 @@ button:hover, .button-link:hover {
   color: currentColor;
 }
 .city-context-text strong { font-size: 1.05rem; }
+.city-context-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  padding: 1px 4px;
+  margin: -1px -4px;
+  width: min(100%, 360px);
+  font-family: inherit;
+  line-height: 1.1;
+}
+.city-context-name:hover { border-color: var(--border); background: rgba(255,255,255,0.4); }
+.city-context-name:focus { border-color: var(--accent); background: #fffdf8; outline: none; }
 .city-context-nav { display: flex; gap: 0.25rem; }
 .city-context-tab {
   padding: 0.35rem 0.7rem;
@@ -2303,6 +2419,8 @@ button:hover, .button-link:hover {
 .felt-headline { text-align: right; }
 .felt-headline strong { display: block; font-size: 2.6rem; line-height: 1; color: var(--stage-decide); }
 .felt-headline span { font-size: 0.78rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+.survey-result-head { display: flex; justify-content: flex-end; margin: 0.5rem 0 0.75rem; }
+.survey-result-head .felt-headline { text-align: right; }
 .survey-result { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; display: flex; flex-direction: column; gap: 1.25rem; }
 .survey-result-axes { display: flex; flex-direction: column; gap: 0.7rem; }
 .survey-result-axis { display: grid; grid-template-columns: 130px 1fr 50px; align-items: center; gap: 0.85rem; }

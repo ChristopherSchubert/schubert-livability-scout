@@ -154,6 +154,7 @@ function BackupMenu({ onExport, onImport }) {
 }
 
 function CityContextStrip({ cityItem, cityNav }) {
+  const { updateCity } = usePlanner();
   const stage = cityStage(cityItem);
   const stageLabel = STAGES.find((entry) => entry.id === stage)?.label || stage;
   return (
@@ -162,7 +163,12 @@ function CityContextStrip({ cityItem, cityNav }) {
         <Link href={MODE_HREF[STAGE_TO_MODE[stage]] || "/board"} className="city-context-back">←</Link>
         <div className="city-context-text">
           <span className="city-context-stage">{stageLabel}</span>
-          <strong>{cityItem.name}</strong>
+          <input
+            className="city-context-name"
+            value={cityItem.name}
+            onChange={(event) => updateCity(cityItem.id, { name: event.target.value })}
+            aria-label="City name"
+          />
         </div>
       </div>
       {cityNav?.length ? (

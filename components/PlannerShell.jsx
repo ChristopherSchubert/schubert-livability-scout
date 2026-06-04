@@ -20,10 +20,12 @@ import {
   axisRollup,
   weightedAxisScore,
   surveyComplete,
+  formatDriveFromPit,
 } from "../lib/planner-data";
 import { appendBust, resolveImage, usePlanner } from "./PlannerProvider";
 import { getSupabase } from "../lib/supabase";
 import MapEmbed from "./MapEmbed";
+import { chipsFor } from "../lib/chips";
 
 // POST a chosen image to the save endpoint with the user's access token
 // (storage upload runs under RLS as that user). `section.folder` is
@@ -54,21 +56,47 @@ export function CityDetail({ cityItem, imageState }) {
   // Board. Equal weights here; Calibrate applies any learned per-axis weights.
   const measured = weightedAxisScore(cityItem, { setting: 1, aliveness: 1, fabric: 1, realness: 1, january: 1 });
 
+  // Chip vocabulary lives in lib/chips.js — assignment is purely data-driven
+  // off measuredMetrics, so a freshly-onboarded city gets chips automatically.
+  const chips = chipsFor(cityItem);
+  const driveLabel = formatDriveFromPit(cityItem.driveHrsFromPit);
+
   return (
     <>
-      <section className="hero-panel">
-        <img className="hero-image" src={appendBust(heroSrc, imageState.version)} alt={`${cityItem.name} at its best`} />
-      </section>
+      <figure className="lead-hero">
+        <img className="lead-hero-image" src={appendBust(heroSrc, imageState.version)} alt={`${cityItem.name} at its best`} />
+      </figure>
 
-      <section className="summary-grid">
-        <article className="card card-spacious">
-          <p className="eyebrow">Why this could be the place</p>
-          <h2>{cityItem.name}</h2>
+      {driveLabel ? (
+        <p className="city-from-pit" aria-label="Travel from Pittsburgh">{driveLabel}</p>
+      ) : null}
+
+      {chips.length ? (
+        <ul className="city-chips" aria-label="Place attributes">
+          {chips.map((label) => <li key={label} className="city-chip">{label}</li>)}
+        </ul>
+      ) : null}
+
+      {cityItem.why || cityItem.ifWins || cityItem.ifFails ? (
+        <section className="lead-prose">
+          {cityItem.why ? <p className="eyebrow">Why this could be the place</p> : null}
           {(cityItem.why || "").split(/\n\n+/).map((para, i) => (
-            <p key={i} className="body-copy">{para}</p>
+            <p key={i} className={`lead-paragraph${i === 0 ? " lead-paragraph-first" : ""}`}>{para}</p>
           ))}
-        </article>
+          {cityItem.ifWins || cityItem.ifFails ? (
+            <aside className="lead-callout">
+              {cityItem.ifWins ? (
+                <p><span className="lead-callout-label">If it wins</span> {cityItem.ifWins}</p>
+              ) : null}
+              {cityItem.ifFails ? (
+                <p><span className="lead-callout-label lead-callout-label-warn">If it fails</span> {cityItem.ifFails}</p>
+              ) : null}
+            </aside>
+          ) : null}
+        </section>
+      ) : null}
 
+      <section className="summary-grid summary-grid-two">
         <article className="card">
           <p className="eyebrow">Stay Zone</p>
           <h3>{cityItem.stayZone || "No stay zone set"}</h3>
@@ -183,8 +211,10 @@ function MeasuredPanel({ cityItem }) {
           horizon={cityItem.horizonFeatures}
           stayZoneBoundary={cityItem.stayZoneBoundary}
           onMeasured={(d) => {
-            // Reflect the new center + composite locally without a reload.
-            if (d.center) updateCity(cityItem.id, { lat: d.center.lat, lon: d.center.lon, measured: d.measured });
+            // Reflect the new pin locally without a reload. The composite
+            // recomputes live from measuredMetrics via weightedAxisScore,
+            // so no scalar to thread through.
+            if (d.center) updateCity(cityItem.id, { lat: d.center.lat, lon: d.center.lon });
           }}
         />
         <WaterTargetPicker cityItem={cityItem} accessToken={token} updateCity={updateCity} bodies={waterCands} setBodies={setWaterCands} />
@@ -280,7 +310,7 @@ function WaterTargetPicker({ cityItem, accessToken, updateCity, bodies, setBodie
     setBusy(true); setMsg(body ? `Targeting ${body.name}…` : "Reverting to nearest…");
     try {
       const d = await post({ cityId: cityItem.id, setWaterTarget: body });
-      updateCity(cityItem.id, { waterTarget: d.waterTarget || null, measuredMetrics: d.measuredMetrics, measured: d.measured });
+      updateCity(cityItem.id, { waterTarget: d.waterTarget || null, measuredMetrics: d.measuredMetrics });
       setBodies(null);
       setMsg(`Water now ${fmtM(d.water_dist_m)} → ${d.waterTarget ? d.waterTarget.name : "nearest major water"}.`);
     } catch (e) { setMsg(e.message); } finally { setBusy(false); }

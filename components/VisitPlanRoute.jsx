@@ -25,13 +25,6 @@ export default function VisitPlanRoute({ slug }) {
 
   return (
     <AppShell activeMode="visit" cityItem={cityItem} cityNav={defaultCityNav(cityItem, "visit")}>
-      <section className="canvas-header">
-        <div>
-          <p className="canvas-eyebrow stage-visit-text">Visit plan</p>
-          <h1>{cityItem.name}</h1>
-          <p className="canvas-sub">Schedule the trip, then fill in real-world details as the visit comes together.</p>
-        </div>
-      </section>
       <VisitPlan
         cityItem={cityItem}
         onPatch={(patch) => updateCity(cityItem.id, patch)}

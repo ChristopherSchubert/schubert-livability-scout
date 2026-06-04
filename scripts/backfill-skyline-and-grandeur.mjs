@@ -1,9 +1,10 @@
 // Re-measure skyline (now with 400m rise filter) for all 69 cities, and water
 // extent (now with elevation-width detector + MAJOR_RIVERS safety net) for any
-// city with water. Recompute composites at the end.
+// city with water. Composite is recomputed live at render time, not stored —
+// this script only persists measured_metrics.
 import pg from "pg";
 import { execSync } from "node:child_process";
-import { measureSkyline, nearestWater, distanceToTarget, composite } from "../lib/measure.js";
+import { measureSkyline, nearestWater, distanceToTarget } from "../lib/measure.js";
 
 const pw = execSync("security find-generic-password -a livability-scout -s supabase-db-password -w", { encoding: "utf8" }).trim();
 const c = new pg.Client({ host: "aws-1-us-west-2.pooler.supabase.com", port: 5432, user: "postgres.fitjkrmiwkdolxhitroc", password: pw, database: "postgres", ssl: { rejectUnauthorized: false } });
@@ -52,10 +53,7 @@ for (const city of rows) {
     }
   }
 
-  // Recompute composite from updated metrics
-  const raw = {}; for (const [k, v] of Object.entries(mm)) raw[k] = v?.value;
-  const measured = composite(raw);
-  await c.query("update cities set measured_metrics=$1::jsonb, measured=$2 where id=$3", [JSON.stringify(mm), measured, city.id]);
+  await c.query("update cities set measured_metrics=$1::jsonb where id=$2", [JSON.stringify(mm), city.id]);
   console.log(`✓ ${city.name.padEnd(30)} ${parts.join(" · ")}`);
   await new Promise((r) => setTimeout(r, 1500));
 }

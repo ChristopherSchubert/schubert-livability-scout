@@ -27,13 +27,6 @@ export default function ImagesPageRoute({ slug }) {
 
   return (
     <AppShell activeMode={modeForCity(cityItem)} cityItem={cityItem} cityNav={defaultCityNav(cityItem, "images")}>
-      <section className="canvas-header">
-        <div>
-          <p className="canvas-eyebrow">Images</p>
-          <h1>{cityItem.name}</h1>
-          <p className="canvas-sub">Pick one great hero. Search, paste a URL, or revert to a previous pick.</p>
-        </div>
-      </section>
       <ImagesPage
         cityItem={cityItem}
         imageState={imageState}

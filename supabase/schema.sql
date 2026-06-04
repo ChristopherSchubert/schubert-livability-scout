@@ -43,6 +43,7 @@ create table if not exists cities (
   blocks             jsonb default '[]',
   status             text default 'Idea',
   decision           text default 'Undecided',
+  is_calibration     boolean not null default false,  -- cohort flag: baseline place, not a candidate
   hero_image         text,
   arrive_date        text,
   depart_date        text,
@@ -57,6 +58,11 @@ create table if not exists cities (
   measured           numeric,                   -- objective 0-10, null until measured
   measured_metrics   jsonb default '{}',        -- { key: { value, asOf } }
   measured_at        date,                      -- when the pipeline last ran
+  water_target       jsonb,                     -- user-picked water body { name, point, … } for water_dist_m
+  stay_zone_boundary jsonb,                     -- GeoJSON polygon: the adaptive stay-zone
+  boundary_source    text,                      -- provenance of stay_zone_boundary (Census/OSM/NRHP/circle/…)
+  boundary_set_at    date,                      -- when the boundary was last fetched
+  horizon_features   jsonb,                     -- visible peaks { peaks: [{ name, angle, dir, … }], occupancyPct }
   lat                double precision,          -- geocoded heart (persisted, reused)
   lon                double precision,
   geo_source         text,                      -- provenance of lat/lon
@@ -64,9 +70,19 @@ create table if not exists cities (
   visit_climate      jsonb,                     -- [12] monthly normals
   crowd_season       jsonb,                     -- [12] 0-5
   season_notes       jsonb,                     -- { charm, truth }
+  drive_hrs_from_pit text,                      -- '4.5' (hours, string) | 'FLY' | null
   created_at         timestamptz not null default now(),
   updated_at         timestamptz not null default now()
 );
+
+-- Idempotent for older deployments that pre-date a column.
+alter table cities add column if not exists drive_hrs_from_pit text;
+alter table cities add column if not exists is_calibration     boolean not null default false;
+alter table cities add column if not exists water_target       jsonb;
+alter table cities add column if not exists stay_zone_boundary jsonb;
+alter table cities add column if not exists boundary_source    text;
+alter table cities add column if not exists boundary_set_at    date;
+alter table cities add column if not exists horizon_features   jsonb;
 
 -- ── felt_surveys (PER-USER) ────────────────────────────────────────────────
 -- Each person's post-visit survey for a city. Readable by both (to compare),

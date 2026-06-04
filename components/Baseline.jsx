@@ -40,7 +40,6 @@ export default function Baseline() {
     <AppShell activeMode="baseline">
       <section className="canvas-header">
         <div>
-          <p className="canvas-eyebrow stage-decide-text">Baseline</p>
           <h1>Rate the places you already know</h1>
           <p className="canvas-sub">
             These are the answer key. Rate them from memory using the same questionnaire you'll use after every visit — that's what makes new places comparable. Bled and Piran should land near 10; your own suburb near 0.

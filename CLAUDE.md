@@ -17,6 +17,23 @@ it must come from a cited source identical across all cities.
 Corollary: do not attribute the model's outputs to the owner's gut. The owner's
 judgment enters in exactly one place — the felt-score questionnaire (Track 2).
 
+## Supabase is the source of truth
+
+**All city/place data lives in Supabase.** No CSVs in the repo, no in-source
+seed maps keyed by city name, no `const someThingByCity = { … }` literals in
+JS modules. When you need to add a new per-city attribute:
+
+1. Add a column (or table) in `supabase/schema.sql` + a one-off migration
+   file in `supabase/migrations/`.
+2. Round-trip it through `lib/city-row.js` (`rowToCity` / `cityToRow`) and
+   add it to the `mapPatch` map in `lib/db.js` so updates persist.
+3. The runtime reads it from the row at load time — never from a literal.
+
+If you find yourself reaching for a CSV to commit, or typing
+`{ "Annapolis, MD": 4.5, … }` into a JS file, stop. That's the anti-pattern
+this rule exists to prevent. Existing in-source seeds (e.g.
+`visitClimateSeed`) are debt to migrate, not a pattern to copy.
+
 ## The three data tracks (never blend them)
 
 1. **Measured (objective)** — `cityItem.measuredMetrics`, defined by
@@ -76,6 +93,31 @@ content-addressable file and overwrites `manifest.images[query]`. The Images
 tab offers search + paste-a-URL (the Google-Images workflow without an API).
 `UNSPLASH_ACCESS_KEY` lives in `.env.local` (gitignored).
 
+## Stay-zone boundary + adaptive measurement
+
+A city has a *stay zone* (broader walkable area, polygon stored in
+`stay_zone_boundary`) and a *measurement field* (700 m around the densest
+social-POI cluster *inside* the stay zone). The score is "best 700 m within
+the stay zone," not "700 m around whichever pin was saved."
+
+- **Boundary policy**: Census Place / CDP → OSM polygon → OSM reverse-geocode
+  → Census Tract → NRHP historic district → point-circle → 2 km anchor circle.
+  Filters: real polygon area (shoelace) in [0.5, 30] km², pin must be inside
+  the bbox. Code lives in `lib/measure.js` (`fetchStayZoneBoundary`).
+- **Measurement field**: `measureAround(lat, lon, { boundary })` calls
+  `findVisitCenters` to find the densest 700 m cluster inside the polygon,
+  then measures there. The saved pin is NOT moved by routine re-measure —
+  only when the user explicitly drags it. The adaptive center is recorded in
+  `geo_source` for transparency.
+- **API cascade**: `POST /api/measure` ensures the boundary is current
+  (lazy-fetches via the chain above, or `refreshBoundary: true` to force),
+  then runs the boundary-aware measurement. No batch scripts needed for
+  routine maintenance — boundaries and measurements update through the API.
+- **One-time bulk migration** lives in `scripts/measure-cities.mjs` (run
+  after a policy change like raising the boundary cap). Boundary metadata
+  (`boundary_source`, `boundary_set_at`) is stored on the row so callers can
+  detect "measurement stale vs boundary."
+
 ## The Python pipeline (separate from the app)
 
 - `scripts/measure_places.py` — computes the objective metrics from cited
@@ -88,24 +130,94 @@ tab offers search + paste-a-URL (the Google-Images workflow without an API).
 - `_files_thread/HANDOFF.md` — the original methodology doc. Read it for the
   reasoning behind the no-fake-data rule and the metric taxonomy.
 
-## Onboarding a new city
+## Standing direction: complete every city's measurements
 
-See **CITY_ONBOARDING.md** for the full procedure. Short version:
-1. `city(...)` into `starterCities` (or **+ Add candidate** in the UI).
-2. Geocode the heart into `measure_places.py` `PLACES`.
-3. Run the pipeline → `import-scores.mjs`. Unmeasured metrics stay `null`.
-4. Seed the visit window (NOAA climate + qualitative crowd/notes).
-5. Set a hero on the Images tab.
-6. Felt score comes later, from the post-visit questionnaire.
+**Every city should carry a complete, cited measurement set.** Today no city
+is fully complete — see **METRICS_COMPLETION.md** for the live coverage
+table per metric, the gaps, and the exact script that fills each one. Treat
+that file as the project's running ledger: when you backfill a metric,
+update the coverage column so the next session sees an honest snapshot.
+
+When the work in front of you isn't time-sensitive, the default productive
+thing to do is move a row in that table closer to 78/78. The highest-value
+gap right now is the OSM batch (44 cities). When you onboard a new city,
+run the full pipeline (METRICS_COMPLETION § "Onboarding a new city") so it
+lands measured, not waiting in queue.
+
+## Feature documentation
+
+Major features each get a markdown file under **`features/`**. See
+**features/README.md** for the index. When you change a feature, update
+its file in the same diff — including the TODOs / future-direction
+section. Stale feature docs are worse than no feature docs; they actively
+mislead the next session.
+
+If you're touching a feature that doesn't have a doc yet (most don't), the
+polite move is to write a stub before you leave so the next session starts
+ahead of where you did. The stub should at minimum say what the feature is,
+the entry-point files, and what state it's in.
+
+Current docs (see `features/README.md` for the full index):
+- **features/city-onboarding.md** — end-to-end Supabase-first procedure for
+  adding a new city. Replaces the old `CITY_ONBOARDING.md`.
+- **features/measurer-pipeline.md** — the measurer registry, runner, and
+  the per-measurer contract. Per-key coverage in `METRICS_COMPLETION.md`.
+- **features/chips.md** — the city attribute strip on the detail page:
+  vocabulary, selection rules, current coverage, future direction.
+- **features/magazine-detail.md** — the chapter-based city detail redesign
+  (mockup at `public/city-detail-redesign.html`; live route not yet wired).
+- **features/visit-window.md** — Charm + Truth windows, year-shape, curves.
+- **features/stay-zone-map.md** — boundary cascade + adaptive measurement
+  field; polygon-on-map UI still pending.
+- **features/baseline-comparison.md** — the "always show vs Allison Park"
+  pattern from the mockup; live route doesn't render deltas yet.
+- **features/six-blocks.md** — curated walk list; data live, UI pending.
+- **features/why-prose.md** — `why` / `if_wins` / `if_fails` editorial
+  fields, the 2026-06-03 audit baseline.
 
 ## Conventions
 
 - Keep `lib/planner-data.js` the home for domain logic; components stay thin.
-- Derived seed/reference data (visit climate, benchmark scores) lives in
-  `lib/planner-data.js` and is re-applied on every `normalizeState` — the seed
-  wins, so updating it updates all cities. User-entered data (surveys, trip
+- Per-city data lives in Supabase (see "Supabase is the source of truth").
+  `normalizeState` only fills in missing top-level fields and defaults — it
+  does not re-seed values from JS-side maps. User-entered data (surveys, trip
   details) is preserved and never overwritten by normalize.
 - When adding a metric: add it to `metricTaxonomy` *with its source*, and the
   Detail page renders it automatically. Don't add a metric without a citation.
 - Dev server: `npm run dev` (port 3000). The repo has no test suite; verify by
   hitting routes and checking the rendered pages.
+
+## Verifying in the preview (auth bypass)
+
+The app is auth-gated by Supabase. To drive the preview from `preview_*`
+tools, use the local `/api/dev-login` endpoint — it's hard-disabled in
+production and mints a real Supabase session from `DEV_LOGIN_EMAIL` /
+`DEV_LOGIN_PASSWORD` (set in `.env.local`).
+
+Two ways in, depending on whether the page has rendered:
+
+1. **Form rendered** — wait for `button.auth-ghost` ("Dev sign-in
+   (localhost only)") to appear, then `preview_click` it. AuthGate's
+   `devSignIn()` handles the rest. Simplest path.
+2. **Form never renders / page stuck on "Loading…"** — call the endpoint
+   directly and adopt the session via the Supabase client:
+
+   ```js
+   const r = await fetch('/api/dev-login', { method: 'POST' });
+   const { access_token, refresh_token } = await r.json();
+   await window.__supabase?.auth.setSession({ access_token, refresh_token });
+   location.reload();
+   ```
+
+   `window.__supabase` is only available if exposed; otherwise click the
+   button (option 1). Do NOT hand-craft the `sb-<ref>-auth-token`
+   localStorage entry — Supabase's `getSession()` will hang trying to
+   refresh a session it didn't mint, leaving the page in permanent
+   "Loading…".
+
+Symptoms that the dev server is itself broken (not the auth path):
+repeated `FATAL: Turbopack ... Next.js package not found` in
+`preview_logs`. GET / still returns 200 (the SSR shell renders), but the
+client chunks fail to build, so React never hydrates and no buttons appear.
+Fix by restarting the dev server; auth bypass cannot work until that's
+healthy.

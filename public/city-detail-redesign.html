@@ -1,0 +1,2583 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Newport, RI — Livability Scout (redesign concept)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,300..900,0..100;1,9..144,300..900,0..100&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+  <style>
+    :root {
+      --paper:      #fbf6ea;
+      --paper-deep: #f4eddc;
+      --ink:        #1b1814;
+      --ink-soft:   #2c2823;
+      --ink-mute:   #7a7268;
+      --accent:     #0d4c44;
+      --accent-2:   #1e7a6e;
+      --warn:       #a23a30;
+      --hair:       rgba(27, 24, 20, 0.14);
+      --hair-soft:  rgba(27, 24, 20, 0.06);
+      --map-land:   #ece4d0;
+      --map-water:  #c5d4d8;
+      --map-street: #fbf6ea;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); }
+
+    body {
+      font-family: 'Fraunces', Georgia, serif;
+      font-variation-settings: "opsz" 14, "SOFT" 50, "wght" 400;
+      font-size: 18px;
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ------- shared atoms ------- */
+    .eyebrow {
+      font-family: 'Inter Tight', sans-serif;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      font-size: 0.72rem;
+      color: var(--accent);
+      margin: 0;
+    }
+    .rule {
+      border: 0;
+      border-top: 1px solid var(--hair);
+      margin: 0;
+    }
+    .label {
+      font-family: 'Inter Tight', sans-serif;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      font-size: 0.68rem;
+      color: var(--ink-mute);
+    }
+
+    /* ------- top context strip (matches the existing app shell) ------- */
+    .strip {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(251, 246, 234, 0.92);
+      backdrop-filter: saturate(150%) blur(8px);
+      border-bottom: 1px solid var(--hair);
+      padding: 0.85rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      font-family: 'Inter Tight', sans-serif;
+      font-size: 0.88rem;
+    }
+    .strip .back { color: var(--ink); text-decoration: none; padding: 0.2rem 0.55rem; border: 1px solid var(--hair); border-radius: 6px; }
+    .strip .stage { font-weight: 600; color: var(--ink-mute); text-transform: uppercase; letter-spacing: 0.13em; font-size: 0.7rem; }
+    .strip .name { font-weight: 600; color: var(--ink); font-size: 1.02rem; padding: 0 0.15rem; border: 1px dashed transparent; border-radius: 4px; }
+    .strip .name:hover { border-color: var(--hair); }
+    .strip nav { margin-left: auto; display: flex; gap: 1.2rem; font-size: 0.85rem; color: var(--ink-mute); }
+    .strip nav a { color: inherit; text-decoration: none; }
+    .strip nav a.active { color: var(--ink); font-weight: 600; }
+
+    /* ============================================================== */
+    /* CHAPTER 1 — SET THE SCENE                                       */
+    /* ============================================================== */
+
+    .hero {
+      position: relative;
+      width: 100%;
+      height: clamp(520px, 78vh, 820px);
+      overflow: hidden;
+      background: #2a2a2a;
+    }
+    .hero img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      filter: saturate(1.05) contrast(1.02);
+    }
+    .hero-grad {
+      position: absolute;
+      inset: auto 0 0 0;
+      height: 55%;
+      background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.18) 35%, rgba(0,0,0,0.68) 100%);
+      pointer-events: none;
+    }
+    .hero-bottom {
+      position: absolute;
+      left: 0; right: 0; bottom: 0;
+      padding: 0 2.5rem 2.2rem;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 2rem;
+      color: #f6efdf;
+    }
+    .hero-bottom .place {
+      font-family: 'Fraunces', serif;
+      font-variation-settings: "opsz" 144, "SOFT" 50, "wght" 600;
+      font-size: clamp(2.6rem, 6vw, 4.8rem);
+      line-height: 0.95;
+      letter-spacing: -0.022em;
+      margin: 0;
+    }
+    .hero-bottom .place em {
+      font-style: italic;
+      font-variation-settings: "opsz" 144, "SOFT" 100, "wght" 500;
+      color: #d6c79c;
+    }
+    .hero-bottom .meta {
+      font-family: 'Inter Tight', sans-serif;
+      text-align: right;
+      font-size: 0.78rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      line-height: 1.6;
+      opacity: 0.9;
+    }
+    .hero-bottom .meta strong { font-weight: 600; }
+    /* Each meta chunk stays atomic — never breaks mid-phrase. If the line
+       runs out of room, the next chunk wraps as a whole onto a new line. */
+    .hero-bottom .meta > span:not(.sep) { white-space: nowrap; }
+    .hero-bottom .meta .sep { display: inline-block; width: 18px; height: 1px; background: #f6efdf; vertical-align: middle; margin: 0 0.5rem 0.2rem; opacity: 0.7; }
+
+    /* ============================================================== */
+    /* CHAPTER 2 — THE WHY (editorial lead)                            */
+    /* ============================================================== */
+
+    .why {
+      max-width: 46rem;
+      margin: 5rem auto 4rem;
+      padding: 0 1.5rem;
+    }
+    .why .eyebrow { margin-bottom: 1.4rem; }
+
+    .why-lead {
+      font-family: 'Fraunces', serif;
+      font-variation-settings: "opsz" 24, "SOFT" 50, "wght" 420;
+      font-size: 1.22rem;
+      line-height: 1.62;
+      margin: 0 0 1.4rem;
+    }
+    .why-lead::first-letter {
+      font-family: 'Fraunces', serif;
+      font-variation-settings: "opsz" 144, "SOFT" 30, "wght" 700;
+      font-size: 5.8rem;
+      line-height: 0.82;
+      float: left;
+      margin: 0.55rem 0.85rem -0.15rem 0;
+      color: var(--accent);
+    }
+    .why p {
+      font-size: 1.1rem;
+      line-height: 1.72;
+      margin: 0 0 1.1rem;
+    }
+
+    .gates {
+      margin: 2.8rem 0 0;
+      display: grid;
+      gap: 1.3rem;
+      padding: 1.7rem 0 0;
+      border-top: 1px solid var(--hair);
+    }
+    .gate {
+      font-family: 'Fraunces', serif;
+      font-style: italic;
+      font-variation-settings: "opsz" 18, "SOFT" 100, "wght" 420;
+      font-size: 1.05rem;
+      line-height: 1.55;
+      margin: 0;
+      position: relative;
+      padding-left: 1.2rem;
+    }
+    .gate::before {
+      content: "";
+      position: absolute;
+      left: 0; top: 0.42rem; bottom: 0.42rem;
+      width: 2px;
+      background: var(--accent);
+    }
+    .gate-fails::before { background: var(--warn); }
+    .gate .gate-label {
+      font-family: 'Inter Tight', sans-serif;
+      font-style: normal;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      font-size: 0.7rem;
+      color: var(--accent);
+      margin-right: 0.55rem;
+    }
+    .gate-fails .gate-label { color: var(--warn); }
+
+    /* ============================================================== */
+    /* CHAPTER 3 — WHERE YOU'D LIVE (map-led, score overlay)           */
+    /* ============================================================== */
+
+    .where {
+      position: relative;
+      margin-top: 2.5rem;
+      background: var(--paper-deep);
+      border-top: 1px solid var(--hair);
+      border-bottom: 1px solid var(--hair);
+    }
+    .where-head {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 1rem 2rem 0.85rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 2rem;
+    }
+    .where-head h2 {
+      font-family: 'Fraunces', serif;
+      font-style: italic;
+      font-variation-settings: "opsz" 24, "SOFT" 80, "wght" 500;
+      font-size: 1.15rem;
+      line-height: 1.2;
+      margin: 0;
+      letter-spacing: -0.002em;
+      color: var(--ink-mute);
+    }
+    .where-head .note {
+      font-family: 'Inter Tight', sans-serif;
+      font-size: 0.78rem;
+      color: var(--ink-mute);
+      max-width: 36ch;
+      line-height: 1.5;
+      margin: 0;
+    }
+
+    .where-map-wrap {
+      position: relative;
+      width: 100%;
+      height: clamp(420px, 62vh, 720px);
+      overflow: hidden;
+      background: var(--paper);
+    }
+    /* (Removed a `.where-map-wrap svg { width: 100%; height: 100% }` rule
+       that was applied to my old static SVG mockup map. It now hits
+       Leaflet's overlay-pane SVG and squishes it to 0×0 because the pane
+       has no intrinsic size — hiding the visit boundary, pin, and the
+       stay-zone polygon. Leaflet sizes its own SVGs internally.) */
+
+    /* score badge — top right (raise above Leaflet's panes) */
+    .verdict-card {
+      position: absolute;
+      top: 2rem;
+      right: 2rem;
+      z-index: 600;
+      background: rgba(27, 24, 20, 0.92);
+      color: #f6efdf;
+      padding: 1.1rem 1.5rem 1.2rem;
+      border-radius: 2px;
+      box-shadow: 0 18px 40px -16px rgba(0,0,0,0.45);
+      display: flex;
+      gap: 1.6rem;
+      align-items: flex-end;
+    }
+    .verdict-card .axis {
+      text-align: center;
+      min-width: 78px;
+    }
+    .verdict-card .axis .lab {
+      font-family: 'Inter Tight', sans-serif;
+      font-size: 0.62rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      opacity: 0.7;
+      margin-bottom: 0.3rem;
+    }
+    .verdict-card .axis .num {
+      font-family: 'Fraunces', serif;
+      font-variation-settings: "opsz" 100, "SOFT" 40, "wght" 600;
+      font-size: 2.4rem;
+      line-height: 1;
+    }
+    .verdict-card .axis .num.muted { color: #6c635a; }
+    .verdict-card .axis .num small {
+      font-size: 0.9rem;
+      opacity: 0.55;
+      margin-left: 0.05em;
+    }
+
+    /* stay-zone overlay — bottom left (raise above Leaflet's panes) */
+    .stay-overlay {
+      position: absolute;
+      bottom: 2rem;
+      left: 2rem;
+      z-index: 600;
+      background: rgba(251, 246, 234, 0.97);
+      padding: 1.4rem 1.7rem 1.5rem;
+      border-left: 3px solid var(--accent);
+      max-width: 36ch;
+      box-shadow: 0 18px 40px -18px rgba(27, 24, 20, 0.25);
+    }
+    .stay-overlay .eyebrow { margin-bottom: 0.6rem; }
+    .stay-overlay h3 {
+      font-family: 'Fraunces', serif;
+      font-variation-settings: "opsz" 100, "SOFT" 60, "wght" 600;
+      font-size: 1.6rem;
+      line-height: 1.1;
+      margin: 0 0 0.5rem;
+      letter-spacing: -0.01em;
+    }
+    .stay-overlay .heart {
+      font-family: 'Inter Tight', sans-serif;
+      font-size: 0.82rem;
+      color: var(--ink-mute);
+      margin: 0;
+    }
+    .stay-overlay .heart strong { color: var(--ink); font-weight: 600; }
+    /* Brief highlight when "Edit center" is toggled on — draws the eye to
+       the suggestions list at bottom-left. */
+    @keyframes candidate-pulse {
+      0%   { box-shadow: 0 18px 40px -18px rgba(27, 24, 20, 0.25), 0 0 0 0 rgba(13, 76, 68, 0.55); }
+      60%  { box-shadow: 0 18px 40px -18px rgba(27, 24, 20, 0.25), 0 0 0 14px rgba(13, 76, 68, 0); }
+      100% { box-shadow: 0 18px 40px -18px rgba(27, 24, 20, 0.25), 0 0 0 0 rgba(13, 76, 68, 0); }
+    }
+    .candidate-panel-pulse {
+      animation: candidate-pulse 1.6s ease-out 2;
+    }
+
+    /* Candidate-core list — ranked options inside the stay zone. The
+       selected row is highlighted to match its green marker on the map. */
+    .candidate-list {
+      list-style: none;
+      margin: 0.9rem 0 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+    .candidate-list li {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.4rem 0.55rem;
+      border-radius: 4px;
+      font-family: 'Inter Tight', sans-serif;
+      font-size: 0.78rem;
+      color: var(--ink-mute);
+      cursor: pointer;
+      border: 1px solid transparent;
+    }
+    .candidate-list li:hover { background: rgba(13, 76, 68, 0.05); }
+    .candidate-list li.selected {
+      background: rgba(13, 76, 68, 0.09);
+      border-color: rgba(13, 76, 68, 0.3);
+      color: var(--ink);
+    }
+    .candidate-list .rank {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 1.5rem;
+      height: 1.5rem;
+      border-radius: 50%;
+      background: #c08457;
+      color: #fffdf8;
+      font-weight: 700;
+      font-size: 0.7rem;
+      flex: 0 0 auto;
+    }
+    .candidate-list li.selected .rank { background: #0d4c44; }
+    .candidate-list .main {
+      display: flex;
+      flex-direction: column;
+      gap: 0.05rem;
+      line-height: 1.25;
+    }
+    .candidate-list .main strong { color: var(--ink); font-weight: 600; font-size: 0.85rem; }
+    .candidate-list .sub { color: var(--ink-mute); font-size: 0.72rem; }
+
+    /* Numbered tooltip text inside the candidate map markers. */
+    .leaflet-tooltip.center-rank {
+      background: transparent;
+      border: 0;
+      box-shadow: none;
+      color: #fffdf8;
+      font-family: 'Inter Tight', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 0;
+      pointer-events: none;
+    }
+    .leaflet-tooltip.center-rank::before { display: none; }
+
+    /* small editor's note under the map */
+    .where-foot {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 0.6rem 2rem 0.85rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 2rem;
+      font-family: 'Inter Tight', sans-serif;
+      font-size: 0.78rem;
+      color: var(--ink-mute);
+    }
+    .where-foot-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .recenter-btn {
+      font-family: 'Fraunces', serif;
+      font-style: italic;
+      font-variation-settings: "opsz" 18, "SOFT" 80, "wght" 450;
+      font-size: 0.82rem;
+      color: var(--ink-soft);
+      background: transparent;
+      border: 1px solid var(--hair);
+      padding: 0.18rem 0.7rem;
+      cursor: pointer;
+      letter-spacing: 0.005em;
+      transition: background 200ms ease, color 200ms ease, border-color 200ms ease;
+    }
+    .recenter-btn:hover {
+      color: var(--accent);
+      border-color: var(--accent);
+      background: rgba(13, 76, 68, 0.04);
+    }
+    .recenter-btn-active {
+      color: var(--accent);
+      border-color: var(--accent);
+      background: rgba(13, 76, 68, 0.08);
+    }
+    .recenter-sep {
+      font-size: 0.7rem;
+      color: var(--ink-mute);
+      opacity: 0.6;
+    }
+    .where-foot a { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--accent); padding-bottom: 1px; }
+
+    /* ============================================================== */
+    /* CHAPTER 4 — THE DATA (measured metrics)                         */
+    /* ============================================================== */
+
+    .data {
+      max-width: 1180px;
+      margin: 3rem auto;
+      padding: 0 2rem;
+    }
+    .data-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      padding-bottom: 1.3rem;
+      border-bottom: 1px solid var(--hair);
+      margin-bottom: 2rem;
+    }
+    .data-head h2 {
+      font-family: 'Fraunces', serif;
+      font-style: italic;
+      font-variation-settings: "opsz" 36, "SOFT" 80, "wght" 500;
+      font-size: 1.55rem;
+      line-height: 1.15;
+      margin: 0;
+      letter-spacing: -0.005em;
+    }
+    .data-head .note {
+      font-family: 'Inter Tight', sans-serif;
+      font-size: 0.82rem;
+      color: var(--ink-mute);
+      max-width: 60ch;
+      line-height: 1.5;
+      text-align: right;
+    }
+    .axes {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 2.2rem;
+    }
+    .axis-col h3 {
+      font-family: 'Fraunces', serif;
+      font-variation-settings: "opsz" 30, "SOFT" 50, "wght" 600;
+      font-size: 1.08rem;
+      letter-spacing: -0.005em;
+      margin: 0 0 0.25rem;
+    }
+    .axis-col .axis-score {
+      font-family: 'Fraunces', serif;
+      font-variation-settings: "opsz" 100, "wght" 700;
+      font-size: 2rem;
+      line-height: 1;
+      color: var(--accent);
+      margin: 0 0 1.1rem;
+    }
+    .axis-col .axis-score small { font-size: 0.95rem; color: var(--ink-mute); margin-left: 0.05em; }
+    .axis-col .axis-formula {
+      font-family: 'Inter Tight', sans-serif;
+      font-size: 0.7rem;
+      color: var(--ink-mute);
+      letter-spacing: 0.04em;
+      margin: -0.6rem 0 1rem;
+      font-style: italic;
+    }
+
+    .metric {
+      padding: 0.55rem 0;
+      border-bottom: 1px solid var(--hair-soft);
+      font-family: 'Inter Tight', sans-serif;
+      font-size: 0.82rem;
+    }
+    .metric:last-child { border-bottom: 0; }
+    .metric-top { display: flex; justify-content: space-between; align-items: baseline; gap: 0.5rem; }
+    .metric-name { color: var(--ink); }
+    .metric-value {
+      font-family: 'Fraunces', serif;
+      font-variation-settings: "opsz" 14, "wght" 600;
+      color: var(--ink);
+      font-size: 0.95rem;
+    }
+    .metric-bar {
+      height: 3px;
+      background: var(--hair);
+      border-radius: 0;
+      overflow: hidden;
+      margin-top: 0.4rem;
+    }
+    .metric-bar > span { display: block; height: 100%; background: var(--accent); }
+    .metric-bar.negative > span { background: var(--warn); opacity: 0.7; }
+    /* Tagline: one-line "what this measures" subtitle under the metric
+       label. Pulled from metricTaxonomy.tagline; keeps the row legible
+       without a hover or click. */
+    .metric-tagline {
+      margin-top: 0.18rem;
+      color: var(--ink-mute);
+      font-family: 'Fraunces', serif;
+      font-style: italic;
+      font-variation-settings: "opsz" 14, "wght" 400;
+      font-size: 0.78rem;
+      line-height: 1.35;
+    }
+    .metric-source {
+      margin-top: 0.25rem;
+      color: var(--ink-mute);
+      font-size: 0.7rem;
+      letter-spacing: 0.02em;
+    }
+
+    /* ============================================================== */
+    /* CHAPTER 5 — WHEN TO GO                                          */
+    /* ============================================================== */
+
+    .when {
+      background: linear-gradient(180deg, var(--paper) 0%, var(--paper-deep) 100%);
+      padding: 4rem 2rem 5rem;
+      border-top: 1px solid var(--hair);
+    }
+    .when-inner { max-width: 1080px; margin: 0 auto; }
+    .when-head {
+      padding-bottom: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .when-head h2 {
+      font-family: 'Fraunces', serif;
+      font-style: italic;
+      font-variation-settings: "opsz" 36, "SOFT" 80, "wght" 500;
+      font-size: 1.55rem;
+      line-height: 1.15;
+      margin: 0 0 0.3rem;
+      letter-spacing: -0.005em;
+    }
+    .when-head .sub {
+      font-family: 'Inter Tight', sans-serif;
+      font-size: 0.78rem;
+      color: var(--ink-mute);
+      max-width: 90ch;
+      letter-spacing: 0.005em;
+    }
+
+    /* ── Diverging climate × crowds chart ─────────────────────────────── */
+    .climate {
+      position: relative;
+      margin: 1.5rem 0 1rem;
+    }
+    .climate svg { display: block; width: 100%; height: auto; overflow: visible; }
+    .climate .axis-rule { stroke: rgba(27,24,20,0.20); stroke-width: 1; }
+    .climate .grid-rule { stroke: rgba(27,24,20,0.07); stroke-width: 1; }
+    .climate .axis-label {
+      font-family: 'Inter Tight', sans-serif;
+      font-size: 9px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      fill: rgba(27,24,20,0.45);
+    }
+    .climate .month-label {
+      font-family: 'Inter Tight', sans-serif;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      fill: var(--ink-mute);
+      text-anchor: middle;
+    }
+    .climate .month-label.now { fill: var(--ink); font-weight: 700; }
+    .climate .comfort-area { fill: var(--accent); fill-opacity: 0.13; }
+    .climate .comfort-stroke { fill: none; stroke: var(--accent); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+    .climate .crowd-area { fill: var(--warn); fill-opacity: 0.18; }
+    .climate .crowd-stroke { fill: none; stroke: var(--warn); stroke-width: 1.6; stroke-linejoin: round; stroke-linecap: round; opacity: 0.85; }
+    .climate .now-line { stroke: var(--ink); stroke-width: 1; stroke-dasharray: 3 4; opacity: 0.55; }
+    .climate .now-pill {
+      font-family: 'Inter Tight', sans-serif;
+      font-size: 10px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      fill: var(--ink);
+      font-weight: 700;
+    }
+    .climate .now-score {
+      font-family: 'Fraunces', serif;
+      font-variation-settings: "opsz" 60, "wght" 700;
+      font-size: 22px;
+      fill: var(--accent);
+    }
+    .climate .annot-line { stroke: var(--ink-mute); stroke-width: 1; opacity: 0.5; }
+    .climate .annot-label {
+      font-family: 'Inter Tight', sans-serif;
+      font-weight: 600;
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+    .climate .annot-label.charm { fill: var(--accent); }
+    .climate .annot-label.truth { fill: var(--warn); }
+    .climate .annot-sub {
+      font-family: 'Fraunces', serif;
+      font-style: italic;
+      font-size: 12px;
+      fill: var(--ink-soft);
+    }
+    .climate .month-dot { fill: #fbf6ea; stroke-width: 2; }
+    .climate .month-dot.comfort { stroke: var(--accent); }
+    .climate .month-dot.crowd { stroke: var(--warn); }
+    .climate .month-dot.visit { stroke: #7a6e5e; fill: #7a6e5e; }
+    /* Visit-score line — quieter than the input areas so it doesn't dominate */
+    .climate .visit-stroke {
+      fill: none;
+      stroke: #7a6e5e;
+      stroke-width: 1.6;
+      stroke-linejoin: round;
+      stroke-linecap: round;
+      stroke-dasharray: 5 3;
+      opacity: 0.85;
+    }
+
+    .climate-legend {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.4rem;
+      margin-top: 0.8rem;
+      padding-top: 0.7rem;
+      border-top: 1px solid var(--hair);
+      font-family: 'Inter Tight', sans-serif;
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ink-mute);
+    }
+    .climate-legend > span { line-height: 1.45; }
+    .climate-legend em {
+      display: block;
+      margin-top: 0.15rem;
+      font-size: 0.7rem;
+    }
+    .climate-legend .sw {
+      display: inline-block;
+      width: 14px; height: 6px;
+      vertical-align: middle;
+      margin-right: 0.5rem;
+    }
+    .climate-legend .sw.comfort { background: var(--accent); }
+    .climate-legend .sw.crowd { background: var(--warn); opacity: 0.7; }
+    .climate-legend .sw.visit { background: #7a6e5e; }
+
+    /* ── Climatology strip — high/low/precip small multiples ─────────── */
+    .climatology {
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--hair);
+    }
+    .climatology svg { display: block; width: 100%; height: auto; overflow: visible; }
+    .climatology .row-label {
+      font-family: 'Inter Tight', sans-serif;
+      font-size: 15px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      fill: var(--ink);
+      font-weight: 600;
+    }
+    .climatology .row-unit {
+      font-family: 'Inter Tight', sans-serif;
+      font-size: 13px;
+      letter-spacing: 0.1em;
+      fill: var(--ink-mute);
+    }
+    .climatology .row-rule { stroke: var(--hair); stroke-width: 1; }
+    .climatology .bar {
+      fill: rgba(27,24,20,0.32);
+    }
+    .climatology .bar.high  { fill: #b86a3f; opacity: 0.62; }
+    .climatology .bar.low   { fill: #4a78a8; opacity: 0.62; }
+    .climatology .bar.precip { fill: #6e7d8c; opacity: 0.62; }
+    /* Allison Park reference bars — paired beside each Newport bar, hatched
+       so they read clearly as "the other one" without competing with the
+       solid Newport bars for visual weight. */
+    .climatology .bar.ref.high   { fill: url(#hatch-high);   stroke: #b86a3f; stroke-width: 0.7; opacity: 0.95; }
+    .climatology .bar.ref.low    { fill: url(#hatch-low);    stroke: #4a78a8; stroke-width: 0.7; opacity: 0.95; }
+    .climatology .bar.ref.precip { fill: url(#hatch-precip); stroke: #6e7d8c; stroke-width: 0.7; opacity: 0.95; }
+    .climatology .val {
+      font-family: 'Fraunces', serif;
+      font-variation-settings: "opsz" 20, "wght" 600;
+      font-size: 18px;
+      fill: var(--ink);
+      text-anchor: middle;
+    }
+    /* Delta (Newport − Allison Park) stacked above val on its own line.
+       Colored by direction so the comparison reads at a glance even when
+       the two bars are nearly the same height. */
+    .climatology .delta {
+      font-family: 'Inter Tight', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      text-anchor: middle;
+    }
+    .climatology .delta.pos { fill: #b86a3f; }   /* Newport warmer / wetter than AP */
+    .climatology .delta.neg { fill: #4a78a8; }   /* Newport cooler / drier than AP */
+    .climatology .delta.zero { fill: var(--ink-mute); }
+    /* .val.peak removed — no value should read as "the right answer" */
+    .climatology .gridline { stroke: rgba(27,24,20,0.06); stroke-width: 1; }
+    .climatology .month-label {
+      font-family: 'Inter Tight', sans-serif;
+      font-size: 14px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      fill: var(--ink-mute);
+      text-anchor: middle;
+    }
+    .climatology-caption {
+      margin-top: 0.6rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-family: 'Inter Tight', sans-serif;
+      font-size: 0.72rem;
+      letter-spacing: 0.06em;
+      color: var(--ink-mute);
+    }
+    .climatology-caption .ref-swatch {
+      display: inline-block;
+      width: 10px; height: 12px;
+      background-image: repeating-linear-gradient(45deg, rgba(27,24,20,0.55) 0 1px, transparent 1px 3.5px);
+      border: 1px solid rgba(27,24,20,0.55);
+      vertical-align: -2px;
+    }
+    .climate-foot {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 1rem;
+      gap: 2rem;
+      font-family: 'Inter Tight', sans-serif;
+      font-size: 0.78rem;
+      color: var(--ink-mute);
+    }
+    .climate-foot strong {
+      font-family: 'Fraunces', serif;
+      font-style: normal;
+      font-variation-settings: "opsz" 36, "wght" 600;
+      color: var(--ink);
+      letter-spacing: 0;
+      text-transform: none;
+      font-size: 0.95rem;
+    }
+
+    /* "Year-shape" — auto-computed worst month per climate direction.
+       The four extremes are pulled from the same NOAA monthly normals the
+       climatology bars render, so every city gets these for free. Each cell
+       takes its accent color from the corresponding row above (low / high /
+       precip / daylight). */
+    .extremes {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0;
+      margin-top: 1.4rem;
+      border-top: 1px solid var(--hair);
+      border-bottom: 1px solid var(--hair);
+    }
+    .extreme {
+      padding: 0.95rem 1.1rem 1rem;
+      border-left: 1px solid var(--hair-soft);
+      position: relative;
+    }
+    .extreme:first-child { border-left: 0; }
+    .extreme::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 36px;
+      height: 2px;
+      background: var(--accent-bar, var(--ink-mute));
+    }
+    .extreme.cold { --accent-bar: #4a78a8; }
+    .extreme.hot  { --accent-bar: #b86a3f; }
+    .extreme.wet  { --accent-bar: #6e7d8c; }
+    .extreme.dark { --accent-bar: #7a6e5e; }
+    .extreme-label {
+      margin: 0 0 0.4rem;
+      font-family: 'Inter Tight', sans-serif;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      font-size: 0.66rem;
+      color: var(--accent-bar);
+    }
+    .extreme-month {
+      margin: 0;
+      font-family: 'Fraunces', serif;
+      font-variation-settings: "opsz" 48, "wght" 500;
+      font-size: 1.45rem;
+      line-height: 1.05;
+      color: var(--ink);
+    }
+    .extreme-value {
+      margin: 0.45rem 0 0;
+      font-family: 'Fraunces', serif;
+      font-variation-settings: "opsz" 36, "wght" 500;
+      font-size: 1.05rem;
+      color: var(--ink-soft);
+    }
+    .extreme-value small {
+      font-family: 'Inter Tight', sans-serif;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-size: 0.62rem;
+      color: var(--ink-mute);
+      margin-left: 0.35rem;
+    }
+    .extreme-ref {
+      margin: 0.55rem 0 0;
+      font-family: 'Inter Tight', sans-serif;
+      font-size: 0.72rem;
+      color: var(--ink-mute);
+    }
+    .extreme-ref strong {
+      color: var(--ink-soft);
+      font-weight: 500;
+    }
+
+    /* ============================================================== */
+    /* CHAPTER 6 — WHERE TO WALK                                       */
+    /* ============================================================== */
+
+    .walks {
+      max-width: 1200px;
+      margin: 6rem auto 0;
+      padding: 0 2rem;
+    }
+    .walks-head {
+      padding-bottom: 1.3rem;
+      border-bottom: 1px solid var(--hair);
+      margin-bottom: 2.5rem;
+    }
+    .walks-head h2 {
+      font-family: 'Fraunces', serif;
+      font-style: italic;
+      font-variation-settings: "opsz" 36, "SOFT" 80, "wght" 500;
+      font-size: 1.55rem;
+      line-height: 1.15;
+      margin: 0 0 0.3rem;
+      letter-spacing: -0.005em;
+    }
+    .walks-head .sub {
+      font-family: 'Inter Tight', sans-serif;
+      font-size: 0.78rem;
+      color: var(--ink-mute);
+      max-width: 90ch;
+      line-height: 1.5;
+      margin: 0;
+      letter-spacing: 0.005em;
+    }
+    .walks-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2.4rem;
+    }
+    @media (max-width: 900px) {
+      .axes { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 640px) {
+      .walks-grid { grid-template-columns: 1fr; }
+    }
+    .walk { display: flex; flex-direction: column; }
+    .walk-map {
+      position: relative;
+      aspect-ratio: 4/3;
+      overflow: hidden;
+      background: var(--paper);
+      border-radius: 4px;
+      margin-bottom: 1rem;
+    }
+    /* Real Leaflet container inside .walk-map. The vintage-atlas filter is
+       reapplied here (same recipe as .leaflet-where) so the small maps share
+       the main map's tone. */
+    .walk-leaflet { position: absolute; inset: 0; }
+    .walk-leaflet .leaflet-tile-pane img {
+      filter: saturate(0.88) sepia(0.06) contrast(1.04) brightness(1.0);
+    }
+    .walk-leaflet .leaflet-control-attribution { display: none; }
+    .walk-num {
+      position: absolute;
+      top: 0.7rem; left: 0.7rem;
+      z-index: 500;
+      background: var(--paper);
+      color: var(--accent);
+      font-family: 'Fraunces', serif;
+      font-variation-settings: "opsz" 30, "wght" 700;
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem;
+      box-shadow: 0 2px 6px -2px rgba(0,0,0,0.2);
+    }
+    .walk-name {
+      font-family: 'Fraunces', serif;
+      font-variation-settings: "opsz" 30, "SOFT" 50, "wght" 600;
+      font-size: 1.25rem;
+      line-height: 1.2;
+      margin: 0 0 0.35rem;
+      letter-spacing: -0.005em;
+    }
+    .walk-attractions {
+      font-family: 'Inter Tight', sans-serif;
+      font-size: 0.85rem;
+      color: var(--ink-soft);
+      line-height: 1.5;
+      margin: 0 0 0.5rem;
+    }
+    .walk-start {
+      font-family: 'Inter Tight', sans-serif;
+      font-size: 0.76rem;
+      color: var(--ink-mute);
+      letter-spacing: 0.04em;
+    }
+    .walk-start strong {
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-weight: 600;
+      color: var(--ink-mute);
+      margin-right: 0.4rem;
+    }
+
+    /* ============================================================== */
+    /* THE VERDICT STAMP                                               */
+    /* ============================================================== */
+
+
+    /* misc */
+    @media (max-width: 760px) {
+      .where-head, .data-head, .when-head, .walks-head { flex-direction: column; align-items: flex-start; gap: 0.7rem; }
+      .verdict-card { position: static; margin: 1rem; }
+      .stay-overlay { position: static; margin: 1rem; max-width: none; }
+      .hero-bottom { flex-direction: column; align-items: flex-start; }
+      .toc { display: none; }
+    }
+
+    /* ============================================================== */
+    /* Real Leaflet map for the Where-you'd-live section.              */
+    /* OSM tiles rendered B&W via CSS filter on the tile pane only.    */
+    /* ============================================================== */
+    .leaflet-where {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--paper);
+      cursor: grab;
+    }
+    .leaflet-where:active { cursor: grabbing; }
+    /* Apply the vintage-atlas filter to individual tile IMG elements,
+       NOT the tile-pane. A CSS filter on the pane creates a compositing
+       layer that paints over the sibling overlay-pane, hiding the
+       boundary circle, pin, and stay-zone polygon. Filtering the
+       images directly avoids that. */
+    .leaflet-where .leaflet-tile-pane img {
+      /* Keep most of the native color so water reads clearly blue and land
+         reads warm. Just a hair of sepia + modest contrast to harmonize with
+         the cream page without washing the map out. */
+      filter: saturate(0.88) sepia(0.06) contrast(1.04) brightness(1.0);
+    }
+    /* Hide Leaflet's default control look — let our editorial styling stand */
+    .leaflet-where .leaflet-control-zoom {
+      border: 1px solid var(--hair);
+      background: rgba(251, 246, 234, 0.92);
+      border-radius: 2px;
+      box-shadow: none;
+      margin: 1rem !important;
+    }
+    .leaflet-where .leaflet-control-zoom a {
+      background: transparent;
+      color: var(--ink);
+      border-bottom: 1px solid var(--hair);
+      font-family: 'Fraunces', serif;
+      font-variation-settings: "opsz" 30, "wght" 500;
+      width: 28px; height: 28px; line-height: 28px;
+    }
+    .leaflet-where .leaflet-control-zoom a:last-child { border-bottom: 0; }
+    .leaflet-where .leaflet-control-zoom a:hover { background: rgba(27, 24, 20, 0.05); color: var(--accent); }
+    .leaflet-where .leaflet-control-attribution {
+      background: rgba(251, 246, 234, 0.85);
+      font-family: 'Inter Tight', sans-serif;
+      font-size: 0.6rem;
+      color: rgba(27, 24, 20, 0.55);
+      padding: 2px 8px;
+      letter-spacing: 0.04em;
+    }
+    .leaflet-where .leaflet-control-attribution a { color: inherit; }
+    .map-region-label {
+      font-family: 'Fraunces', serif;
+      font-style: italic;
+      font-variation-settings: "opsz" 30, "SOFT" 100, "wght" 420;
+      font-size: 19px;
+      letter-spacing: 0.14em;
+      color: rgba(27, 24, 20, 0.55);
+      pointer-events: none;
+      white-space: nowrap;
+      transform: rotate(-12deg);
+      transform-origin: left center;
+      text-shadow:
+        0 0 4px rgba(251, 246, 234, 0.9),
+        0 0 10px rgba(251, 246, 234, 0.6);
+    }
+    .osm-attribution {
+      position: absolute;
+      bottom: 4px;
+      right: 8px;
+      font-family: 'Inter Tight', sans-serif;
+      font-size: 0.6rem;
+      color: rgba(27, 24, 20, 0.5);
+      background: rgba(251, 246, 234, 0.8);
+      padding: 2px 6px;
+      border-radius: 2px;
+      letter-spacing: 0.06em;
+    }
+    .osm-attribution a { color: inherit; }
+
+    /* ============================================================== */
+    /* Editorial chapter TOC — a fading "margin column" of paper that  */
+    /* sits over whatever's behind it. The gradient is the trick: most */
+    /* of the way it's transparent, but it picks up just enough cream  */
+    /* under the text to keep it readable over the map.                */
+    /* ============================================================== */
+    .toc {
+      position: fixed;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      /* Higher than Leaflet's internal panes (max 700) and controls (1000)
+         so the chapter rail always sits on top of the map. */
+      z-index: 1100;
+      /* Hidden by default — only fades in once the reader has scrolled
+         past the hero into the article body. Toggled via .is-visible
+         from the scroll observer. */
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 320ms ease;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0.35rem;
+      padding: 1.4rem 1.6rem 1.4rem 3.5rem;
+      background: linear-gradient(
+        to left,
+        rgba(251, 246, 234, 0.92) 0%,
+        rgba(251, 246, 234, 0.78) 40%,
+        rgba(251, 246, 234, 0.35) 80%,
+        rgba(251, 246, 234, 0) 100%
+      );
+      pointer-events: none;
+    }
+    .toc.is-visible {
+      opacity: 1;
+    }
+    .toc.is-visible a {
+      pointer-events: auto;
+    }
+    .toc a {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      column-gap: 0.85rem;
+      align-items: baseline;
+      text-decoration: none;
+      color: var(--ink-mute);
+      padding: 0.15rem 0;
+      transition: color 220ms ease;
+    }
+    .toc .title {
+      font-family: 'Fraunces', serif;
+      font-style: italic;
+      font-variation-settings: "opsz" 18, "SOFT" 100, "wght" 400;
+      font-size: 0.92rem;
+      letter-spacing: 0.005em;
+      color: var(--ink-mute);
+      white-space: nowrap;
+      text-align: right;
+      transition: color 220ms ease;
+    }
+    .toc .num {
+      font-family: 'Fraunces', serif;
+      font-style: italic;
+      font-variation-settings: "opsz" 30, "SOFT" 80, "wght" 400;
+      font-size: 0.78rem;
+      letter-spacing: 0.06em;
+      width: 1.6rem;
+      text-align: left;
+      color: var(--ink-mute);
+      opacity: 0.55;
+      transition: color 220ms ease, opacity 220ms ease;
+    }
+    .toc a:hover .title,
+    .toc a:hover .num { color: var(--ink); opacity: 1; }
+    .toc a.is-current .title {
+      color: var(--accent);
+      font-variation-settings: "opsz" 18, "SOFT" 80, "wght" 500;
+    }
+    .toc a.is-current .num { color: var(--accent); opacity: 1; }
+    .toc a.is-current::before {
+      content: "—";
+      position: absolute;
+      transform: translateX(calc(-100% - 1.5rem));
+      color: var(--accent);
+      font-family: 'Fraunces', serif;
+      letter-spacing: 0;
+      font-size: 0.88rem;
+    }
+    .toc .rule { display: none; }
+
+    /* ── Responsive TOC ─────────────────────────────────────────────────
+       Wide (>1320px): full chapter titles + numerals, generous gradient.
+       Mid (≤1320): smaller titles, tighter padding.
+       Narrow (≤1080): hide titles except for the active chapter and on
+       hover — just Roman numerals as a quiet ledger column.
+       Mobile (≤760): hidden entirely (existing rule). */
+    @media (max-width: 1320px) {
+      .toc {
+        padding: 1rem 1.1rem 1rem 2.6rem;
+      }
+      .toc .title { font-size: 0.84rem; }
+      .toc .num   { font-size: 0.72rem; }
+      .toc a      { column-gap: 0.6rem; }
+    }
+    @media (max-width: 1080px) {
+      .toc {
+        padding: 0.85rem 0.9rem 0.85rem 2.4rem;
+        background: linear-gradient(
+          to left,
+          rgba(251, 246, 234, 0.92) 0%,
+          rgba(251, 246, 234, 0.78) 55%,
+          rgba(251, 246, 234, 0) 100%
+        );
+      }
+      .toc .title {
+        max-width: 0;
+        opacity: 0;
+        overflow: hidden;
+        white-space: nowrap;
+        transition: max-width 280ms ease, opacity 200ms ease 60ms, margin 280ms ease;
+        margin-right: 0;
+      }
+      .toc:hover .title,
+      .toc a.is-current .title {
+        max-width: 160px;
+        opacity: 1;
+      }
+      .toc .num {
+        font-size: 0.78rem;
+        width: 1.4rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Hidden SVG defs: B&W filter that explicitly pulls blue (water) darker.
+       Coefficients: gray = 0.42R + 0.55G - 0.10B  →  blue inputs (water)
+       produce a lower output than warm tones (land/streets), so the OSM
+       water comes out as a distinctly darker shade rather than the
+       same mid-gray as everything else. The +0.10 offset lifts overall
+       brightness so the map doesn't go too dark. -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <filter id="atlas-bw" color-interpolation-filters="sRGB">
+      <feColorMatrix type="matrix" values="
+        0.42 0.55 -0.10 0 0.10
+        0.42 0.55 -0.10 0 0.10
+        0.42 0.55 -0.10 0 0.10
+        0    0    0     1 0"/>
+    </filter>
+  </svg>
+
+  <!-- ========== Context strip (matches the app shell, with the tabs) ========== -->
+  <header class="strip">
+    <a class="back" href="#" aria-label="Back">←</a>
+    <div>
+      <div class="stage">Shortlist</div>
+      <div class="name">Newport, RI</div>
+    </div>
+    <nav aria-label="City sections">
+      <a class="active" href="#">Detail</a>
+      <a href="#">Visit</a>
+      <a href="#">Images</a>
+      <a href="#">Decide</a>
+    </nav>
+  </header>
+
+  <!-- ========== Floating editorial chapter TOC ========== -->
+  <aside class="toc" aria-label="Chapters">
+    <a href="#scene" data-target="scene"><span class="num">I</span><span class="title">The scene</span></a>
+    <a href="#why" data-target="why"><span class="num">II</span><span class="title">The why</span></a>
+    <a href="#where" data-target="where"><span class="num">III</span><span class="title">Where you'd live</span></a>
+    <a href="#data" data-target="data"><span class="num">IV</span><span class="title">By the numbers</span></a>
+    <a href="#when" data-target="when"><span class="num">V</span><span class="title">When to go</span></a>
+    <a href="#walks" data-target="walks"><span class="num">VI</span><span class="title">Where to walk</span></a>
+  </aside>
+
+  <!-- ========== CHAPTER 1 — SET THE SCENE ========== -->
+  <section id="scene" class="hero" aria-label="Newport, Rhode Island">
+    <img src="https://fitjkrmiwkdolxhitroc.supabase.co/storage/v1/object/public/city-images/cities/newport-ri/b30f1bfbdce1.jpg" alt="Cliff Walk above the Atlantic with the Breakers in the distance, Newport, Rhode Island" />
+    <div class="hero-grad"></div>
+    <div class="hero-bottom">
+      <h1 class="place">Newport, <em>Rhode Island</em></h1>
+      <div class="meta">
+        <span><strong>9.5h</strong> from PIT</span>
+        <span class="sep"></span>
+        <span><strong>Stretch</strong> tier</span>
+        <span class="sep"></span>
+        <span>Coastal · Peninsula · Stretch</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== CHAPTER 2 — THE WHY ========== -->
+  <article id="why" class="why">
+    <p class="eyebrow">Why this could be the place</p>
+
+    <p class="why-lead">
+      Newport sits on the southern tip of Aquidneck Island, at the eastern entrance to Narragansett
+      Bay, about 30 miles south of Providence. It's a city of about 25,000, but the part that matters
+      is the historic peninsula — a tight grid of 18th-century streets running uphill from the
+      working harbor along Thames Street to the colonial Historic Hill neighborhood above. Bowen's
+      Wharf and Bannister's Wharf reach out into the harbor with shops, restaurants, and live
+      charter docks. Bellevue Avenue, a mile east, holds the Gilded Age mansions (The Breakers,
+      Marble House, Rosecliff) that brought Newport its second life as a summer resort. The Cliff
+      Walk runs 3.5 miles along the ocean cliffs from Memorial Boulevard to Bailey's Beach.
+    </p>
+
+    <p>
+      The case for Newport is unusual in the US: real maritime fabric — narrow colonial streets,
+      year-round residents, a working harbor — with Gilded Age scenery layered on top, and the ocean
+      genuinely walkable from downtown. The Naval War College and Naval Station Newport keep a
+      working population in town through the off-season. The honest tradeoff is summer tourism,
+      which is intense — the calendar revolves around it, and the off-season can reveal a thinner
+      version of the place underneath. You'd be testing whether Newport is a year-round city wearing
+      a tourist coat or a tourist town with a year-round skeleton.
+    </p>
+
+    <div class="gates">
+      <p class="gate gate-wins">
+        <span class="gate-label">If it wins —</span>
+        The historic peninsula has actual year-round residential rhythm; the wharves keep working
+        through February.
+      </p>
+      <p class="gate gate-fails">
+        <span class="gate-label">If it fails —</span>
+        Summer-tourism dominance reveals a thinner off-season place where the side streets feel
+        emptied of life.
+      </p>
+    </div>
+  </article>
+
+  <!-- ========== CHAPTER 3 — WHERE YOU'D LIVE ========== -->
+  <section id="where" class="where" aria-label="Where you'd live">
+    <div class="where-head">
+      <h2>Where you'd live</h2>
+    </div>
+
+    <div class="where-map-wrap">
+      <!-- Real interactive Leaflet map. Pan/zoom enabled. OSM tiles get
+           a CSS filter applied to the tile pane only, leaving overlays
+           (circle, pin, labels) in full color. -->
+      <div id="where-map" class="leaflet-where" aria-label="Map of Newport with the measurement center marked"></div>
+
+      <!-- score overlay top-right — measured composite only -->
+      <div class="verdict-card" role="group" aria-label="Measured composite score">
+        <div class="axis">
+          <div class="lab">Measured</div>
+          <div class="num">6.1<small>/10</small></div>
+        </div>
+      </div>
+
+      <!-- stay zone overlay bottom-left — candidates list -->
+      <div class="stay-overlay">
+        <p class="eyebrow">Stay zone · 9.2 km² · 4 candidate cores</p>
+        <h3>Newport waterfront</h3>
+        <p class="heart">Measuring around: <strong id="selected-label">Bowen's &amp; Bannister's Wharf</strong></p>
+        <ol id="candidate-list" class="candidate-list" aria-label="Candidate cores ranked by social-POI density">
+          <li class="selected"><span class="rank">1</span><span class="main"><strong>Bowen's &amp; Bannister's Wharf</strong><span class="sub">38 social spots · 250 m from pin</span></span></li>
+          <li><span class="rank">2</span><span class="main"><strong>Broadway · Washington Sq</strong><span class="sub">24 social spots · 560 m from pin</span></span></li>
+          <li><span class="rank">3</span><span class="main"><strong>Bellevue · Memorial</strong><span class="sub">19 social spots · 760 m from pin</span></span></li>
+          <li><span class="rank">4</span><span class="main"><strong>Long Wharf · The Point</strong><span class="sub">14 social spots · 950 m from pin</span></span></li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="where-foot">
+      <span>Visit center · 41.4870 N, 71.3120 W · set manually</span>
+      <span class="where-foot-actions">
+        <button type="button" class="recenter-btn" data-recenter="zone">Fit to stay zone</button>
+        <button type="button" class="recenter-btn" data-recenter="pin">Center on visit pin</button>
+        <span class="recenter-sep">·</span>
+        <button type="button" class="recenter-btn recenter-btn-edit" data-recenter="edit">Edit center →</button>
+      </span>
+    </div>
+  </section>
+
+  <!-- ========== CHAPTER 4 — THE DATA ========== -->
+  <section id="data" class="data" aria-label="By the numbers">
+    <div class="data-head">
+      <h2>By the numbers</h2>
+      <p class="note">
+        Twenty cited metrics grouped under five axes. Each bar fills against a fixed threshold —
+        good as it matters, not relative to the other candidates.
+      </p>
+    </div>
+
+    <div class="axes">
+
+      <div class="axis-col">
+        <h3>Setting</h3>
+        <p class="axis-score">7.4<small>/10</small></p>
+        <div class="metric">
+          <div class="metric-top"><span class="metric-name">Water dist.</span><span class="metric-value">355 m</span></div>
+          <div class="metric-bar"><span style="width:82%"></span></div>
+          <div class="metric-source">OSM coastline</div>
+        </div>
+        <div class="metric">
+          <div class="metric-top"><span class="metric-name">Skyline</span><span class="metric-value">5.4°</span></div>
+          <div class="metric-bar"><span style="width:48%"></span></div>
+          <div class="metric-source">SRTM DEM</div>
+        </div>
+        <div class="metric">
+          <div class="metric-top"><span class="metric-name">Mtn horizon</span><span class="metric-value">12%</span></div>
+          <div class="metric-bar"><span style="width:26%"></span></div>
+          <div class="metric-source">Open-Meteo + OSM</div>
+        </div>
+      </div>
+
+      <div class="axis-col">
+        <h3>Aliveness</h3>
+        <p class="axis-score">6.8<small>/10</small></p>
+        <div class="metric">
+          <div class="metric-top"><span class="metric-name">Cafés</span><span class="metric-value">11</span></div>
+          <div class="metric-bar"><span style="width:74%"></span></div>
+          <div class="metric-source">OSM</div>
+        </div>
+        <div class="metric">
+          <div class="metric-top"><span class="metric-name">Restaurants</span><span class="metric-value">42</span></div>
+          <div class="metric-bar"><span style="width:88%"></span></div>
+          <div class="metric-source">OSM</div>
+        </div>
+        <div class="metric">
+          <div class="metric-top"><span class="metric-name">Walk Score</span><span class="metric-value">91</span></div>
+          <div class="metric-bar"><span style="width:91%"></span></div>
+          <div class="metric-source">Walk Score API</div>
+        </div>
+      </div>
+
+      <div class="axis-col">
+        <h3>Fabric</h3>
+        <p class="axis-score">5.9<small>/10</small></p>
+        <div class="metric">
+          <div class="metric-top"><span class="metric-name">Bldg coverage</span><span class="metric-value">28%</span></div>
+          <div class="metric-bar"><span style="width:62%"></span></div>
+          <div class="metric-source">OSM footprints</div>
+        </div>
+        <div class="metric">
+          <div class="metric-top"><span class="metric-name">Density</span><span class="metric-value">3,840/km²</span></div>
+          <div class="metric-bar"><span style="width:48%"></span></div>
+          <div class="metric-source">Census ACS</div>
+        </div>
+        <div class="metric">
+          <div class="metric-top"><span class="metric-name">Pre-1940 housing</span><span class="metric-value">71%</span></div>
+          <div class="metric-bar"><span style="width:84%"></span></div>
+          <div class="metric-source">Census ACS</div>
+        </div>
+      </div>
+
+      <div class="axis-col">
+        <h3>Realness</h3>
+        <p class="axis-score">5.3<small>/10</small></p>
+        <div class="metric">
+          <div class="metric-top"><span class="metric-name">Grocery</span><span class="metric-value">580 m</span></div>
+          <div class="metric-bar"><span style="width:66%"></span></div>
+          <div class="metric-source">OSM</div>
+        </div>
+        <div class="metric">
+          <div class="metric-top"><span class="metric-name">Owner-occupied</span><span class="metric-value">58%</span></div>
+          <div class="metric-bar"><span style="width:58%"></span></div>
+          <div class="metric-source">Census ACS</div>
+        </div>
+        <div class="metric">
+          <div class="metric-top"><span class="metric-name">STR density</span><span class="metric-value">9.1%</span></div>
+          <div class="metric-bar"><span style="width:36%"></span></div>
+          <div class="metric-source">AirDNA</div>
+        </div>
+      </div>
+
+      <div class="axis-col">
+        <h3>Year-round</h3>
+        <p class="axis-score">6.4<small>/10</small></p>
+        <!-- Each metric scored 0–10 against a fixed target:
+             10 = "good enough", 0 = "demonstrably bad."
+             Axis composite = mean of those four 0–10 scores. -->
+        <div class="metric">
+          <div class="metric-top"><span class="metric-name">Pleasant days/yr</span><span class="metric-value">99 <small style="color: var(--ink-mute); font-weight: 400;">/ 365</small></span></div>
+          <div class="metric-bar"><span style="width:40%"></span></div>
+          <div class="metric-source">NASA POWER · mean 55–80 °F, dry</div>
+        </div>
+        <div class="metric">
+          <div class="metric-top"><span class="metric-name">Cold days/yr</span><span class="metric-value">76 <small style="color: var(--ink-mute); font-weight: 400;">/ 365</small></span></div>
+          <div class="metric-bar negative"><span style="width:51%"></span></div>
+          <div class="metric-source">NASA POWER · min &lt; 32 °F</div>
+        </div>
+        <div class="metric">
+          <div class="metric-top"><span class="metric-name">Hot days/yr</span><span class="metric-value">8 <small style="color: var(--ink-mute); font-weight: 400;">/ 365</small></span></div>
+          <div class="metric-bar negative"><span style="width:7%"></span></div>
+          <div class="metric-source">NASA POWER · max &gt; 85 °F</div>
+        </div>
+        <div class="metric">
+          <div class="metric-top"><span class="metric-name">Sunny days/yr</span><span class="metric-value">230 <small style="color: var(--ink-mute); font-weight: 400;">/ 365</small></span></div>
+          <div class="metric-bar"><span style="width:74%"></span></div>
+          <div class="metric-source">NASA POWER · shortwave ÷ clear-sky ≥ 0.7</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ========== CHAPTER 5 — WHEN TO GO ========== -->
+  <section id="when" class="when" aria-label="When to visit">
+    <div class="when-inner">
+      <div class="when-head">
+        <h2>When to go</h2>
+        <p class="sub">Two ribbons of the calendar year — comfort rising above the line, crowds falling below.
+        The visits worth taking sit tall above and shallow beneath.</p>
+      </div>
+
+      <div class="climate" aria-label="Monthly climate comfort vs tourist crowd density">
+        <svg viewBox="0 0 1080 320" preserveAspectRatio="none" role="img">
+          <defs>
+            <linearGradient id="comfortGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#0d4c44" stop-opacity="0.32"/>
+              <stop offset="100%" stop-color="#0d4c44" stop-opacity="0.06"/>
+            </linearGradient>
+            <linearGradient id="crowdGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#a23a30" stop-opacity="0.30"/>
+              <stop offset="100%" stop-color="#a23a30" stop-opacity="0.04"/>
+            </linearGradient>
+          </defs>
+
+          <!-- Quarter grid rules -->
+          <line class="grid-rule" x1="60" y1="80"  x2="1020" y2="80"/>
+          <line class="grid-rule" x1="60" y1="130" x2="1020" y2="130"/>
+          <line class="grid-rule" x1="60" y1="180" x2="1020" y2="180"/>
+          <line class="grid-rule" x1="60" y1="230" x2="1020" y2="230"/>
+
+          <!-- Baseline -->
+          <line class="axis-rule" x1="60" y1="280" x2="1020" y2="280"/>
+
+          <!-- Axis label (top-right) — kept clear of the Off-season-visit
+               annotation column at x=60. -->
+          <text class="axis-label" x="1020" y="56" text-anchor="end">↑ Score 0 – 10</text>
+
+          <!--
+            x grid: 12 months at x = 60 + i*(960/11) = 60, 147.3, 234.5, 321.8, 409.1, 496.4, 583.6, 670.9, 758.2, 845.5, 932.7, 1020
+            Both metrics 0-100 scaled to 0-200px above baseline at y=280. y = 280 - val*2.
+            Comfort values: Jan 14→252, Feb 18→244, Mar 32→216, Apr 48→184, May 68→144, Jun 82→116, Jul 78→124, Aug 80→120, Sep 74→132, Oct 58→164, Nov 36→208, Dec 22→236
+            Crowd values:   Jan  8→264, Feb  8→264, Mar 12→256, Apr 18→244, May 30→220, Jun 55→170, Jul 78→124, Aug 88→104, Sep 38→204, Oct 24→232, Nov 14→252, Dec 12→256
+          -->
+
+          <!-- Comfort area + stroke -->
+          <path class="comfort-area"
+                fill="url(#comfortGrad)"
+                d="M 60,280 L 60,252 L 147.3,244 L 234.5,216 L 321.8,184 L 409.1,144 L 496.4,116 L 583.6,124 L 670.9,120 L 758.2,132 L 845.5,164 L 932.7,208 L 1020,236 L 1020,280 Z"/>
+
+          <!-- Crowd area + stroke (drawn AFTER comfort so its fill overlays it; where crowd > comfort it visibly overtakes) -->
+          <path class="crowd-area"
+                fill="url(#crowdGrad)"
+                d="M 60,280 L 60,264 L 147.3,264 L 234.5,256 L 321.8,244 L 409.1,220 L 496.4,170 L 583.6,124 L 670.9,104 L 758.2,204 L 845.5,232 L 932.7,252 L 1020,256 L 1020,280 Z"/>
+
+          <!-- Strokes on top of both fills so the outlines stay crisp -->
+          <path class="comfort-stroke"
+                d="M 60,252 L 147.3,244 L 234.5,216 L 321.8,184 L 409.1,144 L 496.4,116 L 583.6,124 L 670.9,120 L 758.2,132 L 845.5,164 L 932.7,208 L 1020,236"/>
+          <path class="crowd-stroke"
+                d="M 60,264 L 147.3,264 L 234.5,256 L 321.8,244 L 409.1,220 L 496.4,170 L 583.6,124 L 670.9,104 L 758.2,204 L 845.5,232 L 932.7,252 L 1020,256"/>
+
+          <!--
+            Visit score — the 0–10 verdict line on top of both inputs.
+            Values: Jan 1.5, Feb 2.0, Mar 3.5, Apr 5.0, May 7.5, Jun 9.0, Jul 5.0,
+                    Aug 4.0, Sep 8.5, Oct 7.0, Nov 4.0, Dec 2.0
+            Scaled by 20 (so 9.0 → 180px tall) on a baseline at y=280.
+            y = 280 - val*20
+          -->
+          <path class="visit-stroke"
+                d="M 60,250 L 147.3,240 L 234.5,210 L 321.8,180 L 409.1,130 L 496.4,100 L 583.6,180 L 670.9,200 L 758.2,110 L 845.5,140 L 932.7,200 L 1020,240"/>
+
+          <!-- Now indicator at June (i=5, x=496.4) — the x-coordinate is
+               still hand-pinned. Once SVG data-wiring lands it'll move to
+               today's month and pair with a data-driven score in the top
+               corner. -->
+          <line class="now-line" x1="496.4" y1="40" x2="496.4" y2="282"/>
+          <g transform="translate(496.4, 30)">
+            <text class="now-pill" text-anchor="middle">Now</text>
+          </g>
+
+          <!-- Charm annotation — Sep, i=8, x=758.2. Line starts below the
+               sub line (y=44) so it doesn't cross the subtitle text. -->
+          <line class="annot-line" x1="758.2" y1="132" x2="758.2" y2="44"/>
+          <g transform="translate(758.2, 16)">
+            <text class="annot-label charm" text-anchor="middle">Charm visit</text>
+          </g>
+          <text x="758.2" y="36" class="annot-sub" text-anchor="middle">Sep — crowds thin, weather still summery</text>
+
+          <!-- Off-season annotation — Jan, i=0, x=60. Same structure as
+               Charm visit so the two test windows read as symmetric. -->
+          <line class="annot-line" x1="60" y1="252" x2="60" y2="44"/>
+          <g transform="translate(60, 16)">
+            <text class="annot-label truth" text-anchor="middle">Off-season visit</text>
+          </g>
+          <text x="60" y="36" class="annot-sub" text-anchor="middle">Jan — coldest, quietest test</text>
+
+          <!-- Month markers — comfort dots -->
+          <g>
+            <circle class="month-dot comfort" cx="60"    cy="252" r="3.2"/>
+            <circle class="month-dot comfort" cx="147.3" cy="244" r="3.2"/>
+            <circle class="month-dot comfort" cx="234.5" cy="216" r="3.2"/>
+            <circle class="month-dot comfort" cx="321.8" cy="184" r="3.2"/>
+            <circle class="month-dot comfort" cx="409.1" cy="144" r="3.2"/>
+            <circle class="month-dot comfort" cx="496.4" cy="116" r="4.2"/>
+            <circle class="month-dot comfort" cx="583.6" cy="124" r="3.2"/>
+            <circle class="month-dot comfort" cx="670.9" cy="120" r="3.2"/>
+            <circle class="month-dot comfort" cx="758.2" cy="132" r="4.4"/>
+            <circle class="month-dot comfort" cx="845.5" cy="164" r="3.2"/>
+            <circle class="month-dot comfort" cx="932.7" cy="208" r="3.2"/>
+            <circle class="month-dot comfort" cx="1020"  cy="236" r="3.2"/>
+          </g>
+          <!-- Month markers — crowd dots -->
+          <g>
+            <circle class="month-dot crowd" cx="60"    cy="264" r="3.2"/>
+            <circle class="month-dot crowd" cx="147.3" cy="264" r="3.2"/>
+            <circle class="month-dot crowd" cx="234.5" cy="256" r="3.2"/>
+            <circle class="month-dot crowd" cx="321.8" cy="244" r="3.2"/>
+            <circle class="month-dot crowd" cx="409.1" cy="220" r="3.2"/>
+            <circle class="month-dot crowd" cx="496.4" cy="170" r="4.2"/>
+            <circle class="month-dot crowd" cx="583.6" cy="124" r="3.2"/>
+            <circle class="month-dot crowd" cx="670.9" cy="104" r="3.2"/>
+            <circle class="month-dot crowd" cx="758.2" cy="204" r="4.4"/>
+            <circle class="month-dot crowd" cx="845.5" cy="232" r="3.2"/>
+            <circle class="month-dot crowd" cx="932.7" cy="252" r="3.2"/>
+            <circle class="month-dot crowd" cx="1020"  cy="256" r="3.2"/>
+          </g>
+          <!-- Month markers — visit-worth dots (synthesis) -->
+          <g>
+            <circle class="month-dot visit" cx="60"    cy="250" r="3"/>
+            <circle class="month-dot visit" cx="147.3" cy="240" r="3"/>
+            <circle class="month-dot visit" cx="234.5" cy="210" r="3"/>
+            <circle class="month-dot visit" cx="321.8" cy="180" r="3"/>
+            <circle class="month-dot visit" cx="409.1" cy="130" r="3"/>
+            <circle class="month-dot visit" cx="496.4" cy="100" r="4.5"/>
+            <circle class="month-dot visit" cx="583.6" cy="180" r="3"/>
+            <circle class="month-dot visit" cx="670.9" cy="200" r="3"/>
+            <circle class="month-dot visit" cx="758.2" cy="110" r="4.5"/>
+            <circle class="month-dot visit" cx="845.5" cy="140" r="3"/>
+            <circle class="month-dot visit" cx="932.7" cy="200" r="3"/>
+            <circle class="month-dot visit" cx="1020"  cy="240" r="3"/>
+          </g>
+
+          <!-- Month labels under the baseline -->
+          <text class="month-label" x="60"    y="296">Jan</text>
+          <text class="month-label" x="147.3" y="296">Feb</text>
+          <text class="month-label" x="234.5" y="296">Mar</text>
+          <text class="month-label" x="321.8" y="296">Apr</text>
+          <text class="month-label" x="409.1" y="296">May</text>
+          <text class="month-label now" x="496.4" y="296">Jun</text>
+          <text class="month-label" x="583.6" y="296">Jul</text>
+          <text class="month-label" x="670.9" y="296">Aug</text>
+          <text class="month-label" x="758.2" y="296">Sep</text>
+          <text class="month-label" x="845.5" y="296">Oct</text>
+          <text class="month-label" x="932.7" y="296">Nov</text>
+          <text class="month-label" x="1020"  y="296">Dec</text>
+        </svg>
+      </div>
+
+      <div class="climate-legend">
+        <span><span class="sw comfort"></span>Climate comfort <em style="font-style: italic; text-transform: none; letter-spacing: 0; color: var(--ink-mute); font-weight: 400;">(NOAA daily highs/lows + rainy days + daylight, normalized 0–10)</em></span>
+        <span><span class="sw crowd"></span>Tourist crowd <em style="font-style: italic; text-transform: none; letter-spacing: 0; color: var(--ink-mute); font-weight: 400;">(seasonal occupancy &amp; visitor counts, normalized 0–100)</em></span>
+        <span><span class="sw visit"></span>Visit score <em style="font-style: italic; text-transform: none; letter-spacing: 0; color: var(--ink-mute); font-weight: 400;">(comfort minus a fraction of crowd, scaled 0–10)</em></span>
+      </div>
+
+      <div class="climatology" aria-label="Monthly normals — daily high, daily low, precipitation, with Allison Park reference">
+        <svg viewBox="0 0 1080 290" preserveAspectRatio="xMinYMid meet" role="img">
+          <defs>
+            <!-- Hatched patterns for Allison Park reference bars. Color-matched
+                 to each row's metric. -->
+            <pattern id="hatch-high"   patternUnits="userSpaceOnUse" width="3.5" height="3.5" patternTransform="rotate(45)">
+              <line x1="0" y1="0" x2="0" y2="3.5" stroke="#b86a3f" stroke-width="1.3"/>
+            </pattern>
+            <pattern id="hatch-low"    patternUnits="userSpaceOnUse" width="3.5" height="3.5" patternTransform="rotate(45)">
+              <line x1="0" y1="0" x2="0" y2="3.5" stroke="#4a78a8" stroke-width="1.3"/>
+            </pattern>
+            <pattern id="hatch-precip" patternUnits="userSpaceOnUse" width="3.5" height="3.5" patternTransform="rotate(45)">
+              <line x1="0" y1="0" x2="0" y2="3.5" stroke="#6e7d8c" stroke-width="1.3"/>
+            </pattern>
+          </defs>
+          <!--
+            Three small-multiples rows + a month-label strip at the bottom.
+            Each month shows a Newport solid bar (left) paired with an Allison
+            Park hatched bar (right). Value labels sit above the Newport bar.
+
+            x grid: 60 → 1020, 12 column centers (every 87.27 px). Each column
+            slot holds a pair: Newport at center-11 width 10, AP at center+1
+            width 10. Baseline y=58. Row height 58, gap 10 between rows.
+
+            Scales:
+              HIGH max=90,  height (val/90)*28
+              LOW  max=80,  height (val/80)*28
+              PRECIP max=5, height (val/5)*28
+          -->
+
+          <!-- ── Row 1: HIGH ─────────────────────────────────────────── -->
+          <g transform="translate(0, 0)">
+            <text class="row-label" x="0" y="10">High</text>
+            <line class="row-rule"  x1="0" y1="16" x2="1080" y2="16"/>
+            <line class="gridline"  x1="60" y1="80" x2="1020" y2="80"/>
+
+            <!-- Delta vs Allison Park, all on one horizontal line. -->
+            <text class="delta pos"  x="60"    y="30">+3</text>
+            <text class="delta pos"  x="147.3" y="30">+2</text>
+            <text class="delta neg"  x="234.5" y="30">−2</text>
+            <text class="delta neg"  x="321.8" y="30">−5</text>
+            <text class="delta neg"  x="409.1" y="30">−5</text>
+            <text class="delta neg"  x="496.4" y="30">−5</text>
+            <text class="delta neg"  x="583.6" y="30">−3</text>
+            <text class="delta neg"  x="670.9" y="30">−3</text>
+            <text class="delta neg"  x="758.2" y="30">−3</text>
+            <text class="delta neg"  x="845.5" y="30">−1</text>
+            <text class="delta pos"  x="932.7" y="30">+2</text>
+            <text class="delta pos"  x="1020"  y="30">+4</text>
+
+            <!-- Newport values, all on one horizontal line. -->
+            <text class="val" x="60"    y="48">39</text>
+            <text class="val" x="147.3" y="48">41</text>
+            <text class="val" x="234.5" y="48">47</text>
+            <text class="val" x="321.8" y="48">56</text>
+            <text class="val" x="409.1" y="48">65</text>
+            <text class="val" x="496.4" y="48">73</text>
+            <text class="val" x="583.6" y="48">79</text>
+            <text class="val" x="670.9" y="48">78</text>
+            <text class="val" x="758.2" y="48">72</text>
+            <text class="val" x="845.5" y="48">62</text>
+            <text class="val" x="932.7" y="48">53</text>
+            <text class="val" x="1020"  y="48">44</text>
+
+            <!-- Newport bars (left of pair, baseline y=80). -->
+            <rect class="bar high" x="46"    y="67.87" width="12" height="12.13"/>
+            <rect class="bar high" x="133.3" y="67.24" width="12" height="12.76"/>
+            <rect class="bar high" x="220.5" y="65.38" width="12" height="14.62"/>
+            <rect class="bar high" x="307.8" y="62.58" width="12" height="17.42"/>
+            <rect class="bar high" x="395.1" y="59.78" width="12" height="20.22"/>
+            <rect class="bar high" x="482.4" y="57.29" width="12" height="22.71"/>
+            <rect class="bar high" x="569.6" y="55.42" width="12" height="24.58"/>
+            <rect class="bar high" x="656.9" y="55.73" width="12" height="24.27"/>
+            <rect class="bar high" x="744.2" y="57.60" width="12" height="22.40"/>
+            <rect class="bar high" x="831.5" y="60.71" width="12" height="19.29"/>
+            <rect class="bar high" x="918.7" y="63.51" width="12" height="16.49"/>
+            <rect class="bar high" x="1006"  y="66.31" width="12" height="13.69"/>
+
+            <!-- Allison Park bars (right of pair, hatched). -->
+            <rect class="bar ref high" x="62"    y="68.80" width="12" height="11.20"/>
+            <rect class="bar ref high" x="149.3" y="67.87" width="12" height="12.13"/>
+            <rect class="bar ref high" x="236.5" y="64.76" width="12" height="15.24"/>
+            <rect class="bar ref high" x="323.8" y="61.02" width="12" height="18.98"/>
+            <rect class="bar ref high" x="411.1" y="58.22" width="12" height="21.78"/>
+            <rect class="bar ref high" x="498.4" y="55.73" width="12" height="24.27"/>
+            <rect class="bar ref high" x="585.6" y="54.49" width="12" height="25.51"/>
+            <rect class="bar ref high" x="672.9" y="54.80" width="12" height="25.20"/>
+            <rect class="bar ref high" x="760.2" y="56.67" width="12" height="23.33"/>
+            <rect class="bar ref high" x="847.5" y="60.40" width="12" height="19.60"/>
+            <rect class="bar ref high" x="934.7" y="64.13" width="12" height="15.87"/>
+            <rect class="bar ref high" x="1022"  y="67.56" width="12" height="12.44"/>
+          </g>
+
+          <!-- ── Row 2: LOW ──────────────────────────────────────────── -->
+          <g transform="translate(0, 90)">
+            <text class="row-label" x="0" y="10">Low</text>
+            <line class="row-rule"  x1="0" y1="16" x2="1080" y2="16"/>
+            <line class="gridline"  x1="60" y1="80" x2="1020" y2="80"/>
+
+            <!-- Delta vs Allison Park. -->
+            <text class="delta pos"  x="60"    y="30">+3</text>
+            <text class="delta pos"  x="147.3" y="30">+4</text>
+            <text class="delta pos"  x="234.5" y="30">+2</text>
+            <text class="delta pos"  x="321.8" y="30">+1</text>
+            <text class="delta zero" x="409.1" y="30">0</text>
+            <text class="delta zero" x="496.4" y="30">0</text>
+            <text class="delta pos"  x="583.6" y="30">+3</text>
+            <text class="delta pos"  x="670.9" y="30">+4</text>
+            <text class="delta pos"  x="758.2" y="30">+5</text>
+            <text class="delta pos"  x="845.5" y="30">+6</text>
+            <text class="delta pos"  x="932.7" y="30">+6</text>
+            <text class="delta pos"  x="1020"  y="30">+5</text>
+
+            <!-- Newport values. -->
+            <text class="val" x="60"    y="48">24</text>
+            <text class="val" x="147.3" y="48">26</text>
+            <text class="val" x="234.5" y="48">32</text>
+            <text class="val" x="321.8" y="48">40</text>
+            <text class="val" x="409.1" y="48">49</text>
+            <text class="val" x="496.4" y="48">58</text>
+            <text class="val" x="583.6" y="48">65</text>
+            <text class="val" x="670.9" y="48">65</text>
+            <text class="val" x="758.2" y="48">59</text>
+            <text class="val" x="845.5" y="48">48</text>
+            <text class="val" x="932.7" y="48">39</text>
+            <text class="val" x="1020"  y="48">30</text>
+
+            <!-- Newport bars (left of pair). -->
+            <rect class="bar low" x="46"    y="71.60" width="12" height="8.40"/>
+            <rect class="bar low" x="133.3" y="70.90" width="12" height="9.10"/>
+            <rect class="bar low" x="220.5" y="68.80" width="12" height="11.20"/>
+            <rect class="bar low" x="307.8" y="66.00" width="12" height="14.00"/>
+            <rect class="bar low" x="395.1" y="62.85" width="12" height="17.15"/>
+            <rect class="bar low" x="482.4" y="59.70" width="12" height="20.30"/>
+            <rect class="bar low" x="569.6" y="57.25" width="12" height="22.75"/>
+            <rect class="bar low" x="656.9" y="57.25" width="12" height="22.75"/>
+            <rect class="bar low" x="744.2" y="59.35" width="12" height="20.65"/>
+            <rect class="bar low" x="831.5" y="63.20" width="12" height="16.80"/>
+            <rect class="bar low" x="918.7" y="66.35" width="12" height="13.65"/>
+            <rect class="bar low" x="1006"  y="69.50" width="12" height="10.50"/>
+
+            <!-- Allison Park bars (right of pair). -->
+            <rect class="bar ref low" x="62"    y="72.65" width="12" height="7.35"/>
+            <rect class="bar ref low" x="149.3" y="72.30" width="12" height="7.70"/>
+            <rect class="bar ref low" x="236.5" y="69.50" width="12" height="10.50"/>
+            <rect class="bar ref low" x="323.8" y="66.35" width="12" height="13.65"/>
+            <rect class="bar ref low" x="411.1" y="62.85" width="12" height="17.15"/>
+            <rect class="bar ref low" x="498.4" y="59.70" width="12" height="20.30"/>
+            <rect class="bar ref low" x="585.6" y="58.30" width="12" height="21.70"/>
+            <rect class="bar ref low" x="672.9" y="58.65" width="12" height="21.35"/>
+            <rect class="bar ref low" x="760.2" y="61.10" width="12" height="18.90"/>
+            <rect class="bar ref low" x="847.5" y="65.30" width="12" height="14.70"/>
+            <rect class="bar ref low" x="934.7" y="68.45" width="12" height="11.55"/>
+            <rect class="bar ref low" x="1022"  y="71.25" width="12" height="8.75"/>
+          </g>
+
+          <!-- ── Row 3: PRECIP ───────────────────────────────────────── -->
+          <g transform="translate(0, 180)">
+            <text class="row-label" x="0" y="10">Precip</text>
+            <line class="row-rule"  x1="0" y1="16" x2="1080" y2="16"/>
+            <line class="gridline"  x1="60" y1="80" x2="1020" y2="80"/>
+
+            <!-- Delta vs Allison Park. -->
+            <text class="delta pos"  x="60"    y="30">+1.4</text>
+            <text class="delta pos"  x="147.3" y="30">+1.4</text>
+            <text class="delta pos"  x="234.5" y="30">+1.2</text>
+            <text class="delta pos"  x="321.8" y="30">+0.8</text>
+            <text class="delta neg"  x="409.1" y="30">−0.4</text>
+            <text class="delta neg"  x="496.4" y="30">−1.0</text>
+            <text class="delta neg"  x="583.6" y="30">−0.9</text>
+            <text class="delta zero" x="670.9" y="30">0</text>
+            <text class="delta pos"  x="758.2" y="30">+0.6</text>
+            <text class="delta pos"  x="845.5" y="30">+1.3</text>
+            <text class="delta pos"  x="932.7" y="30">+1.6</text>
+            <text class="delta pos"  x="1020"  y="30">+1.5</text>
+
+            <!-- Newport values. -->
+            <text class="val" x="60"    y="48">4.2</text>
+            <text class="val" x="147.3" y="48">3.8</text>
+            <text class="val" x="234.5" y="48">4.5</text>
+            <text class="val" x="321.8" y="48">4.2</text>
+            <text class="val" x="409.1" y="48">3.6</text>
+            <text class="val" x="496.4" y="48">3.4</text>
+            <text class="val" x="583.6" y="48">3.1</text>
+            <text class="val" x="670.9" y="48">3.5</text>
+            <text class="val" x="758.2" y="48">3.6</text>
+            <text class="val" x="845.5" y="48">4.0</text>
+            <text class="val" x="932.7" y="48">4.3</text>
+            <text class="val" x="1020"  y="48">4.4</text>
+
+            <!-- Newport bars (left of pair). -->
+            <rect class="bar precip" x="46"    y="56.48" width="12" height="23.52"/>
+            <rect class="bar precip" x="133.3" y="58.72" width="12" height="21.28"/>
+            <rect class="bar precip" x="220.5" y="54.80" width="12" height="25.20"/>
+            <rect class="bar precip" x="307.8" y="56.48" width="12" height="23.52"/>
+            <rect class="bar precip" x="395.1" y="59.84" width="12" height="20.16"/>
+            <rect class="bar precip" x="482.4" y="60.96" width="12" height="19.04"/>
+            <rect class="bar precip" x="569.6" y="62.64" width="12" height="17.36"/>
+            <rect class="bar precip" x="656.9" y="60.40" width="12" height="19.60"/>
+            <rect class="bar precip" x="744.2" y="59.84" width="12" height="20.16"/>
+            <rect class="bar precip" x="831.5" y="57.60" width="12" height="22.40"/>
+            <rect class="bar precip" x="918.7" y="55.92" width="12" height="24.08"/>
+            <rect class="bar precip" x="1006"  y="55.36" width="12" height="24.64"/>
+
+            <!-- Allison Park bars (right of pair). -->
+            <rect class="bar ref precip" x="62"    y="64.32" width="12" height="15.68"/>
+            <rect class="bar ref precip" x="149.3" y="66.56" width="12" height="13.44"/>
+            <rect class="bar ref precip" x="236.5" y="61.52" width="12" height="18.48"/>
+            <rect class="bar ref precip" x="323.8" y="60.96" width="12" height="19.04"/>
+            <rect class="bar ref precip" x="411.1" y="57.60" width="12" height="22.40"/>
+            <rect class="bar ref precip" x="498.4" y="55.36" width="12" height="24.64"/>
+            <rect class="bar ref precip" x="585.6" y="57.60" width="12" height="22.40"/>
+            <rect class="bar ref precip" x="672.9" y="60.40" width="12" height="19.60"/>
+            <rect class="bar ref precip" x="760.2" y="63.20" width="12" height="16.80"/>
+            <rect class="bar ref precip" x="847.5" y="64.88" width="12" height="15.12"/>
+            <rect class="bar ref precip" x="934.7" y="64.88" width="12" height="15.12"/>
+            <rect class="bar ref precip" x="1022"  y="63.76" width="12" height="16.24"/>
+          </g>
+
+          <!-- Month labels below all rows -->
+          <g transform="translate(0, 275)">
+            <text class="month-label" x="60"    y="0">Jan</text>
+            <text class="month-label" x="147.3" y="0">Feb</text>
+            <text class="month-label" x="234.5" y="0">Mar</text>
+            <text class="month-label" x="321.8" y="0">Apr</text>
+            <text class="month-label" x="409.1" y="0">May</text>
+            <text class="month-label" x="496.4" y="0">Jun</text>
+            <text class="month-label" x="583.6" y="0">Jul</text>
+            <text class="month-label" x="670.9" y="0">Aug</text>
+            <text class="month-label" x="758.2" y="0">Sep</text>
+            <text class="month-label" x="845.5" y="0">Oct</text>
+            <text class="month-label" x="932.7" y="0">Nov</text>
+            <text class="month-label" x="1020"  y="0">Dec</text>
+          </g>
+        </svg>
+        <p class="climatology-caption">
+          High/Low in °F · Precip in inches ·
+          <span class="ref-swatch" aria-hidden="true"></span>
+          hatched bars show the same months in <strong style="color: var(--ink); font-weight: 600;">Allison Park, PA</strong> (your home base) for comparison.
+        </p>
+      </div>
+
+      <!-- Year-shape: the worst month in each climate direction. Auto-pulled
+           from the same monthly normals the bars above render, so every city
+           gets this for free without per-city tuning. -->
+      <div class="extremes" aria-label="Worst month in each climate direction">
+        <article class="extreme cold">
+          <p class="extreme-label">Coldest</p>
+          <p class="extreme-month">January</p>
+          <p class="extreme-value">27°F<small>avg low</small></p>
+          <p class="extreme-ref">Allison Park · <strong>22°F</strong></p>
+        </article>
+        <article class="extreme hot">
+          <p class="extreme-label">Hottest</p>
+          <p class="extreme-month">July</p>
+          <p class="extreme-value">80°F<small>avg high</small></p>
+          <p class="extreme-ref">Allison Park · <strong>86°F</strong></p>
+        </article>
+        <article class="extreme wet">
+          <p class="extreme-label">Wettest</p>
+          <p class="extreme-month">December</p>
+          <p class="extreme-value">6.0″<small>precip</small></p>
+          <p class="extreme-ref">Allison Park · <strong>3.9″</strong></p>
+        </article>
+        <article class="extreme dark">
+          <p class="extreme-label">Darkest</p>
+          <p class="extreme-month">December</p>
+          <p class="extreme-value">9.1<small>daylight hr</small></p>
+          <p class="extreme-ref">Allison Park · <strong>9.2 hr</strong></p>
+        </article>
+      </div>
+
+      <div class="climate-foot">
+        <span><strong>Charm visit</strong> · Sep — comfortable weather, after the crowds thin.</span>
+        <span><strong>Off-season visit</strong> · Jan — coldest, quietest; does real life persist when tourists are gone?</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== CHAPTER 6 — WHERE TO WALK ========== -->
+  <section id="walks" class="walks" aria-label="Where to walk">
+    <div class="walks-head">
+      <h2>Six blocks</h2>
+      <p class="sub">Worth pacing on a regular Tuesday, in the order a resident would probably do them.</p>
+    </div>
+
+    <div class="walks-grid">
+
+      <article class="walk">
+        <div class="walk-map">
+          <div class="walk-leaflet" data-lat="41.48115" data-lon="-71.31440" data-zoom="17"></div>
+          <div class="walk-num">1</div>
+        </div>
+        <h3 class="walk-name">Thames Street at Howard Wharf</h3>
+        <p class="walk-attractions">Working harbor, ice-cream queues, art-deco marquees.</p>
+        <p class="walk-start"><strong>Start</strong> Thames St &amp; Howard Wharf</p>
+      </article>
+
+      <article class="walk">
+        <div class="walk-map">
+          <div class="walk-leaflet" data-lat="41.48666" data-lon="-71.31511" data-zoom="18"></div>
+          <div class="walk-num">2</div>
+        </div>
+        <h3 class="walk-name">Bowen's &amp; Bannister's Wharf</h3>
+        <p class="walk-attractions">The wharf-and-cobble experiment, busiest at golden hour.</p>
+        <p class="walk-start"><strong>Start</strong> Thames St &amp; Bowen's Wharf</p>
+      </article>
+
+      <article class="walk">
+        <div class="walk-map">
+          <div class="walk-leaflet" data-lat="41.48963" data-lon="-71.31266" data-zoom="17"></div>
+          <div class="walk-num">3</div>
+        </div>
+        <h3 class="walk-name">Spring Street between Touro &amp; Mill</h3>
+        <p class="walk-attractions">Side-street residential, the test of weekday public life.</p>
+        <p class="walk-start"><strong>Start</strong> Spring St &amp; Touro St</p>
+      </article>
+
+      <article class="walk">
+        <div class="walk-map">
+          <div class="walk-leaflet" data-lat="41.49059" data-lon="-71.31310" data-zoom="17"></div>
+          <div class="walk-num">4</div>
+        </div>
+        <h3 class="walk-name">Lower Broadway / Washington Sq</h3>
+        <p class="walk-attractions">Where Newport votes, eats breakfast, runs errands.</p>
+        <p class="walk-start"><strong>Start</strong> Broadway &amp; Washington Sq</p>
+      </article>
+
+      <article class="walk">
+        <div class="walk-map">
+          <div class="walk-leaflet" data-lat="41.49718" data-lon="-71.32142" data-zoom="17"></div>
+          <div class="walk-num">5</div>
+        </div>
+        <h3 class="walk-name">The Point — Washington Street at Battery</h3>
+        <p class="walk-attractions">Colonial fabric, no tourists, the residents' quiet streets.</p>
+        <p class="walk-start"><strong>Start</strong> Washington St &amp; Battery St</p>
+      </article>
+
+      <article class="walk">
+        <div class="walk-map">
+          <div class="walk-leaflet" data-lat="41.48521" data-lon="-71.29759" data-zoom="16"></div>
+          <div class="walk-num">6</div>
+        </div>
+        <h3 class="walk-name">Cliff Walk at Memorial Blvd</h3>
+        <p class="walk-attractions">The cinematic mile. Wind matters; check it twice.</p>
+        <p class="walk-start"><strong>Start</strong> Memorial Blvd &amp; Cliff Walk trailhead</p>
+      </article>
+
+    </div>
+  </section>
+
+  <!-- Leaflet — interactive map for the Where you'd live chapter -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+          integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+          crossorigin=""></script>
+  <script>
+    (function () {
+      const el = document.getElementById('where-map');
+      if (!el || !window.L) return;
+      // The saved "heart" pin and the candidate cores that "Suggest cores"
+      // would return. In the live app this comes from findVisitCenters(lat,
+      // lon, {boundary}) — top distinct social-POI density peaks INSIDE the
+      // stay-zone polygon. Each candidate gets a numbered marker; clicking
+      // one moves the pin and re-measures around it (see MapPicker.jsx in
+      // the live app). The 700 m measurement field is drawn around the
+      // *currently selected* candidate (the one whose score is showing).
+      // For the mockup we hard-code four plausible Newport cores and
+      // pre-select #1 (Bowen's & Bannister's Wharf, the densest).
+      const heart = [41.4870, -71.3120]; // saved pin (Thames & Bowen's)
+      const candidates = [
+        { lat: 41.4853, lon: -71.3108, n: 38, label: "Bowen's & Bannister's Wharf" },
+        { lat: 41.4920, lon: -71.3115, n: 24, label: "Broadway · Washington Sq" },
+        { lat: 41.4825, lon: -71.3050, n: 19, label: "Bellevue · Memorial" },
+        { lat: 41.4940, lon: -71.3185, n: 14, label: "Long Wharf · The Point" },
+      ];
+      const selectedIdx = 0;
+      const selected = candidates[selectedIdx];
+      const bestCenter = [selected.lat, selected.lon];
+      // scrollWheelZoom disabled — the map is embedded inside a long article,
+      // so trackpad/wheel scroll should always scroll the page. Users zoom
+      // with the +/- buttons or by clicking the map first.
+      const map = L.map(el, {
+        center: heart,
+        zoom: 14,
+        zoomSnap: 0.5,
+        zoomDelta: 0.5,
+        scrollWheelZoom: false,
+        attributionControl: true,
+        zoomControl: true,
+      });
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+      }).addTo(map);
+
+      // 700m measurement field is drawn by drawMeasurement() below, after
+      // the candidate markers are laid down, so its center stays in sync
+      // with whichever candidate is selected.
+
+      // Visit-center pin — double-ring so it reads at any zoom. Tracked as
+      // variables so the pin can be moved when the user picks a candidate.
+      const heartOuter = L.circleMarker(heart, {
+        radius: 18,
+        color: '#0d4c44',
+        weight: 1,
+        opacity: 0.4,
+        fillColor: '#fbf6ea',
+        fillOpacity: 0.9,
+        interactive: false,
+      }).addTo(map);
+      const heartInner = L.circleMarker(heart, {
+        radius: 10,
+        color: '#fbf6ea',
+        weight: 4,
+        fillColor: '#0d4c44',
+        fillOpacity: 1,
+        interactive: false,
+      }).addTo(map);
+      // Footer "Visit center · 41.4870 N, 71.3120 W" element — kept in sync
+      // with whichever candidate the user picks.
+      function updateHeartFooter(c) {
+        const span = document.querySelector('.where-foot > span:first-child');
+        if (!span) return;
+        const lat = Math.abs(c.lat).toFixed(4);
+        const lon = Math.abs(c.lon).toFixed(4);
+        span.textContent = `Visit center · ${lat} N, ${lon} W · ${c.label || 'custom'}`;
+      }
+      function moveHeart(c) {
+        heartOuter.setLatLng([c.lat, c.lon]);
+        heartInner.setLatLng([c.lat, c.lon]);
+        updateHeartFooter(c);
+      }
+
+      // Editorial label: Narragansett Bay, rendered as a divIcon so it lives
+      // at a geographic point but inherits our Fraunces typography.
+      L.marker([41.49, -71.39], {
+        icon: L.divIcon({
+          className: '',
+          html: '<div class="map-region-label">Narragansett Bay</div>',
+          iconSize: [220, 28],
+          iconAnchor: [0, 14],
+        }),
+        interactive: false,
+        keyboard: false,
+      }).addTo(map);
+
+      // Stay-zone polygon — the broader walkable area you'd consider staying
+      // in. In the live app this comes from cities.stay_zone_boundary
+      // (Census Place → OSM polygon → Census Tract → NRHP fallback chain,
+      // capped at 30 km²). For the mockup we hand-trace a ~9 km² shape
+      // covering The Point, Historic Hill, the harbor, Bellevue Ave's start,
+      // and the Bath Rd / King Park waterfront. The 700 m measurement field
+      // (green circle) is placed at the densest 700 m INSIDE this polygon —
+      // so the polygon is the area being searched, not the score itself.
+      const stayZonePoly = [
+        [41.5020, -71.3220], // The Point, Battery Park north
+        [41.5025, -71.3050], // Historic Hill north edge
+        [41.4930, -71.2980], // Touro Park / Bellevue start
+        [41.4810, -71.2980], // Bellevue mid (Bath Rd)
+        [41.4760, -71.3030], // King Park
+        [41.4730, -71.3170], // Wellington Ave waterfront
+        [41.4790, -71.3290], // Fort Adams Rd west
+        [41.4880, -71.3300], // outer harbor west
+        [41.4960, -71.3260], // Goat Island channel
+      ];
+      const stayZone = L.polygon(stayZonePoly, {
+        color: '#a23a30',
+        weight: 2,
+        opacity: 0.85,
+        fillColor: '#a23a30',
+        fillOpacity: 0.06,
+        dashArray: '4 5',
+        interactive: false,
+      }).addTo(map);
+
+      // Candidate cores — numbered markers for the top distinct social-POI
+      // density peaks inside the stay zone. Selected one is green, others
+      // are copper. Clicking a candidate (in the live app) moves the pin
+      // and re-measures around it. In the mockup, click to "select" updates
+      // which one shows the green 700m field.
+      const candidateLayer = L.layerGroup().addTo(map);
+      const measurementLayer = L.layerGroup().addTo(map);
+      function drawMeasurement(c) {
+        measurementLayer.clearLayers();
+        L.circle([c.lat, c.lon], { radius: 700, color: '#fbf6ea', weight: 8, opacity: 0.9, fill: false, interactive: false }).addTo(measurementLayer);
+        L.circle([c.lat, c.lon], { radius: 700, color: '#0d4c44', weight: 4, opacity: 1, fillColor: '#0d4c44', fillOpacity: 0.16, interactive: false }).addTo(measurementLayer);
+      }
+      let sel = selectedIdx;
+      function drawCandidates() {
+        candidateLayer.clearLayers();
+        candidates.forEach((c, i) => {
+          const isSel = i === sel;
+          const m = L.circleMarker([c.lat, c.lon], {
+            radius: isSel ? 14 : 11,
+            color: '#fffdf8',
+            weight: 2,
+            fillColor: isSel ? '#0d4c44' : '#c08457',
+            fillOpacity: 0.95,
+          }).addTo(candidateLayer);
+          m.bindTooltip(String(i + 1), { permanent: true, direction: 'center', className: 'center-rank' });
+          m.on('click', () => { sel = i; drawCandidates(); drawMeasurement(c); moveHeart(c); updatePanel(); });
+        });
+      }
+      function updatePanel() {
+        const list = document.getElementById('candidate-list');
+        if (!list) return;
+        list.querySelectorAll('li').forEach((li, i) => {
+          li.classList.toggle('selected', i === sel);
+        });
+        const head = document.getElementById('selected-label');
+        if (head) head.textContent = candidates[sel].label;
+      }
+      drawCandidates();
+      drawMeasurement(candidates[sel]);
+
+      // Wire the bottom-left candidate list so clicking a row also selects.
+      document.querySelectorAll('#candidate-list li').forEach((li, i) => {
+        li.addEventListener('click', () => {
+          sel = i;
+          drawCandidates();
+          drawMeasurement(candidates[i]);
+          moveHeart(candidates[i]);
+          updatePanel();
+        });
+      });
+
+      // Recenter buttons (mockup behavior — no real persistence). "Edit
+      // center" now points the user at the candidate list rather than
+      // spawning a draggable pin — the suggestions ARE the picker. We pan
+      // the map to fit all candidates so they're all visible, scroll the
+      // candidate panel into view, and add a brief highlight pulse.
+      const heartView = { center: heart, zoom: 14.5 };
+      let editMode = false;
+      const candidatePanel = document.querySelector('.stay-overlay');
+      document.querySelectorAll('.recenter-btn').forEach((btn) => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          if (btn.dataset.recenter === 'zone') {
+            map.flyToBounds(stayZone.getBounds(), { padding: [40, 40], duration: 0.6 });
+          } else if (btn.dataset.recenter === 'pin') {
+            map.flyTo(heartView.center, heartView.zoom, { duration: 0.6 });
+          } else if (btn.dataset.recenter === 'edit') {
+            editMode = !editMode;
+            if (editMode) {
+              // Frame all candidate markers so every option is visible.
+              const bounds = L.latLngBounds(candidates.map((c) => [c.lat, c.lon]));
+              map.flyToBounds(bounds, { padding: [80, 80], duration: 0.6 });
+              if (candidatePanel) {
+                candidatePanel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                candidatePanel.classList.add('candidate-panel-pulse');
+              }
+              btn.textContent = 'Done ✓';
+              btn.classList.add('recenter-btn-active');
+            } else {
+              if (candidatePanel) candidatePanel.classList.remove('candidate-panel-pulse');
+              btn.textContent = 'Edit center →';
+              btn.classList.remove('recenter-btn-active');
+            }
+          }
+        });
+      });
+    })();
+  </script>
+
+  <script>
+    // Five small Leaflet maps for the "Where to walk" cards. Each <div
+    // class="walk-leaflet"> carries data-lat/lon/zoom for its start point.
+    // Pan/zoom/drag are disabled — these are read-only mini-maps.
+    (function () {
+      if (!window.L) return;
+      document.querySelectorAll('.walk-leaflet').forEach((el) => {
+        const lat = parseFloat(el.dataset.lat);
+        const lon = parseFloat(el.dataset.lon);
+        const zoom = parseFloat(el.dataset.zoom) || 17;
+        if (Number.isNaN(lat) || Number.isNaN(lon)) return;
+        const m = L.map(el, {
+          center: [lat, lon],
+          zoom,
+          zoomControl: false,
+          attributionControl: false,
+          dragging: false,
+          scrollWheelZoom: false,
+          doubleClickZoom: false,
+          boxZoom: false,
+          keyboard: false,
+          touchZoom: false,
+        });
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 19,
+        }).addTo(m);
+        // Match the main where-map pin: dark double-ring marker.
+        L.circleMarker([lat, lon], {
+          radius: 9,
+          color: '#fbf6ea',
+          weight: 3,
+          fillColor: '#0d4c44',
+          fillOpacity: 1,
+          interactive: false,
+        }).addTo(m);
+      });
+    })();
+  </script>
+
+  <script>
+    // Highlight the chapter whose centerline is closest to viewport center.
+    (function () {
+      const links = document.querySelectorAll('.toc a[data-target]');
+      const targets = [...links].map(a => ({
+        link: a,
+        el: document.getElementById(a.dataset.target),
+      })).filter(x => x.el);
+
+      const toc = document.querySelector('.toc');
+      const whyEl = document.getElementById('why');
+
+      function update() {
+        const mid = window.scrollY + window.innerHeight * 0.35;
+        let best = targets[0], bestDist = Infinity;
+        for (const t of targets) {
+          const r = t.el.getBoundingClientRect();
+          const top = window.scrollY + r.top;
+          const bot = top + r.height;
+          const center = (top + bot) / 2;
+          // If mid is inside, distance is 0 (it wins). Else distance to nearest edge.
+          let dist;
+          if (mid >= top && mid <= bot) dist = 0;
+          else dist = Math.min(Math.abs(top - mid), Math.abs(bot - mid));
+          if (dist < bestDist) { bestDist = dist; best = t; }
+        }
+        for (const t of targets) t.link.classList.toggle('is-current', t === best);
+
+        // Show the chapter rail only once the reader has scrolled into the
+        // Why section. Trigger fires when Why's top crosses 70% down the viewport.
+        if (toc && whyEl) {
+          const whyTop = window.scrollY + whyEl.getBoundingClientRect().top;
+          const trigger = whyTop - window.innerHeight * 0.7;
+          toc.classList.toggle('is-visible', window.scrollY >= trigger);
+        }
+      }
+
+      // Smooth scroll on click
+      for (const t of targets) {
+        t.link.addEventListener('click', (e) => {
+          e.preventDefault();
+          t.el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+      }
+
+      update();
+      window.addEventListener('scroll', update, { passive: true });
+      window.addEventListener('resize', update);
+    })();
+  </script>
+
+  <!-- ============================================================== -->
+  <!-- DATA WIRING — pull real values from the /api/mockup-data        -->
+  <!-- endpoint (server-side query against Supabase). No build step,   -->
+  <!-- no snapshot file. Everything below is DOM manipulation via      -->
+  <!-- textContent + createElement; no innerHTML, no string            -->
+  <!-- concatenation into the document.                                -->
+  <!-- ============================================================== -->
+  <script type="module">
+    // Slug comes from ?slug=... in the URL, defaulting to newport-ri.
+    const params = new URLSearchParams(window.location.search);
+    const slug = params.get('slug') || 'newport-ri';
+    // The API runs on the Next dev server (:3000) and accepts CORS from
+    // anywhere. When the mockup is served from any other origin (the
+    // static preview at :8765, an `open file://` test, etc.), we still
+    // resolve to the same Supabase-backed data.
+    const apiBase = (window.location.port && window.location.port !== '3000')
+      ? `${window.location.protocol}//${window.location.hostname}:3000`
+      : '';
+    const SNAPSHOT = await fetch(`${apiBase}/api/mockup-data?slug=${encodeURIComponent(slug)}`)
+      .then((r) => r.ok ? r.json() : null)
+      .catch(() => null);
+    if (!SNAPSHOT) {
+      console.warn('[mockup] /api/mockup-data unreachable — leaving hardcoded values in place.');
+    } else {
+      hydrate(SNAPSHOT);
+    }
+
+    // ── Tiny safe DOM builders ───────────────────────────────────────
+    // el(tag, {class, text}, ...children) — builds a node with text
+    // content and class set safely (no innerHTML, ever). The `text`
+    // value is set via .textContent so it can never inject markup.
+    function el(tag, opts = {}, ...children) {
+      const n = document.createElement(tag);
+      if (opts.class) n.className = opts.class;
+      if (opts.text != null) n.textContent = String(opts.text);
+      for (const child of children) {
+        if (child == null) continue;
+        n.appendChild(typeof child === 'string' ? document.createTextNode(child) : child);
+      }
+      return n;
+    }
+    function clear(node) { while (node.firstChild) node.removeChild(node.firstChild); }
+
+    function hydrate({ city, homebase }) {
+      hydrateStrip(city);
+      hydrateHero(city);
+      hydrateWhy(city);
+      hydrateWhere(city);
+      hydrateAxes(city);
+      hydrateExtremes(city, homebase);
+      hydrateClimateFoot(city);
+      hydrateVerdict(city);
+    }
+
+    // ── CHAPTER 0 — top context strip ─────────────────────────────────
+    function hydrateStrip(city) {
+      const stage = document.querySelector('.strip .stage');
+      const name = document.querySelector('.strip .name');
+      if (stage) stage.textContent = city.status || 'Idea';
+      if (name) name.textContent = city.name;
+      document.title = `${city.name} — Livability Scout`;
+    }
+
+    // ── CHAPTER 1 — hero ──────────────────────────────────────────────
+    function hydrateHero(city) {
+      const img = document.querySelector('.hero img');
+      if (img && city.heroImage) {
+        img.src = city.heroImage;
+        img.alt = `${city.name} at its best`;
+      }
+      const place = document.querySelector('.hero-bottom .place');
+      if (place) {
+        clear(place);
+        const [head, tail] = city.name.split(/,\s*/);
+        place.appendChild(document.createTextNode(head + (tail ? ', ' : '')));
+        if (tail) place.appendChild(el('em', { text: tail }));
+      }
+      const meta = document.querySelector('.hero-bottom .meta');
+      if (meta) {
+        clear(meta);
+        if (city.driveHrsFromPit) {
+          const span = el('span');
+          span.appendChild(el('strong', { text: `${city.driveHrsFromPit}h` }));
+          span.appendChild(document.createTextNode(' from PIT'));
+          meta.appendChild(span);
+        }
+        if (city.chips?.length) {
+          if (meta.children.length) meta.appendChild(el('span', { class: 'sep' }));
+          meta.appendChild(el('span', { text: city.chips.join(' · ') }));
+        }
+      }
+    }
+
+    // ── CHAPTER 2 — the why ───────────────────────────────────────────
+    function hydrateWhy(city) {
+      const paras = (city.why || '').split(/\n\n+/).map((s) => s.trim()).filter(Boolean);
+      const why = document.querySelector('.why');
+      if (why && paras.length) {
+        // Replace lead text, then rebuild trailing body paragraphs.
+        const lead = why.querySelector('.why-lead');
+        if (lead) lead.textContent = paras[0];
+        // Remove existing body paras (anything between .why-lead and .gates).
+        [...why.querySelectorAll('p')].forEach((p) => {
+          if (p.classList.contains('why-lead')) return;
+          if (p.classList.contains('eyebrow')) return;
+          if (p.closest('.gates')) return;
+          p.remove();
+        });
+        const gates = why.querySelector('.gates');
+        for (let i = 1; i < paras.length; i++) {
+          const p = el('p', { text: paras[i] });
+          if (gates) why.insertBefore(p, gates); else why.appendChild(p);
+        }
+      }
+      replaceGateText('.gate-wins', city.ifWins);
+      replaceGateText('.gate-fails', city.ifFails);
+    }
+    function replaceGateText(selector, text) {
+      if (!text) return;
+      const elx = document.querySelector(selector);
+      if (!elx) return;
+      const label = elx.querySelector('.gate-label');
+      clear(elx);
+      if (label) elx.appendChild(label);
+      elx.appendChild(document.createTextNode(' ' + text));
+    }
+
+    // ── CHAPTER 3 — where you'd live ──────────────────────────────────
+    function hydrateWhere(city) {
+      const num = document.querySelector('.verdict-card .axis .num');
+      if (num && city.measuredScore != null) {
+        clear(num);
+        num.appendChild(document.createTextNode(city.measuredScore.toFixed(1)));
+        num.appendChild(el('small', { text: '/10' }));
+      }
+      const zoneH = document.querySelector('.stay-overlay h3');
+      if (zoneH && city.stayZone) zoneH.textContent = city.stayZone;
+      const heart = document.querySelector('.stay-overlay .heart');
+      if (heart && city.heartIntersection) {
+        clear(heart);
+        heart.appendChild(document.createTextNode('Heart of the zone: '));
+        heart.appendChild(el('strong', { text: city.heartIntersection }));
+      }
+      const foot = document.querySelector('.where-foot span:first-child');
+      if (foot && city.lat != null) {
+        foot.textContent =
+          `Visit center · ${city.lat.toFixed(4)} N, ${Math.abs(city.lon).toFixed(4)} W`;
+      }
+    }
+
+    // ── CHAPTER 4 — by the numbers ────────────────────────────────────
+    // Strategy: REBUILD each axis-col's metric rows from the snapshot
+    // instead of patching the template's hand-typed rows. The template's
+    // metric labels diverged from the taxonomy (fabricated rows like
+    // "Pre-1940 housing" / "Owner-occupied" that aren't in the taxonomy
+    // at all). Rebuilding from data guarantees only real metrics render
+    // and every row carries its tagline.
+    function hydrateAxes(city) {
+      const cols = [...document.querySelectorAll('.axes .axis-col')];
+      for (const axisData of city.axes || []) {
+        const col = cols.find((c) => c.querySelector('h3')?.textContent.trim() === axisData.label);
+        if (!col) continue;
+        const scoreEl = col.querySelector('.axis-score');
+        if (scoreEl) {
+          clear(scoreEl);
+          if (axisData.score != null) {
+            scoreEl.appendChild(document.createTextNode(axisData.score.toFixed(1)));
+            scoreEl.appendChild(el('small', { text: '/10' }));
+          } else {
+            scoreEl.appendChild(document.createTextNode('—'));
+          }
+        }
+        // Drop every existing .metric row, then append fresh ones.
+        [...col.querySelectorAll('.metric')].forEach((n) => n.remove());
+        for (const m of axisData.metrics) {
+          col.appendChild(buildMetricRow(m));
+        }
+      }
+    }
+    function buildMetricRow(m) {
+      const row = el('div', { class: 'metric' });
+      const top = el('div', { class: 'metric-top' });
+      top.appendChild(el('span', { class: 'metric-name', text: m.label }));
+      const valueSpan = el('span', { class: 'metric-value' });
+      if (m.value != null) setMetricValue(valueSpan, m);
+      else valueSpan.textContent = '—';
+      top.appendChild(valueSpan);
+      row.appendChild(top);
+      if (m.tagline) row.appendChild(el('div', { class: 'metric-tagline', text: m.tagline }));
+      const barWrap = el('div', { class: m.direction < 0 ? 'metric-bar negative' : 'metric-bar' });
+      const barFill = el('span');
+      if (m.barPct != null) barFill.style.width = `${m.barPct}%`;
+      barWrap.appendChild(barFill);
+      row.appendChild(barWrap);
+      if (m.source) row.appendChild(el('div', { class: 'metric-source', text: m.source }));
+      return row;
+    }
+    function setMetricValue(node, m) {
+      clear(node);
+      const text = formatMetricNumber(m);
+      node.appendChild(document.createTextNode(text));
+      if (m.unit === 'days') {
+        node.appendChild(document.createTextNode(' '));
+        const small = el('small', { text: '/ 365' });
+        small.style.cssText = 'color: var(--ink-mute); font-weight: 400;';
+        node.appendChild(small);
+      }
+    }
+    function formatMetricNumber(m) {
+      const v = m.value;
+      if (v == null) return '—';
+      if (m.unit === 'days')    return String(Math.round(v));
+      // `%` values are stored as percentage numbers already (e.g. 11.8 ⇒ 11.8%).
+      // `frac` values are stored as 0–1 fractions and need ×100 to display.
+      if (m.unit === '%')       return `${Math.round(v)}%`;
+      if (m.unit === 'frac')    return `${Math.round(v * 100)}%`;
+      if (m.unit === 'm')       return v < 1000 ? `${Math.round(v)} m` : `${(v / 1000).toFixed(1)} km`;
+      if (m.unit === 'km²')     return `${v.toFixed(1)} km²`;
+      if (m.unit === '°')       return `${v.toFixed(1)}°`;
+      if (m.unit === '$')       return `$${(v / 1000).toFixed(0)}k`;
+      if (m.unit === 'ratio')   return `${v.toFixed(1)}×`;
+      if (m.unit === '/km²')    return `${Math.round(v)}/km²`;
+      if (m.unit === '/sqmi')   return `${Math.round(v).toLocaleString()}/sq mi`;
+      if (m.unit === 'count')   return String(Math.round(v));
+      if (m.unit === 'km')      return `${v.toFixed(1)} km`;
+      if (m.unit === '0–100')   return String(Math.round(v));
+      if (m.unit === 'hr')      return `${v.toFixed(1)} hr`;
+      return String(v);
+    }
+
+    // ── CHAPTER 5 — when to go (extremes strip + foot) ────────────────
+    function hydrateExtremes(city, homebase) {
+      const monthName = (i) => ['January','February','March','April','May','June','July','August','September','October','November','December'][i] || '';
+      function apply(selector, ext, refExt, fmtMain, fmtRef) {
+        const article = document.querySelector(selector);
+        if (!article || !ext) return;
+        const monthEl = article.querySelector('.extreme-month');
+        if (monthEl) monthEl.textContent = monthName(ext.monthIdx);
+        const valEl = article.querySelector('.extreme-value');
+        if (valEl) {
+          clear(valEl);
+          valEl.appendChild(document.createTextNode(fmtMain.value(ext.value)));
+          valEl.appendChild(el('small', { text: fmtMain.unit }));
+        }
+        const refEl = article.querySelector('.extreme-ref');
+        if (refEl && refExt) {
+          clear(refEl);
+          refEl.appendChild(document.createTextNode('Allison Park · '));
+          refEl.appendChild(el('strong', { text: fmtRef(refExt.value) }));
+        }
+      }
+      apply('.extreme.cold', city.extremes?.coldest, homebase?.extremes?.coldest,
+        { value: (v) => `${Math.round(v)}°F`, unit: 'avg low' }, (v) => `${Math.round(v)}°F`);
+      apply('.extreme.hot', city.extremes?.hottest, homebase?.extremes?.hottest,
+        { value: (v) => `${Math.round(v)}°F`, unit: 'avg high' }, (v) => `${Math.round(v)}°F`);
+      apply('.extreme.wet', city.extremes?.wettest, homebase?.extremes?.wettest,
+        { value: (v) => `${v.toFixed(1)}″`, unit: 'precip' }, (v) => `${v.toFixed(1)}″`);
+      apply('.extreme.dark', city.extremes?.darkest, homebase?.extremes?.darkest,
+        { value: (v) => v.toFixed(1), unit: 'daylight hr' }, (v) => `${v.toFixed(1)} hr`);
+    }
+    function hydrateClimateFoot(city) {
+      const foot = document.querySelector('.climate-foot');
+      const vw = city.visitWindow;
+      if (!foot || !vw) return;
+      const spans = foot.querySelectorAll('span');
+      const charmNote = city.seasonNotes?.charm;
+      const truthNote = city.seasonNotes?.truth;
+      function setVisit(span, label, month, note) {
+        if (!span || !month) return;
+        clear(span);
+        span.appendChild(el('strong', { text: label }));
+        span.appendChild(document.createTextNode(` · ${month}${note ? ' — ' + note : ''}`));
+      }
+      setVisit(spans[0], 'Charm visit', vw.charm?.month, charmNote);
+      setVisit(spans[1], 'Off-season visit', vw.truth?.month, truthNote);
+    }
+
+    // ── Verdict stamp ─────────────────────────────────────────────────
+    function hydrateVerdict(city) {
+      const num = document.querySelector('.stamp-num');
+      if (num && city.measuredScore != null) {
+        clear(num);
+        num.appendChild(document.createTextNode(city.measuredScore.toFixed(1)));
+        num.appendChild(el('small', { text: '/10' }));
+      }
+    }
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,50 @@
+# Self-hosted Overpass API for the measurement pipeline.
+#
+# One-time bootstrap:
+#   docker compose up -d
+#   docker compose logs -f overpass-us       # watch the import (8–14 hours)
+#
+# When the logs settle into the periodic-update loop, the API is ready:
+#   curl "http://localhost:12345/api/interpreter?data=[out:json][timeout:25];node[amenity=cafe](around:500,40.7128,-74.0060);out%20count;"
+#
+# After init completes you can remove (or comment out) OVERPASS_MODE=init so
+# subsequent boots skip straight to serving. The container keeps minute-diff
+# updates running on OVERPASS_UPDATE_SLEEP cadence.
+#
+# Batch scripts opt in by setting OVERPASS_URL before running:
+#   OVERPASS_URL=http://localhost:12345/api/interpreter node topup-metrics.mjs
+# Vercel never sets that env var, so prod /api/measure stays on public Overpass.
+
+services:
+  overpass-us:
+    image: wiktorn/overpass-api:latest
+    container_name: overpass-us
+    # NO restart policy during init. The entrypoint has `set -eo pipefail` —
+    # any step failing (e.g. an over-strict preprocess rm) crashes the
+    # container, and a restart would re-download the 11.9 GB PBF from
+    # Geofabrik. Switch to `unless-stopped` only AFTER /db/init_done exists.
+    restart: "no"
+    ports:
+      - "12345:80"
+    environment:
+      - OVERPASS_MODE=init
+      - OVERPASS_META=no              # our queries never read user/version/timestamp
+      - OVERPASS_COMPRESSION=gz
+      - OVERPASS_RULES_LOAD=10
+      # Point at the local copy of the Geofabrik PBF kept under ./db (recovery
+      # from a prior init crash — the original 11.9 GB download survived as
+      # planet.osm.osm.bz2). curl handles file:// and treats status 000 as
+      # success; this skips the 15-min network re-fetch on each crashed init.
+      # For a fresh import on a clean machine, switch this back to the URL:
+      #   https://download.geofabrik.de/north-america/us-latest.osm.pbf
+      - OVERPASS_PLANET_URL=file:///db/planet.osm.osm.bz2
+      - OVERPASS_DIFF_URL=https://download.geofabrik.de/north-america/us-updates/
+      - OVERPASS_UPDATE_SLEEP=86400   # daily diff cadence is plenty for our use
+      # Geofabrik serves .osm.pbf but the image expects /db/planet.osm.bz2 at
+      # the preprocess step. Convert in-place with osmium. The final `rm` must
+      # tolerate a missing file — osmium-cat appears to unlink its input
+      # mid-stream under virtiofs, so the `rm` would otherwise fail and
+      # `set -e` would abort the whole init.
+      - OVERPASS_PLANET_PREPROCESS=mv /db/planet.osm.bz2 /db/planet.osm.pbf && osmium cat -o /db/planet.osm.bz2 /db/planet.osm.pbf ; rm -f /db/planet.osm.pbf ; true
+    volumes:
+      - ./db:/db

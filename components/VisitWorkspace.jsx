@@ -44,7 +44,6 @@ export default function VisitWorkspace() {
     <AppShell activeMode="visit">
       <section className="canvas-header">
         <div>
-          <p className="canvas-eyebrow stage-visit-text">Visit</p>
           <h1>Trips you've planned or are on</h1>
           <p className="canvas-sub">{trips.length === 0 ? "Move a candidate from Calibrate to Visit once you've booked the trip." : `${trips.length} ${trips.length === 1 ? "trip" : "trips"} on deck. Sorted by arrival date.`}</p>
         </div>

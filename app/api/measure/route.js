@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import {
-  measureAround, findVisitCenter, findVisitCenters, nearestWaterMulti,
+  measureAround, findVisitCenters, nearestWaterMulti,
   rankedWaterBodies, distanceToTarget, nearestWater, geocodeHeart,
   measureCensus, measureWalkScore, measureClimate, measureBuildingCoverage, measureSkyline,
   measureHorizonPeaks, composite, fetchStayZoneBoundary,
@@ -12,18 +12,45 @@ export const maxDuration = 60;
 
 /**
  * POST /api/measure
- * body: { cityId, lat?, lon?, recenter?, full? }
- *  - lat/lon       → measure around that exact point (user moved the pin)
- *  - recenter:true → recenter on the densest walkable cluster, then measure
- *  - full:true     → also refresh keyed/slow layers (Census, Walk Score,
- *                    climate, building coverage). Default is the fast
- *                    location-core (OSM + elevation + water, no keys) — the
- *                    things that actually change when you nudge a pin.
+ * body: { cityId, lat?, lon?, recenter?, full?, refreshBoundary? }
+ *  - lat/lon            → measure around that exact point (user moved the pin)
+ *  - recenter:true      → recenter on the densest walkable cluster, then measure
+ *  - refreshBoundary    → re-fetch the stay-zone polygon from sources
+ *                         (Census Place → OSM → Tract → NRHP → fallback) before
+ *                         measuring. Use after stay_zone changes.
+ *  - full:true          → also refresh keyed/slow layers (Census, Walk Score,
+ *                         climate, building coverage). Default is the fast
+ *                         location-core (OSM + elevation + water, no keys).
+ *
+ * Measurement always uses the stay-zone boundary: the 700 m field is placed
+ * at the densest social-POI cluster INSIDE the polygon (via findVisitCenters),
+ * not blindly around the saved pin. Boundary is auto-fetched if missing.
  * Always MERGES into measured_metrics so other layers aren't clobbered.
  */
+
+// Helper: ensure the city has a current stay-zone boundary. Lazily fetch and
+// persist if missing or if `refresh` is set. Returns {poly, source, fetched}
+// where `fetched` indicates we hit network this call.
+async function ensureBoundary(supabase, city, anchor, { refresh } = {}) {
+  if (city.stay_zone_boundary && !refresh) {
+    return { poly: city.stay_zone_boundary, source: city.boundary_source || null, fetched: false };
+  }
+  const res = await fetchStayZoneBoundary(city.stay_zone, city.name, anchor);
+  if (!res) return { poly: null, source: null, fetched: false };
+  const asOf = new Date().toISOString().slice(0, 10);
+  await supabase.from("cities").update({
+    stay_zone_boundary: res.poly,
+    boundary_source: res.source,
+    boundary_set_at: asOf,
+  }).eq("id", city.id);
+  return { poly: res.poly, source: res.source, fetched: true };
+}
+
 export async function POST(request) {
   try {
-    const { cityId, lat, lon, recenter, full, scout, water, setWaterTarget } = await request.json();
+    const { cityId, lat, lon, full, scout, water, setWaterTarget, refreshBoundary } = await request.json();
+    // (legacy `recenter` flag is intentionally ignored — measureAround now
+    //  always picks the best 700 m inside the boundary, making it redundant.)
     if (!cityId) throw new Error("Missing cityId.");
     const auth = request.headers.get("authorization") || "";
     const token = auth.startsWith("Bearer ") ? auth.slice(7) : null;
@@ -36,7 +63,7 @@ export async function POST(request) {
     });
 
     const { data: city, error: readErr } = await supabase.from("cities")
-      .select("id,name,stay_zone,stay_zone_boundary,heart_intersection,lat,lon,measured_metrics,water_target").eq("id", cityId).single();
+      .select("id,name,stay_zone,stay_zone_boundary,boundary_source,boundary_set_at,heart_intersection,lat,lon,measured_metrics,measured_at,water_target").eq("id", cityId).single();
     if (readErr) throw new Error(readErr.message);
 
     // Scout mode: return candidate cores (with water distance each) so the user
@@ -47,17 +74,8 @@ export async function POST(request) {
       let anchor = (city.lat != null && city.lon != null) ? { lat: city.lat, lon: city.lon } : null;
       if (!anchor) anchor = await geocodeHeart(city.heart_intersection, city.name);
       if (!anchor) throw new Error("Could not locate this city — set a point manually.");
-      let boundary = city.stay_zone_boundary || null;
-      let boundaryFetched = false;
-      if (!boundary && city.stay_zone) {
-        boundary = await fetchStayZoneBoundary(city.stay_zone, city.name);
-        if (boundary) {
-          boundaryFetched = true;
-          // Best-effort persist; don't fail the scout if the write errors.
-          await supabase.from("cities").update({ stay_zone_boundary: boundary }).eq("id", cityId);
-        }
-      }
-      const cands = await findVisitCenters(anchor.lat, anchor.lon, { boundary });
+      const b = await ensureBoundary(supabase, city, anchor, { refresh: refreshBoundary });
+      const cands = await findVisitCenters(anchor.lat, anchor.lon, { boundary: b.poly });
       // ONE water fetch around the anchor, then distance per candidate locally.
       const waters = await nearestWaterMulti(anchor.lat, anchor.lon, cands);
       const candidates = cands.map((c, i) => ({ ...c, water_dist_m: waters[i] }));
@@ -65,9 +83,9 @@ export async function POST(request) {
         ok: true, scout: true,
         current: { lat: city.lat, lon: city.lon },
         candidates,
-        boundary: boundary || null,
-        boundaryFetched,
-        boundarySource: boundary ? "OpenStreetMap (Nominatim)" : null,
+        boundary: b.poly,
+        boundaryFetched: b.fetched,
+        boundarySource: b.source,
       });
     }
 
@@ -93,28 +111,36 @@ export async function POST(request) {
       merged.water_dist_m = { value: dist, asOf, source: target ? `OpenStreetMap — target: ${target.name}` : "OpenStreetMap (Overpass)", point: point || null };
       if (extentKm2 != null) merged.water_extent_km2 = { value: extentKm2, asOf, source: "OpenStreetMap (Overpass)" };
       const raw = {}; for (const [k, v] of Object.entries(merged)) raw[k] = v?.value;
+      // Composite is computed for the response toast only — not persisted.
+      // The live runtime recomputes via weightedAxisScore at render time, so
+      // a stored scalar would just go stale.
       const measured = composite(raw);
       const { error: wErr } = await supabase.from("cities")
-        .update({ measured_metrics: merged, measured, water_target: target }).eq("id", cityId);
+        .update({ measured_metrics: merged, water_target: target }).eq("id", cityId);
       if (wErr) throw new Error(wErr.message);
       return NextResponse.json({ ok: true, waterTarget: target, water_dist_m: dist, measured, measuredMetrics: merged });
     }
-    let center, geoSource;
+    // Where to anchor the boundary fetch + cluster scan. The saved pin (if
+    // present) or, for a new city, the geocoded heart intersection.
+    let anchor;
     if (Number.isFinite(lat) && Number.isFinite(lon)) {
-      center = { lat, lon }; geoSource = "manual (placed by user)";
+      anchor = { lat, lon };
+    } else if (city.lat != null && city.lon != null) {
+      anchor = { lat: city.lat, lon: city.lon };
     } else {
-      let anchor = (city.lat != null && city.lon != null) ? { lat: city.lat, lon: city.lon } : null;
-      if (!anchor) anchor = await geocodeHeart(city.heart_intersection, city.name);
+      anchor = await geocodeHeart(city.heart_intersection, city.name);
       if (!anchor) throw new Error("Could not locate this city — set a point manually.");
-      if (recenter) {
-        const vc = await findVisitCenter(anchor.lat, anchor.lon);
-        center = { lat: vc.lat, lon: vc.lon };
-        geoSource = `visit center: densest walkable cluster (${vc.n} POIs)`;
-      } else {
-        center = anchor;
-        geoSource = city.lat != null ? undefined : "Nominatim (heart intersection)";
-      }
     }
+
+    // Ensure the stay-zone boundary is current. If the user supplied a new
+    // pin (lat/lon) or asked for refreshBoundary, we re-fetch from sources so
+    // the measurement that follows runs against an up-to-date polygon.
+    const userMovedPin = Number.isFinite(lat) && Number.isFinite(lon);
+    const b = await ensureBoundary(supabase, city, anchor, { refresh: refreshBoundary || userMovedPin });
+
+    // Measurement center: by default, the best-cluster center INSIDE the
+    // boundary (measureAround handles this internally when given a boundary).
+    const center = anchor; // the "anchor" of the search; measureAround returns the chosen cluster.
 
     // A moved pin is a new place — re-measure EVERY layer for the new point.
     // `full:false` can opt down to the no-key core, but default is everything,
@@ -122,22 +148,27 @@ export async function POST(request) {
     const doFull = full !== false;
     const censusKey = process.env.CENSUS_API_KEY;
     const wsKey = process.env.WALKSCORE_API_KEY;
-    const [core, cen, ws, cl, bc, sky, horizon] = await Promise.all([
-      measureAround(center.lat, center.lon, { asOf }),
-      doFull && censusKey ? measureCensus(center.lat, center.lon, censusKey, { asOf }) : Promise.resolve({ metrics: {} }),
-      doFull && wsKey ? measureWalkScore(center.lat, center.lon, city.name, wsKey, { asOf }) : Promise.resolve({}),
-      doFull ? measureClimate(center.lat, center.lon, { asOf }) : Promise.resolve({ metrics: {} }),
-      doFull ? measureBuildingCoverage(center.lat, center.lon) : Promise.resolve({}),
-      doFull ? measureSkyline(center.lat, center.lon, { asOf }) : Promise.resolve({ metrics: {} }),
-      doFull ? measureHorizonPeaks(center.lat, center.lon, { asOf }).catch(() => null) : Promise.resolve(null),
+    const core = await measureAround(center.lat, center.lon, { asOf, boundary: b.poly });
+    const measureLat = core.center.lat, measureLon = core.center.lon;
+    const [cen, ws, cl, bc, sky, horizon] = await Promise.all([
+      doFull && censusKey ? measureCensus(measureLat, measureLon, censusKey, { asOf }) : Promise.resolve({ metrics: {} }),
+      doFull && wsKey ? measureWalkScore(measureLat, measureLon, city.name, wsKey, { asOf }) : Promise.resolve({}),
+      doFull ? measureClimate(measureLat, measureLon, { asOf }) : Promise.resolve({ metrics: {} }),
+      doFull ? measureBuildingCoverage(measureLat, measureLon) : Promise.resolve({}),
+      doFull ? measureSkyline(measureLat, measureLon, { asOf }) : Promise.resolve({ metrics: {} }),
+      doFull ? measureHorizonPeaks(measureLat, measureLon, { asOf }).catch(() => null) : Promise.resolve(null),
     ]);
+    const geoSource = b.poly
+      ? `best 700 m inside stay zone (${core.clusterN ?? "?"} POIs, ${core.drift ?? 0} m from pin)`
+      : (userMovedPin ? "manual (placed by user)" : (city.lat != null ? undefined : "Nominatim (heart intersection)"));
     const newMetrics = { ...core.metrics, ...cen.metrics, ...ws, ...cl.metrics, ...bc, ...sky.metrics };
     if (horizon) newMetrics.mtn_horizon_pct = { value: horizon.occupancyPct, asOf, source: "Open-Meteo elevation + OSM peaks" };
 
-    // If a water target is set, the center moved — re-route water to THAT body
-    // rather than auto-nearest, so the user's choice persists across re-measures.
+    // If a water target is set, re-route water distance to THAT body rather
+    // than auto-nearest, so the user's choice persists across re-measures.
+    // Measured from the actual measurement center, not the saved pin.
     if (city.water_target && newMetrics.water_dist_m) {
-      const td = await distanceToTarget(center.lat, center.lon, city.water_target);
+      const td = await distanceToTarget(measureLat, measureLon, city.water_target);
       if (td.dist != null) {
         newMetrics.water_dist_m = { value: td.dist, asOf, source: `OpenStreetMap — target: ${city.water_target.name}`, point: td.point };
         if (td.extentKm2 != null) newMetrics.water_extent_km2 = { value: td.extentKm2, asOf, source: "OpenStreetMap (Overpass)" };
@@ -149,11 +180,19 @@ export async function POST(request) {
     const raw = {};
     for (const [k, v] of Object.entries(merged)) raw[k] = v?.value;
 
+    // The saved pin (lat/lon) is where the user said "this is the place." We
+    // only move it when the request explicitly carries a new lat/lon (manual
+    // drag) OR when there was no prior pin. Routine re-measures don't move
+    // it — the adaptive measurement center is recorded in geo_source for
+    // transparency, not by overwriting the user's choice.
+    const movePin = userMovedPin || city.lat == null;
+    const newLat = movePin ? center.lat : city.lat;
+    const newLon = movePin ? center.lon : city.lon;
+
     const patch = {
       measured_metrics: merged,
-      measured: composite(raw),
       measured_at: asOf,
-      lat: center.lat, lon: center.lon, geocoded_at: asOf,
+      lat: newLat, lon: newLon, geocoded_at: asOf,
     };
     if (geoSource) patch.geo_source = geoSource;
     if (horizon) patch.horizon_features = horizon; // visible named peaks + occupancy
@@ -162,7 +201,18 @@ export async function POST(request) {
     const { error: writeErr } = await supabase.from("cities").update(patch).eq("id", cityId);
     if (writeErr) throw new Error(writeErr.message);
 
-    return NextResponse.json({ ok: true, center, geoSource, measured: patch.measured, raw, horizon, full: !!full });
+    // Composite computed for the response toast only — not persisted.
+    // The runtime recomputes via weightedAxisScore on every render, so any
+    // stored scalar would just lag behind the truth.
+    const measured = composite(raw);
+
+    return NextResponse.json({
+      ok: true,
+      center: { lat: newLat, lon: newLon }, // saved pin location
+      measurementCenter: { lat: measureLat, lon: measureLon }, // adaptive
+      geoSource, measured, raw, horizon, full: !!full,
+      boundary: b.poly, boundarySource: b.source, boundaryFetched: b.fetched,
+    });
   } catch (error) {
     return NextResponse.json({ error: error.message || "Measure failed" }, { status: 500 });
   }

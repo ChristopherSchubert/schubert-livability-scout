@@ -18,7 +18,7 @@ when its `value` is non-null.
 | Axis | Metric | Coverage | Source | Filler script |
 |---|---|---|---|---|
 | Setting | `skyline_deg` | **78/78** ✅ | Open-Meteo elevation (line-of-sight skyline) | `scripts/backfill-skyline-and-grandeur.mjs` |
-| Setting | `mtn_horizon_pct` | 34/78 | Open-Meteo elevation + OSM peaks | `scripts/onboard.mjs --measurer horizon` |
+| Setting | `mtn_horizon_pct` | **78/78** ✅ | Open-Meteo elevation + OSM peaks | `scripts/onboard.mjs --measurer horizon` |
 | Setting | `water_dist_m` | 34/78 | OpenStreetMap (Overpass) | `scripts/measure-cities.mjs` (`measureAround`) |
 | Setting | `water_extent_km2` | 34/78 | OpenStreetMap (Overpass) | `scripts/measure-cities.mjs` |
 | Aliveness | `cafe_n` | 33/78 | OSM (osmnx) | `scripts/measure-cities.mjs` |
@@ -80,15 +80,11 @@ Open-Meteo archive runs cheaply; not blocked on OSM. Should be a single re-run o
 node scripts/measure-climate-bldg.mjs
 ```
 
-### 3. Mountain horizon (34 → 78)
+### 3. ~~Mountain horizon (34 → 78)~~ — DONE
 
-```bash
-node scripts/onboard.mjs --measurer horizon
-```
-
-Run with `--force` to refresh cities that already have an entry (e.g. after
-the flatland-zero fix landed — cities that previously failed silently with
-no peaks within 90 km should now record 0% instead of staying null).
+Completed via `node scripts/onboard.mjs --measurer horizon` (against local
+Overpass). The flatland-zero fix in `measureHorizonPeaks` means cities with
+no peaks within 90 km now honestly record 0% instead of staying null.
 
 ### 4. Census top-up (3 cities)
 

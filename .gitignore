@@ -11,3 +11,9 @@ node_modules/
 
 # Input artifacts (already extracted to _files_thread/)
 files.zip
+
+# Local Overpass-API database (30–50 GB, rebuilt from Geofabrik on import)
+overpass/db/
+
+# Transient session lock (per-process, not shared state)
+.claude/scheduled_tasks.lock
