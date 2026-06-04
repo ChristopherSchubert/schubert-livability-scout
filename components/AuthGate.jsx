@@ -85,8 +85,8 @@ function SignIn() {
   if (sent) {
     return (
       <div className="auth-card">
-        <span className="brand-dot" aria-hidden="true" />
-        <h1>Check your email</h1>
+        <span className="auth-eyebrow">Livability Scout</span>
+        <h1 className="auth-title">Check your <em>email</em></h1>
         <p className="auth-muted">A sign-in link is on its way to <strong>{email}</strong>. Open it on this device and you’re in — and you’ll stay signed in.</p>
         <button type="button" className="auth-ghost" onClick={() => setSent(false)}>Use a different email</button>
       </div>
@@ -95,19 +95,22 @@ function SignIn() {
 
   return (
     <form className="auth-card" onSubmit={send}>
-      <span className="brand-dot" aria-hidden="true" />
-      <h1>Livability Scout</h1>
-      <p className="auth-muted">Sign in with your email — we’ll send a one-tap link. No password.</p>
-      <input
-        type="email" required autoFocus
-        className="auth-input"
-        placeholder="you@email.com"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
+      <span className="auth-eyebrow">Livability Scout</span>
+      <h1 className="auth-title">Find the next place that feels like <em>home</em>.</h1>
+      <p className="auth-muted">A quiet tool for the two of us — chasing the feeling of Bled and Piran across walkable American towns. Sign in with your email; we’ll send a one-tap link. No password to remember.</p>
+      <label className="auth-field">
+        <span className="auth-field-label">Your email</span>
+        <input
+          type="email" required autoFocus
+          className="auth-input"
+          placeholder="you@email.com"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+      </label>
       {err ? <p className="auth-err">{err}</p> : null}
       <button type="submit" className="auth-primary" disabled={busy || !email.trim()}>
-        {busy ? "Sending…" : "Send me a link"}
+        {busy ? "Sending…" : "Send me a link →"}
       </button>
       {process.env.NODE_ENV !== "production" ? (
         <button type="button" className="auth-ghost" onClick={devSignIn}>Dev sign-in (localhost only)</button>
@@ -131,6 +134,40 @@ function SignIn() {
   }
 }
 
+// Two Slovenia heroes — the literal feeling the whole project is chasing.
+// Public Supabase Storage URLs (no auth needed to render the gate).
+const SCENES = [
+  {
+    src: "https://fitjkrmiwkdolxhitroc.supabase.co/storage/v1/object/public/city-images/cities/bled-si/6b5c0a37fdc7.jpg",
+    place: "Bled",
+    region: "Slovenia",
+    note: "The lake, the island church, alpine paths from the village.",
+  },
+  {
+    src: "https://fitjkrmiwkdolxhitroc.supabase.co/storage/v1/object/public/city-images/cities/piran-si/575e4232284d.jpg",
+    place: "Piran",
+    region: "Slovenia",
+    note: "Tartini Square, the Punta, a town that stays alive in winter.",
+  },
+];
+
+// Editorial split: a cinematic Slovenia scene on the left, the sign-in panel on
+// the right. On the loading / setup states the panel still centers nicely.
 function FullScreen({ children }) {
-  return <div className="auth-screen">{children}</div>;
+  // Stable per-load pick so the scene doesn't flicker between renders, but
+  // varies visit-to-visit. Date-based so it's deterministic within a session.
+  const scene = SCENES[new Date().getDate() % SCENES.length];
+  return (
+    <div className="auth-screen">
+      <aside className="auth-scene" style={{ backgroundImage: `url(${scene.src})` }} aria-hidden="true">
+        <div className="auth-scene-grad" />
+        <div className="auth-scene-copy">
+          <p className="auth-scene-kicker">The feeling we’re looking for</p>
+          <p className="auth-scene-place">{scene.place}<span>, {scene.region}</span></p>
+          <p className="auth-scene-note">{scene.note}</p>
+        </div>
+      </aside>
+      <main className="auth-panel">{children}</main>
+    </div>
+  );
 }

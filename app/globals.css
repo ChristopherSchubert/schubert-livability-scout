@@ -2546,17 +2546,163 @@ button:hover, .button-link:hover {
 .vw-source { margin-left: auto; color: #b3a890; }
 @media (max-width: 720px) { .vw-windows { grid-template-columns: 1fr; } .vw-month-temp { display: none; } }
 
-/* ── Auth gate (magic-link sign-in) ────────────────────────────────────── */
-.auth-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--bg); padding: 1.5rem; }
-.auth-card { width: 100%; max-width: 380px; background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 2rem; display: flex; flex-direction: column; gap: 0.75rem; }
-.auth-card h1 { margin: 0.3rem 0 0; font-size: 1.5rem; }
-.auth-card .brand-dot { width: 12px; height: 12px; }
-.auth-muted { color: var(--muted); line-height: 1.5; margin: 0; font-size: 0.95rem; }
-.auth-input { padding: 0.7rem 0.85rem; border: 1px solid var(--border); border-radius: 10px; background: #fffdf8; font: inherit; }
-.auth-primary { background: var(--accent); color: #fff; border: 1px solid var(--accent); border-radius: 10px; padding: 0.7rem 1rem; font-weight: 700; cursor: pointer; }
-.auth-primary:disabled { opacity: 0.5; cursor: not-allowed; }
-.auth-ghost { background: transparent; border: none; color: var(--muted); cursor: pointer; text-decoration: underline; font: inherit; padding: 0; align-self: flex-start; }
-.auth-err { color: #962914; font-size: 0.88rem; margin: 0; }
+/* ── Auth gate (magic-link sign-in) — editorial split ──────────────────── */
+.auth-screen {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  background: var(--bg);
+}
+
+/* Left: a cinematic Slovenia scene — the feeling the whole project chases. */
+.auth-scene {
+  position: relative;
+  background-size: cover;
+  background-position: center;
+  min-height: 100vh;
+  overflow: hidden;
+}
+.auth-scene-grad {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(20,16,12,0.05) 0%, rgba(20,16,12,0.10) 45%, rgba(20,16,12,0.72) 100%),
+    linear-gradient(90deg, rgba(20,16,12,0.18) 0%, transparent 38%);
+}
+.auth-scene-copy {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  padding: 2.4rem 2.6rem 2.8rem;
+  color: #f6efdf;
+}
+.auth-scene-kicker {
+  font-family: var(--font-ui);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.7rem;
+  font-weight: 600;
+  margin: 0 0 0.7rem;
+  opacity: 0.85;
+}
+.auth-scene-place {
+  font-family: var(--font-display);
+  font-variation-settings: "opsz" 144, "SOFT" 50, "wght" 600;
+  font-size: clamp(2.6rem, 4.5vw, 4rem);
+  line-height: 0.96;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+.auth-scene-place span {
+  font-style: italic;
+  font-variation-settings: "opsz" 144, "SOFT" 100, "wght" 500;
+  color: #d6c79c;
+}
+.auth-scene-note {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 1.05rem;
+  line-height: 1.5;
+  margin: 0.7rem 0 0;
+  max-width: 32ch;
+  opacity: 0.92;
+}
+
+/* Right: the sign-in panel. */
+.auth-panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  min-height: 100vh;
+}
+.auth-card {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.auth-eyebrow {
+  font-family: var(--font-ui);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+.auth-title {
+  font-family: var(--font-display);
+  font-variation-settings: "opsz" 48, "SOFT" 50, "wght" 520;
+  font-size: clamp(1.9rem, 3.4vw, 2.5rem);
+  line-height: 1.08;
+  letter-spacing: -0.015em;
+  margin: 0.1rem 0 0;
+}
+.auth-title em {
+  font-style: italic;
+  font-variation-settings: "opsz" 48, "SOFT" 100, "wght" 460;
+  color: var(--accent);
+}
+.auth-muted { color: var(--muted); line-height: 1.6; margin: 0; font-size: 1rem; }
+.auth-field { display: flex; flex-direction: column; gap: 0.4rem; margin-top: 0.4rem; }
+.auth-field-label {
+  font-family: var(--font-ui);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.66rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+.auth-input {
+  padding: 0.85rem 0.95rem;
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  background: #fffdf8;
+  font: inherit;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.auth-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+.auth-primary {
+  background: var(--accent);
+  color: #fff;
+  border: 1px solid var(--accent);
+  border-radius: 11px;
+  padding: 0.85rem 1rem;
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: 0.98rem;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: transform 0.12s ease, filter 0.15s ease;
+}
+.auth-primary:hover:not(:disabled) { filter: brightness(1.08); transform: translateY(-1px); }
+.auth-primary:disabled { opacity: 0.45; cursor: not-allowed; }
+.auth-ghost {
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  text-decoration: underline;
+  font: inherit;
+  font-size: 0.88rem;
+  padding: 0;
+  align-self: flex-start;
+}
+.auth-ghost:hover { color: var(--accent); }
+.auth-err { color: var(--warn, #962914); font-size: 0.88rem; margin: 0; }
+
+/* Stack on narrow screens: the scene becomes a shorter top band. */
+@media (max-width: 820px) {
+  .auth-screen { grid-template-columns: 1fr; grid-template-rows: 38vh auto; }
+  .auth-scene, .auth-panel { min-height: 0; }
+  .auth-scene { height: 38vh; }
+  .auth-scene-copy { padding: 1.4rem 1.5rem 1.6rem; }
+  .auth-panel { padding: 2rem 1.5rem 3rem; align-items: flex-start; }
+}
 
 /* ── Visit-center map picker (Measured panel) ──────────────────────────── */
 .visit-center-tool { margin-top: 1rem; border-top: 1px dashed #d8ccb3; padding-top: 0.8rem; }
