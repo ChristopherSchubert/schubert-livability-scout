@@ -109,7 +109,14 @@ is expected. Every push to `main` triggers a `next build` + production deploy
 dashboard, not the repo (mirror any new var into both `.env.local` and Vercel).
 "The live site looks unchanged" almost always = deploy still building, a stale
 CDN/tab cache, or a genuinely subtle change — never a skipped manual step.
-Full details + the Supabase redirect-allowlist gotcha: **features/deployment.md**.
+
+**Two secret stores, no overlap:** the local measurement pipeline reads from the
+**macOS Keychain** (account `livability-scout`: `supabase-db-password`,
+`census-api-key`, `walkscore-api-key`, via `security find-generic-password`),
+never `.env.local`; the **Vercel dashboard** holds the live app's runtime env
+vars. Vercel can't see your Keychain, so a missing Keychain item breaks your
+local scripts, not the live site. Full details + the Supabase redirect-allowlist
+gotcha: **features/deployment.md**.
 
 ## Image model
 

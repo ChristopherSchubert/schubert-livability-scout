@@ -38,6 +38,37 @@ How Livability Scout gets from a `git push` to the live site your wife sees.
   endpoint is hard-disabled in production (`NODE_ENV === "production"`), so it's
   inert live even though the vars exist there.
 
+### Secrets: macOS Keychain (local pipeline) vs Vercel (prod runtime)
+
+There are **two** secret stores, and they don't overlap — this trips people up:
+
+- **Local measurement pipeline → macOS Keychain.** The Python/Node measurer
+  scripts and `lib/measurers/_db.js` read secrets from the **macOS Keychain**,
+  never `.env.local` (the direct Postgres password especially must not be
+  committed or sit in a dotfile). Items live under account `livability-scout`:
+  - `supabase-db-password` — the Supabase Postgres password (the canonical one;
+    `_db.js` pulls it via `execFileSync("security", …)`).
+  - `census-api-key`, `walkscore-api-key` — the two measurer API keys.
+
+  Read one with:
+  ```bash
+  security find-generic-password -a livability-scout -s supabase-db-password -w
+  ```
+  Scripts that need it expect `DBPW` in the env, so the usual invocation is
+  `DBPW=$(security find-generic-password -a livability-scout -s supabase-db-password -w) node scripts/…`
+  (already-set env vars win, so a Keychain-sourced override always works).
+
+- **Production runtime (Vercel) → dashboard env vars.** Vercel has **no access
+  to your macOS Keychain.** Anything the live app needs at runtime must be a
+  Vercel env var. The live Next.js app only uses the public Supabase client
+  (`NEXT_PUBLIC_SUPABASE_*`), not the direct pg password — the
+  Keychain-backed `_db.js` path is a **local-only** pipeline tool, not part of
+  the deployed request path. So a missing Keychain item breaks *your local
+  measurement scripts*, not the live site.
+
+The short version: **Keychain = your laptop's pipeline; Vercel dashboard = the
+live app.** Don't expect either one to see the other's secrets.
+
 ## Auth redirect allowlist (gotcha)
 
 The magic-link sign-in uses `emailRedirectTo: window.location.origin`. For links
