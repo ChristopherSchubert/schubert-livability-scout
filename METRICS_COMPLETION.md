@@ -29,7 +29,7 @@ when its `value` is non-null.
 | Fabric | `mean_block_m` | 33/78 | OSM (osmnx) | `scripts/measure-cities.mjs` |
 | Fabric | `carfree_frac` | 33/78 | OSM (osmnx) | `scripts/measure-cities.mjs` |
 | Fabric | `bldg_coverage` | 35/78 | OSM (osmnx) | `scripts/measure-climate-bldg.mjs` |
-| Fabric | `street_km` | 33/78 | OSM (osmnx) | `scripts/measure-cities.mjs` |
+| _diagnostic_ | `street_km` | 33/78 | OSM (osmnx) | `scripts/measure-cities.mjs` — measured but not in the Fabric rollup (dropped 2026-06-04: penalized peninsula/lakeside/park-heavy cores by counting "missing streets on water" as a deficit). Kept as a stored diagnostic. |
 | Realness | `daily_needs_n` | 33/78 | OSM (osmnx) | `scripts/measure-cities.mjs` |
 | Realness | `core_density` | **78/78** ✅ | US Census ACS (tract) for US; Eurostat GISCO LAU 2021 for EU | `scripts/onboard.mjs --measurer census,eurostat_lau` |
 | Realness | `owner_occ_pct` | **78/78** ✅ | US Census ACS (B25003) for US; SURS PxWeb table 0861102 (2021) for SI | `scripts/onboard.mjs --measurer census,surs_obcina` |
