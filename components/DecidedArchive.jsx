@@ -3,14 +3,16 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import {
-  averageScore,
   cityImageQuery,
   cityStage,
   citySlug,
-  normalizeMatrix,
+  weightedAxisScore,
 } from "../lib/planner-data";
 import AppShell from "./AppShell";
 import { resolveImage, usePlanner } from "./PlannerProvider";
+
+// Equal-weight measured composite — same engine as Detail / Board.
+const EQUAL_WEIGHTS = { setting: 1, aliveness: 1, fabric: 1, realness: 1, january: 1 };
 
 const DECISIONS = ["Advance", "Winter Revisit", "Eliminate"];
 
@@ -82,7 +84,8 @@ export default function DecidedArchive() {
                 const slug = citySlug(cityItem);
                 const heroQuery = cityImageQuery(cityItem.name, cityItem.stayZone, cityItem.heartIntersection);
                 const heroSrc = resolveImage(cityItem.heroImage, heroQuery, imageState);
-                const avg = averageScore(normalizeMatrix(cityItem.matrix, cityItem.name)).toFixed(1);
+                const measured = weightedAxisScore(cityItem, EQUAL_WEIGHTS);
+                const avg = measured != null ? measured.toFixed(1) : "—";
                 const decision = normalizeDecision(cityItem);
                 const memo = (cityItem.decisionMemo || cityItem.firstImpressions || "").trim();
                 return (

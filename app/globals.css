@@ -582,18 +582,6 @@ button:hover, .button-link:hover {
   overflow: auto;
 }
 
-.matrix-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.matrix-table th, .matrix-table td {
-  padding: 0.85rem 0.7rem;
-  border-bottom: 1px solid var(--border);
-  text-align: left;
-  white-space: nowrap;
-}
-
 .place-cell {
   min-width: 280px;
 }

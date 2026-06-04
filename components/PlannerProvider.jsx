@@ -2,14 +2,11 @@
 
 import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
 import {
-  averageScore,
   city,
   cityStage,
   citySlug,
   defaultWeights,
   emptySurvey,
-  matrixDimensions,
-  normalizeMatrix,
 } from "../lib/planner-data";
 import {
   fetchCities, insertCity, saveCityFields,
@@ -203,7 +200,7 @@ export function PlannerProvider({ children, initialManifest }) {
 
 // Whitelist the shared fields updateCityWith may persist (drops transient keys).
 function mapWritable(obj) {
-  const allow = ["name","stayZone","stayZoneBoundary","heartIntersection","tripWeek","why","ifWins","ifFails","blocks","status","decision","heroImage","arriveDate","departDate","tripLength","flightDetails","carDetails","lodgingDetails","logisticsNotes","days","checklists","matrix","measuredMetrics","visitClimate","crowdSeason","seasonNotes"];
+  const allow = ["name","stayZone","stayZoneBoundary","heartIntersection","tripWeek","why","ifWins","ifFails","blocks","status","decision","heroImage","arriveDate","departDate","tripLength","flightDetails","carDetails","lodgingDetails","logisticsNotes","days","checklists","measuredMetrics","visitClimate","crowdSeason","seasonNotes"];
   const out = {};
   for (const k of allow) if (k in obj) out[k] = obj[k];
   return out;
@@ -243,10 +240,6 @@ export function plannerStats(cities) {
   const visited = cities.filter((c) => c.status === "Visited").length;
   const advanced = cities.filter((c) => c.decision === "Advance").length;
   return { scheduled, visited, advanced };
-}
-
-export function sortedScore(cityItem) {
-  return averageScore(normalizeMatrix(cityItem.matrix, cityItem.name)).toFixed(1);
 }
 
 export function imageChoicesFor(token, query, imageState) {

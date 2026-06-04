@@ -3,14 +3,18 @@
 import Link from "next/link";
 import { useMemo } from "react";
 import {
-  averageScore,
   cityImageQuery,
   cityStage,
   citySlug,
-  normalizeMatrix,
+  weightedAxisScore,
 } from "../lib/planner-data";
 import AppShell from "./AppShell";
 import { resolveImage, usePlanner } from "./PlannerProvider";
+
+// Equal-weight measured composite — same engine as the Detail and Board
+// scores. Calibrate applies any learned per-axis weights; here we just want a
+// quick "how measured-good is this place" glance.
+const EQUAL_WEIGHTS = { setting: 1, aliveness: 1, fabric: 1, realness: 1, january: 1 };
 
 /**
  * VisitWorkspace — purpose-built page for the Visit stage.
@@ -62,7 +66,8 @@ export default function VisitWorkspace() {
             const slug = citySlug(cityItem);
             const heroQuery = cityImageQuery(cityItem.name, cityItem.stayZone, cityItem.heartIntersection);
             const heroSrc = resolveImage(cityItem.heroImage, heroQuery, imageState);
-            const avg = averageScore(normalizeMatrix(cityItem.matrix, cityItem.name)).toFixed(1);
+            const measured = weightedAxisScore(cityItem, EQUAL_WEIGHTS);
+            const avg = measured != null ? measured.toFixed(1) : "—";
             const today = new Date();
             const active = arrive && depart && today >= arrive && today <= depart;
             return (

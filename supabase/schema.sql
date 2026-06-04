@@ -54,8 +54,6 @@ create table if not exists cities (
   logistics_notes    text,
   days               jsonb default '[]',
   checklists         jsonb default '{}',
-  matrix             jsonb default '{}',        -- legacy seed scores
-  measured           numeric,                   -- objective 0-10, null until measured
   measured_metrics   jsonb default '{}',        -- { key: { value, asOf } }
   measured_at        date,                      -- when the pipeline last ran
   water_target       jsonb,                     -- user-picked water body { name, point, … } for water_dist_m
