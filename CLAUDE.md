@@ -64,11 +64,17 @@ this rule exists to prevent. Existing in-source seeds (e.g.
 ## App architecture (Next.js, app router)
 
 - `lib/planner-data.js` — the data model + all derived helpers. Single source
-  of truth for the taxonomy, survey, benchmarks, visit-window logic, and the
-  city factory. **Most domain logic lives here.**
-- `components/PlannerProvider.jsx` — React context; localStorage persistence
-  (`planner`, `weights`, `references`); `imageState.version` cache-bust;
-  `resolveImage` / `appendBust`.
+  of truth for the taxonomy, survey, visit-window logic, and the city factory.
+  **Most domain logic lives here.** (Big godfile — split is the top architecture
+  backlog item; see `ARCHITECTURE.md`.)
+- `lib/city-detail-view.js` — the shared shaper (`buildCityDetailView`) that
+  turns a `cityItem` into the chapter-ready envelope the magazine detail page
+  consumes. Backs both the live page and `/api/mockup-data`, so they can't drift.
+- `components/PlannerProvider.jsx` — React context. **Supabase is the system of
+  record**: on mount it loads cities + per-user surveys/baselines/weights from
+  Supabase and debounce-writes edits back (no localStorage persistence of
+  planner state). Also `imageState.version` cache-bust; `resolveImage` /
+  `appendBust`.
 - `components/AppShell.jsx` — top nav (workflow modes), city context strip.
 - Workflow modes / routes:
   - `/board` — funnel kanban (all stages). `FunnelBoard.jsx`.
@@ -77,10 +83,16 @@ this rule exists to prevent. Existing in-source seeds (e.g.
   - `/decide` — post-visit survey queue. `DecideWorkspace.jsx`.
   - `/decided` — verdict archive. `DecidedArchive.jsx`.
   - `/baseline` — rate known places from memory (Track 2 answer key). `Baseline.jsx`.
-  - `/cities/[slug]` · `/visit` · `/images` · `/decide` — per-city pages,
-    rendered through `CityDetailRoute` / `VisitPlanRoute` / `ImagesPageRoute` /
-    `DecideRoute`, which wrap content sections still exported from
-    `PlannerShell.jsx` (`CityDetail`, `VisitPlan`, `ImagesPage`).
+  - `/cities/[slug]` — per-city detail, the **magazine chapter layout**
+    (`CityDetailRoute` → `components/city-detail/MagazineDetail.jsx`, styled by
+    `app/city-detail.css` scoped under `.cd-root`). See
+    `features/magazine-detail.md`.
+  - `/cities/[slug]/{visit,images,decide}` — per-city pages via `VisitPlanRoute`
+    / `ImagesPageRoute` / `DecideRoute`, wrapping `VisitPlan` / `ImagesPage`
+    (still in `PlannerShell.jsx`).
+  - `/overview/board`, `/overview/matrix`, `/shortlist`,
+    `/cities/[slug]/decision` — legacy URLs, now one-line `redirect()` shims to
+    the routes above.
 - `SurveyFlow.jsx` — the facilitated questionnaire (used by both Decide and Baseline).
 - `app/api/images/{search,save}/route.js` + `lib/image-manifest.js` — image
   search (Unsplash → Openverse → Commons) and content-addressable hero save.
