@@ -33,7 +33,7 @@ and every city re-evaluates on the next load with no migration.
 | Water | Island, Peninsula, Bayfront, Harbor town, Coastal, Riverfront, Lakefront | `osm_context.*`, `water_dist_m.meta` |
 | Terrain | Mountain, Foothills, Valley, Plateau, Plains, Forested, Desert | `terrain.*`, `osm_context.forest_frac_10km`, `climate_extremes.annual_precip_in` |
 | Urban form | Walkable, Pedestrian street, Square-centered, Historic, Compact | `walk_score`, `osm_context.*`, `core_density` |
-| Public life | College town, Tourist-heavy, Year-round, Cafés | `osm_context.university_within_2km`, `seasonal_vac_pct`, `cafe_n` |
+| Public life | College town, Tourist-heavy, Year-round, Café culture | `osm_context.university_within_2km`, `seasonal_vac_pct`, `cafe_n` |
 | Winter | Snowy, Real winter, Mild winter | `climate_extremes.annual_snow_in` *(currently null)*, `climate_extremes.jan_mean_f` |
 | Summer | Humid summer, Dry summer, Cool summer | `climate_extremes.jul_dewpoint_f`, `climate_extremes.jul_mean_f` |
 | Outdoors | Hiking nearby, Skiable, Bikeable | `osm_context.hiking_route_within_5km`, `ski_resort_within_50km`, `cycleway_km_within_700m` |
