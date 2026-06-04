@@ -1,14 +1,21 @@
+/* Palette aligned with the magazine city-detail page (app/city-detail.css):
+   the warm paper/ink scale and the deep-green accent, so the dashboard and the
+   editorial detail page read as one product. Variable NAMES are unchanged so
+   every existing rule keeps working — only the values shifted. */
 :root {
-  --bg: #f6f1e8;
-  --panel: #fffaf2;
-  --panel-strong: #f3ede3;
-  --border: #dbcdbb;
-  --text: #201d1a;
-  --muted: #6c665f;
-  --accent: #0d6e63;
-  --accent-soft: #d8eee9;
+  --bg: #fbf6ea;            /* paper */
+  --panel: #fffdf6;
+  --panel-strong: #f4eddc;  /* paper-deep */
+  --border: #d8ccb8;        /* hair */
+  --text: #1b1814;          /* ink */
+  --muted: #7a7268;         /* ink-mute */
+  --accent: #0d4c44;        /* deep green */
+  --accent-soft: #d2e6e1;
   --shadow: 0 10px 30px rgba(41, 33, 19, 0.06);
   --radius: 14px;
+  /* Editorial type system, shared with the magazine page. */
+  --font-display: 'Fraunces', Georgia, "Times New Roman", serif;
+  --font-ui: 'Inter Tight', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
 * { box-sizing: border-box; }
@@ -16,7 +23,22 @@ html, body { margin: 0; padding: 0; }
 body {
   background: var(--bg);
   color: var(--text);
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: var(--font-ui);
+}
+
+/* Display headings use Fraunces; UI labels and dense tables stay in Inter
+   Tight. This is the editorial voice carried across the workspace pages. */
+.canvas-header h1,
+.canvas-header h2,
+.panel > .section-head h2,
+.card > .section-head h2,
+.section-head > div > h2,
+.empty-state h2,
+.archive-name,
+.trip-name {
+  font-family: var(--font-display);
+  font-variation-settings: "opsz" 40, "SOFT" 60, "wght" 500;
+  letter-spacing: -0.01em;
 }
 
 a { color: inherit; text-decoration: none; }
@@ -74,9 +96,10 @@ button:hover, .button-link:hover {
 .eyebrow {
   margin: 0 0 0.2rem;
   color: var(--accent);
-  font-size: 0.78rem;
-  font-weight: 800;
-  letter-spacing: 0.04em;
+  font-family: var(--font-ui);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
 }
 
@@ -2443,7 +2466,7 @@ button:hover, .button-link:hover {
 /* ── Twin score card (Measured | Felt) ─────────────────────────────────── */
 .score-card-twin { display: flex; gap: 1.5rem; align-items: stretch; }
 .twin-score { flex: 1; display: flex; flex-direction: column; }
-.twin-score strong { font-size: 2.4rem; line-height: 1; }
+.twin-score strong { font-size: 2.6rem; line-height: 1; font-family: var(--font-display); font-variation-settings: "opsz" 100, "SOFT" 40, "wght" 600; }
 .twin-score:first-child strong { color: var(--stage-calibrate); }
 .twin-score:last-child strong { color: var(--stage-decide); }
 .twin-score span { font-size: 0.78rem; color: var(--muted); margin-top: 0.2rem; }
@@ -2618,7 +2641,7 @@ button:hover, .button-link:hover {
 .rt-city span { font-size: 0.76rem; color: var(--muted); }
 .rt-score { display: inline-block; min-width: 2.3em; padding: 0.15rem 0.35rem; border-radius: 6px; font-variant-numeric: tabular-nums; font-weight: 600; }
 .rt-na { color: #c4b89e; }
-.rt-overall { font-variant-numeric: tabular-nums; font-weight: 700; color: var(--text); }
+.rt-overall { font-variant-numeric: tabular-nums; font-weight: 600; color: var(--text); font-family: var(--font-display); font-variation-settings: "opsz" 40, "SOFT" 40, "wght" 600; font-size: 1.05rem; }
 .weight-note { font-size: 0.86rem; color: var(--muted); margin: 0 0 1rem; line-height: 1.5; background: #fbf6ea; border: 1px solid #efe7d6; border-radius: 10px; padding: 0.6rem 0.8rem; }
 .weight-note-learned { background: #f1f7f2; border-color: #cfe3d5; }
 .weight-note strong { color: var(--text); }
