@@ -162,7 +162,20 @@ export async function POST(request) {
       ? `best 700 m inside stay zone (${core.clusterN ?? "?"} POIs, ${core.drift ?? 0} m from pin)`
       : (userMovedPin ? "manual (placed by user)" : (city.lat != null ? undefined : "Nominatim (heart intersection)"));
     const newMetrics = { ...core.metrics, ...cen.metrics, ...ws, ...cl.metrics, ...bc, ...sky.metrics };
-    if (horizon) newMetrics.mtn_horizon_pct = { value: horizon.occupancyPct, asOf, source: "Open-Meteo elevation + OSM peaks" };
+    if (horizon) {
+      newMetrics.mtn_horizon_pct = { value: horizon.occupancyPct, asOf, source: "Open-Meteo elevation + OSM peaks" };
+      // Upgrade skyline_deg if the best named peak beats the ray-sampled value
+      // (see lib/measurers/horizon.js — same logic, mirrored for this path
+      // where sky + horizon run in parallel rather than in measurer order).
+      const raySkyline = newMetrics.skyline_deg?.value ?? 0;
+      if (horizon.bestVisibleAngle > raySkyline) {
+        newMetrics.skyline_deg = {
+          value: horizon.bestVisibleAngle,
+          asOf,
+          source: "Open-Meteo elevation + OSM peaks (best visible summit, occlusion-tested)",
+        };
+      }
+    }
 
     // If a water target is set, re-route water distance to THAT body rather
     // than auto-nearest, so the user's choice persists across re-measures.
