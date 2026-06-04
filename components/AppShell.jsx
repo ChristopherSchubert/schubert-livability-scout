@@ -53,8 +53,10 @@ export default function AppShell({ activeMode, activeStage, cityItem, cityNav, c
   const mode = activeMode || activeStage;
   return (
     <div className="shell">
-      <TopBar activeMode={mode} />
-      {cityItem ? <CityContextStrip cityItem={cityItem} cityNav={cityNav} /> : null}
+      <div className="sticky-header">
+        <TopBar activeMode={mode} />
+        {cityItem ? <CityContextStrip cityItem={cityItem} cityNav={cityNav} /> : null}
+      </div>
       <main className={`canvas${cityItem ? " has-context" : ""}`}>{children}</main>
     </div>
   );

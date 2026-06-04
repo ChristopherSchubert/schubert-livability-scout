@@ -1015,13 +1015,21 @@ button:hover, .button-link:hover {
   background: var(--bg);
 }
 
-/* Top bar ---------------------------------------------------------------- */
-.topbar-v2 {
+/* Sticky header wrapper — holds the topbar and the optional city-context
+   strip together so they stack naturally without each needing its own
+   magic top-offset. The topbar can wrap to 2–3 rows on narrow viewports;
+   making the wrapper sticky (instead of each child) lets the strip sit
+   flush under whatever height the topbar happens to be. */
+.sticky-header {
   position: sticky;
   top: 0;
   /* Above Leaflet's control layer (z-index 1000) so the map can't punch
      through the sticky nav when the city detail scrolls. */
   z-index: 1100;
+}
+
+/* Top bar ---------------------------------------------------------------- */
+.topbar-v2 {
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem 1.25rem;
@@ -1135,11 +1143,8 @@ button:hover, .button-link:hover {
 .backup-danger { color: #a13e1f; }
 
 /* City context strip ----------------------------------------------------- */
+/* Stacks naturally inside .sticky-header below the topbar — no own offset. */
 .city-context {
-  position: sticky;
-  top: 64px;
-  /* Above Leaflet (1000), below the topbar (1100). */
-  z-index: 1090;
   display: flex;
   align-items: center;
   justify-content: space-between;
