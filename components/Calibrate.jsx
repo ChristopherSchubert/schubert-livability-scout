@@ -11,7 +11,7 @@ import {
   visitNowScore,
   weightedAxisScore,
 } from "../lib/planner-data";
-import { chipsFor } from "../lib/chips";
+import { allChipsFor } from "../lib/chips";
 import AppShell from "./AppShell";
 import { usePlanner } from "./PlannerProvider";
 
@@ -60,7 +60,7 @@ export default function Calibrate() {
       visitNow: visitNowScore(cityItem, nowMonth),
       state,
       region,
-      chipLabels: chipsFor(cityItem),
+      chipLabels: allChipsFor(cityItem),
     };
   }), [visibleCities, weights, nowMonth]);
 

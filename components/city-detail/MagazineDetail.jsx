@@ -3,6 +3,7 @@
 import { useMemo } from "react";
 import dynamic from "next/dynamic";
 import { buildCityDetailView, buildHomebaseView } from "../../lib/city-detail-view";
+import { chipFrequencies } from "../../lib/chips";
 import { citySlug, formatDriveFromPit, formatMapSearchQuery } from "../../lib/planner-data";
 import { appendBust, resolveImage, usePlanner } from "../PlannerProvider";
 import FloatingToc from "./FloatingToc";
@@ -31,7 +32,11 @@ const HOMEBASE_SLUG = "allison-park-pa";
 export default function MagazineDetail({ cityItem }) {
   const { planner, imageState } = usePlanner();
 
-  const view = useMemo(() => buildCityDetailView(cityItem, { slug: citySlug(cityItem) }), [cityItem]);
+  const chipFreq = useMemo(() => chipFrequencies(planner.cities), [planner.cities]);
+  const view = useMemo(
+    () => buildCityDetailView(cityItem, { slug: citySlug(cityItem), chipFrequencies: chipFreq }),
+    [cityItem, chipFreq],
+  );
   const homebase = useMemo(() => {
     const hb = planner.cities.find((c) => citySlug(c) === HOMEBASE_SLUG);
     return hb && hb.id !== cityItem.id ? buildHomebaseView(hb, { slug: HOMEBASE_SLUG }) : null;
