@@ -2789,8 +2789,8 @@ button:hover, .button-link:hover {
 .rt-rank { color: var(--muted); width: 2.2rem; font-variant-numeric: tabular-nums; }
 .rt-city { text-align: left; min-width: 200px; }
 .rt-city-inner { display: flex; align-items: center; gap: 0.65rem; }
-.rt-city-thumb { display: block; width: 72px; height: 44px; border-radius: 8px; object-fit: cover; background: #f1ead9; flex: 0 0 auto; box-shadow: 0 1px 2px rgba(30, 24, 12, 0.08); }
-.rt-city-thumb-empty { background: linear-gradient(135deg, #f1ead9 0%, #e7dcc6 100%); }
+.rt-city-thumb { display: block; width: 72px; height: 44px; border-radius: 1px; object-fit: cover; background: #f1ead9; flex: 0 0 auto; border: 1px solid rgba(27, 24, 20, 0.14); filter: saturate(1.05) contrast(1.02); }
+.rt-city-thumb-empty { background: linear-gradient(135deg, #f4eddc 0%, #ece4d0 100%); filter: none; }
 .rt-city-text { min-width: 0; }
 .rt-city-text strong { display: block; color: var(--text); }
 .rt-city-text span { font-size: 0.76rem; color: var(--muted); }
