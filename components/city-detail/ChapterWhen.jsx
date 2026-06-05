@@ -149,7 +149,7 @@ function Climatology({ climate, homebase }) {
   const hasFeel = Array.isArray(climate) && climate.some((m) => m?.heatIndex != null && m.hi != null && (m.heatIndex - m.hi) >= 3);
   const rows = [
     { key: "high",   label: "High",   pick: (m) => m?.hi,       max: 90, fmt: (v) => String(Math.round(v)) },
-    ...(hasFeel ? [{ key: "feel", label: "Feels", pick: (m) => (m?.heatIndex != null && m?.hi != null && (m.heatIndex - m.hi) >= 1) ? m.heatIndex : null, max: 110, fmt: (v) => String(Math.round(v)) }] : []),
+    ...(hasFeel ? [{ key: "feel", label: "Feels", pick: (m) => m?.heatIndex, max: 110, fmt: (v) => String(Math.round(v)) }] : []),
     { key: "low",    label: "Low",    pick: (m) => m?.lo,       max: 80, fmt: (v) => String(Math.round(v)) },
     { key: "precip", label: "Precip", pick: (m) => m?.precipIn, max: 7,  fmt: (v) => v.toFixed(1) },
   ];
