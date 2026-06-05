@@ -6,6 +6,7 @@ import {
   MONTHS,
   axisRollup,
   calibrateAxes,
+  cityImageQuery,
   citySlug,
   learnedAxisWeights,
   visitNowScore,
@@ -13,7 +14,7 @@ import {
 } from "../lib/planner-data";
 import { allChipsFor } from "../lib/chips";
 import AppShell from "./AppShell";
-import { usePlanner } from "./PlannerProvider";
+import { appendBust, resolveImage, usePlanner } from "./PlannerProvider";
 
 /**
  * Calibrate — sortable, filterable ranking table.
@@ -30,7 +31,7 @@ import { usePlanner } from "./PlannerProvider";
  */
 export default function Calibrate() {
   const router = useRouter();
-  const { planner } = usePlanner();
+  const { planner, imageState } = usePlanner();
   const [sort, setSort] = useState([{ key: "overall", dir: "desc" }]);
   const [hideCalibration, setHideCalibration] = useState(true);
   const [query, setQuery] = useState("");
@@ -235,12 +236,23 @@ export default function Calibrate() {
           <tbody>
             {rows.map((row, i) => {
               const slug = citySlug(row.cityItem);
+              const heroQuery = cityImageQuery(row.cityItem.name, row.cityItem.stayZone, row.cityItem.heartIntersection);
+              const heroSrc = appendBust(resolveImage(row.cityItem.heroImage, heroQuery, imageState), imageState.version);
               return (
                 <tr key={row.cityItem.id} className="rt-row" onClick={() => router.push(`/cities/${slug}`)}>
                   <td className="rt-rank">{i + 1}</td>
                   <td className="rt-city">
-                    <strong>{row.cityItem.name}</strong>
-                    <span>{row.cityItem.stayZone || "—"}</span>
+                    <div className="rt-city-inner">
+                      {heroSrc ? (
+                        <img className="rt-city-thumb" src={heroSrc} alt="" loading="lazy" />
+                      ) : (
+                        <span className="rt-city-thumb rt-city-thumb-empty" aria-hidden="true" />
+                      )}
+                      <div className="rt-city-text">
+                        <strong>{row.cityItem.name}</strong>
+                        <span>{row.cityItem.stayZone || "—"}</span>
+                      </div>
+                    </div>
                   </td>
                   {calibrateAxes.map(([key]) => (
                     <td key={key} className="rt-axis"><ScoreCell value={row.roll[key]} /></td>

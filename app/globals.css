@@ -2787,9 +2787,13 @@ button:hover, .button-link:hover {
 .rt-row { cursor: pointer; }
 .rt-row:hover td { background: #faf5ea; }
 .rt-rank { color: var(--muted); width: 2.2rem; font-variant-numeric: tabular-nums; }
-.rt-city { text-align: left; min-width: 160px; }
-.rt-city strong { display: block; color: var(--text); }
-.rt-city span { font-size: 0.76rem; color: var(--muted); }
+.rt-city { text-align: left; min-width: 200px; }
+.rt-city-inner { display: flex; align-items: center; gap: 0.65rem; }
+.rt-city-thumb { display: block; width: 42px; height: 42px; border-radius: 8px; object-fit: cover; background: #f1ead9; flex: 0 0 auto; box-shadow: 0 1px 2px rgba(30, 24, 12, 0.08); }
+.rt-city-thumb-empty { background: linear-gradient(135deg, #f1ead9 0%, #e7dcc6 100%); }
+.rt-city-text { min-width: 0; }
+.rt-city-text strong { display: block; color: var(--text); }
+.rt-city-text span { font-size: 0.76rem; color: var(--muted); }
 .rt-score { display: inline-block; min-width: 2.3em; padding: 0.15rem 0.35rem; border-radius: 6px; font-variant-numeric: tabular-nums; font-weight: 600; }
 .rt-na { color: #c4b89e; }
 .rt-overall { font-variant-numeric: tabular-nums; font-weight: 600; color: var(--text); font-family: var(--font-display); font-variation-settings: "opsz" 40, "SOFT" 40, "wght" 600; font-size: 1.05rem; }
