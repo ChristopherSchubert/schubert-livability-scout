@@ -726,9 +726,11 @@
       fill: rgba(27,24,20,0.32);
     }
 .cd-root .climatology .bar.high { fill: #b86a3f; opacity: 0.62; }
+.cd-root .climatology .bar.feel { fill: #a23a30; opacity: 0.62; }
 .cd-root .climatology .bar.low { fill: #4a78a8; opacity: 0.62; }
 .cd-root .climatology .bar.precip { fill: #6e7d8c; opacity: 0.62; }
 .cd-root .climatology .bar.ref.high { fill: url(#hatch-high);   stroke: #b86a3f; stroke-width: 0.7; opacity: 0.95; }
+.cd-root .climatology .bar.ref.feel { fill: url(#hatch-feel);   stroke: #a23a30; stroke-width: 0.7; opacity: 0.95; }
 .cd-root .climatology .bar.ref.low { fill: url(#hatch-low);    stroke: #4a78a8; stroke-width: 0.7; opacity: 0.95; }
 .cd-root .climatology .bar.ref.precip { fill: url(#hatch-precip); stroke: #6e7d8c; stroke-width: 0.7; opacity: 0.95; }
 .cd-root .climatology .val {
