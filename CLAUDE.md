@@ -29,6 +29,39 @@ measurer, follow the same pattern: a non-null response is not the same as a
 successful response. Real cities have streets — if you got back zero of
 those, the query lied.
 
+## ⛔ NEVER USE PUBLIC OVERPASS — LOCAL DOCKER ONLY
+
+**We run our own Overpass instance at `http://localhost:12345/api/interpreter`
+with the full planet file already loaded.** Every measurement script, every
+ad-hoc audit probe, every `overpass()` call goes through it. The public
+mirrors (`overpass-api.de`, `overpass.kumi.systems`, etc.) are slow,
+rate-limited, and — worst — silently return HTTP 200 with truncated bodies
+that look like "this town has zero cafés." That failure mode is the source
+of multiple data-quality incidents (Bled/Ljubljana/Piran 2026-06-04; the
+new-cities audit 2026-06-05).
+
+The rules are absolute:
+
+1. **`lib/measure.js`'s `overpass()` defaults to `localhost:12345` with NO
+   public fallback.** If you change this, you are reintroducing the bug. If
+   local is down, the script must fail loudly — never degrade onto a public
+   mirror.
+2. **Every ad-hoc script you write that hits Overpass uses
+   `OVERPASS_URL=http://localhost:12345/api/interpreter` (or just imports
+   `overpass()` from `lib/measure.js`).** No `fetch("https://overpass-api.de/...")`
+   in audit one-offs. No "I'll just probe quickly via the public mirror" —
+   that's how data-quality bugs get masked by transient mirror failures.
+3. **If you ever write a fallback chain to a public Overpass endpoint, stop.**
+   The fail-fast behavior is intentional — we'd rather the script error than
+   silently produce wrong measurements again. Restart the local Docker
+   instance (`docker ps | grep overpass`) and re-run.
+4. **Production deploys do not measure.** The live Vercel site never calls
+   Overpass — measurement happens locally via the scripts. So "but Vercel
+   can't see localhost" is not a valid reason to add a public fallback.
+
+When in doubt: if your terminal shows a request to `overpass-api.de` or any
+other public mirror, that is a bug. Fix it before continuing.
+
 ## Supabase is the source of truth
 
 **All city/place data lives in Supabase.** No CSVs in the repo, no in-source
