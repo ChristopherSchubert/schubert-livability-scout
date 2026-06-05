@@ -97,19 +97,8 @@ export default function Calibrate() {
 
   return (
     <AppShell activeMode="calibrate">
-      <section className="canvas-header">
-        <div>
-          <p className="page-eyebrow">Ranking</p>
-          <h1>Rank by measured fit</h1>
-          <p className="canvas-sub">
-            Each column is a measured axis scored 0–10 from the cited metrics. <strong>Overall</strong> is their weighted average. Click a header to sort; <strong>shift-click</strong> to add a secondary sort.
-          </p>
-        </div>
-      </section>
-
-      <WeightNote learned={learned} />
-
       <section className="rank-controls">
+        <h1 className="rank-title">Ranking</h1>
         <input
           type="search"
           className="rank-search"
@@ -128,7 +117,10 @@ export default function Calibrate() {
       </section>
 
       <section className="rank-table-wrap">
-        <div className="rank-count">{rows.length} of {cityRows.length} candidates{filters.activeFilterCount > 0 ? " match filters" : ""}</div>
+        <div className="rank-count">
+          {rows.length} of {cityRows.length} candidates{filters.activeFilterCount > 0 ? " match filters" : ""}
+          <WeightNote learned={learned} />
+        </div>
         <table className="rank-table">
           <thead>
             <tr>
@@ -196,17 +188,17 @@ function ScoreCell({ value }) {
 function WeightNote({ learned }) {
   if (learned.weights) {
     return (
-      <p className="weight-note weight-note-learned">
-        <strong>Overall weights learned from your {learned.n} gut ratings</strong> — how well each axis predicts your felt Slovenia score:{" "}
+      <span className="weight-note-inline" title={`Learned from ${learned.n} gut ratings on Baseline`}>
+        {" · weights learned: "}
         {calibrateAxes.map(([k, l], i) => (
-          <span key={k}>{i ? " · " : ""}{shortAxisLabel(l)} ×{(learned.weights[k] ?? 1).toFixed(1)}</span>
+          <span key={k}>{i ? " · " : ""}{shortAxisLabel(l)}×{(learned.weights[k] ?? 1).toFixed(1)}</span>
         ))}
-      </p>
+      </span>
     );
   }
   return (
-    <p className="weight-note">
-      Axes count <strong>equally</strong> for now. Rate ≥{learned.need} places by gut on the <strong>Baseline</strong> tab (the 5 axes + a 0–10 Slovenia score) and Overall will learn how much each axis actually matters to you — {learned.n}/{learned.need} so far.
-    </p>
+    <span className="weight-note-inline" title="Rate places by gut on Baseline so Overall can learn axis weights">
+      {` · axes equal-weighted (${learned.n}/${learned.need} baselined)`}
+    </span>
   );
 }

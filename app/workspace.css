@@ -88,7 +88,7 @@
 .city-context-tab.active { background: transparent; border-bottom-color: var(--accent); color: var(--text); }
 
 /* ── Page headers: an eyebrow + a big Fraunces title over a hairline ─────── */
-.canvas { gap: 2rem; padding-top: 2.25rem; }
+.canvas { gap: 1.25rem; padding-top: 1.25rem; }
 
 .canvas-header,
 .funnel-header {
@@ -123,6 +123,14 @@
 /* RANKING (Calibrate) — the centerpiece, an editorial ranked list */
 /* ============================================================== */
 
+.rank-title {
+  font-family: var(--font-display);
+  font-variation-settings: "opsz" 40, "SOFT" 60, "wght" 520;
+  font-size: 1.35rem;
+  letter-spacing: -0.01em;
+  margin: 0 0.5rem 0 0;
+  line-height: 1;
+}
 .rank-table-wrap {
   background: transparent;
   border: 0;
@@ -132,11 +140,17 @@
 .rank-count {
   font-family: var(--font-ui);
   text-transform: uppercase;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.08em;
   font-size: 0.7rem;
   font-weight: 600;
   color: var(--muted);
   margin-bottom: 0.6rem;
+}
+.weight-note-inline {
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 500;
+  color: var(--muted);
 }
 .rank-table { border-collapse: collapse; width: 100%; }
 .rank-table thead th {

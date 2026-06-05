@@ -1380,11 +1380,11 @@ button:hover, .button-link:hover {
 .funnel-column-empty-slim .funnel-column-empty { display: none; }
 /* Inside a filled column, cards lay out in a responsive grid so a wide
    column with many cards renders as a comfortable 2- or 3-card row instead
-   of an infinite vertical stack. */
+   of an infinite vertical stack of giant heroes. */
 .funnel-column-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.6rem;
 }
 .funnel-column.drag-over { background: #f1f7f2; box-shadow: 0 0 0 2px var(--accent) inset; }
 .funnel-column.stage-shortlist { border-top-color: var(--stage-shortlist); }
@@ -1430,12 +1430,15 @@ button:hover, .button-link:hover {
 .funnel-column-empty p { margin: 0; font-weight: 600; color: var(--text); font-size: 0.85rem; }
 .funnel-column-empty small { display: block; margin-top: 0.15rem; font-size: 0.74rem; }
 
-/* Image-forward draggable kanban card — big hero on top so the column
+/* Image-forward draggable kanban card — modest hero on top so the column
    reads as a wall of places, not a list of names. Copy + score sit under
-   the image; the score floats on the image as a subtle pill. */
+   the image; the score floats on the image as a subtle pill. Card width is
+   capped so wide columns pack many cards instead of inflating each one. */
 .funnel-card {
   display: flex;
   flex-direction: column;
+  width: 100%;
+  max-width: 260px;
   background: #fffdf8;
   border: 1px solid var(--border);
   border-radius: 12px;
