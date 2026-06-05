@@ -8,10 +8,19 @@ import {
   cityImageQuery,
   cityStage,
   citySlug,
+  visitNowScore,
   weightedAxisScore,
 } from "../lib/planner-data";
 import AppShell from "./AppShell";
 import { appendBust, resolveImage, usePlanner } from "./PlannerProvider";
+import {
+  CityFilterDrawer,
+  CityFiltersBar,
+  applyCityFilters,
+  augmentCityForFilters,
+  availableFilterOptions,
+  useCityFilters,
+} from "./city-filters";
 
 /**
  * FunnelBoard — kanban over the funnel stages.
@@ -20,51 +29,34 @@ import { appendBust, resolveImage, usePlanner } from "./PlannerProvider";
  * setCityStage). Calibration/reference places are hidden by default (toggle to
  * show). Cards are compact so 60+ candidates don't crowd; ranking inside each
  * column is by the measured Overall score, same engine as Calibrate.
+ *
+ * Filters reuse the shared drawer/chips/sliders from components/city-filters
+ * so Board and Ranking offer the same vocabulary (region/state/chips/axis
+ * minimums) without duplicated state or UI.
  */
 const EQUAL_WEIGHTS = { setting: 1, aliveness: 1, fabric: 1, realness: 1, january: 1 };
 
-// City names are formatted "City, ST" (US) or "City, Country" — the last
-// comma-separated segment is the region token we filter on.
-function cityRegion(cityItem) {
-  const parts = (cityItem.name || "").split(",");
-  return parts.length > 1 ? parts[parts.length - 1].trim() : "";
-}
-
 export default function FunnelBoard({ focusStage }) {
   const router = useRouter();
-  const { planner, imageState, addCity, advanceCityStage, setCityStage, updateCity } = usePlanner();
-  const [query, setQuery] = useState("");
-  const [region, setRegion] = useState("");
-  const [minScore, setMinScore] = useState("");
+  const { planner, imageState, advanceCityStage, setCityStage } = usePlanner();
+  const filters = useCityFilters();
   const [hideCalibration, setHideCalibration] = useState(true);
   const [dragOver, setDragOver] = useState(null);
 
   const calCount = planner.cities.filter((c) => c.isCalibration).length;
+  const visibleCities = hideCalibration ? planner.cities.filter((c) => !c.isCalibration) : planner.cities;
 
-  const regionOptions = useMemo(() => {
-    const set = new Set();
-    for (const c of planner.cities) {
-      if (hideCalibration && c.isCalibration) continue;
-      const r = cityRegion(c);
-      if (r) set.add(r);
-    }
-    return Array.from(set).sort();
-  }, [planner.cities, hideCalibration]);
+  const cityRows = useMemo(() => visibleCities.map((cityItem) => ({
+    ...augmentCityForFilters(cityItem),
+    overall: weightedAxisScore(cityItem, EQUAL_WEIGHTS),
+    visitNow: visitNowScore(cityItem, filters.nowMonth),
+  })), [visibleCities, filters.nowMonth]);
 
-  const filteredCities = useMemo(() => {
-    const needle = query.trim().toLowerCase();
-    const min = minScore === "" ? null : Number(minScore);
-    return planner.cities.filter((c) => {
-      if (hideCalibration && c.isCalibration) return false;
-      if (needle && !c.name.toLowerCase().includes(needle)) return false;
-      if (region && cityRegion(c) !== region) return false;
-      if (min != null && !Number.isNaN(min)) {
-        const score = weightedAxisScore(c, EQUAL_WEIGHTS);
-        if (score == null || score < min) return false;
-      }
-      return true;
-    });
-  }, [planner.cities, hideCalibration, query, region, minScore]);
+  const options = useMemo(() => availableFilterOptions(cityRows), [cityRows]);
+  const filteredCities = useMemo(
+    () => applyCityFilters(cityRows, filters).map((r) => r.cityItem),
+    [cityRows, filters],
+  );
 
   const grouped = useMemo(() => {
     const buckets = Object.fromEntries(STAGES.map((stage) => [stage.id, []]));
@@ -77,8 +69,6 @@ export default function FunnelBoard({ focusStage }) {
 
   const visibleStages = focusStage ? STAGES.filter((stage) => stage.id === focusStage) : STAGES;
   const totalForFocus = focusStage ? (grouped[focusStage] || []).length : filteredCities.length;
-  const hasFilters = Boolean(query || region || minScore);
-  function clearFilters() { setQuery(""); setRegion(""); setMinScore(""); }
 
   // Drag handlers — set/clear the dataTransfer, highlight column under cursor,
   // and on drop, move the card by writing the column's stage onto the city.
@@ -117,41 +107,21 @@ export default function FunnelBoard({ focusStage }) {
         </button>
       </section>
 
-      <section className="funnel-filters" aria-label="Filter candidates">
+      <section className="rank-controls" aria-label="Filter candidates">
         <input
-          className="funnel-search"
-          value={query}
-          onChange={(event) => setQuery(event.target.value)}
-          placeholder="Search name…"
-          aria-label="Filter by name"
+          type="search"
+          className="rank-search"
+          value={filters.query}
+          onChange={(e) => filters.setQuery(e.target.value)}
+          placeholder="Search city name…"
         />
-        <label className="funnel-filter">
-          <span>Region</span>
-          <select value={region} onChange={(e) => setRegion(e.target.value)}>
-            <option value="">All</option>
-            {regionOptions.map((r) => <option key={r} value={r}>{r}</option>)}
-          </select>
-        </label>
-        <label className="funnel-filter">
-          <span>Min score</span>
-          <input
-            type="number"
-            min="0"
-            max="10"
-            step="0.5"
-            value={minScore}
-            onChange={(e) => setMinScore(e.target.value)}
-            placeholder="—"
-          />
-        </label>
+        <CityFiltersBar filters={filters} />
+        <span className="rank-controls-spacer" />
         {calCount > 0 ? (
-          <label className="cal-toggle">
+          <label className="rank-toggle">
             <input type="checkbox" checked={hideCalibration} onChange={(e) => setHideCalibration(e.target.checked)} />
             Hide calibration ({calCount})
           </label>
-        ) : null}
-        {hasFilters ? (
-          <button type="button" className="funnel-filter-clear" onClick={clearFilters}>Clear</button>
         ) : null}
       </section>
 
@@ -197,6 +167,8 @@ export default function FunnelBoard({ focusStage }) {
             );
           })}
       </section>
+
+      <CityFilterDrawer filters={filters} options={options} />
     </AppShell>
   );
 }
