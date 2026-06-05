@@ -143,13 +143,14 @@ function Annotation({ idx, y, cls, label, sub }) {
 // month against the home base (Allison Park) when its climate is known.
 function Climatology({ climate, homebase }) {
   const ref = Array.isArray(homebase?.visitClimate) && homebase.visitClimate.length === 12 ? homebase.visitClimate : null;
-  // "Feels" only earns a row when the heat index diverges from the high by
-  // at least 3°F in some month — northern cities sit at or near the air temp
-  // year-round, so the row would just echo the High line.
-  const hasFeel = Array.isArray(climate) && climate.some((m) => m?.heatIndex != null && m.hi != null && (m.heatIndex - m.hi) >= 3);
+  // "Feels" earns a row when the felt high (heat index OR wind chill) diverges
+  // from the air-temp high by ≥3°F in any month. Hot/humid cities qualify in
+  // summer; cold/windy cities qualify in winter. Mild-everywhere cities skip
+  // the row so it doesn't just echo the High line.
+  const hasFeel = Array.isArray(climate) && climate.some((m) => m?.feltHigh != null && m.hi != null && Math.abs(m.feltHigh - m.hi) >= 3);
   const rows = [
     { key: "high",   label: "High",   pick: (m) => m?.hi,       max: 90, fmt: (v) => String(Math.round(v)) },
-    ...(hasFeel ? [{ key: "feel", label: "Feels", pick: (m) => m?.heatIndex, max: 110, fmt: (v) => String(Math.round(v)) }] : []),
+    ...(hasFeel ? [{ key: "feel", label: "Feels", pick: (m) => m?.feltHigh, max: 110, fmt: (v) => String(Math.round(v)) }] : []),
     { key: "low",    label: "Low",    pick: (m) => m?.lo,       max: 80, fmt: (v) => String(Math.round(v)) },
     { key: "precip", label: "Precip", pick: (m) => m?.precipIn, max: 7,  fmt: (v) => v.toFixed(1) },
   ];
