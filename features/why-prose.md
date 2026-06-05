@@ -18,8 +18,9 @@ doesn't move the goalposts.
   [public/city-detail-redesign.html](../public/city-detail-redesign.html) — same content,
   magazine typography (drop cap, wider measure).
 - **Authoring rule**: 2-paragraph form, geography/fabric → case + honest
-  tradeoff + "you'd be testing…" closer. Set during the 2026-06-03 audit
-  (TODO #5). Full style guide in the section below.
+  tradeoff + "you'd be testing…" closer. Set during the 2026-06-03 audit,
+  re-enforced 2026-06-05 (every why now has the typographic break, not
+  just the structural moves). Full style guide in the section below.
 
 ## Style guide — how to write a wonderful why
 
@@ -33,7 +34,13 @@ If the why reads like it could be written about any one of forty similar
 towns, it has failed. The job is to find the *thing that's only true of
 this place* and lead with it.
 
-### The form (two paragraphs)
+### The form (two paragraphs — always)
+
+A why has **two paragraphs separated by a blank line**, no exceptions.
+Even short whys (under 700 chars) get the break. The 2026-06-05 audit
+found 31 whys that had the right structural moves but no `\n\n` between
+them — the reader's eye couldn't see the form working. If a why fits on
+one screen, it still gets one paragraph break.
 
 **Paragraph 1 — orientation.** Where the place is, what its geography
 *does*, and what the walkable core actually looks like. Specific named
@@ -42,8 +49,9 @@ verify. End with the geographic context that matters (the mountains
 behind, the water in front, the river through). Lead with the place
 itself, not with a distance from somewhere else.
 
-**Paragraph 2 — the case, the tradeoff, the closer.** Three moves, in
-order:
+**Paragraph 2 — the case, the tradeoff, the closer.** The break falls
+right before "The case is…" or "The case for [place] is…" — never
+mid-orientation, never after the tradeoff. Three moves, in order:
 
 1. *The case for [place] is…* — the argument, framed as the unique
    *combination* this place offers. Not "it's pretty" — combinations:
@@ -77,8 +85,12 @@ order:
   steal. Replace each with the specific thing that earned the adjective,
   or cut it.
 
-### Don't-do list (the failure modes the 2026-06-04 cohort showed)
+### Don't-do list (recurring failure modes)
 
+- **The missing break.** Every why must have a blank line between
+  paragraph 1 and paragraph 2. A single wall of prose hides the
+  structure even when all three moves are there. Surfaced in the
+  2026-06-05 audit (31 of 121 whys).
 - **The locked template.** "Town of N people at K feet, M hours from
   Pittsburgh, with Main Street businesses and ski mountain X minutes
   away." Twelve cities in a row with the same skeleton means the
@@ -89,9 +101,9 @@ order:
   story; Asheville doesn't mention Pittsburgh at all). Cities 7+ hours
   away aren't testable as weekend trips — saying so doesn't help.
 - **Reflex ski-mountain reference.** Only mention skiing if it's
-  actually part of the year-round case. Half the 2026-06-04 cohort
-  had a "X Mountain Y minutes north" line as filler. If the place
-  isn't a winter candidate, the ski line is noise.
+  actually part of the year-round case. Cohorts of lake-and-mountain
+  candidates love to drop "X Mountain Y minutes north" as filler. If
+  the place isn't a winter candidate, the ski line is noise.
 - **Restating the case in the tradeoff.** "The case is a walkable
   Victorian downtown. The tradeoff is the walkable Victorian downtown
   is small." The tradeoff has to be a different *kind* of fact than
@@ -104,9 +116,10 @@ order:
 
 ### Length
 
-- **600–1200 chars** for typical cities. 800–1000 is the sweet spot.
-- **Under 700** is fine when the place is small or simple (Camden at
-  580, Bled at 685). Don't pad to hit a target.
+- **600–1200 chars** is the typical band; current median across the
+  corpus is ~975. Don't aim at a target — let the place determine it.
+- **Under 700** is fine when the place is small or simple (Camden ~580,
+  Bled ~685, Greenport ~570). Short whys still get the paragraph break.
 - **Over 1400** only when the place genuinely needs the room (Santa
   Barbara at 1592 earns it; most don't).
 
@@ -143,11 +156,11 @@ The best models in the corpus right now:
 - **Ithaca** — the unique-combination case
 - **Northampton** — substantial walkable density argued without
   hyperbole
-- **Camden** — short why done right (580 chars, all of it earned)
-
-The cohort that needs rewriting (the 2026-06-04 12) is the inverse:
-read those side-by-side with Camden to see how the template flattens
-specificity.
+- **Camden** — short why done right (~580 chars, all of it earned)
+- **Floyd, VA** and **Berea, KY** — small-town whys that lead with the
+  one specific thing only that place has (the Friday Night Jamboree;
+  the tuition-free craft college). The orientation paragraph names a
+  single anchor and lets it carry the geography.
 
 ### Process for a new city
 
@@ -165,12 +178,23 @@ specificity.
 
 ## Status
 
-- All 78 candidate cities have whys in the 800–1600 character band (the
-  audit's target).
+- **121/121 cities** have a why with ≥2 paragraphs (2026-06-05 audit).
+  Length distribution: min 427, median 975, max 1592. The 31 single-
+  paragraph whys surfaced in this audit all already had the right
+  structural moves — orientation + "The case…" + "The tradeoff…" — and
+  were fixed by inserting the missing `\n\n` at the pivot
+  (`scripts/.split-paragraphs.mjs`).
 - The 9 calibration/benchmark places (Pittsburgh-area controls + Slovenia
   originals) keep their short whys — intentional, not a gap.
 - `if_wins` / `if_fails` are populated unevenly — present on the cities
   that have made it past Shortlist; absent on early candidates.
+
+### Audit cadence
+
+Run `node scripts/.audit-whys.mjs` after every onboarding batch. It
+reports paragraph counts and length distribution and lists any why
+that's still one paragraph. Re-run after rewrites until the 0-or-1-para
+count is zero.
 
 ## TODOs / future direction
 
