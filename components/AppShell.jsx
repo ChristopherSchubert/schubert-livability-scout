@@ -5,22 +5,22 @@ import { useEffect, useState } from "react";
 import { STAGES, citySlug, cityStage } from "../lib/planner-data";
 import { usePlanner } from "./PlannerProvider";
 
-// Top-nav workflow modes. The home is "Board" (the kanban overview); the
-// others are purpose-built workspaces. Stage IDs from STAGES are still used
-// for city metadata (badges, context strip color), but the nav is workflow,
-// not a stage filter.
+// Top-nav workflow modes. The home is "Ranking" (the sortable ranked list);
+// the others are purpose-built workspaces. "Board" is an auxiliary kanban
+// utility, demoted to the end of the nav. Stage IDs from STAGES are still
+// used for city metadata (badges, context strip color).
 const NAV_MODES = [
-  { id: "board",     href: "/board",     label: "Board",     help: "Kanban view of where every candidate stands.", stageId: null },
   { id: "calibrate", href: "/calibrate", label: "Ranking",   help: "Sortable table of candidates ranked by measured fit.", stageId: "calibrate" },
   { id: "visit",     href: "/visit",     label: "Visit",     help: "Trips you've planned or are on.", stageId: "visit" },
   { id: "decide",    href: "/decide",    label: "Decide",    help: "Cities back from a trip, awaiting their survey.", stageId: "decide" },
   { id: "decided",   href: "/decided",   label: "Decided",   help: "Archive of verdicts you've made.", stageId: "decided" },
   { id: "baseline",  href: "/baseline",  label: "Baseline",  help: "Rate places you already know — the calibration answer key.", stageId: null },
+  { id: "board",     href: "/board",     label: "Board",     help: "Auxiliary kanban view of where every candidate stands.", stageId: null },
 ];
 
 // Used by city context strip to know which workflow mode owns each stage.
 const STAGE_TO_MODE = {
-  shortlist: "board",
+  shortlist: "calibrate",
   calibrate: "calibrate",
   visit:     "visit",
   decide:    "decide",
@@ -33,8 +33,8 @@ const MODE_HREF = Object.fromEntries(NAV_MODES.map((mode) => [mode.id, mode.href
 // city? The mode whose stage the city is currently sitting in. Used by the
 // Detail / Images routes (Visit / Decide override with a fixed mode).
 export function modeForCity(cityItem) {
-  if (!cityItem) return "board";
-  return STAGE_TO_MODE[cityStage(cityItem)] || "board";
+  if (!cityItem) return "calibrate";
+  return STAGE_TO_MODE[cityStage(cityItem)] || "calibrate";
 }
 
 /**
@@ -68,7 +68,7 @@ function TopBar({ activeMode }) {
   return (
     <header className="topbar-v2">
       <div className="topbar-brand">
-        <Link href="/board" className="brand-mark">
+        <Link href="/calibrate" className="brand-mark">
           <span className="brand-dot" aria-hidden="true" />
           <span>Livability Scout</span>
         </Link>
@@ -162,7 +162,7 @@ function CityContextStrip({ cityItem, cityNav }) {
   return (
     <div className={`city-context stage-${stage}`}>
       <div className="city-context-left">
-        <Link href={MODE_HREF[STAGE_TO_MODE[stage]] || "/board"} className="city-context-back">←</Link>
+        <Link href={MODE_HREF[STAGE_TO_MODE[stage]] || "/calibrate"} className="city-context-back">←</Link>
         <div className="city-context-text">
           <span className="city-context-stage">{stageLabel}</span>
           <input
