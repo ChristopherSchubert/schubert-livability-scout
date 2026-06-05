@@ -17,8 +17,9 @@ Snapshot of `cities.measured_metrics` in Supabase as of 2026-06-05 (audit via
 is non-null.
 
 **112/115 cities are fully measured.** The 3-city gap is the Slovenian
-trio for `median_price_usd` (no pan-EU price registry). Population has a
-small 9-city tail to backfill.
+trio for `median_price_usd` (no pan-EU price registry). Population now
+covers 111/115 — only the 3 SI cities and Deep Creek Lake (McHenry, MD,
+genuinely unincorporated) remain.
 
 | Axis | Metric | Coverage | Source | Filler script |
 |---|---|---|---|---|
@@ -53,7 +54,7 @@ Auxiliary fields (not in `measured_metrics`):
 | `lat` / `lon` (heart) | **115/115** ✅ | Geocoded once on insert |
 | `visit_climate` (12-month normals) | 115/115 | `scripts/onboard.mjs --measurer climate` |
 | `drive_hrs_from_pit` | **115/115** ✅ | OSRM public from PIT airport (40.4915, -80.2329). Anything outside CONUS bbox marked `'FLY'`. Script: `scripts/measure-drive-hrs.mjs` |
-| `population_total` / `population_source` | 106/115 | Census ACS Place B01003_001E (city-wide, NOT tract). Script: `scripts/measure-crowd-season.py` pass 1 |
+| `population_total` / `population_source` | 111/115 | Census ACS Place B01003_001E (city-wide, NOT tract); RI uses county-subdivision (town) since RI has no Census Places. Script: `scripts/measure-crowd-season.py --pop-only` |
 | `crowd_season` (12 ints 0–5, within-city shape) | 43/115 | Google Trends BLEND: `<city> hotels` (booking intent, shift +1mo, w=0.4) + `things to do in <city>` (presence, w=0.6), per-capita normalized. Script: `scripts/measure-crowd-season.py`. **Blocked by Google rate-limit** as of last check |
 | `crowd_intensity` (0–5 scalar, cross-city magnitude) | 41/115 | log-scaled blended-peak per-capita, anchors floor=100/M ceil=10,000/M. Same script |
 
@@ -61,10 +62,10 @@ Auxiliary fields (not in `measured_metrics`):
 
 - **`median_price_usd` (3 missing)** — Bled, Ljubljana, Piran. No pan-EU
   price registry; would need a per-country adapter (Slovenia: GURS ETN).
-- **`population_total` (9 missing)** — Bled, Bristol RI, Deep Creek Lake
-  (McHenry) MD, Ljubljana, Old Forge NY, Piran, Rhinebeck NY, Wilmington NC,
-  Wolfeboro NH. Re-run `python scripts/measure-crowd-season.py` (pass 1) to
-  pick up the US misses; SI needs a SURS adapter.
+- **`population_total` (4 missing)** — 3 SI cities (Bled, Ljubljana,
+  Piran) need a SURS adapter; Deep Creek Lake (McHenry) MD is genuinely
+  unincorporated and has no Census Place — the surrounding county
+  subdivision spans an area too large to honestly call "the city's pop".
 - **`crowd_season` / `crowd_intensity` (72 / 74 missing)** — Google Trends
   rate-limit blocks bulk runs. Needs an alternative pipeline or a different
   signal (Wikipedia pageviews, AirDNA seasonality) — see
@@ -87,23 +88,13 @@ trio for `median_price_usd` (no pan-EU price registry).
 
 ## Backfill plan (priority order)
 
-### 1. Population pass on the 6 US holdouts
-
-Bristol RI, Deep Creek Lake (McHenry) MD, Old Forge NY, Rhinebeck NY,
-Wilmington NC, Wolfeboro NH — re-run pass 1 of the crowd-season script
-to fill `population_total`/`population_source`:
-
-```bash
-python scripts/measure-crowd-season.py  # pass 1 only
-```
-
-### 2. EU price + population adapters (3 SI cities)
+### 1. EU price + population adapters (3 SI cities)
 
 Bled, Ljubljana, Piran lack `median_price_usd` and `population_total` because
 the US Census paths don't apply. Needs SURS PxWeb adapters
 (table 0861102 already used for `owner_occ_pct` — extend for price + pop).
 
-### 3. Crowd season pipeline replacement
+### 2. Crowd season pipeline replacement
 
 Google Trends rate-limits bulk runs; only 43/115 cities are covered. Needs
 either an unblock workaround (residential proxies, slower cadence) or a
