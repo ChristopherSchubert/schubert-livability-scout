@@ -18,8 +18,7 @@ is non-null.
 
 **112/115 cities are fully measured.** The 3-city gap is the Slovenian
 trio for `median_price_usd` (no pan-EU price registry). Population now
-covers 111/115 — only the 3 SI cities and Deep Creek Lake (McHenry, MD,
-genuinely unincorporated) remain.
+covers 112/115 — only the 3 SI cities remain.
 
 | Axis | Metric | Coverage | Source | Filler script |
 |---|---|---|---|---|
@@ -54,7 +53,7 @@ Auxiliary fields (not in `measured_metrics`):
 | `lat` / `lon` (heart) | **115/115** ✅ | Geocoded once on insert |
 | `visit_climate` (12-month normals) | 115/115 | `scripts/onboard.mjs --measurer climate` |
 | `drive_hrs_from_pit` | **115/115** ✅ | OSRM public from PIT airport (40.4915, -80.2329). Anything outside CONUS bbox marked `'FLY'`. Script: `scripts/measure-drive-hrs.mjs` |
-| `population_total` / `population_source` | 111/115 | Census ACS Place B01003_001E (city-wide, NOT tract); RI uses county-subdivision (town) since RI has no Census Places. Script: `scripts/measure-crowd-season.py --pop-only` |
+| `population_total` / `population_source` | 112/115 | Census ACS B01003_001E with documented fallback tiers: (1) Incorporated Place / CDP — default; (2) county-subdivision (town) where the state has no Census Places (Rhode Island); (3) ZCTA (postal-ZIP boundary) where the heart sits in unincorporated territory with no CDP (e.g. Deep Creek Lake / McHenry MD 21541). Tier is encoded in `population_source` so cross-city comparisons stay legible. Script: `scripts/measure-crowd-season.py --pop-only` |
 | `crowd_season` (12 ints 0–5, within-city shape) | 43/115 | Google Trends BLEND: `<city> hotels` (booking intent, shift +1mo, w=0.4) + `things to do in <city>` (presence, w=0.6), per-capita normalized. Script: `scripts/measure-crowd-season.py`. **Blocked by Google rate-limit** as of last check |
 | `crowd_intensity` (0–5 scalar, cross-city magnitude) | 41/115 | log-scaled blended-peak per-capita, anchors floor=100/M ceil=10,000/M. Same script |
 
@@ -62,10 +61,8 @@ Auxiliary fields (not in `measured_metrics`):
 
 - **`median_price_usd` (3 missing)** — Bled, Ljubljana, Piran. No pan-EU
   price registry; would need a per-country adapter (Slovenia: GURS ETN).
-- **`population_total` (4 missing)** — 3 SI cities (Bled, Ljubljana,
-  Piran) need a SURS adapter; Deep Creek Lake (McHenry) MD is genuinely
-  unincorporated and has no Census Place — the surrounding county
-  subdivision spans an area too large to honestly call "the city's pop".
+- **`population_total` (3 missing)** — Bled, Ljubljana, Piran need a
+  SURS adapter (Slovenia is not in the US Census).
 - **`crowd_season` / `crowd_intensity` (72 / 74 missing)** — Google Trends
   rate-limit blocks bulk runs. Needs an alternative pipeline or a different
   signal (Wikipedia pageviews, AirDNA seasonality) — see
