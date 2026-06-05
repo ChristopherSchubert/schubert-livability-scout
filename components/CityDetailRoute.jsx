@@ -3,12 +3,24 @@
 import Link from "next/link";
 import AppShell, { defaultCityNav, modeForCity } from "./AppShell";
 import MagazineDetail from "./city-detail/MagazineDetail";
-import { usePlannerCity } from "./PlannerProvider";
+import { usePlanner, usePlannerCity } from "./PlannerProvider";
 
 export default function CityDetailRoute({ slug }) {
+  const { hydrated } = usePlanner();
   const cityItem = usePlannerCity(slug);
 
   if (!cityItem) {
+    if (!hydrated) {
+      return (
+        <AppShell activeMode="board">
+          <section className="canvas-header">
+            <div>
+              <p className="canvas-sub">Loading…</p>
+            </div>
+          </section>
+        </AppShell>
+      );
+    }
     return (
       <AppShell activeMode="board">
         <section className="canvas-header">
