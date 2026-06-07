@@ -50,18 +50,26 @@ verify. End with the geographic context that matters (the mountains
 behind, the water in front, the river through). Lead with the place
 itself, not with a distance from somewhere else.
 
-**Paragraph 2 — the case and the tradeoff.** The break falls right
-before "The case is…" or "The case for [place] is…" — never
-mid-orientation, never after the tradeoff. Two moves, in order:
+**Paragraph 2 — the case and the tradeoff.** Two moves, in order:
 
-1. *The case for [place] is…* — the argument, framed as the unique
-   *combination* this place offers. Not "it's pretty" — combinations:
-   "real walkable downtown + dramatic gorge geography + a major
-   university keeping culture year-round" (Ithaca). The case is what
-   would make this place a 9/10 if it lives up to it.
-2. *The honest tradeoff is…* — the real downside, stated plainly. Not
+1. **The case** — the argument, framed as the unique *combination*
+   this place offers. Not "it's pretty" — combinations: "real walkable
+   downtown + dramatic gorge geography + a major university keeping
+   culture year-round" (Ithaca). The case is what would make this
+   place a 9/10 if it lives up to it.
+2. **The honest tradeoff** — the real downside, stated plainly. Not
    hedged, not balanced ("but also has wonderful…"). If the winter is
    brutal, say brutal. If it's been discovered and priced, say so.
+
+**Don't open with "The case for [Name] is…".** That was the prescribed
+opener in earlier versions of this guide; 119 of 121 whys ended up
+sharing the same fingerprint. Open paragraph 2 on the specific thing
+that makes the case — a noun phrase ("The unusual combination of…"),
+an evocative observation ("The postcard is real…"), a structural
+claim ("Classic geography intact…"), whatever fits this particular
+place. Same prohibition on "The honest tradeoff is…" as the second
+move opener — vary it ("Honest tradeoffs are several…", "The price
+is…", "Off-season, the…").
 
 End on the tradeoff. The why is editorial about the place; it doesn't
 need to tell the reader what they'd be evaluating. Camden's why is
@@ -113,6 +121,12 @@ the model — orientation, case, tradeoff, done, no closer.
   Pittsburgh, with Main Street businesses and ski mountain X minutes
   away." Twelve cities in a row with the same skeleton means the
   skeleton is the writer, not the place.
+- **"The case for [Name] is…" as the paragraph-2 opener.** Same sin
+  at a different scale: 119 of 121 whys shared this exact frame until
+  it was stripped 2026-06-06. The paragraph already announces itself
+  as the case by what it does — naming a combination, an observation,
+  a structural fact. Don't put a label on it. Same for "The honest
+  tradeoff is…" — vary the opener.
 - **Reflex distance-from-Pittsburgh.** Most cities don't need it. It
   earns its place only when the distance is actually load-bearing
   (Hudson is "two hours by train from NYC" because the train is the
@@ -164,7 +178,8 @@ The best models in the corpus right now:
    name changed, the draft has failed — try again.
 3. Draft paragraph 2 with the case/tradeoff form. The case must name
    a combination; the tradeoff must be a different *kind* of fact than
-   the case. End on the tradeoff — no project-facing closer.
+   the case. End on the tradeoff — no project-facing closer, no
+   "The case for [Name] is…" template opener.
 4. Verify every named business, institution, and statistic. Cut
    any you can't confirm in under 30 seconds.
 
@@ -185,6 +200,11 @@ The best models in the corpus right now:
 - **Closer strip (2026-06-06):** the "You'd be testing whether…" closer
   was removed from 94 of 121 whys; paragraph 2 now lands on the
   tradeoff across the corpus.
+- **Case-opener strip (2026-06-06):** the "The case for [Name] is…"
+  template opener was removed from all 121 whys. Paragraph 2 now opens
+  on the specific thing being argued — a noun phrase, an observation,
+  a structural fact — rather than a label that's the same across
+  every city.
 - **`if_wins` / `if_fails` dropped (2026-06-06):** the gut-gate columns
   and the magazine-chapter callout were removed in migration 0007. Their
   framing duplicated the case/tradeoff and read as project-meta on the

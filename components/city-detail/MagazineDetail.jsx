@@ -111,14 +111,12 @@ function ChapterWhy({ view }) {
   if (!paras.length) {
     return (
       <article id="why" className="why">
-        <p className="eyebrow">The case for this place</p>
         <p className="why-lead">No editorial written for {view.name} yet — add the case for this place on the detail editor, and it appears here as the lead.</p>
       </article>
     );
   }
   return (
     <article id="why" className="why">
-      <p className="eyebrow">The case for this place</p>
       {paras.map((p, i) => (
         i === 0 ? <p key={i} className="why-lead">{p}</p> : <p key={i}>{p}</p>
       ))}
