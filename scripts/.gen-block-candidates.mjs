@@ -45,18 +45,31 @@ import { dirname, join } from "node:path";
 }
 process.env.OVERPASS_URL ||= "http://localhost:12345/api/interpreter";
 
+import { execFileSync } from "node:child_process";
 import { overpass, haversine } from "../lib/measure.js";
 import { connect } from "../lib/measurers/_db.js";
+
+// Google Places API key — env override, else macOS Keychain (account
+// livability-scout, like the DB password). The pipeline runs locally only.
+function googleKey() {
+  if (process.env.GOOGLE_PLACES_API_KEY) return process.env.GOOGLE_PLACES_API_KEY;
+  if (process.env.GKEY) return process.env.GKEY;
+  return execFileSync("security",
+    ["find-generic-password", "-a", "livability-scout", "-s", "google-places-api-key", "-w"],
+    { encoding: "utf8" }).trim();
+}
+const GKEY = googleKey();
 
 const TARGET = 6;          // cap on blocks shown per city; the real count is
                            //   whatever DBSCAN finds (often fewer). Dynamic header.
 const RADIUS_M = 1000;     // POI / road gather radius around the pin
 // DBSCAN — density-based clustering. Two physically-meaningful params instead of
 // a pile of hand-tuned knobs:
-const EPS_M = 75;          // two social POIs within this are "connected"; chains
+const EPS_M = 85;          // two social POIs within this are "connected"; chains
                            //   of connections form a cluster (a walkable strip)
-const MIN_PTS = 4;         // a cluster needs this many POIs; everything sparser is
-                           //   noise and dropped — this IS the cut-losses rule
+const MIN_PTS = 3;         // a cluster needs this many POIs; sparser is noise.
+                           //   3 (not 4) so a tiny real downtown still clusters —
+                           //   Lewisburg WV's Washington St shouldn't read as empty
 // Within a dense region, blocks are spaced spots, not the whole blob:
 const DENS_R = 80;         // radius that defines one spot's local density
 const SPOT_SEP = 140;      // distinct spots sit at least this far apart — small
@@ -68,15 +81,43 @@ const MAX_PER_STREET = 3;  // one street contributes at most this many stretches
                            //   so Carson gives a few distinct corners, not six
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-// ── street-type abbreviation, matching blocks.js authoring style ──────────────
-const ABBR = [
-  [/\bStreet\b/g, "St"], [/\bAvenue\b/g, "Ave"], [/\bBoulevard\b/g, "Blvd"],
-  [/\bRoad\b/g, "Rd"], [/\bDrive\b/g, "Dr"], [/\bLane\b/g, "Ln"],
-  [/\bSquare\b/g, "Sq"], [/\bCourt\b/g, "Ct"], [/\bPlace\b/g, "Pl"],
-  [/\bParkway\b/g, "Pkwy"], [/\bHighway\b/g, "Hwy"], [/\bTerrace\b/g, "Ter"],
-];
-const abbr = (s) => ABBR.reduce((acc, [re, r]) => acc.replace(re, r), s || "");
-const norm = (s) => abbr(String(s || "")).toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+// ── street-name normalization ─────────────────────────────────────────────────
+// Google ("E Carson St", "Washington St W") and OSM ("East Carson Street") spell
+// the same street differently, which broke cross-street matching. norm() expands
+// every token to a canonical full form so the two compare equal; tidyStreet()
+// renders a clean display ("East Carson St", direction as a prefix) matching the
+// hand-authored block style.
+const EXPAND = {
+  st: "street", ave: "avenue", av: "avenue", blvd: "boulevard", rd: "road",
+  dr: "drive", ln: "lane", sq: "square", ct: "court", pl: "place", pkwy: "parkway",
+  hwy: "highway", ter: "terrace", trl: "trail", cir: "circle", mt: "mount",
+  n: "north", s: "south", e: "east", w: "west",
+  ne: "northeast", nw: "northwest", se: "southeast", sw: "southwest",
+};
+const norm = (s) => String(s || "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim()
+  .split(" ").filter(Boolean).map((t) => EXPAND[t] || t).join(" ");
+
+const TYPE_ABBR = {
+  street: "St", avenue: "Ave", boulevard: "Blvd", road: "Rd", drive: "Dr",
+  lane: "Ln", square: "Sq", court: "Ct", place: "Pl", parkway: "Pkwy",
+  highway: "Hwy", terrace: "Ter", trail: "Trl", circle: "Cir",
+};
+const DIR_FULL = { north: "North", south: "South", east: "East", west: "West",
+  northeast: "Northeast", northwest: "Northwest", southeast: "Southeast", southwest: "Southwest" };
+// Clean display name: pull a leading/trailing direction to the front as a full
+// word, abbreviate the street type. "Washington St W" → "West Washington St".
+function tidyStreet(name) {
+  let toks = norm(name).split(" ").filter(Boolean);
+  if (!toks.length) return String(name || "");
+  let dir = null;
+  if (DIR_FULL[toks[0]]) { dir = DIR_FULL[toks[0]]; toks = toks.slice(1); }
+  else if (toks.length > 1 && DIR_FULL[toks[toks.length - 1]]) { dir = DIR_FULL[toks[toks.length - 1]]; toks = toks.slice(0, -1); }
+  const core = toks.map((t, i) => {
+    if (i === toks.length - 1 && TYPE_ABBR[t]) return TYPE_ABBR[t];
+    return t.charAt(0).toUpperCase() + t.slice(1);
+  }).join(" ");
+  return dir ? `${dir} ${core}` : core;
+}
 
 async function loadCity(client, slug) {
   const { rows } = await client.query(
@@ -91,17 +132,73 @@ async function allSlugs(client) {
   return rows;
 }
 
-// ── OSM gather (three calls per city, radius around the pin) ───────────────────
+// ── POI gather: Google Places (New), tiled ────────────────────────────────────
+// OSM POI coverage is too thin for this — it had ZERO of The Wine Cave, Tú y Yo,
+// Barrel Junction (all real, hundreds of Google reviews), and showed Lewisburg
+// WV / Verona as near-empty when Google finds 20+. So the *social-POI signal*
+// comes from Google; OSM stays only for street geometry + parks (well-mapped).
+//
+// "Social POI" = what creates street life: food & drink, stroll retail, arts &
+// culture. Car/big-box types are simply omitted from includedTypes so suburbs
+// don't false-inflate. Nearby Search (New) caps at 20 results/call, so we tile a
+// grid of small-radius searches over the gather area and dedupe by place id.
+const GOOGLE_TYPES = [
+  "restaurant", "cafe", "coffee_shop", "bakery", "bar", "pub", "wine_bar",
+  "ice_cream_shop", "meal_takeaway", "art_gallery", "book_store", "clothing_store",
+  "gift_shop", "jewelry_store", "shoe_store", "florist", "liquor_store", "market",
+  "museum", "tourist_attraction", "performing_arts_theater", "movie_theater",
+];
+const TILE_R = 350;   // radius of each Nearby search
+const TILE_STEP = 450; // grid spacing (< 2·TILE_R so circles overlap, no holes)
+
+async function googleNearby(lat, lon, radius) {
+  const body = JSON.stringify({
+    includedTypes: GOOGLE_TYPES,
+    maxResultCount: 20,
+    locationRestriction: { circle: { center: { latitude: lat, longitude: lon }, radius } },
+  });
+  let lastErr;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      const r = await fetch("https://places.googleapis.com/v1/places:searchNearby", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Goog-Api-Key": GKEY,
+          "X-Goog-FieldMask": "places.id,places.location,places.displayName,places.addressComponents",
+        },
+        body,
+      });
+      const j = await r.json();
+      if (j.error) throw new Error(j.error.message || JSON.stringify(j.error));
+      return j.places || [];
+    } catch (e) { lastErr = e; await sleep(800 * (attempt + 1)); }
+  }
+  throw new Error(`Google Places (after retries): ${lastErr?.message || lastErr}`);
+}
+
 async function socialPois(lat, lon) {
-  const q = `[out:json][timeout:60];
-    (nwr["amenity"~"^(cafe|restaurant|bar|pub|biergarten|ice_cream|marketplace|food_court)$"](around:${RADIUS_M},${lat},${lon});
-     nwr["shop"~"^(coffee|bakery|deli|tea|pastry|greengrocer|books|wine|cheese|chocolate|farm|butcher)$"](around:${RADIUS_M},${lat},${lon}););
-    out center;`;
-  const d = await overpass(q);
-  return (d?.elements || []).map((el) => {
-    const p = el.center || (el.lat != null ? { lat: el.lat, lon: el.lon } : null);
-    return p ? { lat: p.lat, lon: p.lon, street: el.tags?.["addr:street"] || null } : null;
-  }).filter(Boolean);
+  const mPerLat = 111320, mPerLon = 111320 * Math.cos((lat * Math.PI) / 180);
+  const seen = new Map();
+  for (let dy = -RADIUS_M; dy <= RADIUS_M; dy += TILE_STEP) {
+    for (let dx = -RADIUS_M; dx <= RADIUS_M; dx += TILE_STEP) {
+      if (Math.hypot(dx, dy) > RADIUS_M + TILE_R) continue; // skip corners outside the disk
+      const tlat = lat + dy / mPerLat, tlon = lon + dx / mPerLon;
+      const places = await googleNearby(tlat, tlon, TILE_R);
+      for (const p of places) {
+        if (!p.id || !p.location) continue;
+        if (haversine(lat, lon, p.location.latitude, p.location.longitude) > RADIUS_M) continue;
+        const route = (p.addressComponents || []).find((a) => (a.types || []).includes("route"));
+        if (!seen.has(p.id)) seen.set(p.id, {
+          lat: p.location.latitude, lon: p.location.longitude,
+          name: p.displayName?.text || null,
+          street: route ? (route.shortText || route.longText) : null,
+        });
+      }
+      await sleep(40);
+    }
+  }
+  return [...seen.values()];
 }
 
 async function namedRoads(lat, lon) {
@@ -318,8 +415,8 @@ function nameSpot(c, members, feats, roadIndex, roads) {
     const d = haversine(c.lat, c.lon, x.lat, x.lon);
     if (d < bi.d) bi = { d, cross: x.names.find((nm) => norm(nm) !== sN) };
   }
-  if (bi.cross && bi.d <= 160) return { block: `${abbr(street)} & ${abbr(bi.cross)}`, why: null, street: sN };
-  return { block: abbr(street), why: null, street: sN };
+  if (bi.cross && bi.d <= 160) return { block: `${tidyStreet(street)} & ${tidyStreet(bi.cross)}`, why: null, street: sN };
+  return { block: tidyStreet(street), why: null, street: sN };
 }
 
 async function generate(city, originalBlocks) {

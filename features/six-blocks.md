@@ -13,41 +13,51 @@ less location string.
   [scripts/onboard.mjs](../scripts/onboard.mjs)). The target is 5–7 per
   city — the "Six blocks" header is the column's name, not a hard count;
   small towns honestly land lower rather than getting padded.
-- **Authoring candidates from OSM**: when a city has too few blocks,
-  [scripts/.gen-block-candidates.mjs](../scripts/.gen-block-candidates.mjs)
-  proposes new ones grounded in real OpenStreetMap social-POI density —
-  it never invents. A block is a *spot* (an intersection or named place),
-  found with a principled two-layer algorithm rather than hand-tuned
-  thresholds:
-  1. Gather social POIs (cafe/restaurant/bar/bakery/market/…) within
-     ~1 km of the pin. **No polygon clip** — the saved
-     `stay_zone_boundary` is often mis-sized (Saratoga's polygon clipped
-     69 of 95 POIs; Kingston's is so big density scatters), so we work
-     from the density itself.
-  2. **DBSCAN** (`eps` ~75 m, `minPts` 4) finds the genuine dense
-     region(s) and labels everything sparser as noise → dropped. This is
-     the honest cut-losses rule: a town with no real cluster yields
-     nothing (Lewisburg WV → 0).
+- **Authoring candidates (Google Places + DBSCAN)**: when a city has too
+  few blocks, [scripts/.gen-block-candidates.mjs](../scripts/.gen-block-candidates.mjs)
+  proposes new ones from real social-POI density — it never invents. A
+  block is a *spot* (an intersection or named place), found with a
+  principled two-layer algorithm rather than hand-tuned thresholds:
+  1. Gather social POIs (food/drink + stroll retail + arts/culture)
+     within ~1 km of the pin from **Google Places** (Nearby Search New),
+     **tiled** (the API caps at 20 results/call) and deduped by place id.
+     **Why Google, not OSM:** OSM POI coverage is too thin — it had *zero*
+     of The Wine Cave, Tú y Yo Café, Barrel Junction (all real, hundreds
+     of reviews) and showed Lewisburg WV / Verona as near-empty when
+     Google finds 20+. Treating OSM's absence as "no social life" was the
+     classic *zero-is-not-null* trap. Car/big-box types are omitted so
+     suburbs don't false-inflate (Allison Park still reads ~0, correctly).
+     **No polygon clip** — the saved `stay_zone_boundary` is often
+     mis-sized (Saratoga's clipped 69 of 95 POIs), so we work from density.
+  2. **DBSCAN** (`eps` ~85 m, `minPts` 3) finds the genuine dense
+     region(s) and labels sparser POIs as noise → dropped. This is the
+     honest cut-losses rule.
   3. **Within each region, sample spaced spots** — densest point, snap to
-     its local centroid, drop within ~140 m, repeat. Small spacing keeps
+     local centroid, drop within ~140 m, repeat. Small spacing keeps
      adjacent streets distinct (Saratoga's Broadway vs Caroline); a
-     **per-street cap (3)** stops one spine (South Side's East Carson)
-     being sampled six times. A wide downtown blob becomes several spots;
-     a long strip a few corners.
-  4. **Name** each spot from the majority `addr:street` of its POIs
-     (works on pedestrian malls where road geometry has no detectable
-     intersections) crossed with the nearest intersecting street
-     (`"Church St & College St"`), or the named feature there
-     (`"Pritchard Park"`). Rank by density, cap at six. The count is
-     whatever the data supports.
+     **per-street cap (3)** stops one spine (East Carson) being sampled
+     six times. A wide blob becomes several spots; a long strip a few
+     corners.
+  4. **Name** each spot from the majority street of its POIs (Google
+     `addressComponents.route`, canonicalized so "E Carson St" matches
+     OSM's "East Carson Street") crossed with the nearest intersecting
+     street from OSM geometry (`"East Carson St & South 15th St"`), or the
+     named feature there from OSM (`"Pritchard Park"`). Rank by density,
+     cap at six; the count is whatever the data supports.
 
-  It **prints proposals for review and never writes**. `--all --json`
-  dumps the corpus; `.format-block-proposals.mjs` renders a reviewable
-  doc; `.save-block-proposals.mjs --commit` applies approved picks
-  (excludes the Slovenia anchors + the Allison Park homebase — no
-  walkable social core, and local Overpass is US-only besides). After
-  saving, re-run the measurer below to resolve the new blocks'
-  coordinates.
+  OSM still provides **street geometry + parks/squares** (well-mapped);
+  Google provides the **POI signal** (coverage). The Google key lives in
+  the macOS Keychain (`account livability-scout`, service
+  `google-places-api-key`); the script reads it there or from
+  `GOOGLE_PLACES_API_KEY`/`GKEY`. It **prints proposals for review and
+  never writes**. `--all --json` dumps the corpus;
+  `.format-block-proposals.mjs` renders a reviewable doc;
+  `.save-block-proposals.mjs --commit` applies picks (excludes the
+  Slovenia anchors + Allison Park homebase — no walkable core). After
+  saving, re-run the measurer below to resolve coordinates.
+  **NOTE:** the measured Aliveness metrics (`cafe_n`/`bar_n`/`rest_n` in
+  `lib/measure.js`) still come from OSM and carry the same coverage gap —
+  a known follow-up, not yet migrated to Google.
 - **Data (block coordinates)**: `cities.block_geometries` jsonb — an
   array parallel to `blocks`, each entry shaped like
   `{ name, lat, lon, accuracy, source, meta, asOf }` with `accuracy`
@@ -100,13 +110,14 @@ less location string.
 ## Status
 
 - **Data layer (blocks)**: backfilled corpus-wide (2026-06-07) via the
-  DBSCAN generator. 72 of 117 candidate cities carry a full 6; 17 sit at
-  a valid 5; the rest land lower by honest density (Kingston at 1 — only
-  its Uptown core is in range; Lewisburg WV at 0 — 4 POIs, no cluster) —
-  left short rather than padded. The 4 reference anchors (Bled, Piran,
-  Ljubljana, Allison Park) intentionally carry none. New blocks came
-  from [scripts/.gen-block-candidates.mjs](../scripts/.gen-block-candidates.mjs)
-  (OSM-derived, reviewed) — see "Authoring candidates from OSM" above.
+  Google Places + DBSCAN generator. **106 of 117** candidate cities carry
+  a full 6; the rest land lower by honest density (small towns: Jim Thorpe
+  2, Lewisburg WV / Sewickley 3, Beacon / Verona 4). The 4 reference
+  anchors (Bled, Piran, Ljubljana, Allison Park) intentionally carry none.
+  An earlier OSM-only pass undercounted badly (only 72 reached 6, Lewisburg
+  read as ~0) — switching the POI signal to Google fixed it. New blocks
+  came from [scripts/.gen-block-candidates.mjs](../scripts/.gen-block-candidates.mjs),
+  reviewed — see "Authoring candidates (Google Places + DBSCAN)" above.
 - **Data layer (block_geometries)**: resolved by the `blocks` measurer.
   Re-run with `--force` after any block edit (it re-evaluates every
   non-`manual` entry through the strengthened resolution chain). Typical
