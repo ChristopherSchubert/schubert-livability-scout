@@ -56,13 +56,22 @@ Floor (100) and ceil (10000) are part of the citation and never shift
 as cities are added — the ruler is identical across the corpus.
 
 Usage:
-  python3 scripts/measure-crowd-season.py               # do everything
+  python3 scripts/measure-crowd-season.py --status      # progress, NO fetches
+  python3 scripts/measure-crowd-season.py               # resume: fetch up to
+                                                        # MAX_FETCHES_PER_RUN,
+                                                        # stop on 2nd 429/500
   python3 scripts/measure-crowd-season.py --limit 5     # first 5 cities only
   python3 scripts/measure-crowd-season.py --only "Annapolis,Pittsburgh"
   python3 scripts/measure-crowd-season.py --refresh     # force re-measure
   python3 scripts/measure-crowd-season.py --recalibrate # discard the stored
                                                         # calibration and create
                                                         # a new one from this sweep
+
+Quota safety (after the 2026-06-07 burn): no retry/backoff — each 429/500 is a
+throttle signal; tolerate one, STOP on the second. Hard cap of
+MAX_FETCHES_PER_RUN successful fetches per run. Every run is a resume — the
+durable per-city cache means re-running picks up exactly where it left off
+(never re-queries a cached city). So the corpus fills over a few daily windows.
 
 Calibration (lib/calibrations/crowd-season-v3.json): the first sweep
 captures Mackinac's per-template anchor curves and persists them. Every
@@ -142,17 +151,18 @@ CACHE_PATH = os.path.join(os.path.dirname(__file__), ".crowd-season-cache.json")
 # gracefully the moment we look throttled (resume next window from cache).
 SLEEP_BASE_S = 240            # 4 min between successful fetches (paranoid)
 SLEEP_JITTER_S = 90           # + 0..90s, so cadence isn't a fixed fingerprint
-MAX_CONSEC_BLOCKS = 1         # the FIRST hard block (after its one retry) means
-                              # we're throttled — stop immediately, don't keep
-                              # firing requests into a closed window (that's
-                              # what deepened the hole on 2026-06-07).
-MAX_RETRIES = 2               # 1 retry then give up — a 429 won't clear in 60s,
-                              # so retrying 5× just spends quota digging deeper.
+# Quota policy (after the 2026-06-07 burn): do NOT retry a 429/500 — retrying
+# just fires more requests into a window Google has already closed. Treat each
+# 429/500 as a throttle signal. Tolerate ONE (could be a blip), STOP on the
+# SECOND. Worst case: 2 requests after throttling begins, then we're out.
+MAX_QUOTA_ERRORS = 2          # stop the run on the 2nd 429/500
 MAX_FETCHES_PER_RUN = 50      # hard backstop: bank at most 50 cities/run, then
-                              # stop voluntarily with headroom to spare. The
-                              # corpus finishes over a few daily windows.
+                              # stop voluntarily with headroom. Corpus finishes
+                              # over a few daily windows; just re-run to resume.
 # Deterministic jitter (no random module dependence): cycle through offsets.
 _JITTER_CYCLE = [13, 71, 37, 89, 5, 53, 29, 61]
+_QUOTA_MARKERS = ("429", "TooManyRequests", "code 500", "code 502",
+                  "code 503", "code 504", "ResponseError")
 
 # Calibration file is the permanent record of the anchor curves (Myrtle
 # Beach's 12-month per-template curves from the sweep that defined this
@@ -379,34 +389,22 @@ def fetch_trends_batch(query_strings):
     return out
 
 
-def fetch_with_retry(cities, max_tries=MAX_RETRIES):
-    """Honor Google's transient errors (429 rate-limit AND 5xx server errors)
-    with exponential backoff. Google sometimes returns 500/502 to scrapers as
-    a soft block — the correct response is the same backoff treatment as 429.
-    Non-transient errors (malformed payload, network unreachable) re-raise.
+class QuotaError(Exception):
+    """A 429/500-family response — Google has (soft-)closed the window."""
 
-    Skips the final sleep — once we know we're giving up, don't burn 16 min
-    on a sleep nobody will return to."""
-    delay = 60
-    transient = ("429", "TooManyRequests", "code 500", "code 502", "code 503", "code 504", "ResponseError")
-    for i in range(max_tries):
-        try:
-            return fetch_trends_batch(cities)
-        except Exception as e:
-            msg = str(e)
-            if any(m in msg for m in transient):
-                if i == max_tries - 1:
-                    # Last attempt — don't sleep, just give up.
-                    break
-                kind = "rate-limited" if ("429" in msg or "TooManyRequests" in msg) else "transient-error"
-                print(f"    {kind}: {msg[:80]} — sleeping {delay}s (attempt {i+1}/{max_tries})")
-                time.sleep(delay)
-                delay *= 2
-                continue
-            raise
-    # Gave up after backoff — return None so the caller can count this as a
-    # block and stop the run gracefully (rather than crash the whole sweep).
-    return None
+
+def fetch_once(cities):
+    """Single attempt. Returns the batch dict on success. Raises QuotaError on
+    a 429/500-family response (caller counts it toward the stop threshold) and
+    re-raises anything else (a real bug worth surfacing). No retry, no backoff
+    — retrying a closed window only spends more quota. A city that errors is
+    simply left uncached and picked up on the next resume run."""
+    try:
+        return fetch_trends_batch(cities)
+    except Exception as e:
+        if any(m in str(e) for m in _QUOTA_MARKERS):
+            raise QuotaError(str(e)[:100]) from e
+        raise
 
 
 # ─── Scaling ────────────────────────────────────────────────────────────────
@@ -538,6 +536,20 @@ def main():
 
     cache = load_cache()
 
+    # --status: report resume progress (cached vs remaining per template)
+    # with ZERO Google calls. Safe to run anytime to see how far the sweep got.
+    if "--status" in argv:
+        ambiguous = ambiguous_bare_names(rows)
+        have_pop = sum(1 for r in rows if r["population_total"])
+        print(f"\nSTATUS (no fetches) — {len(rows)} cities, population {have_pop}/{len(rows)}")
+        for tmpl in QUERY_TEMPLATES:
+            tc = cache.get("trends", {}).get(tmpl["key"], {})
+            qs = {city_query(r["name"], tmpl, ambiguous) for r in rows}
+            qs.discard(tmpl["anchor"])
+            cached = sum(1 for q in qs if q in tc)
+            print(f"  template {tmpl['key']:<14} {cached:>3}/{len(qs)} cached  ({len(qs)-cached} remaining)")
+        cur.close(); conn.close(); return
+
     # ── Pass 1: ensure every selected city has a population_total ─────────
     print(f"\nPASS 1: populations  ({len(rows)} cities)")
     print("-" * 70)
@@ -604,12 +616,16 @@ def main():
     # Each 2-term call returns BOTH the anchor's curve and the city's curve on
     # that call's shared 0-100 scale; we store both so scaling is recomputable
     # offline. Every successful fetch is written to disk immediately.
+    # RESUME / REPAIR: the durable per-city cache means every run is a resume —
+    # `todo` is whatever isn't cached yet (never-fetched OR errored-and-skipped
+    # on a prior run). Nothing special to invoke; just re-run to pick up where
+    # the last window left off.
     fetched_this_run = 0
-    consec_blocks = 0
-    throttled = False
+    quota_errors = 0
+    stopped = None    # reason string once we stop early
 
     for tmpl in QUERY_TEMPLATES:
-        if throttled:
+        if stopped:
             break
         tkey = tmpl["key"]
         anchor_q = tmpl["anchor"]
@@ -622,24 +638,22 @@ def main():
         unique_queries = [q for q in query_groups if q != anchor_q]
         todo = [q for q in unique_queries if q not in tmpl_cache]
         print(f"\n  TEMPLATE '{tkey}': {len(unique_queries)} queries — "
-              f"{len(unique_queries)-len(todo)} cached, {len(todo)} to fetch")
+              f"{len(unique_queries)-len(todo)} cached, {len(todo)} to fetch (resume)")
 
         for qi, q in enumerate(todo):
             if fetched_this_run >= MAX_FETCHES_PER_RUN:
-                print(f"    → per-run cap ({MAX_FETCHES_PER_RUN}) reached. Stopping with quota headroom; resume next window.")
-                throttled = True
+                stopped = f"per-run cap ({MAX_FETCHES_PER_RUN}) reached"
                 break
             print(f"    [{qi+1}/{len(todo)}] fetch: {q!r}")
-            raw = fetch_with_retry([anchor_q, q])
-            if raw is None:
-                consec_blocks += 1
-                print(f"    ✗ blocked ({consec_blocks}/{MAX_CONSEC_BLOCKS} consecutive)")
-                if consec_blocks >= MAX_CONSEC_BLOCKS:
-                    print("    → throttled. Saving and exiting; resume next window.")
-                    throttled = True
+            try:
+                raw = fetch_once([anchor_q, q])
+            except QuotaError as e:
+                quota_errors += 1
+                print(f"    ✗ 429/500 (#{quota_errors}/{MAX_QUOTA_ERRORS}): {e}")
+                if quota_errors >= MAX_QUOTA_ERRORS:
+                    stopped = f"{MAX_QUOTA_ERRORS} quota errors — window is throttled"
                     break
-                continue
-            consec_blocks = 0
+                continue   # tolerate one; skip this city, it resumes next run
             # Store both curves; default to zeros if Google omitted a column.
             tmpl_cache[q] = {
                 "anchor": raw.get(anchor_q, [0]*12),
@@ -654,7 +668,7 @@ def main():
                 time.sleep(nap)
 
     print(f"\nfetch pass done: {fetched_this_run} new this run"
-          f"{' (stopped early — throttled)' if throttled else ''}")
+          + (f" — STOPPED ({stopped}); just re-run to resume" if stopped else " — corpus current"))
 
     # ── BUILD per-capita curves from whatever is in the cache (cached +
     # just-fetched). Cities not yet fetched are simply skipped this run. ──
