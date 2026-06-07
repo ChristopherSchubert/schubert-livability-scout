@@ -18,9 +18,11 @@ doesn't move the goalposts.
   [public/city-detail-redesign.html](../public/city-detail-redesign.html) — same content,
   magazine typography (drop cap, wider measure).
 - **Authoring rule**: 2-paragraph form, geography/fabric → case + honest
-  tradeoff + "you'd be testing…" closer. Set during the 2026-06-03 audit,
-  re-enforced 2026-06-05 (every why now has the typographic break, not
-  just the structural moves). Full style guide in the section below.
+  tradeoff. End on the tradeoff. Set during the 2026-06-03 audit,
+  re-enforced 2026-06-05 (typographic break required), and revised
+  2026-06-06 (dropped the "you'd be testing…" closer that was reading
+  as project-meta in 94/121 whys). Full style guide in the section
+  below.
 
 ## Style guide — how to write a wonderful why
 
@@ -49,9 +51,9 @@ verify. End with the geographic context that matters (the mountains
 behind, the water in front, the river through). Lead with the place
 itself, not with a distance from somewhere else.
 
-**Paragraph 2 — the case, the tradeoff, the closer.** The break falls
-right before "The case is…" or "The case for [place] is…" — never
-mid-orientation, never after the tradeoff. Three moves, in order:
+**Paragraph 2 — the case and the tradeoff.** The break falls right
+before "The case is…" or "The case for [place] is…" — never
+mid-orientation, never after the tradeoff. Two moves, in order:
 
 1. *The case for [place] is…* — the argument, framed as the unique
    *combination* this place offers. Not "it's pretty" — combinations:
@@ -61,9 +63,10 @@ mid-orientation, never after the tradeoff. Three moves, in order:
 2. *The honest tradeoff is…* — the real downside, stated plainly. Not
    hedged, not balanced ("but also has wonderful…"). If the winter is
    brutal, say brutal. If it's been discovered and priced, say so.
-3. *You'd be testing whether…* — the closer. Turns the why into the
-   question the visit will answer. This is the sentence that makes the
-   trip falsifiable.
+
+End on the tradeoff. The why is editorial about the place; it doesn't
+need to tell the reader what they'd be evaluating. Camden's why is
+the model — orientation, case, tradeoff, done, no closer.
 
 ### Voice rules
 
@@ -92,8 +95,14 @@ mid-orientation, never after the tradeoff. Three moves, in order:
   the city page should see editorial prose about a place, not a tour
   of the project's mechanics. This applies to every why — including
   the places used internally as anchors or controls. They get the
-  same case/tradeoff/closer form as everywhere else, written about
-  the place itself.
+  same case/tradeoff form as everywhere else, written about the place
+  itself.
+- **No meta closer.** "You'd be testing whether…" / "What you'd be
+  testing on the ground is…" frames the why as a project task and
+  pushes the reader out of the place and into the evaluation. Drop it.
+  Let the tradeoff land. (The 2026-06-03 audit baked this closer into
+  the form; the 2026-06-06 audit removed it after 94/121 whys ended
+  on the same construction.)
 
 ### Don't-do list (recurring failure modes)
 
@@ -171,9 +180,9 @@ The best models in the corpus right now:
 2. Draft paragraph 1 from those specifics. If your draft could be
    pasted onto a different city in the same region with only the
    name changed, the draft has failed — try again.
-3. Draft paragraph 2 with the case/tradeoff/closer form. The case
-   must name a combination; the tradeoff must be a different *kind*
-   of fact than the case; the closer must be falsifiable.
+3. Draft paragraph 2 with the case/tradeoff form. The case must name
+   a combination; the tradeoff must be a different *kind* of fact than
+   the case. End on the tradeoff — no project-facing closer.
 4. Verify every named business, institution, and statistic. Cut
    any you can't confirm in under 30 seconds.
 5. Write `if_wins` and `if_fails` as gut gates, not summaries.
