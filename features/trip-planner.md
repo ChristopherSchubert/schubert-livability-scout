@@ -265,17 +265,40 @@ Planner-specific tokens:
 
 ## Status
 - **Design: locked** (owner sign-off on the mockup, 2026-06-07).
-- **Implementation: not started.** Note: there is **uncommitted WIP** in
-  the tree from an earlier, different "trip calendar" feature —
-  `components/TripCalendar.jsx`, `app/visit/calendar/`,
-  `features/trip-calendar.md` (a drag-onto-a-wall-calendar model). **This
-  swim-lane planner supersedes that visual model.** When porting, replace
-  TripCalendar.jsx rather than building alongside it. (Do not bulk-commit
-  the dirty tree — it carries unrelated changes from other sessions.)
+- **Implementation: LIVE** at `/visit/calendar` (2026-06-07). The swim-lane
+  planner replaced the old drag-onto-a-wall-calendar model:
+  - `lib/planner-data.js#weeklyVisitScore(cityItem, viewStart)` — the real
+    cited curve (Phase 1).
+  - `components/TripPlanner.jsx` — the component. CSS-var geometry + pixel-
+    space SVG (viewBox set per redraw → no Safari stroke-gap). Pan/zoom/
+    drag/resize/jump/dblclick + photo-topped hovers, all ported faithfully
+    from the mockup and verified in-browser (Chromium): 53-stop gradient,
+    absolute y-domain, week hover (`Santa Cruz · Jun 15 · 84 · 75/51°F`),
+    drag (`Jun 8–15`→`Jun 18–25`), jump preview (`Aug 31 · 71 · 11 weeks`).
+  - `app/trip-planner.css` — all `.trip-pl-*` styles (separate file, imported
+    in `app/layout.js`; kept out of the WIP-dirty `workspace.css`).
+- **Window**: Monday-on/before the 1st of the current month, 53 weeks
+  forward (robust year-round; today clamped to the left edge, no past).
+- **Section mapping (v1 decision)** — uses existing fields, no new column:
+  - **Planned** = `status === "Scheduled"` + both dates (locked; get-ready
+    hover; ↩ to un-commit, sets `status:""`).
+  - **Planning** = `cityStage` ∈ {`visit`, `calibrate`} and not committed.
+    Each is a draggable lane + curve; ✓ commits (`status:"Scheduled"`).
+  - **Backlog** = `cityStage === "shortlist"`. Cards; click promotes
+    (`status:"Shortlist"` → calibrate → a Planning lane appears).
+  - **Reality of current data**: statuses are only `"Idea"` (→ Backlog) and
+    `"Scheduled"` (→ Planned). So **Planning starts empty** by design — you
+    populate it by promoting from the Backlog pane at the bottom (owner-
+    confirmed model, 2026-06-07). The empty state points there.
 
 ## TODOs / future direction
-- Port to the live route per the handoff above.
-- Real `weeklyVisitScore` with a cited method (replace mock comfort arrays).
+- **Lane drag-to-reorder** + **backlog drag-into-lanes** — not yet ported
+  (the mockup had pointer reordering; v1 ships promote-by-click instead).
+- Decide whether lane order / the planning set persists (a column) or stays
+  session-local. (Promote/commit persist via `status`; order does not.)
+- **Demote from Planning** affordance (currently only commit ✓; to leave
+  Planning you'd un-set the status elsewhere).
+- Manual **Safari** pass on a populated Planning section (the pixel-space
+  fix is structurally in place; Chromium verified).
 - Onboard **Bar Harbor, ME** (only demo city missing from `cities`).
-- Decide whether lane order persists (add a column) or stays session-local.
 - Consider crowd-intensity-scaled line prominence (mirror `ChapterWhen`).
