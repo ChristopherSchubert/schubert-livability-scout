@@ -60,7 +60,7 @@ function MetricRow({ m, addon }) {
         <span style={{ width: m.barPct != null ? `${m.barPct}%` : 0 }} />
       </div>
       {addon}
-      {m.source ? <div className="metric-source">{m.source}</div> : null}
+      {m.source ? <div className="metric-source" title={m.source}>{m.source}</div> : null}
     </div>
   );
 }

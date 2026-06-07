@@ -564,6 +564,9 @@
       color: var(--ink-mute);
       font-size: 0.7rem;
       letter-spacing: 0.02em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 .cd-root .when {
       background: linear-gradient(180deg, var(--paper) 0%, var(--paper-deep) 100%);
