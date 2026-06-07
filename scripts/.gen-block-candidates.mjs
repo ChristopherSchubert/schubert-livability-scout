@@ -1,24 +1,31 @@
 // scripts/.gen-block-candidates.mjs — propose "Six blocks" candidates for a
-// city from OpenStreetMap, grounded in real social-POI density inside the stay
-// zone. NEVER saves: prints proposals for human review. After approval, the
-// chosen strings go into cities.blocks and `onboard.mjs --measurer blocks`
-// resolves their map coordinates.
+// city from OpenStreetMap, grounded in real social-POI density. NEVER saves:
+// prints proposals for human review. After approval the chosen strings go into
+// cities.blocks and `onboard.mjs --measurer blocks` resolves their map coords.
 //
-// Method (mirrors lib/measure.js#findVisitCenter philosophy — "best 700 m
-// within the stay zone"):
-//   1. Pull social POIs (cafe/restaurant/bar/bakery/market/…) within the stay
-//      zone (boundary-gated when a polygon exists, else a radius around the pin).
-//   2. Pull named social *features* (parks, squares, plazas, piers, markets,
-//      waterfront promenades) — these make the strongest standalone blocks.
-//   3. Rank streets by how many social POIs carry that `addr:street`. For each
-//      top street, bound the commercial stretch with the two cross-streets that
-//      flank the POI extent → "Main St between A and B".
-//   4. Dedupe against the city's existing blocks; emit what's needed.
+// MODEL: a block is a SPOT (an intersection / a named place), not a whole
+// street. Found with a principled two-layer algorithm, not hand-tuned knobs:
+//
+//   1. Gather social POIs (cafe/restaurant/bar/bakery/market/…) within ~1 km
+//      of the pin. NO polygon clip — the saved stay_zone_boundary is often
+//      mis-sized (too tight amputates the core: Saratoga clipped 69 of 95;
+//      too big scatters density: Kingston). We work from the density itself.
+//   2. DBSCAN (eps ~75 m, minPts 4) finds the genuine dense region(s) and
+//      labels everything sparser as noise → dropped. This is the cut-losses
+//      rule: a town with no real cluster honestly yields nothing.
+//   3. Within each region, sample spaced spots: densest point → snap to local
+//      centroid → drop within SPOT_SEP (~140 m) → repeat until below SPOT_FLOOR.
+//      Small spacing keeps adjacent streets distinct (Broadway vs Caroline);
+//      a per-street cap (3) stops one spine being sampled six times. A wide
+//      downtown blob thus becomes several spots, a long strip a few corners.
+//   4. Name each spot from the majority addr:street of its POIs (works on
+//      pedestrian malls) crossed with the nearest intersecting street, or the
+//      named feature there. Rank by density, cap at six. The count is whatever
+//      the data supports (Kingston 1, Lewisburg WV 0, a rich core 6).
 //
 // Usage:
-//   node scripts/.gen-block-candidates.mjs --slug essex-ct
-//   node scripts/.gen-block-candidates.mjs --slug essex-ct --json
-//   node scripts/.gen-block-candidates.mjs --all --json > /tmp/proposals.json
+//   node scripts/.gen-block-candidates.mjs --slug pittsburgh-south-side-pa
+//   node scripts/.gen-block-candidates.mjs --all --json > /tmp/block-proposals.json
 
 import { readFileSync, existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
@@ -38,11 +45,27 @@ import { dirname, join } from "node:path";
 }
 process.env.OVERPASS_URL ||= "http://localhost:12345/api/interpreter";
 
-import { overpass, haversine, pointInGeoJSON } from "../lib/measure.js";
+import { overpass, haversine } from "../lib/measure.js";
 import { connect } from "../lib/measurers/_db.js";
 
-const TARGET = 6;                 // blocks we want each city to carry
-const RADIUS_M = 900;             // search radius when no boundary polygon
+const TARGET = 6;          // cap on blocks shown per city; the real count is
+                           //   whatever DBSCAN finds (often fewer). Dynamic header.
+const RADIUS_M = 1000;     // POI / road gather radius around the pin
+// DBSCAN — density-based clustering. Two physically-meaningful params instead of
+// a pile of hand-tuned knobs:
+const EPS_M = 75;          // two social POIs within this are "connected"; chains
+                           //   of connections form a cluster (a walkable strip)
+const MIN_PTS = 4;         // a cluster needs this many POIs; everything sparser is
+                           //   noise and dropped — this IS the cut-losses rule
+// Within a dense region, blocks are spaced spots, not the whole blob:
+const DENS_R = 80;         // radius that defines one spot's local density
+const SPOT_SEP = 140;      // distinct spots sit at least this far apart — small
+                           //   enough to tell adjacent streets apart (Saratoga's
+                           //   Broadway vs Caroline), with the per-street cap
+                           //   (below) doing the don't-resample-one-spine job
+const SPOT_FLOOR = 3;      // a spot still needs this many POIs within DENS_R
+const MAX_PER_STREET = 3;  // one street contributes at most this many stretches —
+                           //   so Carson gives a few distinct corners, not six
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 // ── street-type abbreviation, matching blocks.js authoring style ──────────────
@@ -57,7 +80,7 @@ const norm = (s) => abbr(String(s || "")).toLowerCase().replace(/[^a-z0-9]+/g, "
 
 async function loadCity(client, slug) {
   const { rows } = await client.query(
-    `select slug, name, lat, lon, stay_zone_boundary, blocks
+    `select slug, name, lat, lon, blocks, block_geometries
        from cities where slug = $1`, [slug]);
   return rows[0] || null;
 }
@@ -68,23 +91,19 @@ async function allSlugs(client) {
   return rows;
 }
 
-// All social POIs in range, with their addr:street and a point.
+// ── OSM gather (three calls per city, radius around the pin) ───────────────────
 async function socialPois(lat, lon) {
   const q = `[out:json][timeout:60];
     (nwr["amenity"~"^(cafe|restaurant|bar|pub|biergarten|ice_cream|marketplace|food_court)$"](around:${RADIUS_M},${lat},${lon});
      nwr["shop"~"^(coffee|bakery|deli|tea|pastry|greengrocer|books|wine|cheese|chocolate|farm|butcher)$"](around:${RADIUS_M},${lat},${lon}););
-    out center tags;`;
+    out center;`;
   const d = await overpass(q);
   return (d?.elements || []).map((el) => {
     const p = el.center || (el.lat != null ? { lat: el.lat, lon: el.lon } : null);
-    if (!p) return null;
-    return { lat: p.lat, lon: p.lon, street: el.tags?.["addr:street"] || null, name: el.tags?.name || null };
+    return p ? { lat: p.lat, lon: p.lon, street: el.tags?.["addr:street"] || null } : null;
   }).filter(Boolean);
 }
 
-// All named roads in range, with geometry — used to attach a street to social
-// POIs that lack an addr:street tag (OSM coverage is patchy). One query per
-// city beats one per POI.
 async function namedRoads(lat, lon) {
   const q = `[out:json][timeout:60];
     way["highway"~"^(residential|living_street|unclassified|tertiary|secondary|primary|pedestrian)$"]["name"](around:${RADIUS_M},${lat},${lon});
@@ -95,19 +114,6 @@ async function namedRoads(lat, lon) {
     .map((w) => ({ name: w.tags.name, geom: w.geometry }));
 }
 
-// Nearest named road to a point, if within `maxM` of any of its vertices.
-function nearestRoad(p, roads, maxM = 45) {
-  let best = { d: Infinity, name: null };
-  for (const r of roads) {
-    for (const n of r.geom) {
-      const d = haversine(p.lat, p.lon, n.lat, n.lon);
-      if (d < best.d) best = { d, name: r.name };
-    }
-  }
-  return best.d <= maxM ? best.name : null;
-}
-
-// Named social features that read well as standalone blocks.
 async function namedFeatures(lat, lon) {
   const q = `[out:json][timeout:60];
     (way["leisure"="park"]["name"](around:${RADIUS_M},${lat},${lon});
@@ -117,174 +123,223 @@ async function namedFeatures(lat, lon) {
      way["man_made"="pier"]["name"](around:${RADIUS_M},${lat},${lon});
      way["leisure"="marina"]["name"](around:${RADIUS_M},${lat},${lon});
      nwr["amenity"="marketplace"]["name"](around:${RADIUS_M},${lat},${lon});
-     nwr["tourism"="attraction"]["name"]["historic"](around:${RADIUS_M},${lat},${lon});
-     way["highway"="pedestrian"]["area"="yes"]["name"](around:${RADIUS_M},${lat},${lon});
-     way["leisure"="garden"]["name"]["garden:type"!="residential"](around:${RADIUS_M},${lat},${lon}););
+     way["highway"="pedestrian"]["area"="yes"]["name"](around:${RADIUS_M},${lat},${lon}););
     out center tags;`;
   const d = await overpass(q);
   return (d?.elements || []).map((el) => {
     const p = el.center || (el.lat != null ? { lat: el.lat, lon: el.lon } : null);
     if (!p || !el.tags?.name) return null;
-    const kind = el.tags.leisure === "park" || el.tags.leisure === "garden" || el.tags.leisure === "common" ? "park"
-      : el.tags.place === "square" ? "square"
+    const kind = el.tags.place === "square" ? "square"
       : el.tags.man_made === "pier" ? "pier"
       : el.tags.leisure === "marina" ? "marina"
       : el.tags.amenity === "marketplace" ? "market"
       : el.tags.highway === "pedestrian" ? "plaza"
-      : "landmark";
+      : "park";
     return { lat: p.lat, lon: p.lon, name: el.tags.name, kind };
   }).filter(Boolean);
 }
 
-// For a named street, bound the social stretch with the two cross-streets that
-// flank the POI extent along the street. Returns "Main St between A and B" or,
-// if cross-streets can't be resolved, just the street name.
-async function streetStretch(streetName, poisOnStreet, lat, lon) {
-  const bbox = [lat - 0.012, lon - 0.012, lat + 0.012, lon + 0.012];
-  const q = `[out:json][timeout:60];
-    way["name"="${esc(streetName)}"]["highway"](${bbox.join(",")})->.main;
-    .main out geom;
-    node(w.main)->.mn;
-    way(bn.mn)["highway"]["name"]->.cross;
-    .cross out geom;`;
-  let d;
-  try { d = await overpass(q); } catch { return abbr(streetName); }
-  const ways = d?.elements || [];
-  const mainWays = ways.filter((w) => norm(w.tags?.name) === norm(streetName) && Array.isArray(w.geometry));
-  if (!mainWays.length) return abbr(streetName);
-
-  // Build an ordered centerline of the main street, then a 1-D coordinate
-  // (cumulative metres) for projecting POIs and cross-streets onto it.
-  const line = mainWays.flatMap((w) => w.geometry);
-  if (line.length < 2) return abbr(streetName);
-  const cum = [0];
-  for (let i = 1; i < line.length; i++) cum[i] = cum[i - 1] + haversine(line[i - 1].lat, line[i - 1].lon, line[i].lat, line[i].lon);
-  const project = (p) => {
-    let best = { d: Infinity, s: 0 };
-    for (let i = 0; i < line.length; i++) {
-      const dd = haversine(p.lat, p.lon, line[i].lat, line[i].lon);
-      if (dd < best.d) best = { d: dd, s: cum[i] };
-    }
-    return best.s;
+// ── DBSCAN ────────────────────────────────────────────────────────────────────
+// Standard density-based clustering. Points within EPS_M are neighbors; a point
+// with ≥ MIN_PTS neighbors is a "core point" that seeds/grows a cluster; points
+// reachable from a core join it; everything else is noise (dropped). Returns an
+// array of clusters, each an array of points. No preset cluster count.
+function dbscan(pts) {
+  const n = pts.length;
+  const label = new Array(n).fill(0); // 0 = unvisited, -1 = noise, >0 = cluster id
+  const neighbors = (i) => {
+    const out = [];
+    for (let j = 0; j < n; j++) if (i !== j && haversine(pts[i].lat, pts[i].lon, pts[j].lat, pts[j].lon) <= EPS_M) out.push(j);
+    return out;
   };
-
-  const mainNodeKeys = new Set(line.map((n) => `${n.lat.toFixed(6)},${n.lon.toFixed(6)}`));
-  const crosses = [];
-  for (const w of ways) {
-    if (!Array.isArray(w.geometry) || norm(w.tags?.name) === norm(streetName) || !w.tags?.name) continue;
-    const shared = w.geometry.find((n) => mainNodeKeys.has(`${n.lat.toFixed(6)},${n.lon.toFixed(6)}`));
-    if (!shared) continue;
-    crosses.push({ name: w.tags.name, s: project(shared) });
+  let cid = 0;
+  for (let i = 0; i < n; i++) {
+    if (label[i] !== 0) continue;
+    const nb = neighbors(i);
+    if (nb.length + 1 < MIN_PTS) { label[i] = -1; continue; } // not a core point → noise (may be claimed later)
+    cid++;
+    label[i] = cid;
+    const queue = [...nb];
+    for (let q = 0; q < queue.length; q++) {
+      const j = queue[q];
+      if (label[j] === -1) label[j] = cid;      // noise becomes a border point
+      if (label[j] !== 0) continue;
+      label[j] = cid;
+      const nb2 = neighbors(j);
+      if (nb2.length + 1 >= MIN_PTS) for (const k of nb2) if (label[k] <= 0) queue.push(k);
+    }
   }
-  if (crosses.length < 2) return abbr(streetName);
-
-  const poiS = poisOnStreet.map(project).sort((a, b) => a - b);
-  const lo = poiS[0], hi = poiS[poiS.length - 1];
-  // nearest cross below lo, nearest cross above hi (fallback: extremes)
-  const below = crosses.filter((c) => c.s <= lo + 30).sort((a, b) => b.s - a.s)[0] || crosses.slice().sort((a, b) => a.s - b.s)[0];
-  const above = crosses.filter((c) => c.s >= hi - 30).sort((a, b) => a.s - b.s)[0] || crosses.slice().sort((a, b) => b.s - a.s)[0];
-  if (!below || !above || norm(below.name) === norm(above.name)) return abbr(streetName);
-  return `${abbr(streetName)} between ${abbr(below.name)} and ${abbr(above.name)}`;
+  const clusters = [];
+  for (let c = 1; c <= cid; c++) {
+    const members = [];
+    for (let i = 0; i < n; i++) if (label[i] === c) members.push(pts[i]);
+    if (members.length) clusters.push(members);
+  }
+  return clusters;
 }
 
-const esc = (s) => String(s).replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+const countWithin = (c, pts, r) => pts.reduce((n, p) => n + (haversine(c.lat, c.lon, p.lat, p.lon) <= r ? 1 : 0), 0);
 
-// Normalized base street name from a block string: the part before "between"/
-// "from"/"at"/"along", with "Mall"/"Pedestrian" suffixes folded out so
-// "Pearl St Mall" and "Pearl St" collapse to one. Empty for pure features.
-function streetBase(text) {
-  const head = String(text || "").split(/\s+(?:between|from|at|along|near|around)\s+/i)[0];
-  const n = norm(head).replace(/\b(mall|pedestrian|promenade)\b/g, "").replace(/\s+/g, " ").trim();
-  // Only treat as a street if it ends in a street type; otherwise it's a feature name.
-  return /\b(st|ave|blvd|rd|dr|ln|pkwy|hwy|ter|pl|ct|sq|broadway)$/.test(n) ? n : "";
+// Within one dense region, place spaced spots: take the densest point, snap to
+// its local centroid, record it, drop everything within SPOT_SEP, repeat until
+// the densest remaining point falls below SPOT_FLOOR. Returns spot groups (the
+// POIs within DENS_R of each chosen center). This turns a long strip into a few
+// distinct corners and a wide downtown blob into several spots — instead of one
+// mega-cluster — without any street/drift heuristics.
+function spotsInRegion(region) {
+  let pool = region.slice();
+  const spots = [];
+  while (pool.length) {
+    let best = null;
+    for (const p of pool) {
+      const n = countWithin(p, pool, DENS_R);
+      if (!best || n > best.n) best = { ...p, n };
+    }
+    if (!best || best.n < SPOT_FLOOR) break;
+    // snap to local centroid
+    let c = { lat: best.lat, lon: best.lon };
+    for (let it = 0; it < 5; it++) {
+      const near = pool.filter((p) => haversine(c.lat, c.lon, p.lat, p.lon) <= DENS_R);
+      const nl = near.reduce((s, p) => s + p.lat, 0) / near.length;
+      const no = near.reduce((s, p) => s + p.lon, 0) / near.length;
+      if (haversine(c.lat, c.lon, nl, no) < 8) { c = { lat: nl, lon: no }; break; }
+      c = { lat: nl, lon: no };
+    }
+    const members = region.filter((p) => haversine(c.lat, c.lon, p.lat, p.lon) <= DENS_R);
+    spots.push({ ...c, members, density: members.length });
+    pool = pool.filter((p) => haversine(c.lat, c.lon, p.lat, p.lon) > SPOT_SEP);
+  }
+  return spots;
 }
 
-async function generate(city) {
-  const { lat, lon } = city;
-  const boundary = city.stay_zone_boundary || null;
-  const inZone = (p) => (boundary ? pointInGeoJSON(p.lat, p.lon, boundary) : haversine(lat, lon, p.lat, p.lon) <= RADIUS_M);
+// Two layers: DBSCAN finds the genuine dense region(s) and drops noise (the
+// principled cut-losses), then spaced spots are sampled inside each region.
+// Every spot is named, deduped against originals, ranked by density, capped.
+function pickBlocks(pois, _occupied, ctx, existingNorms) {
+  const regions = dbscan(pois);
+  const spots = regions.flatMap(spotsInRegion);
 
-  const pois = (await socialPois(lat, lon)).filter(inZone);
-  await sleep(300);
-  // Attach a street to POIs lacking an addr:street tag via nearest named road.
-  if (pois.some((p) => !p.street)) {
-    const roads = await namedRoads(lat, lon);
-    await sleep(300);
-    for (const p of pois) if (!p.street) p.street = nearestRoad(p, roads);
-  }
-  const feats = (await namedFeatures(lat, lon)).filter(inZone);
+  // name every spot, then add densest-first respecting the per-street cap
+  const named = spots.map((s) => ({ s, n: nameSpot(s, s.members, ctx.feats, ctx.roadIndex, ctx.roads) }))
+    .filter((x) => x.n)
+    .sort((a, b) => b.s.density - a.s.density);
 
-  const existing = new Set((city.blocks || []).map(norm));
-  const candidates = [];
-  const seen = new Set(existing);
-  // Track the base street name (token before "between") so we don't propose
-  // both "Pearl St between 5th and 17th" and "Pearl St Mall between …".
-  const baseStreets = new Set();
-  for (const b of city.blocks || []) baseStreets.add(streetBase(b));
-  const add = (text, why) => {
-    const k = norm(text);
-    if (!k || seen.has(k)) return;
-    const base = streetBase(text);
-    if (base && baseStreets.has(base)) return;
+  const seen = new Set(existingNorms);
+  const streetCount = new Map();
+  const out = [];
+  for (const { s, n } of named) {
+    if (out.length >= TARGET) break;
+    const k = norm(n.block);
+    if (!k || seen.has(k)) continue;
+    if (n.street && (streetCount.get(n.street) || 0) >= MAX_PER_STREET) continue;
+    // overlap guard: skip "A & B" if a hand-authored block already names both
+    if (n.block.includes(" & ")) {
+      const [a, b] = n.block.split(" & ").map(norm);
+      if (existingNorms.some((e) => e.includes(a) && e.includes(b))) continue;
+    }
     seen.add(k);
-    if (base) baseStreets.add(base);
-    candidates.push({ block: text, why });
-  };
-
-  // 1) Streets ranked by social-POI count.
-  const byStreet = new Map();
-  for (const p of pois) {
-    if (!p.street) continue;
-    const k = norm(p.street);
-    const e = byStreet.get(k) || { name: p.street, pts: [] };
-    e.pts.push(p); byStreet.set(k, e);
+    if (n.street) streetCount.set(n.street, (streetCount.get(n.street) || 0) + 1);
+    const why = n.why ? `${n.why}, ${s.density} social POIs within ${DENS_R} m`
+                      : `${s.density} social POIs within ${DENS_R} m`;
+    out.push({ block: n.block, why, density: s.density });
   }
-  const streetsRanked = [...byStreet.values()].filter((s) => s.pts.length >= 2).sort((a, b) => b.pts.length - a.pts.length);
-
-  // 2) Features ranked by surrounding social density — a square ringed by
-  // cafés earns its place; a tennis court with nothing around it is dead
-  // weight, so drop features with no social POIs within 150 m. Kind breaks
-  // ties (a market/square/pier reads better than a generic park).
-  const kindRank = { square: 0, market: 1, pier: 2, plaza: 3, marina: 4, park: 5, landmark: 6 };
-  const featsRanked = feats
-    .map((f) => ({ ...f, near: nearbyPoiCount(f, pois) }))
-    .filter((f) => f.near >= 1)
-    .sort((a, b) => b.near - a.near || (kindRank[a.kind] - kindRank[b.kind]));
-
-  // Interleave: best street, best feature, next street, next feature… so the
-  // proposed set has both a commercial spine and a public-realm anchor. A
-  // feature needs ≥2 nearby social POIs to compete for a pick slot; weaker
-  // ones (a quiet pocket park) drop to the back so they only surface as
-  // alternates / small-town last resorts, never crowding out a live street.
-  const need = Math.max(0, TARGET - (city.blocks || []).length);
-  const primaryFeats = featsRanked.filter((f) => f.near >= 2);
-  const weakFeats = featsRanked.filter((f) => f.near < 2);
-  const queue = [];
-  let si = 0, fi = 0;
-  while (queue.length < need + 4 && (si < streetsRanked.length || fi < primaryFeats.length)) {
-    if (si < streetsRanked.length) queue.push({ type: "street", v: streetsRanked[si++] });
-    if (fi < primaryFeats.length) queue.push({ type: "feat", v: primaryFeats[fi++] });
-  }
-  // Leftovers as fallback, streets before weak features.
-  while (si < streetsRanked.length) queue.push({ type: "street", v: streetsRanked[si++] });
-  for (const f of weakFeats) queue.push({ type: "feat", v: f });
-
-  for (const item of queue) {
-    if (candidates.length >= need + 3) break;
-    if (item.type === "feat") {
-      add(item.v.name, `${item.v.kind}, ${item.v.near} social POIs within 150 m`);
-    } else {
-      const stretch = await streetStretch(item.v.name, item.v.pts, lat, lon);
-      await sleep(250);
-      add(stretch, `${item.v.pts.length} social POIs on this street`);
-    }
-  }
-
-  return { need, poiCount: pois.length, featCount: feats.length, candidates };
+  return out;
 }
 
-function nearbyPoiCount(feat, pois) {
-  return pois.filter((p) => haversine(feat.lat, feat.lon, p.lat, p.lon) <= 150).length;
+// ── naming ────────────────────────────────────────────────────────────────────
+// Coordinate-hash the road geometry: any node shared by ≥2 distinct roads is an
+// intersection. Also tally how many social POIs sit nearest each road so we can
+// call the busier one the "primary" street in "A & B".
+function buildRoadIndex(roads, pois) {
+  const node = new Map(); // coordKey -> { lat, lon, names:Set }
+  const key = (la, lo) => `${la.toFixed(5)},${lo.toFixed(5)}`;
+  for (const r of roads) {
+    for (const n of r.geom) {
+      const k = key(n.lat, n.lon);
+      const e = node.get(k) || { lat: n.lat, lon: n.lon, names: new Set() };
+      e.names.add(r.name); node.set(k, e);
+    }
+  }
+  const intersections = [];
+  for (const e of node.values()) if (e.names.size >= 2) intersections.push({ lat: e.lat, lon: e.lon, names: [...e.names] });
+
+  const roadPoi = new Map();
+  for (const p of pois) {
+    let best = { d: Infinity, name: null };
+    for (const r of roads) for (const n of r.geom) {
+      const d = haversine(p.lat, p.lon, n.lat, n.lon);
+      if (d < best.d) best = { d, name: r.name };
+    }
+    if (best.name && best.d <= 45) roadPoi.set(best.name, (roadPoi.get(best.name) || 0) + 1);
+  }
+  return { intersections, roadPoi };
+}
+
+// Nearest road name to a point (within maxM).
+function nearestRoadName(c, roads, maxM = 50) {
+  let best = { d: Infinity, name: null };
+  for (const r of roads) for (const n of r.geom) {
+    const d = haversine(c.lat, c.lon, n.lat, n.lon);
+    if (d < best.d) best = { d, name: r.name };
+  }
+  return best.d <= maxM ? best.name : null;
+}
+
+// Majority addr:street among a spot's member POIs — the most reliable signal of
+// which street a spot belongs to (works even on pedestrian malls where the road
+// geometry has no detectable intersections).
+function majorityStreet(members) {
+  const tally = new Map();
+  for (const m of members) if (m.street) tally.set(m.street, (tally.get(m.street) || 0) + 1);
+  let best = null;
+  for (const [name, n] of tally) if (!best || n > best.n) best = { name, n };
+  return best?.name || null;
+}
+
+// Name a spot. Priority: a named feature right at it → the street it sits on
+// (from member POIs) crossed with the nearest intersecting street → the bare
+// street. Returns { block, why, street } where `street` drives the per-street cap.
+function nameSpot(c, members, feats, roadIndex, roads) {
+  let bf = { d: Infinity, f: null };
+  for (const f of feats) {
+    const d = haversine(c.lat, c.lon, f.lat, f.lon);
+    if (d < bf.d) bf = { d, f };
+  }
+  if (bf.f && bf.d <= 80) return { block: bf.f.name, why: `${bf.f.kind} at this spot`, street: null };
+
+  const street = majorityStreet(members) || nearestRoadName(c, roads, 60);
+  if (!street) return null;
+  const sN = norm(street);
+
+  // nearest intersection that involves this street, to name the cross-street
+  let bi = { d: Infinity, cross: null };
+  for (const x of roadIndex.intersections) {
+    if (!x.names.some((nm) => norm(nm) === sN)) continue;
+    const d = haversine(c.lat, c.lon, x.lat, x.lon);
+    if (d < bi.d) bi = { d, cross: x.names.find((nm) => norm(nm) !== sN) };
+  }
+  if (bi.cross && bi.d <= 160) return { block: `${abbr(street)} & ${abbr(bi.cross)}`, why: null, street: sN };
+  return { block: abbr(street), why: null, street: sN };
+}
+
+async function generate(city, originalBlocks) {
+  const { lat, lon } = city;
+  const pois = await socialPois(lat, lon);
+  await sleep(250);
+  const roads = await namedRoads(lat, lon);
+  await sleep(250);
+  const feats = await namedFeatures(lat, lon);
+
+  // Ignore DB block_geometries as "occupied": the DB currently holds an
+  // over-eager earlier save (its restore was blocked), so it's unreliable.
+  // We avoid duplicating real originals by name instead (existingNorms +
+  // the "A & B" overlap guard in pickBlocks).
+  const roadIndex = buildRoadIndex(roads, pois);
+  const existingNorms = (originalBlocks || []).map(norm);
+
+  const candidates = pickBlocks(pois, [], { feats, roadIndex, roads }, existingNorms);
+  const need = Math.max(0, TARGET - (originalBlocks || []).length);
+  return { need, poiCount: pois.length, candidates };
 }
 
 // ── main ──────────────────────────────────────────────────────────────────
@@ -293,29 +348,32 @@ const slugArg = argv.includes("--slug") ? argv[argv.indexOf("--slug") + 1] : nul
 const wantAll = argv.includes("--all");
 const asJson = argv.includes("--json");
 
+// True pre-session blocks, captured before the old-style save was applied, so
+// generation ignores whatever auto-blocks currently sit in the DB.
+const ORIGINALS = existsSync("/tmp/original-blocks.json")
+  ? JSON.parse(readFileSync("/tmp/original-blocks.json", "utf8")) : {};
+
 const client = await connect();
 let targets = [];
-if (slugArg) {
-  targets = slugArg.split(",").map((s) => s.trim());
-} else if (wantAll) {
+if (slugArg) targets = slugArg.split(",").map((s) => s.trim());
+else if (wantAll) {
+  // base the "needs blocks" filter on ORIGINAL counts, not current DB state
   const rows = await allSlugs(client);
-  targets = rows.filter((r) => r.n < TARGET).map((r) => r.slug);
-} else {
-  console.error("pass --slug <slug[,slug]> or --all");
-  await client.end(); process.exit(2);
-}
+  targets = rows.filter((r) => (ORIGINALS[r.slug]?.length ?? r.n) < TARGET).map((r) => r.slug);
+} else { console.error("pass --slug <slug[,slug]> or --all"); await client.end(); process.exit(2); }
 
 const out = {};
 for (const slug of targets) {
   const city = await loadCity(client, slug);
   if (!city) { console.error(`! no city ${slug}`); continue; }
+  const original = ORIGINALS[slug] ?? city.blocks ?? [];
   try {
-    const res = await generate(city);
-    out[slug] = { name: city.name, existing: city.blocks || [], ...res };
+    const res = await generate(city, original);
+    out[slug] = { name: city.name, existing: original, ...res };
     if (!asJson) {
-      console.log(`\n## ${city.name} (${slug}) — have ${(city.blocks||[]).length}, need ${res.need} more  [${res.poiCount} POIs, ${res.featCount} features]`);
-      (city.blocks || []).forEach((b, i) => console.log(`   ${i + 1}. ${b}  (existing)`));
-      res.candidates.forEach((c, i) => console.log(`   +  ${c.block}   — ${c.why}`));
+      console.log(`\n## ${city.name} (${slug}) — have ${original.length}, need ${res.need}  [${res.poiCount} POIs]`);
+      original.forEach((b, i) => console.log(`   ${i + 1}. ${b}  (existing)`));
+      res.candidates.forEach((c) => console.log(`   +  ${c.block}   — ${c.why}`));
     }
   } catch (e) {
     console.error(`! ${slug}: ${e.message}`);

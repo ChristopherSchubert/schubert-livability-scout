@@ -15,21 +15,39 @@ less location string.
   small towns honestly land lower rather than getting padded.
 - **Authoring candidates from OSM**: when a city has too few blocks,
   [scripts/.gen-block-candidates.mjs](../scripts/.gen-block-candidates.mjs)
-  proposes new ones grounded in real OpenStreetMap social-POI density
-  inside the stay zone — it never invents. Method: pull social POIs
-  (cafe/restaurant/bar/bakery/market/…) within the boundary polygon (or
-  a 900 m radius), rank streets by how many POIs sit on them (using
-  `addr:street`, falling back to nearest named road for untagged POIs),
-  bound each street's commercial stretch with the cross-streets flanking
-  the POI extent (`"Main St between A and B"`), and surface named social
-  features (squares, markets, piers, parks ringed by ≥2 POIs) as
-  standalone blocks. It **prints proposals for review and never writes**.
-  `--all --json` dumps the corpus; `.format-block-proposals.mjs` renders
-  a reviewable doc; `.save-block-proposals.mjs --commit` applies approved
-  picks (excludes the Slovenia anchors + the Allison Park homebase, which
-  have no walkable social core to author from — and the local Overpass
-  is US-only besides). After saving, re-run the measurer below to resolve
-  the new blocks' coordinates.
+  proposes new ones grounded in real OpenStreetMap social-POI density —
+  it never invents. A block is a *spot* (an intersection or named place),
+  found with a principled two-layer algorithm rather than hand-tuned
+  thresholds:
+  1. Gather social POIs (cafe/restaurant/bar/bakery/market/…) within
+     ~1 km of the pin. **No polygon clip** — the saved
+     `stay_zone_boundary` is often mis-sized (Saratoga's polygon clipped
+     69 of 95 POIs; Kingston's is so big density scatters), so we work
+     from the density itself.
+  2. **DBSCAN** (`eps` ~75 m, `minPts` 4) finds the genuine dense
+     region(s) and labels everything sparser as noise → dropped. This is
+     the honest cut-losses rule: a town with no real cluster yields
+     nothing (Lewisburg WV → 0).
+  3. **Within each region, sample spaced spots** — densest point, snap to
+     its local centroid, drop within ~140 m, repeat. Small spacing keeps
+     adjacent streets distinct (Saratoga's Broadway vs Caroline); a
+     **per-street cap (3)** stops one spine (South Side's East Carson)
+     being sampled six times. A wide downtown blob becomes several spots;
+     a long strip a few corners.
+  4. **Name** each spot from the majority `addr:street` of its POIs
+     (works on pedestrian malls where road geometry has no detectable
+     intersections) crossed with the nearest intersecting street
+     (`"Church St & College St"`), or the named feature there
+     (`"Pritchard Park"`). Rank by density, cap at six. The count is
+     whatever the data supports.
+
+  It **prints proposals for review and never writes**. `--all --json`
+  dumps the corpus; `.format-block-proposals.mjs` renders a reviewable
+  doc; `.save-block-proposals.mjs --commit` applies approved picks
+  (excludes the Slovenia anchors + the Allison Park homebase — no
+  walkable social core, and local Overpass is US-only besides). After
+  saving, re-run the measurer below to resolve the new blocks'
+  coordinates.
 - **Data (block coordinates)**: `cities.block_geometries` jsonb — an
   array parallel to `blocks`, each entry shaped like
   `{ name, lat, lon, accuracy, source, meta, asOf }` with `accuracy`
@@ -81,11 +99,11 @@ less location string.
 
 ## Status
 
-- **Data layer (blocks)**: backfilled corpus-wide (2026-06-07). 95 of
-  117 candidate cities now carry a full 6; 13 sit at a valid 5; the
-  remaining ~9 are honest small-town / thin-OSM shortfalls (e.g.
-  verona-pa at 0, lewisburg-wv at 1, saratoga-springs-ny at 2) left
-  short rather than padded. The 4 reference anchors (Bled, Piran,
+- **Data layer (blocks)**: backfilled corpus-wide (2026-06-07) via the
+  DBSCAN generator. 72 of 117 candidate cities carry a full 6; 17 sit at
+  a valid 5; the rest land lower by honest density (Kingston at 1 — only
+  its Uptown core is in range; Lewisburg WV at 0 — 4 POIs, no cluster) —
+  left short rather than padded. The 4 reference anchors (Bled, Piran,
   Ljubljana, Allison Park) intentionally carry none. New blocks came
   from [scripts/.gen-block-candidates.mjs](../scripts/.gen-block-candidates.mjs)
   (OSM-derived, reviewed) — see "Authoring candidates from OSM" above.

@@ -31,7 +31,10 @@ for (const slug of Object.keys(j).sort()) {
   changed++; added += picks.length;
   console.log(`${slug}: ${existing.length} → ${merged.length}  (+ ${picks.join(" | ")})`);
   if (commit) {
-    await client.query(`update cities set blocks = $1::jsonb where slug = $2`,
+    // Overwrite blocks (folds out any earlier over-eager auto-save) and clear
+    // block_geometries so no stale/mismatched pins render before the measurer
+    // re-resolves them in the --force pass that follows.
+    await client.query(`update cities set blocks = $1::jsonb, block_geometries = '[]'::jsonb where slug = $2`,
       [JSON.stringify(merged), slug]);
   }
 }
