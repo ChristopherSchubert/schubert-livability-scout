@@ -158,15 +158,39 @@ CALIBRATION_PATH = os.path.join(
 )
 
 
-def parse_name(name):
-    """Row name → (city_short, state). Strips parenthetical neighborhood.
+def colloquial(city):
+    """Normalize an official city name to the term people actually search,
+    purely algorithmically (no per-city map). Handles the three corpus
+    irregularities that otherwise tank the Trends signal:
 
-    "Lewisburg, PA"           → ("Lewisburg", "PA")
-    "Cleveland (Tremont), OH" → ("Cleveland", "OH")
-    "Allison Park, PA"        → ("Allison Park", "PA")
+      "Carmel-by-the-Sea"        → "Carmel"          (drop descriptive suffix)
+      "Carrboro / Chapel Hill"   → "Carrboro"        (twin towns: take first;
+      "Monterey / Pacific Grove" → "Monterey"         seasonality is shared)
+      "Cleveland (Tremont)"      → "Cleveland"        (parenthetical, handled
+                                                       upstream in parse_name)
+
+    'Carmel-by-the-Sea hotels' returns ~0 on Trends because searchers type
+    'Carmel hotels'. Twin-town slash names share one tourism season, so
+    either half's curve is the same shape — we take the first deterministically.
+    """
+    c = city.split("/")[0].strip()                       # twin-town → first half
+    c = re.sub(r"-by-the-(sea|lake|bay)$", "", c, flags=re.I)  # drop locale suffix
+    c = re.sub(r"-(on|upon|sur)-[a-z]+$", "", c, flags=re.I)   # -on-Hudson etc.
+    return c.strip()
+
+
+def parse_name(name):
+    """Row name → (search_city, state). Strips parenthetical neighborhood,
+    then normalizes to the colloquial search term.
+
+    "Lewisburg, PA"            → ("Lewisburg", "PA")
+    "Cleveland (Tremont), OH"  → ("Cleveland", "OH")
+    "Carmel-by-the-Sea, CA"    → ("Carmel", "CA")
+    "Monterey / Pacific Grove, CA" → ("Monterey", "CA")
     """
     parts = [p.strip() for p in name.split(",")]
     city = re.sub(r"\s*\([^)]+\)\s*", "", parts[0]).strip()
+    city = colloquial(city)
     state = parts[1] if len(parts) > 1 else ""
     return city, state
 

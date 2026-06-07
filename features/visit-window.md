@@ -105,9 +105,10 @@ versioned as `gtrends_pop_norm_v3_blend(hotels:lead=1m:w=0.4|things_to_do:lead=0
    is added *only* to bare names that collide across states in the corpus
    — currently just Newport (RI/VT) and Lewisburg (PA/WV). The collision
    set is computed live from the corpus, so it self-corrects as cities are
-   added. (Open caveat — Task #7: cities whose official name differs from
-   the colloquial search term, e.g. "Carmel-by-the-Sea" vs "Carmel", still
-   need a name-alias; the bare-query change doesn't fix those.)
+   added. Official names are also normalized to the colloquial search term
+   algorithmically (`colloquial()`): `Carmel-by-the-Sea` → `Carmel`,
+   twin-town slash names → first half (shared season), parentheticals
+   stripped. No per-city alias map.
 3. **Per-month median** over 5 years for each pass, suppresses one-off
    spikes (hurricanes, news events).
 4. **Per-capita**: `per_million = monthly_median / population * 1e6` for
