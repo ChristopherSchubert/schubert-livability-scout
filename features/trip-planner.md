@@ -166,6 +166,90 @@ Per city, via `rowToCity` / `cityItem`:
 
 ---
 
+---
+
+## Handoff Spec (via design:design-handoff)
+
+Generated with the design-handoff framework against the locked mockup.
+Stack: **Next.js app-router + React, plain CSS** (`app/workspace.css`),
+project tokens in `app/globals.css`. No Tailwind, no component lib.
+
+### Overview
+Visit-stage planner. Three stacked sections — **Planned** (committed
+trips, one consolidated lane), **Planning** (one lane per candidate city
+with its visit-score curve + draggable trip box), **Backlog** (candidate
+cards to promote). The whole time area pans/zooms as one; the label column
+is fixed.
+
+### Design tokens
+Project tokens (reuse from `globals.css`): `--bg #fbf6ea`, `--paper
+#fffdf6`, `--panel #f4eddc`, `--border #d8ccb8`, `--rule #c1b69e`, `--text
+#1b1814`, `--muted #7a7268`, `--accent #0d4c44`; `--font-display Fraunces`,
+`--font-ui "Inter Tight"`.
+
+Planner-specific tokens:
+| Token | Value | Usage |
+|---|---|---|
+| `--label-w` | `236px` | fixed left column (city labels) |
+| `--day-w` | `16px` default (zoom var) | px per day; drives ALL x-geometry |
+| `--week-w` | `calc(var(--day-w)*7)` | week gridlines |
+| `--pan-x` | px (pan var) | `translateX` of every `.scroller` |
+| `--track-h` | `62px` | planning lane height |
+| score ramp | `#b5402c → #d6b13f → #4f8a3f` over score 40–80 | area fill (`fill-opacity .38`) |
+| feels-like line | `#c2823f` solid 1.5px | toggle |
+| crowd line | `#5b7a99` dashed `5 4` 1.5px | toggle |
+| threshold line | `#8a5a22` dashed | ≥ marker |
+| best-week dot | `#2f4a23` r≈3.5 | per lane |
+| zoom range | `--day-w` clamped **6–44px**; default 16 | Season→Days |
+| score y-domain | **absolute 30–95** | NOT autoscaled |
+| jump threshold | default **65** (0–100, step 5) | configurable |
+
+### Components / states
+| Element | State | Behavior |
+|---|---|---|
+| Trip box (planning) | rest | frosted `rgba(255,253,246,.72)` + `backdrop-filter: blur(2.5px) saturate(1.1)`, 1.5px `--accent` border, h 40px; line1 dates, line2 `N nt · 82°F · busy` |
+| Trip box | hover | resize handles fade in (`opacity .6`, edges); jump ‹ › chips appear just outside L/R; rich hover card (photo-topped) |
+| Trip box | dragging | grab→grabbing cursor, stronger shadow, z raised; live date/conditions update; snaps to whole days |
+| Resize handle | hover | edge strip `opacity 1`, `ew-resize` |
+| Jump ‹ › | hover | popover preview (target week, ±N weeks, score) or "No later/earlier week ≥ TH"; disabled into past |
+| Trip box | dblclick | editor popover: Start `<input type=date min=today>` + Nights `<input type=number 1–60>`, Apply/Cancel |
+| Committed box | locked | `cursor:default`, no handles/drag; hover = "get ready" card (countdown, weather, rain, daylight, crowds, pack) |
+| City label | hover/drag | grip (⠿) grab cursor; drag ↕ reorders lanes live |
+| Ruler | hover/drag | grab→grabbing; drag pans |
+| Backlog card | hover | lift `translateY(-3px) rotate(-.5deg)` + shadow |
+
+### Responsive
+| Breakpoint | Changes |
+|---|---|
+| Desktop (default) | label-w 236 + scrollable time area; 8–10 lanes visible |
+| ≤1100px (mockup precedent) | tray/backlog stacks; cards go to a wider grid. **Planner lanes are horizontal-scroll heavy → treat as desktop-first; mobile is out of scope for v1** |
+
+### Edge cases
+- **Empty (no Planning cities)**: show the Backlog with a "drag up to plan" prompt; hide the Planning section header controls.
+- **No `visitClimate`/`crowdSeason`**: render the lane with no curve + a muted "conditions not measured" note; trip box still draggable. (Per project rule: blank, not faked.)
+- **Stale trip (dates in past)**: auto-shift forward to start today on load.
+- **No qualifying week ≥ threshold**: jump buttons no-op with "No later/earlier week ≥ N".
+- **Long city names**: ellipsis in label and box; full name in hover header.
+- **Narrow box (short trip)**: line text spills with a paper text-shadow halo rather than clipping; box stays true-duration width.
+- **Missing hero**: blank tile with city initial (existing `resolveImage` fallback).
+
+### Animation / motion
+| Element | Trigger | Animation | Duration | Easing |
+|---|---|---|---|---|
+| Resize handles / jump chips | hover | opacity in | 120ms | ease |
+| Trip box | hover/drag | shadow + 1px lift | 140ms | ease-out |
+| Backlog card | hover | lift + rotate | 160ms | cubic-bezier(.2,.7,.3,1) |
+| Curves on pan/zoom | redraw | instant re-path (no tween) | — | — |
+
+### Accessibility (gaps to close in the real build — mockup is pointer-only)
+- **Keyboard**: trip box needs focusability + arrow-key move/resize (←→ day, ⌥←→ resize), Enter→date editor, Esc→cancel. Jump = `[`/`]`. Lanes reorderable via a keyboard affordance.
+- **ARIA**: each lane `role="group"` labelled by city; trip box `role="slider"` or a labelled button with `aria-valuetext="Asheville, Jun 7–14, 7 nights, visit score 64"`. Threshold/toggles are native inputs (fine).
+- **Screen reader**: announce on move/resize ("moved to Jun 14–21, visit score 71"). The visual curve needs a text equivalent — the hover card content is that equivalent; expose it as the box's accessible description.
+- **Contrast**: score number/labels on `--paper` pass AA; verify the amber/slate toggle lines aren't the sole signal (they're labelled by the toggles).
+- **Touch targets**: 6–9px resize handles are below 44px — widen hit area on coarse pointers.
+
+---
+
 ## Status
 - **Design: locked** (owner sign-off on the mockup, 2026-06-07).
 - **Implementation: not started.** `TripCalendar.jsx` is the earlier
