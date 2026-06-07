@@ -179,43 +179,6 @@
       margin: 0 0 1.1rem;
     }
 
-    .gates {
-      margin: 2.8rem 0 0;
-      display: grid;
-      gap: 1.3rem;
-      padding: 1.7rem 0 0;
-      border-top: 1px solid var(--hair);
-    }
-    .gate {
-      font-family: 'Fraunces', serif;
-      font-style: italic;
-      font-variation-settings: "opsz" 18, "SOFT" 100, "wght" 420;
-      font-size: 1.05rem;
-      line-height: 1.55;
-      margin: 0;
-      position: relative;
-      padding-left: 1.2rem;
-    }
-    .gate::before {
-      content: "";
-      position: absolute;
-      left: 0; top: 0.42rem; bottom: 0.42rem;
-      width: 2px;
-      background: var(--accent);
-    }
-    .gate-fails::before { background: var(--warn); }
-    .gate .gate-label {
-      font-family: 'Inter Tight', sans-serif;
-      font-style: normal;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.16em;
-      font-size: 0.7rem;
-      color: var(--accent);
-      margin-right: 0.55rem;
-    }
-    .gate-fails .gate-label { color: var(--warn); }
-
     /* ============================================================== */
     /* CHAPTER 3 — WHERE YOU'D LIVE (map-led, score overlay)           */
     /* ============================================================== */
@@ -1293,18 +1256,6 @@
       a tourist coat or a tourist town with a year-round skeleton.
     </p>
 
-    <div class="gates">
-      <p class="gate gate-wins">
-        <span class="gate-label">If it wins —</span>
-        The historic peninsula has actual year-round residential rhythm; the wharves keep working
-        through February.
-      </p>
-      <p class="gate gate-fails">
-        <span class="gate-label">If it fails —</span>
-        Summer-tourism dominance reveals a thinner off-season place where the side streets feel
-        emptied of life.
-      </p>
-    </div>
   </article>
 
   <!-- ========== CHAPTER 3 — WHERE YOU'D LIVE ========== -->
@@ -2392,30 +2343,15 @@
         // Replace lead text, then rebuild trailing body paragraphs.
         const lead = why.querySelector('.why-lead');
         if (lead) lead.textContent = paras[0];
-        // Remove existing body paras (anything between .why-lead and .gates).
         [...why.querySelectorAll('p')].forEach((p) => {
           if (p.classList.contains('why-lead')) return;
           if (p.classList.contains('eyebrow')) return;
-          if (p.closest('.gates')) return;
           p.remove();
         });
-        const gates = why.querySelector('.gates');
         for (let i = 1; i < paras.length; i++) {
-          const p = el('p', { text: paras[i] });
-          if (gates) why.insertBefore(p, gates); else why.appendChild(p);
+          why.appendChild(el('p', { text: paras[i] }));
         }
       }
-      replaceGateText('.gate-wins', city.ifWins);
-      replaceGateText('.gate-fails', city.ifFails);
-    }
-    function replaceGateText(selector, text) {
-      if (!text) return;
-      const elx = document.querySelector(selector);
-      if (!elx) return;
-      const label = elx.querySelector('.gate-label');
-      clear(elx);
-      if (label) elx.appendChild(label);
-      elx.appendChild(document.createTextNode(' ' + text));
     }
 
     // ── CHAPTER 3 — where you'd live ──────────────────────────────────

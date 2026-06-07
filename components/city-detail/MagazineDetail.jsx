@@ -108,7 +108,7 @@ export default function MagazineDetail({ cityItem }) {
 
 function ChapterWhy({ view }) {
   const paras = (view.why || "").split(/\n\n+/).map((s) => s.trim()).filter(Boolean);
-  if (!paras.length && !view.ifWins && !view.ifFails) {
+  if (!paras.length) {
     return (
       <article id="why" className="why">
         <p className="eyebrow">The case for this place</p>
@@ -122,12 +122,6 @@ function ChapterWhy({ view }) {
       {paras.map((p, i) => (
         i === 0 ? <p key={i} className="why-lead">{p}</p> : <p key={i}>{p}</p>
       ))}
-      {view.ifWins || view.ifFails ? (
-        <div className="gates">
-          {view.ifWins ? <p className="gate gate-wins"><span className="gate-label">If it wins —</span> {view.ifWins}</p> : null}
-          {view.ifFails ? <p className="gate gate-fails"><span className="gate-label">If it fails —</span> {view.ifFails}</p> : null}
-        </div>
-      ) : null}
     </article>
   );
 }

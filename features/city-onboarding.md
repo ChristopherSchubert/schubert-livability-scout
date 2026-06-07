@@ -36,8 +36,7 @@ Required fields at insert time:
 | `name` | "City, ST" — unique, drives the slug | `Annapolis, MD` |
 | `stay_zone` | the neighborhood you'd actually live in | `City Dock / Eastport` |
 | `heart_intersection` | the single corner that is the heart | `Main St & Randall St` |
-| `why` | 2–4 sentences: why this place belongs on the list | (prose) |
-| `if_wins` / `if_fails` | gut gates — what would mean hit/miss | "A true harbor piazza." / "Dead off-season." |
+| `why` | 2-paragraph editorial (orientation + case/tradeoff) | (prose) |
 | `blocks` | array of specific blocks/zones to walk | `["Main St between …", …]` |
 
 ### 2. Geocode the heart

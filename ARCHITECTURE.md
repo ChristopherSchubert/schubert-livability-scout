@@ -107,5 +107,4 @@ client compute, then restore the candidate list + click-to-reselect.
 - No state-management library — Context + Supabase is right for this scale.
 - No `server-only` on `lib/measure.js` — it's intentionally isomorphic and
   reused by Node scripts; the guard would break them.
-- No CMS — `why` / `if_wins` / `if_fails` belong in Supabase columns, edited in
-  the app.
+- No CMS — `why` belongs in a Supabase column, edited in the app.

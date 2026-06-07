@@ -15,7 +15,7 @@ const c = new pg.Client({
 });
 
 const cols = [
-  "name","slug","stay_zone","heart_intersection","trip_week","why","if_wins","if_fails",
+  "name","slug","stay_zone","heart_intersection","trip_week","why",
   "blocks","status","decision","hero_image","arrive_date","depart_date","trip_length",
   "flight_details","car_details","lodging_details","logistics_notes","days","checklists",
   "matrix","measured","measured_metrics","visit_climate","crowd_season","season_notes",

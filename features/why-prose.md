@@ -1,19 +1,18 @@
-# Why prose (why / if-wins / if-fails)
+# Why prose
 
-Three short prose fields on every city — the case for the place, plus
-the gut gates that decide whether a visit confirmed or refuted it.
-The "why" is the editorial pitch; "if wins" and "if fails" are the
-sentences you write *before* the trip so post-trip rationalization
-doesn't move the goalposts.
+The editorial case for each city — a single 2-paragraph argument that
+runs at the top of the detail page. The why is the only field on the
+city written in the owner's voice; the rest is measured data.
 
 ## How it works today
 
-- **Data**: `cities.why`, `cities.if_wins`, `cities.if_fails` (text).
-  Hand-written per city; not derived from any source.
+- **Data**: `cities.why` (text). Hand-written per city; not derived
+  from any source.
 - **Render (live)**: shown on the city detail page above the metrics —
-  `cityItem.why` paragraphs, then a callout with "If it wins" and
-  "If it fails". Live in
-  [components/PlannerShell.jsx](../components/PlannerShell.jsx) (`CityDetail`).
+  `cityItem.why` paragraphs as a magazine-style chapter. Live in
+  [components/PlannerShell.jsx](../components/PlannerShell.jsx)
+  (`CityDetail`) and [components/city-detail/MagazineDetail.jsx](../components/city-detail/MagazineDetail.jsx)
+  (`ChapterWhy`).
 - **Render (mockup)**: chapter 2 of
   [public/city-detail-redesign.html](../public/city-detail-redesign.html) — same content,
   magazine typography (drop cap, wider measure).
@@ -21,16 +20,16 @@ doesn't move the goalposts.
   tradeoff. End on the tradeoff. Set during the 2026-06-03 audit,
   re-enforced 2026-06-05 (typographic break required), and revised
   2026-06-06 (dropped the "you'd be testing…" closer that was reading
-  as project-meta in 94/121 whys). Full style guide in the section
-  below.
+  as project-meta in 94/121 whys; same day, dropped `if_wins`/`if_fails`
+  entirely — the gut-gate columns and their UI callout). Full style
+  guide in the section below.
 
 ## Style guide — how to write a wonderful why
 
-A why is a one-page editorial argument for a place, ending in the question
-the trip will answer. It is the only field in the system written in the
-owner's voice, so it must sound like a person who has actually thought
-about this — not a real-estate listing, not a Wikipedia stub, not a
-ChatGPT travelogue.
+A why is a one-page editorial argument for a place. It is the only
+field in the system written in the owner's voice, so it must sound
+like a person who has actually thought about this — not a real-estate
+listing, not a Wikipedia stub, not a ChatGPT travelogue.
 
 If the why reads like it could be written about any one of forty similar
 towns, it has failed. The job is to find the *thing that's only true of
@@ -129,9 +128,8 @@ the model — orientation, case, tradeoff, done, no closer.
   the case — usually about season, price, scale, or the gap between
   what's marketed and what's lived.
 - **Slovenia name-drops.** The Bled/Piran comparison is implicit in
-  the whole project; it shouldn't show up by name in a why unless it
-  earns the comparison structurally (Camden does, in `if_wins`). Most
-  whys should make their case on the place's own terms.
+  the whole project; it shouldn't show up by name in a why. Whys make
+  their case on the place's own terms.
 
 ### Length
 
@@ -141,22 +139,6 @@ the model — orientation, case, tradeoff, done, no closer.
   Bled ~685, Greenport ~570). Short whys still get the paragraph break.
 - **Over 1400** only when the place genuinely needs the room (Santa
   Barbara at 1592 earns it; most don't).
-
-### if_wins / if_fails (the gut gates)
-
-One sentence each. Written *before* the trip so post-trip
-rationalization can't move the goalposts.
-
-- **if_wins**: the specific lived-experience claim that, if true, makes
-  this place a buy. Name the combination, not just an attribute.
-  Good: "Hills + harbor + walkable downtown — the closest Maine analog
-  to Bled." Bad: "Beautiful Maine town with great walking."
-- **if_fails**: the specific way the place could collapse in person.
-  Name the failure mode you actually fear. Good: "Off-season hollows
-  out; winter is too long." Bad: "Doesn't live up to expectations."
-
-These should not restate the case/tradeoff from paragraph 2 — they
-sharpen them into a yes/no the visit produces.
 
 ### Worked examples
 
@@ -185,7 +167,6 @@ The best models in the corpus right now:
    the case. End on the tradeoff — no project-facing closer.
 4. Verify every named business, institution, and statistic. Cut
    any you can't confirm in under 30 seconds.
-5. Write `if_wins` and `if_fails` as gut gates, not summaries.
 
 ## Status
 
@@ -197,12 +178,17 @@ The best models in the corpus right now:
   (`scripts/.split-paragraphs.mjs`).
 - **No-meta-references audit (2026-06-06):** 11 whys (Bled, Piran,
   Ljubljana, Allison Park, Oakmont, Sewickley, Verona, Pittsburgh
-  Lawrenceville, Pittsburgh Shadyside, plus if_wins/if_fails tweaks on
-  Honolulu Kaimuki and Petaluma) were rewritten to drop "in this
-  database, X is the calibration anchor / control" framing. Every why
-  now reads as editorial about the place, not a tour of the project.
-- `if_wins` / `if_fails` are populated unevenly — present on the cities
-  that have made it past Shortlist; absent on early candidates.
+  Lawrenceville, Pittsburgh Shadyside, plus tweaks on Honolulu Kaimuki
+  and Petaluma) were rewritten to drop "in this database, X is the
+  calibration anchor / control" framing. Every why now reads as
+  editorial about the place, not a tour of the project.
+- **Closer strip (2026-06-06):** the "You'd be testing whether…" closer
+  was removed from 94 of 121 whys; paragraph 2 now lands on the
+  tradeoff across the corpus.
+- **`if_wins` / `if_fails` dropped (2026-06-06):** the gut-gate columns
+  and the magazine-chapter callout were removed in migration 0007. Their
+  framing duplicated the case/tradeoff and read as project-meta on the
+  city page. The why now carries the entire editorial argument.
 
 ### Audit cadence
 
@@ -214,13 +200,9 @@ count is zero.
 ## TODOs / future direction
 
 - **Reading-quality typography for the live route.** Mockup uses a drop
-  cap, a wider measure, and small caps on "If it wins" — none of which
-  the live page does. Worth lifting when the magazine wire-up lands
-  (see [magazine-detail.md](magazine-detail.md)).
-- **`if_wins` / `if_fails` prompt on stage change.** When the owner moves
-  a city to Shortlist, surface a small modal that asks for these two
-  sentences if they're blank — easier than a separate authoring pass
-  and prevents trips that don't have a gate to fail.
+  cap and a wider measure — neither of which the live page does. Worth
+  lifting when the magazine wire-up lands (see
+  [magazine-detail.md](magazine-detail.md)).
 - **Versioning.** Every why edit overwrites the prior version. If the
   owner reframes a place mid-evaluation, the old framing is lost. A
   simple `why_history` jsonb append-only column would keep the audit

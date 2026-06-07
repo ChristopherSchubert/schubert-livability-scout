@@ -38,8 +38,6 @@ create table if not exists cities (
   heart_intersection text,
   trip_week          text,
   why                text,
-  if_wins            text,
-  if_fails           text,
   blocks             jsonb default '[]',
   block_geometries   jsonb default '[]',        -- per-block { name, lat, lon, accuracy, source, meta, asOf } — populated by lib/measurers/blocks.js
   status             text default 'Idea',

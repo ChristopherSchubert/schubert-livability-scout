@@ -128,10 +128,10 @@ row closer to N/N is the default productive thing.
 
 ## Authoring city prose
 
-When you write or edit a city's `why` / `if_wins` / `if_fails`, read
+When you write or edit a city's `why`, read
 [features/why-prose.md](features/why-prose.md) first — the 2-paragraph form
-and voice rules are project rules, not suggestions. Run
-`scripts/.audit-whys.mjs` after any onboarding batch.
+(orientation + case/tradeoff) and voice rules are project rules, not
+suggestions. Run `scripts/.audit-whys.mjs` after any onboarding batch.
 
 ## Feature documentation
 
