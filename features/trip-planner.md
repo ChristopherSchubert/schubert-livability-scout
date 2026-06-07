@@ -306,7 +306,10 @@ Planner-specific tokens:
   **None** (manual `order` state), re-merged when the planning set changes.
 - **Demote from Planning** — `×` on the lane label (always faintly visible)
   opens a **confirm popover** ("Remove <city> from planning?" · Remove /
-  Cancel); Remove sets `status:"Idea"` → the lane drops back to the Backlog.
+  Cancel); Remove sets `status:"Idea"` **and clears arrive/depart dates** →
+  the lane drops back to the Backlog. (Clearing dates is required: a city
+  with dates resolves to the `visit` stage via `cityStage` regardless of
+  status, so status alone wouldn't remove a dated lane.)
 - **Backlog drag-into-lanes** — pointer-drag a Backlog card; a ghost follows
   the cursor; dropping over the lanes promotes it (`status:"Shortlist"`), and
   dropping **on a lane's timeline** also sets the trip to that week (reads

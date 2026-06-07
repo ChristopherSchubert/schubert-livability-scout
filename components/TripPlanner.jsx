@@ -1013,7 +1013,7 @@ export default function TripPlanner() {
                     <div className="ldemote-confirm" onPointerDown={(e) => e.stopPropagation()}>
                       <span className="ldc-msg">Remove <b>{l.city.name.replace(/,.*/, "")}</b> from planning?</span>
                       <div className="ldc-actions">
-                        <button type="button" className="ldc-yes" onClick={() => { updateCity(l.city.id, { status: "Idea" }); setConfirmId(null); }}>Remove</button>
+                        <button type="button" className="ldc-yes" onClick={() => { updateCity(l.city.id, { status: "Idea", arriveDate: "", departDate: "" }); setConfirmId(null); }}>Remove</button>
                         <button type="button" className="ldc-no" onClick={() => setConfirmId(null)}>Cancel</button>
                       </div>
                     </div>
