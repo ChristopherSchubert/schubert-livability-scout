@@ -53,8 +53,12 @@ less location string.
   never writes**. `--all --json` dumps the corpus;
   `.format-block-proposals.mjs` renders a reviewable doc;
   `.save-block-proposals.mjs --commit` applies picks (excludes the
-  Slovenia anchors + Allison Park homebase — no walkable core). After
-  saving, re-run the measurer below to resolve coordinates.
+  Slovenia anchors + Allison Park homebase). After saving, re-run the
+  measurer below to resolve coordinates.
+  **Allison Park is the owner's *actual current house*** — its pin is a
+  residential address, not a downtown. ~0 walkable POIs is the correct,
+  expected reading: it is the unwalkable **baseline** every candidate is
+  scored against, not a coverage bug. Do not "fix" it.
   **NOTE:** the measured Aliveness metrics (`cafe_n`/`bar_n`/`rest_n` in
   `lib/measure.js`) still come from OSM and carry the same coverage gap —
   a known follow-up, not yet migrated to Google.
