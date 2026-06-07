@@ -53,7 +53,7 @@ Auxiliary fields (not in `measured_metrics`):
 | `lat` / `lon` (heart) | **115/115** ✅ | Geocoded once on insert |
 | `visit_climate` (12-month normals) | 115/115 | `scripts/onboard.mjs --measurer climate` |
 | `drive_hrs_from_pit` | **115/115** ✅ | OSRM public from PIT airport (40.4915, -80.2329). Anything outside CONUS bbox marked `'FLY'`. Script: `scripts/measure-drive-hrs.mjs` |
-| `population_total` / `population_source` | 112/115 | Census ACS B01003_001E with documented fallback tiers: (1) Incorporated Place / CDP — default; (2) county-subdivision (town) where the state has no Census Places (Rhode Island); (3) ZCTA (postal-ZIP boundary) where the heart sits in unincorporated territory with no CDP (e.g. Deep Creek Lake / McHenry MD 21541). Tier is encoded in `population_source` so cross-city comparisons stay legible. Script: `scripts/measure-crowd-season.py --pop-only` |
+| `population_total` / `population_source` | **all** ✅ | US: Census ACS B01003_001E with 3-tier fallback — (1) Incorporated Place / CDP; (2) county-subdivision (RI, no Places); (3) ZCTA (unincorporated, e.g. Deep Creek Lake). EU: Eurostat GISCO LAU 2021 municipality population. Now filled by the JS measurer pipeline (`lib/measurers/census.js` US, `eurostat-lau.js` EU) so onboarding fills it automatically. Tier/source recorded in `population_source` |
 | `crowd_season` (12 ints 0–5, within-city shape) | **all** ✅ | CASCADE, all tiers live: **6 NPS** ground-truth recreation-visits (`scripts/measure-crowd-nps.py`; in-town/adjacent units whose visitors are the town's tourists — St. Augustine/Castillo, Charleston/Fort Sumter, Savannah/Fort Pulaski, Salem/Salem Maritime, Manteo/Fort Raleigh, Astoria/Lewis & Clark — unit recorded in `nps_unit_code`) > Google Trends (primary, rate-limit-blocked, pending) > **115 Wikipedia×Wikivoyage blend** (`scripts/measure-crowd-wiki.py`; traffic-gated geomean, ≈44 blend + 71 WP-only). Tier recorded in `crowd_season_source` |
 | `crowd_intensity` (0–5 scalar, cross-city magnitude) | **all but 3** (Wiki tier) | Wiki tier: per-capita WP-peak, log-scaled, fixed anchors 50k/M–3M/M. 3 null (cities missing `population_total`). Trends tier uses its own hotel-search anchors. Drives chart line-muting for low-tourism cities |
 
@@ -61,8 +61,9 @@ Auxiliary fields (not in `measured_metrics`):
 
 - **`median_price_usd` (3 missing)** — Bled, Ljubljana, Piran. No pan-EU
   price registry; would need a per-country adapter (Slovenia: GURS ETN).
-- **`population_total` (3 missing)** — Bled, Ljubljana, Piran need a
-  SURS adapter (Slovenia is not in the US Census).
+- **`population_total`** — RESOLVED (121/121). Bled/Ljubljana/Piran now use
+  the Eurostat GISCO LAU municipality population the `eurostat_lau` measurer
+  already fetched for `core_density`.
 - **`crowd_season` / `crowd_intensity`** — RESOLVED for full coverage via
   the Wikipedia×Wikivoyage blend tier (`scripts/measure-crowd-wiki.py`).
   Remaining work is *quality upgrades*, not coverage: (1) Trends-v3 is the
