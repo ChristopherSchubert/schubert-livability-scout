@@ -224,37 +224,8 @@ def main():
         q = lambda p: percap[int(p*(len(percap)-1))]
         print(f"  WP peak-views per million residents — p10={q(.1):,.0f}  p50={q(.5):,.0f}  p90={q(.9):,.0f}  max={percap[-1]:,.0f}")
 
-    if not do_write:
-        print("\n(report only — re-run with --write to compute blend + write DB)")
-        cur.close(); conn.close(); return
-
-    # ── Compute blend + write (shape only here; intensity calibrated next) ──
-    print("\nWRITE")
-    print("-" * 78)
-    written = 0
-    for r in rows:
-        e = cache.get(r["name"], {})
-        wp, wv = e.get("wp"), e.get("wv")
-        wp_pk, wv_pk = e.get("wp_peak", 0), e.get("wv_peak", 0)
-        if not wp or wp_pk == 0:
-            continue
-        if wv and wv_pk >= WV_TRAFFIC_GATE:
-            wpn, wvn = norm01(wp), norm01(wv)
-            blend = [math.sqrt(wpn[i] * wvn[i]) for i in range(12)]
-            src = SOURCE_BLEND
-        else:
-            blend = norm01(wp)
-            src = SOURCE_WP
-        shape = to5(blend)
-        intensity = wiki_intensity(wp_pk, r["population_total"])
-        cur.execute(
-            "update cities set crowd_season=%s::jsonb, crowd_season_source=%s, crowd_intensity=%s where id=%s",
-            (json.dumps(shape), src, intensity, r["id"]))
-        conn.commit()
-        written += 1
-        tag = "BLEND" if src == SOURCE_BLEND else "WP   "
-        print(f"  {r['name']:<30} {tag}  int={intensity if intensity is not None else '–'}  peak={MONTHS[shape.index(max(shape))]}  {shape}")
-    print(f"\nwrote {written} cities (crowd_season shape + crowd_intensity)")
+    print("\nRaw is persisted to crowd_raw.wiki. Scoring is the master scorer's job:")
+    print("  python3 scripts/score-crowd-season.py --write")
     cur.close(); conn.close()
 
 

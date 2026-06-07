@@ -87,15 +87,14 @@ def main():
             print(f"{name:<20}{code:<7}NO NPS DATA — skipping")
             continue
         if do_write:
-            # Persist the raw TRV series to crowd_raw.nps (source of truth),
-            # plus the derived shape + provenance unit code.
+            # Record RAW only — the master scorer (score-crowd-season.py) turns
+            # crowd_raw.nps into crowd_season. nps_unit_code is provenance, not
+            # a score, so it's set here.
             save_raw(conn, cur, row["id"], "nps", {"unit": code, "trv": trv})
-            cur.execute(
-                "update cities set nps_unit_code=%s, crowd_season=%s::jsonb, crowd_season_source=%s where id=%s",
-                (code, json.dumps(shape), f"{SOURCE}:{code}", row["id"]))
+            cur.execute("update cities set nps_unit_code=%s where id=%s", (code, row["id"]))
             conn.commit()
             overridden += 1
-            action = "WROTE override"
+            action = "recorded raw"
         else:
             action = "(dry-run)"
         print(f"{name:<20}{code:<7}{peak:<10}{str(shape):<28}{action}")

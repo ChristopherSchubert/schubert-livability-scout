@@ -7,9 +7,19 @@ candidate should pass both before it advances.
 
 ## Crowd-season source cascade (current)
 
+**Architecture — collectors vs. scorer.** The measurers
+(`measure-crowd-{wiki,nps,season}.py`) are pure data collectors: each writes
+its raw signals into `cities.crowd_raw.{wiki,trends,nps}` and **nothing else**.
+A single master scorer, `scripts/score-crowd-season.py`, is the **only** thing
+that writes `crowd_season` / `crowd_intensity` / `crowd_season_source` — it
+reads `crowd_raw`, applies the cascade precedence below, and computes the
+score. So the score is a deterministic function of `crowd_raw` (which lives in
+Supabase), no collector can clobber a higher tier, and precedence lives in one
+declarative place. Re-run the scorer (`--write`) any time raw changes.
+
 `crowd_season` (the 12-month SHAPE) comes from the best available source
-per city. Higher tiers override lower; `crowd_season_source` records which
-tier produced each city's curve.
+per city. Higher tiers win; `crowd_season_source` records which tier
+produced each city's curve.
 
 1. **NPS recreation-visits** (`nps_trv_v1:<UNIT>`, ground-truth *presence*) —
    6 towns where a National Park Service unit's visitors are the town's

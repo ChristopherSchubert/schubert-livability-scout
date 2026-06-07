@@ -694,109 +694,15 @@ def main():
     print(f"\nfetch pass done: {fetched_this_run} new this run"
           + (f" — STOPPED ({stopped}); just re-run to resume" if stopped else " — corpus current"))
 
-    # ── BUILD per-capita curves from whatever is in the cache (cached +
-    # just-fetched). Cities not yet fetched are simply skipped this run. ──
-    # per_million_by_city_template[(city_id, template_key)] = [12 floats]
-    per_million_by_city_template = {}
-    for tmpl in QUERY_TEMPLATES:
-        tkey = tmpl["key"]
-        tmpl_cache = cache.get("trends", {}).get(tkey, {})
-        # Reference anchor peak: stored calibration, else the strongest anchor
-        # peak we've cached (Myrtle dominates ~every pairing, so this ≈ 100).
-        if calibration and tkey in calibration.get("templates", {}):
-            reference_curve = calibration["templates"][tkey]["anchor_curve"]
-        elif tmpl_cache:
-            reference_curve = max((e["anchor"] for e in tmpl_cache.values()),
-                                  key=lambda a: max(a) if a else 0)
-            fresh_anchors[tkey] = reference_curve
-        else:
-            continue
-        ref_peak = max(reference_curve) or 1
-        for r in rows:
-            q = city_query(r["name"], tmpl, ambiguous)
-            entry = tmpl_cache.get(q)
-            if not entry:
-                continue
-            call_peak = max(entry["anchor"]) or 1
-            scale = ref_peak / call_peak
-            per_million = [(v or 0) * scale / r["population_total"] * 1_000_000
-                           for v in entry["city"]]
-            per_million_by_city_template[(r["id"], tkey)] = per_million
-
-    # ── Combine + write ───────────────────────────────────────────────────
-    print(f"\nCOMBINE + WRITE  ({len(rows)} cities)")
-    print("-" * 70)
-    written = 0
-    for r in rows:
-        # Blend per-capita curves across templates with shift + weight.
-        blended = [0.0] * 12
-        used_weight = 0.0
-        per_template_dbg = {}
-        have = 0
-        for tmpl in QUERY_TEMPLATES:
-            pm = per_million_by_city_template.get((r["id"], tmpl["key"]))
-            if pm is None:
-                continue
-            have += 1
-            shifted = shift_forward(pm, tmpl["lead_months"])
-            per_template_dbg[tmpl["key"]] = max(shifted)
-            for m in range(12):
-                blended[m] += shifted[m] * tmpl["weight"]
-            used_weight += tmpl["weight"]
-        # Only OVERWRITE the existing crowd_season once the FULL v3 blend is
-        # ready (all templates fetched). A partial (hotels-only) Trends signal
-        # is not clearly better than the city's current Wiki blend, and the
-        # per-run cap means things_to_do lands several windows after hotels —
-        # so until both are in, leave the Wiki value standing. The raw is
-        # already safe in crowd_raw regardless.
-        if have < len(QUERY_TEMPLATES):
-            continue
-        blended = [v / used_weight for v in blended]
-
-        shape = shape_within_city(blended)
-        intensity = intensity_log_scaled(blended)
-        peak_pc = max(blended)
-        cur.execute(
-            "update cities set crowd_season=%s::jsonb, crowd_season_source=%s, crowd_intensity=%s where id=%s",
-            (json.dumps(shape), METHOD, intensity, r["id"]),
-        )
-        conn.commit()
-        written += 1
-        dbg = " ".join(f"{k}_peak={v:.0f}" for k, v in per_template_dbg.items())
-        print(f"  {r['name']:<28} pop {r['population_total']:>7,}  blended_peak {peak_pc:>7,.0f}/M  intensity {intensity}  shape {shape}  [{dbg}]")
-
-    print(f"\nwrote {written} cities; {len(rows)-written} still pending (null until fetched)")
+    # Scoring is NOT this script's job. measure-crowd-season.py only records
+    # raw signals into crowd_raw.trends. The master scorer turns raw into the
+    # crowd_season score, applying the NPS>Trends>Wiki cascade in one place:
+    print("\nRaw persisted to crowd_raw.trends. To (re)score the corpus:")
+    print("  python3 scripts/score-crowd-season.py --write")
     cur.close()
     conn.close()
-
-    # Persist calibration if this run captured fresh anchor curves for every
-    # template AND there wasn't already a calibration on file. Subsequent runs
-    # — including per-city onboarding — read this file and rescale against
-    # these stored curves, so the corpus stays on a single ruler.
-    if fresh_anchors and (not calibration or recalibrate):
-        if all(t["key"] in fresh_anchors for t in QUERY_TEMPLATES):
-            calib_out = {
-                "method": METHOD,
-                "epoch": time.strftime("%Y-%m-%d"),
-                "anchor_name": ANCHOR_NAME,
-                "floor_per_million": FLOOR_PER_M,
-                "ceil_per_million": CEIL_PER_M,
-                "templates": {
-                    t["key"]: {
-                        "anchor_query": t["anchor"],
-                        "lead_months":  t["lead_months"],
-                        "weight":       t["weight"],
-                        "anchor_curve": fresh_anchors[t["key"]],
-                    }
-                    for t in QUERY_TEMPLATES
-                },
-            }
-            save_calibration(calib_out)
-        else:
-            missing = [t["key"] for t in QUERY_TEMPLATES if t["key"] not in fresh_anchors]
-            print(f"\n[skipped calibration write — incomplete templates: {missing}]")
-
-    print(f"\ndone — method = {METHOD}")
+    print(f"\ndone — recorded raw ({METHOD})")
+    return
 
 
 if __name__ == "__main__":
