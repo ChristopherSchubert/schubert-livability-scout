@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   cityImageQuery,
   cityStage,
@@ -165,6 +165,91 @@ export default function TripPlanner() {
     const len = arrive && depart ? Math.max(1, daysBetween(arrive, depart) + 1) : DEFAULT_TRIP_LEN;
     return { city: c, weeks: laneWeeks(c), start, len };
   }).sort((a, b) => a.start - b.start), [committed, laneWeeks, viewStart, todayDay]);
+
+  // ── lane order (session-local; drag the grip to override the start sort) ─
+  const [order, setOrder] = useState([]);
+  useEffect(() => {
+    const ids = planLanes.map((l) => l.city.id);
+    setOrder((prev) => {
+      const kept = prev.filter((id) => ids.includes(id));
+      const added = ids.filter((id) => !kept.includes(id));
+      if (added.length === 0 && kept.length === prev.length) return prev;
+      return [...kept, ...added];
+    });
+  }, [planLanes]);
+  const orderedLanes = useMemo(() => {
+    if (order.length === 0) return planLanes;
+    const byId = new Map(planLanes.map((l) => [l.city.id, l]));
+    const out = [];
+    for (const id of order) { const l = byId.get(id); if (l) { out.push(l); byId.delete(id); } }
+    for (const l of planLanes) if (byId.has(l.city.id)) out.push(l);
+    return out;
+  }, [planLanes, order]);
+
+  const [dragLaneId, setDragLaneId] = useState(null);
+  function startLaneReorder(e, id) {
+    if (e.button !== undefined && e.button !== 0) return;
+    e.preventDefault(); e.stopPropagation();
+    setDragLaneId(id);
+    const move = (ev) => {
+      const wrap = document.querySelector(".trip-pl-lanes");
+      if (!wrap) return;
+      const els = [...wrap.children].filter((c) => c.classList && c.classList.contains("trip-pl-lane"));
+      let overId = null;
+      for (const el of els) { const r = el.getBoundingClientRect(); if (ev.clientY < r.top + r.height / 2) { overId = el.getAttribute("data-lane-id"); break; } }
+      setOrder((prev) => {
+        if (prev.indexOf(id) < 0) return prev;
+        const without = prev.filter((x) => x !== id);
+        let to = overId ? without.indexOf(overId) : without.length;
+        if (to < 0) to = without.length;
+        const next = [...without.slice(0, to), id, ...without.slice(to)];
+        return next.length === prev.length && next.every((v, i) => v === prev[i]) ? prev : next;
+      });
+    };
+    const up = () => { setDragLaneId(null); window.removeEventListener("pointermove", move); window.removeEventListener("pointerup", up); };
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", up);
+  }
+
+  // ── drag a backlog card → promote (drop on a lane's timeline sets the week) ─
+  const [ghost, setGhost] = useState(null);
+  function startCardDrag(e, c) {
+    if (e.button !== undefined && e.button !== 0) return;
+    const startX = e.clientX, startY = e.clientY;
+    let moved = false;
+    const name = (() => { const i = c.name.lastIndexOf(", "); return i > 0 ? c.name.slice(0, i) : c.name; })();
+    const move = (ev) => {
+      if (!moved && Math.hypot(ev.clientX - startX, ev.clientY - startY) < 5) return;
+      moved = true;
+      setGhost({ name, x: ev.clientX, y: ev.clientY });
+    };
+    const up = (ev) => {
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", up);
+      setGhost(null);
+      const lanesWrap = document.querySelector(".trip-pl-lanes");
+      const z = lanesWrap ? lanesWrap.getBoundingClientRect() : null;
+      const overLanes = z && ev.clientY >= z.top - 8 && ev.clientY <= z.bottom + 40;
+      if (!moved || overLanes) {
+        const patch = { status: "Shortlist" };
+        const lbody = moved ? document.elementFromPoint(ev.clientX, ev.clientY)?.closest(".lbody") : null;
+        if (lbody) {
+          const r = lbody.getBoundingClientRect();
+          const root = rootRef.current;
+          const dayW = parseFloat(getComputedStyle(root).getPropertyValue("--day-w")) || DEFAULT_DAY_W;
+          const panX = parseFloat(getComputedStyle(root).getPropertyValue("--pan-x")) || 0;
+          let d = Math.round((ev.clientX - r.left - panX) / dayW);
+          if (d < todayDay) d = todayDay;
+          if (d + DEFAULT_TRIP_LEN > N) d = N - DEFAULT_TRIP_LEN;
+          patch.arriveDate = toYmd(addDays(viewStart, d));
+          patch.departDate = toYmd(addDays(viewStart, d + DEFAULT_TRIP_LEN - 1));
+        }
+        updateCity(c.id, patch);
+      }
+    };
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", up);
+  }
 
   // ── ruler cells (months / weeks) ──────────────────────────────────────
   const monthCells = useMemo(() => {
@@ -841,23 +926,32 @@ export default function TripPlanner() {
         </div>
 
         <div className="trip-pl-lanes">
-          {hasPlanning ? planLanes.map((l) => {
+          {hasPlanning ? orderedLanes.map((l) => {
             const hero = heroFor(l.city);
             const gid = `tpg-${l.city.id}`;
             const best = l.weeks ? l.weeks.reduce((a, b) => (b.score > a.score ? b : a)) : null;
             return (
               <div
                 key={l.city.id}
-                className="trip-pl-lane"
+                className={`trip-pl-lane${dragLaneId === l.city.id ? " lane-dragging" : ""}`}
                 data-city={l.city.name}
+                data-lane-id={l.city.id}
                 data-weeks={l.weeks ? JSON.stringify(l.weeks) : ""}
               >
                 <div className="llabel">
+                  <span className="lgrip" title="Drag to reorder" onPointerDown={(e) => startLaneReorder(e, l.city.id)}>⠿</span>
                   <span className="lthumb" style={hero ? { backgroundImage: `url(${hero})` } : undefined}>{hero ? "" : l.city.name.slice(0, 1)}</span>
                   <span className="ltext">
                     <span className="lcity">{l.city.name}</span>
                     {best ? <span className="lrec">best ≈ {best.label}</span> : <span className="lrec lmuted">conditions not measured</span>}
                   </span>
+                  <button
+                    type="button"
+                    className="ldemote"
+                    title="Remove from planning"
+                    onPointerDown={(e) => e.stopPropagation()}
+                    onClick={() => updateCity(l.city.id, { status: "Idea" })}
+                  >×</button>
                 </div>
                 <div className="lbody">
                   <div className="trip-pl-scroller">
@@ -914,23 +1008,29 @@ export default function TripPlanner() {
               const base = lastComma > 0 ? c.name.slice(0, lastComma) : c.name;
               const st = lastComma > 0 ? c.name.slice(lastComma + 2) : "";
               return (
-                <button
+                <div
                   key={c.id}
-                  type="button"
+                  role="button"
+                  tabIndex={0}
                   className="bk"
-                  title="Promote to planning"
-                  onClick={() => updateCity(c.id, { status: "Shortlist" })}
+                  title="Drag onto a lane, or click, to promote"
+                  onPointerDown={(e) => startCardDrag(e, c)}
+                  onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); updateCity(c.id, { status: "Shortlist" }); } }}
                 >
                   <span className="bkt" style={hero ? { backgroundImage: `url(${hero})` } : undefined}>{hero ? "" : base.slice(0, 1)}</span>
                   <span className="bkb">
                     <span className="bkc">{base}</span>
-                    <span className="bks">{st ? `${st} · ` : ""}promote →</span>
+                    <span className="bks">{st ? `${st} · ` : ""}drag up ↑</span>
                   </span>
-                </button>
+                </div>
               );
             })}
           </div>
         </section>
+
+        {ghost ? (
+          <div className="trip-pl-ghost" style={{ left: ghost.x + 14, top: ghost.y + 14 }}>{ghost.name}</div>
+        ) : null}
       </div>
     </AppShell>
   );

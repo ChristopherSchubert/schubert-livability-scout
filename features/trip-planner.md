@@ -291,13 +291,22 @@ Planner-specific tokens:
     populate it by promoting from the Backlog pane at the bottom (owner-
     confirmed model, 2026-06-07). The empty state points there.
 
+### Interactions ported (full set, 2026-06-07)
+- **Lane drag-to-reorder** — grip (⠿) on each lane label; pointer-drag ↕
+  reorders. Order is **session-local** React state (`order`), seeded from the
+  soonest-trip-first sort and re-merged when the planning set changes.
+- **Demote from Planning** — `×` on the lane label (hover) sets
+  `status:"Idea"` → the lane drops back to the Backlog.
+- **Backlog drag-into-lanes** — pointer-drag a Backlog card; a ghost follows
+  the cursor; dropping over the lanes promotes it (`status:"Shortlist"`), and
+  dropping **on a lane's timeline** also sets the trip to that week (reads
+  live `--day-w`/`--pan-x`, clamped to today). A plain click still promotes.
+- All three verified in-browser (Chromium): reorder moves the dragged lane;
+  ghost tracks + cancels cleanly on an off-target drop.
+
 ## TODOs / future direction
-- **Lane drag-to-reorder** + **backlog drag-into-lanes** — not yet ported
-  (the mockup had pointer reordering; v1 ships promote-by-click instead).
 - Decide whether lane order / the planning set persists (a column) or stays
-  session-local. (Promote/commit persist via `status`; order does not.)
-- **Demote from Planning** affordance (currently only commit ✓; to leave
-  Planning you'd un-set the status elsewhere).
+  session-local. (Promote/commit/demote persist via `status`; order does not.)
 - Manual **Safari** pass on a populated Planning section (the pixel-space
   fix is structurally in place; Chromium verified).
 - Onboard **Bar Harbor, ME** (only demo city missing from `cities`).

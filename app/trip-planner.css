@@ -94,7 +94,24 @@
 
 /* lanes */
 .trip-pl-lane { border-bottom: 1px solid var(--border); background: var(--bg); }
-.llabel { display: flex; align-items: center; gap: 9px; padding: 0 14px 0 0; min-width: 0; }
+.trip-pl-lane.lane-dragging {
+  opacity: 0.94; position: relative; z-index: 20; background: var(--panel);
+  box-shadow: 0 14px 30px -12px rgba(13, 76, 68, 0.5);
+}
+.llabel { display: flex; align-items: center; gap: 9px; padding: 0 12px 0 0; min-width: 0; }
+.lgrip {
+  flex: 0 0 auto; cursor: grab; color: var(--border); font-size: 1rem; line-height: 1;
+  letter-spacing: -2px; user-select: none; touch-action: none; padding: 4px 1px;
+}
+.lgrip:hover { color: var(--muted); }
+.lgrip:active { cursor: grabbing; }
+.ldemote {
+  margin-left: auto; flex: 0 0 auto; opacity: 0; transition: opacity 0.12s;
+  border: 0; background: transparent; color: var(--muted); cursor: pointer;
+  font-size: 1.05rem; line-height: 1; padding: 2px 5px; border-radius: 0;
+}
+.llabel:hover .ldemote { opacity: 1; }
+.ldemote:hover { color: #b5402c; }
 .lthumb {
   flex: 0 0 36px; width: 36px; height: 36px; background-size: cover; background-position: center;
   border: 1px solid var(--border); border-radius: 1px; filter: saturate(0.88) contrast(1.05);
@@ -256,6 +273,15 @@
 .bkb { display: block; padding: 8px 10px 10px; }
 .bkc { font-family: var(--font-display); font-variation-settings: "opsz" 28, "wght" 540; font-size: 0.94rem; display: block; }
 .bks { font-size: 0.6rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); margin-top: 1px; display: block; }
+.bk { touch-action: none; }
+
+/* drag ghost for a backlog card */
+.trip-pl-ghost {
+  position: fixed; z-index: 1200; pointer-events: none;
+  background: var(--accent); color: var(--panel); font-family: var(--font-display);
+  font-variation-settings: "opsz" 24, "wght" 540; font-size: 0.85rem;
+  padding: 6px 12px; border-radius: 3px; box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.4);
+}
 
 /* floating popover (appended to <body>) */
 .trip-pl-pop {
