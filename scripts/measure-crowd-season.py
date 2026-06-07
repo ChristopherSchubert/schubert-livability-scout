@@ -532,7 +532,7 @@ def main():
     cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
     cur.execute("""
         select id, name, lat, lon, population_total, crowd_season,
-               coalesce(crowd_raw, '{}'::jsonb) as crowd_raw
+               nps_unit_code, coalesce(crowd_raw, '{}'::jsonb) as crowd_raw
         from cities
         where lat is not null and lon is not null
         order by name
@@ -551,10 +551,13 @@ def main():
     # with ZERO Google calls. Safe to run anytime to see how far the sweep got.
     if "--status" in argv:
         have_pop = sum(1 for r in rows if r["population_total"])
-        print(f"\nSTATUS (no fetches) — {len(rows)} cities, population {have_pop}/{len(rows)}")
+        measurable = [r for r in rows if not r.get("nps_unit_code")]   # NPS-locked excluded
+        nps_n = len(rows) - len(measurable)
+        print(f"\nSTATUS (no fetches) — {len(rows)} cities, population {have_pop}/{len(rows)}, "
+              f"{nps_n} NPS-locked (excluded from Trends)")
         for tmpl in QUERY_TEMPLATES:
             tc = cache.get("trends", {}).get(tmpl["key"], {})
-            qs = {city_query(r["name"], tmpl, ambiguous) for r in rows}
+            qs = {city_query(r["name"], tmpl, ambiguous) for r in measurable}
             qs.discard(tmpl["anchor"])
             cached = sum(1 for q in qs if q in tc)
             print(f"  template {tmpl['key']:<14} {cached:>3}/{len(qs)} cached  ({len(qs)-cached} remaining)")
@@ -588,7 +591,7 @@ def main():
     # Refresh rows after population update
     cur.execute("""
         select id, name, lat, lon, population_total, crowd_season,
-               coalesce(crowd_raw, '{}'::jsonb) as crowd_raw
+               nps_unit_code, coalesce(crowd_raw, '{}'::jsonb) as crowd_raw
         from cities
         where lat is not null and lon is not null
         order by name
@@ -597,6 +600,12 @@ def main():
     by_name = {r["name"]: r for r in rows_all}
     rows = [by_name[r["name"]] for r in rows if r["name"] in by_name]
     rows = [r for r in rows if r["population_total"]]
+    # NPS-override cities are locked to the TOP cascade tier — Trends (lower
+    # priority) must never measure or overwrite them. Drop them outright.
+    nps_locked = [r["name"] for r in rows if r.get("nps_unit_code")]
+    if nps_locked:
+        print(f"skipping {len(nps_locked)} NPS-locked cities: {', '.join(sorted(nps_locked))}")
+    rows = [r for r in rows if not r.get("nps_unit_code")]
 
     # Collision set is computed over the FULL corpus (rows_all), not the
     # filtered measurement subset — otherwise a --only run on one half of a
@@ -723,20 +732,26 @@ def main():
         blended = [0.0] * 12
         used_weight = 0.0
         per_template_dbg = {}
+        have = 0
         for tmpl in QUERY_TEMPLATES:
             pm = per_million_by_city_template.get((r["id"], tmpl["key"]))
             if pm is None:
                 continue
+            have += 1
             shifted = shift_forward(pm, tmpl["lead_months"])
             per_template_dbg[tmpl["key"]] = max(shifted)
             for m in range(12):
                 blended[m] += shifted[m] * tmpl["weight"]
             used_weight += tmpl["weight"]
-        # No data fetched for this city yet → leave it NULL (honest blank),
-        # don't write an all-zeros curve that masquerades as "measured".
-        if used_weight == 0:
+        # Only OVERWRITE the existing crowd_season once the FULL v3 blend is
+        # ready (all templates fetched). A partial (hotels-only) Trends signal
+        # is not clearly better than the city's current Wiki blend, and the
+        # per-run cap means things_to_do lands several windows after hotels —
+        # so until both are in, leave the Wiki value standing. The raw is
+        # already safe in crowd_raw regardless.
+        if have < len(QUERY_TEMPLATES):
             continue
-        blended = [v / used_weight for v in blended]  # renormalize if a pass missing
+        blended = [v / used_weight for v in blended]
 
         shape = shape_within_city(blended)
         intensity = intensity_log_scaled(blended)
