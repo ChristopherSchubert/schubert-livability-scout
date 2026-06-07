@@ -84,6 +84,16 @@ mid-orientation, never after the tradeoff. Three moves, in order:
   picturesque, vibrant, bustling.* These are filler that any town can
   steal. Replace each with the specific thing that earned the adjective,
   or cut it.
+- **No meta-references to the project.** The why is about the place,
+  full stop. Never mention "this database," "this app," "this tool,"
+  "the dataset," "the owner," "the felt scale," "the measured metrics,"
+  "calibration anchor," "control," "candidate," "regression target,"
+  "the axes," or any other internal vocabulary. A reader landing on
+  the city page should see editorial prose about a place, not a tour
+  of the project's mechanics. This applies to every why — including
+  the places used internally as anchors or controls. They get the
+  same case/tradeoff/closer form as everywhere else, written about
+  the place itself.
 
 ### Don't-do list (recurring failure modes)
 
@@ -139,14 +149,6 @@ rationalization can't move the goalposts.
 These should not restate the case/tradeoff from paragraph 2 — they
 sharpen them into a yes/no the visit produces.
 
-### Calibration anchors are different
-
-The 9 anchors (Bled, Piran, Sewickley, Allison Park, Pittsburgh
-neighborhoods used as controls, etc.) get a different form: a short
-orientation paragraph and an explicit "in this database, X isn't a
-candidate, it's the [anchor/control]" paragraph. Don't apply the
-case/tradeoff/closer form to them — they aren't being tested.
-
 ### Worked examples
 
 The best models in the corpus right now:
@@ -184,8 +186,12 @@ The best models in the corpus right now:
   structural moves — orientation + "The case…" + "The tradeoff…" — and
   were fixed by inserting the missing `\n\n` at the pivot
   (`scripts/.split-paragraphs.mjs`).
-- The 9 calibration/benchmark places (Pittsburgh-area controls + Slovenia
-  originals) keep their short whys — intentional, not a gap.
+- **No-meta-references audit (2026-06-06):** 11 whys (Bled, Piran,
+  Ljubljana, Allison Park, Oakmont, Sewickley, Verona, Pittsburgh
+  Lawrenceville, Pittsburgh Shadyside, plus if_wins/if_fails tweaks on
+  Honolulu Kaimuki and Petaluma) were rewritten to drop "in this
+  database, X is the calibration anchor / control" framing. Every why
+  now reads as editorial about the place, not a tour of the project.
 - `if_wins` / `if_fails` are populated unevenly — present on the cities
   that have made it past Shortlist; absent on early candidates.
 
