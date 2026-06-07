@@ -106,9 +106,9 @@
 .lgrip:hover { color: var(--muted); }
 .lgrip:active { cursor: grabbing; }
 .ldemote {
-  margin-left: auto; flex: 0 0 auto; opacity: 0; transition: opacity 0.12s;
+  margin-left: auto; flex: 0 0 auto; opacity: 0.4; transition: opacity 0.12s, color 0.12s;
   border: 0; background: transparent; color: var(--muted); cursor: pointer;
-  font-size: 1.05rem; line-height: 1; padding: 2px 5px; border-radius: 0;
+  font-size: 1.1rem; line-height: 1; padding: 2px 6px; border-radius: 0;
 }
 .llabel:hover .ldemote { opacity: 1; }
 .ldemote:hover { color: #b5402c; }
@@ -219,7 +219,7 @@
 }
 .trip-pl-bar:hover .bcommit { opacity: 1; }
 .bcommit:hover { filter: brightness(1.12); }
-.bcommit.unlock { background: var(--panel); color: var(--accent); top: -9px; right: -9px; opacity: 0; }
+.bcommit.unlock { background: var(--panel); color: var(--accent); top: -9px; right: -9px; opacity: 0.55; }
 .trip-pl-bar.is-planned:hover .bcommit.unlock { opacity: 1; }
 
 /* planning section controls */
