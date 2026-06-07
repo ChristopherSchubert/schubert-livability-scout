@@ -142,8 +142,15 @@ CACHE_PATH = os.path.join(os.path.dirname(__file__), ".crowd-season-cache.json")
 # gracefully the moment we look throttled (resume next window from cache).
 SLEEP_BASE_S = 240            # 4 min between successful fetches (paranoid)
 SLEEP_JITTER_S = 90           # + 0..90s, so cadence isn't a fixed fingerprint
-MAX_CONSEC_BLOCKS = 2         # after N cities fail ALL retries in a row → we're
-                              # throttled; save and exit, don't keep hammering
+MAX_CONSEC_BLOCKS = 1         # the FIRST hard block (after its one retry) means
+                              # we're throttled — stop immediately, don't keep
+                              # firing requests into a closed window (that's
+                              # what deepened the hole on 2026-06-07).
+MAX_RETRIES = 2               # 1 retry then give up — a 429 won't clear in 60s,
+                              # so retrying 5× just spends quota digging deeper.
+MAX_FETCHES_PER_RUN = 50      # hard backstop: bank at most 50 cities/run, then
+                              # stop voluntarily with headroom to spare. The
+                              # corpus finishes over a few daily windows.
 # Deterministic jitter (no random module dependence): cycle through offsets.
 _JITTER_CYCLE = [13, 71, 37, 89, 5, 53, 29, 61]
 
@@ -372,7 +379,7 @@ def fetch_trends_batch(query_strings):
     return out
 
 
-def fetch_with_retry(cities, max_tries=5):
+def fetch_with_retry(cities, max_tries=MAX_RETRIES):
     """Honor Google's transient errors (429 rate-limit AND 5xx server errors)
     with exponential backoff. Google sometimes returns 500/502 to scrapers as
     a soft block — the correct response is the same backoff treatment as 429.
@@ -618,6 +625,10 @@ def main():
               f"{len(unique_queries)-len(todo)} cached, {len(todo)} to fetch")
 
         for qi, q in enumerate(todo):
+            if fetched_this_run >= MAX_FETCHES_PER_RUN:
+                print(f"    → per-run cap ({MAX_FETCHES_PER_RUN}) reached. Stopping with quota headroom; resume next window.")
+                throttled = True
+                break
             print(f"    [{qi+1}/{len(todo)}] fetch: {q!r}")
             raw = fetch_with_retry([anchor_q, q])
             if raw is None:
