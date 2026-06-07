@@ -152,10 +152,10 @@ export default function TripPlanner() {
       if (start < todayDay) start = todayDay;
       if (start + len > N) start = N - len;
       if (start < 0) start = 0;
-      return { city: c, weeks, start, len };
+      const bestScore = weeks ? weeks.reduce((m, w) => Math.max(m, w.score), -1) : -1;
+      return { city: c, weeks, start, len, bestScore };
     });
-    lanes.sort((a, b) => a.start - b.start);
-    return lanes;
+    return lanes; // base order; display order is applied by sortMode below
   }, [planning, laneWeeks, viewStart, todayDay]);
 
   const committedLanes = useMemo(() => {
@@ -190,7 +190,10 @@ export default function TripPlanner() {
     return Math.max(0, lb);
   }, [committedLanes, todayDay]);
 
-  // ── lane order (session-local; drag the grip to override the start sort) ─
+  // ── lane sort + manual order ──────────────────────────────────────────
+  // sortMode: "next" (by scheduled trip), "best" (peak score first), "none"
+  // (manual — set by dragging a lane's grip; persists in `order`).
+  const [sortMode, setSortMode] = useState("next");
   const [order, setOrder] = useState([]);
   useEffect(() => {
     const ids = planLanes.map((l) => l.city.id);
@@ -201,19 +204,30 @@ export default function TripPlanner() {
       return [...kept, ...added];
     });
   }, [planLanes]);
-  const orderedLanes = useMemo(() => {
-    if (order.length === 0) return planLanes;
-    const byId = new Map(planLanes.map((l) => [l.city.id, l]));
-    const out = [];
-    for (const id of order) { const l = byId.get(id); if (l) { out.push(l); byId.delete(id); } }
-    for (const l of planLanes) if (byId.has(l.city.id)) out.push(l);
-    return out;
-  }, [planLanes, order]);
+  const displayLanes = useMemo(() => {
+    const lanes = [...planLanes];
+    if (sortMode === "next") return lanes.sort((a, b) => a.start - b.start);
+    if (sortMode === "best") return lanes.sort((a, b) => b.bestScore - a.bestScore);
+    // "none" → manual order
+    if (order.length) {
+      const byId = new Map(lanes.map((l) => [l.city.id, l]));
+      const out = [];
+      for (const id of order) { const l = byId.get(id); if (l) { out.push(l); byId.delete(id); } }
+      for (const l of lanes) if (byId.has(l.city.id)) out.push(l);
+      return out;
+    }
+    return lanes;
+  }, [planLanes, sortMode, order]);
 
   const [dragLaneId, setDragLaneId] = useState(null);
   function startLaneReorder(e, id) {
     if (e.button !== undefined && e.button !== 0) return;
     e.preventDefault(); e.stopPropagation();
+    // dragging takes over ordering: snapshot the visible order, switch to manual
+    const visible = [...document.querySelectorAll(".trip-pl-lanes .trip-pl-lane")]
+      .map((el) => el.getAttribute("data-lane-id")).filter(Boolean);
+    if (visible.length) setOrder(visible);
+    setSortMode("none");
     setDragLaneId(id);
     const move = (ev) => {
       const wrap = document.querySelector(".trip-pl-lanes");
@@ -934,6 +948,12 @@ export default function TripPlanner() {
           <div className="st">
             <span className="eyebrow">Planning</span><h2>Cities looking for a slot</h2>
             <div className="plan-ctl">
+              <div className="sortctl" role="group" aria-label="Sort lanes">
+                <span className="sortlbl">Sort</span>
+                <button type="button" className={sortMode === "none" ? "on" : ""} onClick={() => setSortMode("none")}>None</button>
+                <button type="button" className={sortMode === "next" ? "on" : ""} onClick={() => setSortMode("next")}>Next trip</button>
+                <button type="button" className={sortMode === "best" ? "on" : ""} onClick={() => setSortMode("best")} title="Best time to visit (peak score first)">Best time</button>
+              </div>
               <div className="togs">
                 <label className="tog"><input type="checkbox" id="tpFeels" /> <span style={{ color: "#a8651c" }}>Feels-like</span></label>
                 <label className="tog"><input type="checkbox" id="tpCrowds" /> <span style={{ color: "#3f5d7a" }}>Crowds</span></label>
@@ -951,7 +971,7 @@ export default function TripPlanner() {
         </div>
 
         <div className="trip-pl-lanes">
-          {hasPlanning ? orderedLanes.map((l) => {
+          {hasPlanning ? displayLanes.map((l) => {
             const hero = heroFor(l.city);
             const gid = `tpg-${l.city.id}`;
             const best = l.weeks ? l.weeks.reduce((a, b) => (b.score > a.score ? b : a)) : null;

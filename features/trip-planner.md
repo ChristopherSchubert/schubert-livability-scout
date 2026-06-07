@@ -292,9 +292,12 @@ Planner-specific tokens:
     confirmed model, 2026-06-07). The empty state points there.
 
 ### Interactions ported (full set, 2026-06-07)
+- **Lane sort** — a segmented control in the Planning header: **None**
+  (manual), **Next trip** (by the scheduled box, the default), **Best time**
+  (by each city's peak visit score, highest first). Session-local `sortMode`.
 - **Lane drag-to-reorder** — grip (⠿) on each lane label; pointer-drag ↕
-  reorders. Order is **session-local** React state (`order`), seeded from the
-  soonest-trip-first sort and re-merged when the planning set changes.
+  reorders. Dragging snapshots the visible order and switches sort to
+  **None** (manual `order` state), re-merged when the planning set changes.
 - **Demote from Planning** — `×` on the lane label (hover) sets
   `status:"Idea"` → the lane drops back to the Backlog.
 - **Backlog drag-into-lanes** — pointer-drag a Backlog card; a ghost follows

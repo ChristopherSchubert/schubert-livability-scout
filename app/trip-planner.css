@@ -224,6 +224,16 @@
 
 /* planning section controls */
 .plan-ctl { margin-left: auto; display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+.sortctl { display: inline-flex; align-items: center; gap: 0; }
+.sortlbl { font-size: 0.7rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 600; margin-right: 8px; }
+.sortctl button {
+  background: var(--panel); border: 1px solid var(--border); border-right: 0; border-radius: 0;
+  padding: 5px 9px; cursor: pointer; color: var(--muted); font-weight: 600;
+  font-family: var(--font-ui); font-size: 0.68rem; letter-spacing: 0.06em; text-transform: uppercase;
+}
+.sortctl button:first-of-type { border-radius: 1px 0 0 1px; }
+.sortctl button:last-of-type { border-right: 1px solid var(--border); border-radius: 0 1px 1px 0; }
+.sortctl button.on { background: var(--accent); color: var(--panel); border-color: var(--accent); }
 .togs { display: flex; gap: 14px; }
 .tog {
   display: flex; align-items: center; gap: 5px; font-size: 0.7rem; letter-spacing: 0.06em;
