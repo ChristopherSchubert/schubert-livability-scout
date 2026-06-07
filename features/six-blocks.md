@@ -10,7 +10,26 @@ less location string.
 - **Data (block names)**: `cities.blocks` jsonb — an array of strings
   like `"Thames Street at Howard Wharf"`, `"Spring Street between Touro
   & Mill"`. Populated at insert time (UI *+ Add candidate* or
-  [scripts/onboard.mjs](../scripts/onboard.mjs)).
+  [scripts/onboard.mjs](../scripts/onboard.mjs)). The target is 5–7 per
+  city — the "Six blocks" header is the column's name, not a hard count;
+  small towns honestly land lower rather than getting padded.
+- **Authoring candidates from OSM**: when a city has too few blocks,
+  [scripts/.gen-block-candidates.mjs](../scripts/.gen-block-candidates.mjs)
+  proposes new ones grounded in real OpenStreetMap social-POI density
+  inside the stay zone — it never invents. Method: pull social POIs
+  (cafe/restaurant/bar/bakery/market/…) within the boundary polygon (or
+  a 900 m radius), rank streets by how many POIs sit on them (using
+  `addr:street`, falling back to nearest named road for untagged POIs),
+  bound each street's commercial stretch with the cross-streets flanking
+  the POI extent (`"Main St between A and B"`), and surface named social
+  features (squares, markets, piers, parks ringed by ≥2 POIs) as
+  standalone blocks. It **prints proposals for review and never writes**.
+  `--all --json` dumps the corpus; `.format-block-proposals.mjs` renders
+  a reviewable doc; `.save-block-proposals.mjs --commit` applies approved
+  picks (excludes the Slovenia anchors + the Allison Park homebase, which
+  have no walkable social core to author from — and the local Overpass
+  is US-only besides). After saving, re-run the measurer below to resolve
+  the new blocks' coordinates.
 - **Data (block coordinates)**: `cities.block_geometries` jsonb — an
   array parallel to `blocks`, each entry shaped like
   `{ name, lat, lon, accuracy, source, meta, asOf }` with `accuracy`
@@ -62,14 +81,24 @@ less location string.
 
 ## Status
 
-- **Data layer (blocks)**: populated for most cities (entries vary in
-  count and quality — some are 5-block lists, some are partial).
-- **Data layer (block_geometries)**: 31/78 cities have at least one
-  resolved entry; the remainder need a `node scripts/onboard.mjs
-  --measurer blocks` pass. Re-running with `--force` re-evaluates
-  every non-`manual` entry through the strengthened resolution chain.
-- **UI layer**: wired. Embedded mini-maps render wherever
-  `block_geometries[i].accuracy !== "unresolved"`.
+- **Data layer (blocks)**: backfilled corpus-wide (2026-06-07). 95 of
+  117 candidate cities now carry a full 6; 13 sit at a valid 5; the
+  remaining ~9 are honest small-town / thin-OSM shortfalls (e.g.
+  verona-pa at 0, lewisburg-wv at 1, saratoga-springs-ny at 2) left
+  short rather than padded. The 4 reference anchors (Bled, Piran,
+  Ljubljana, Allison Park) intentionally carry none. New blocks came
+  from [scripts/.gen-block-candidates.mjs](../scripts/.gen-block-candidates.mjs)
+  (OSM-derived, reviewed) — see "Authoring candidates from OSM" above.
+- **Data layer (block_geometries)**: resolved by the `blocks` measurer.
+  Re-run with `--force` after any block edit (it re-evaluates every
+  non-`manual` entry through the strengthened resolution chain). Typical
+  city resolves 5–6 of 6 via Overpass intersections + feature centroids,
+  with Nominatim catching the rest; a few stay `unresolved` (placeholder
+  card) when no layer can place them inside the stay zone.
+- **UI layer**: wired. The Chapter VI header reflects the real block
+  count ("Six blocks" / "Two blocks", not a hard-coded six). Embedded
+  mini-maps render wherever `block_geometries[i].accuracy !==
+  "unresolved"`.
 
 ## TODOs / future direction
 
