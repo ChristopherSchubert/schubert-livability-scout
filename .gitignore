@@ -17,3 +17,7 @@ overpass/db/
 
 # Transient session lock (per-process, not shared state)
 .claude/scheduled_tasks.lock
+
+# Large cached source data (re-downloadable; not committed)
+data/
+scripts/.crowd-season-cache*.json

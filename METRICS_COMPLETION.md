@@ -54,8 +54,8 @@ Auxiliary fields (not in `measured_metrics`):
 | `visit_climate` (12-month normals) | 115/115 | `scripts/onboard.mjs --measurer climate` |
 | `drive_hrs_from_pit` | **115/115** ✅ | OSRM public from PIT airport (40.4915, -80.2329). Anything outside CONUS bbox marked `'FLY'`. Script: `scripts/measure-drive-hrs.mjs` |
 | `population_total` / `population_source` | 112/115 | Census ACS B01003_001E with documented fallback tiers: (1) Incorporated Place / CDP — default; (2) county-subdivision (town) where the state has no Census Places (Rhode Island); (3) ZCTA (postal-ZIP boundary) where the heart sits in unincorporated territory with no CDP (e.g. Deep Creek Lake / McHenry MD 21541). Tier is encoded in `population_source` so cross-city comparisons stay legible. Script: `scripts/measure-crowd-season.py --pop-only` |
-| `crowd_season` (12 ints 0–5, within-city shape) | 43/115 | Google Trends BLEND: `<city> hotels` (booking intent, shift +1mo, w=0.4) + `things to do in <city>` (presence, w=0.6), per-capita normalized. Script: `scripts/measure-crowd-season.py`. **Blocked by Google rate-limit** as of last check |
-| `crowd_intensity` (0–5 scalar, cross-city magnitude) | 41/115 | log-scaled blended-peak per-capita, anchors floor=100/M ceil=10,000/M. Same script |
+| `crowd_season` (12 ints 0–5, within-city shape) | **all** ✅ (Wiki tier) | CASCADE: NPS visits (park towns) > Google Trends (primary, rate-limit-blocked) > **Wikipedia×Wikivoyage blend** (live fallback, now covering the whole corpus). `scripts/measure-crowd-wiki.py` — traffic-gated geometric mean of within-city-normalized WP & WV pageviews (≈47 blend where Wikivoyage has traffic, rest WP-only). Trends-v3 (`scripts/measure-crowd-season.py`) upgrades per-city as quota allows; NPS overrides park towns. Source tier recorded in `crowd_season_source` |
+| `crowd_intensity` (0–5 scalar, cross-city magnitude) | **all but 3** (Wiki tier) | Wiki tier: per-capita WP-peak, log-scaled, fixed anchors 50k/M–3M/M. 3 null (cities missing `population_total`). Trends tier uses its own hotel-search anchors. Drives chart line-muting for low-tourism cities |
 
 ### Remaining gaps
 
@@ -63,10 +63,17 @@ Auxiliary fields (not in `measured_metrics`):
   price registry; would need a per-country adapter (Slovenia: GURS ETN).
 - **`population_total` (3 missing)** — Bled, Ljubljana, Piran need a
   SURS adapter (Slovenia is not in the US Census).
-- **`crowd_season` / `crowd_intensity` (72 / 74 missing)** — Google Trends
-  rate-limit blocks bulk runs. Needs an alternative pipeline or a different
-  signal (Wikipedia pageviews, AirDNA seasonality) — see
-  `scripts/measure-crowd-season.py`.
+- **`crowd_season` / `crowd_intensity`** — RESOLVED for full coverage via
+  the Wikipedia×Wikivoyage blend tier (`scripts/measure-crowd-wiki.py`).
+  Remaining work is *quality upgrades*, not coverage: (1) Trends-v3 is the
+  cleaner tourism-coded signal but is Google-rate-limit-bound — run it from
+  fresh quota windows to upgrade cities per the cascade; (2) NPS monthly
+  recreation-visits (`data/nps/`) is ground-truth presence for ~10–15
+  curated park/monument towns — overrides the Wiki shape where the unit's
+  visitors are the town's tourists; (3) some mid-intensity non-tourist
+  towns (e.g. Roanoke, Pittsburgh, Sewickley) still carry residual
+  Wikipedia contamination in their shape — these are largely muted by low
+  `crowd_intensity` and will be corrected by tiers (1)/(2).
 
 ---
 

@@ -26,20 +26,39 @@ export default function ChapterWhen({ view, homebase }) {
   }
 
   const comfort = view.monthlyComfort || [];           // 0–10 per month | null
-  const crowd = Array.isArray(view.crowdSeason) ? view.crowdSeason : null; // 0–5 | null
+  const crowd = Array.isArray(view.crowdSeason) ? view.crowdSeason : null; // 0–5 SHAPE | null
+  const intensity = Number.isFinite(view.crowdIntensity) ? view.crowdIntensity : null; // 0–5 MAGNITUDE | null
   const nowIdx = new Date().getMonth();
   const vw = view.visitWindow;
+  // Render the crowd line muted when the city has little overall tourist
+  // saturation — the shape still computes, but a confident red ribbon for
+  // Pittsburgh would mislead. intensity 0-1 = muted, 2-3 = normal, 4-5 = bold.
+  const crowdClass = intensity == null ? "" : intensity <= 1 ? " low-intensity" : intensity >= 4 ? " high-intensity" : "";
+  const intensityLabel = intensity == null ? null :
+    intensity <= 1 ? "Low" : intensity <= 2 ? "Modest" : intensity <= 3 ? "Notable" : "Heavy";
 
-  // Visit-worth synthesis: comfort minus a fraction of crowd pressure (when we
-  // know it). With no crowd data, the verdict line IS the comfort line.
+  // Visit-worth synthesis: comfort minus a fraction of crowd pressure (when
+  // we know it), weighted by overall tourist intensity. A peak-crowd month in
+  // a high-intensity city (Bar Harbor in July) penalizes visit timing far
+  // more than a peak-crowd month in a low-intensity city (Pittsburgh in
+  // July). With no crowd data the verdict line IS the comfort line.
   const visit = comfort.map((c, i) => {
     if (c == null) return null;
-    const pen = crowd && Number.isFinite(crowd[i]) ? 0.35 * crowd[i] * 2 : 0;
+    const pen = crowd && Number.isFinite(crowd[i])
+      ? 0.35 * crowd[i] * 2 * (intensity == null ? 0.6 : intensity / 5)
+      : 0;
     return Math.max(0, Math.min(10, c - pen));
   });
 
   const yC = (v) => 280 - v * 20;          // comfort/visit 0–10 → 200px band
-  const yCrowd = (v) => 280 - v * 40;      // crowd 0–5 → 200px band
+  // Crowd y-mapping: 0–5 across 200px, but SCALED BY INTENSITY so the visual
+  // amplitude is honest. Asheville (intensity 2) has the same monthly shape
+  // as Bar Harbor (intensity 5) — but rendering both at full chart height
+  // would mislead. With this scaling: Bar Harbor peak hits 200px, Asheville
+  // peak hits 80px (2/5 of band), Pittsburgh (intensity 0) sits flat.
+  // Default to 0.6 when intensity is unknown — generic-tourist-town look.
+  const amplitude = intensity == null ? 0.6 : intensity / 5;
+  const yCrowd = (v) => 280 - v * 40 * amplitude;
 
   return (
     <section id="when" className="when" aria-label="When to visit">
@@ -67,9 +86,9 @@ export default function ChapterWhen({ view, homebase }) {
             <text className="axis-label" x="1020" y="56" textAnchor="end">↑ Score 0 – 10</text>
 
             <path className="comfort-area" fill="url(#comfortGrad)" d={areaPath(comfort, yC)} />
-            {crowd ? <path className="crowd-area" fill="url(#crowdGrad)" d={areaPath(crowd, yCrowd)} /> : null}
+            {crowd ? <path className={`crowd-area${crowdClass}`} fill="url(#crowdGrad)" d={areaPath(crowd, yCrowd)} /> : null}
             <path className="comfort-stroke" d={linePath(comfort, yC)} />
-            {crowd ? <path className="crowd-stroke" d={linePath(crowd, yCrowd)} /> : null}
+            {crowd ? <path className={`crowd-stroke${crowdClass}`} d={linePath(crowd, yCrowd)} /> : null}
             <path className="visit-stroke" d={linePath(visit, yC)} />
 
             <line className="now-line" x1={X(nowIdx)} y1="40" x2={X(nowIdx)} y2="282" />
@@ -84,6 +103,8 @@ export default function ChapterWhen({ view, homebase }) {
             {crowd ? <g>{dots(crowd, yCrowd, "crowd", nowIdx)}</g> : null}
             <g>{dots(visit, yC, "visit", nowIdx)}</g>
 
+            <g>{valueLabels(comfort, yC, "comfort-val", -10, (v) => v.toFixed(1))}</g>
+
             {MONTHS.map((mo, i) => (
               <text key={mo} className={`month-label${i === nowIdx ? " now" : ""}`} x={X(i)} y="296">{mo}</text>
             ))}
@@ -92,7 +113,7 @@ export default function ChapterWhen({ view, homebase }) {
 
         <div className="climate-legend">
           <span><span className="sw comfort" />Climate comfort <em style={{ fontStyle: "italic", textTransform: "none", letterSpacing: 0, color: "var(--ink-mute)", fontWeight: 400 }}>(daily highs/lows + rainy days + daylight, normalized 0–10)</em></span>
-          {crowd ? <span><span className="sw crowd" />Tourist crowd <em style={{ fontStyle: "italic", textTransform: "none", letterSpacing: 0, color: "var(--ink-mute)", fontWeight: 400 }}>(seasonal occupancy, 0–5)</em></span> : null}
+          {crowd ? <span><span className={`sw crowd${crowdClass}`} />Tourist crowd <em style={{ fontStyle: "italic", textTransform: "none", letterSpacing: 0, color: "var(--ink-mute)", fontWeight: 400 }}>{intensityLabel ? `(${intensityLabel.toLowerCase()} saturation — shape shows the within-city peak)` : "(seasonal shape, within-city scaled)"}</em></span> : null}
           <span><span className="sw visit" />Visit score <em style={{ fontStyle: "italic", textTransform: "none", letterSpacing: 0, color: "var(--ink-mute)", fontWeight: 400 }}>(comfort minus a fraction of crowd)</em></span>
         </div>
 
@@ -127,6 +148,13 @@ function linePath(series, y) {
 function dots(series, y, cls, nowIdx) {
   return series.map((v, i) => v == null ? null : (
     <circle key={i} className={`month-dot ${cls}`} cx={X(i)} cy={y(v)} r={i === nowIdx ? 4.2 : 3.2} />
+  ));
+}
+// Numeric labels above (or below) each dot, so the chart isn't just shape.
+// dy < 0 → above the dot, > 0 → below.
+function valueLabels(series, y, cls, dy, fmt) {
+  return series.map((v, i) => v == null ? null : (
+    <text key={i} className={cls} x={X(i)} y={y(v) + dy}>{fmt(v)}</text>
   ));
 }
 function Annotation({ idx, y, cls, label, sub }) {

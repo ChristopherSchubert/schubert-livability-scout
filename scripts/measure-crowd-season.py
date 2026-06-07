@@ -31,8 +31,11 @@ Method (versioned as gtrends_pop_norm_v3):
        b. "things to do in <city> [state]" — during-trip signal, ~1-week
           lead. Captures TOURISTS specifically (locals don't search what
           to do in their own town). Weight 0.6.
-     Each pass uses batches of 5 with Mackinac Island as the fixed cross-
-     batch anchor (with the same query template for the anchor in each pass).
+     Each Trends call is 2-term: anchor + 1 city. Larger compare batches
+     (3+ terms) consistently return HTTP 500 from Google once we've used
+     up the per-IP daily quota for them, while the 2-term quota is much
+     more permissive. Trade-off: more total Trends calls (one per city
+     per template) but the run actually completes.
   3. Per-month median over 5 years for each pass.
   4. Per-pass: divide by city population → per-million-residents.
   5. SHIFT + COMBINE: shift the hotels curve forward by 1 month; weighted-
@@ -80,8 +83,28 @@ from pytrends.request import TrendReq
 
 # Versioned method identifier — bake the anchors into the source string so a
 # future run with different scaling produces a visibly different citation.
-METHOD = "gtrends_pop_norm_v3_blend(hotels:lead=1m:w=0.4|things_to_do:lead=0:w=0.6)_anchor=mackinac_island"
-ANCHOR_NAME = "Mackinac Island"
+#
+# Anchor choice: Myrtle Beach, SC (pop 36k, mass-market beach destination).
+# Iterated through two prior choices:
+#   - Mackinac Island (pop 583): tiny absolute search volume crushed its
+#     curve to low-resolution integers (3-8) when paired against moderate-pop
+#     cities in 2-term compare queries, hurting cross-batch rescale precision.
+#   - Newport, RI (pop 25k): better resolution, BUT Newport RI + Newport VT
+#     are both in our corpus, so the anchor collided with measured rows.
+# Myrtle Beach solves both: 36k pop gives comfortable resolution headroom
+# when paired with anything from 5k towns to 300k cities; its textbook-stable
+# mass-market beach seasonality (no viral spikes, pure leisure, no business-
+# travel contamination) makes a clean reference curve; and it is NOT in our
+# corpus (never a walkable Bled/Piran candidate), so no anchor/row collision.
+# Note: this changes only the *normalization reference*, not the intensity-
+# ceiling definition (still CEIL_PER_M = 10,000/M — Mackinac at ~124k/M still
+# clamps to intensity 5 when measured, it just no longer serves as anchor).
+METHOD = "gtrends_pop_norm_v3_blend(hotels:lead=1m:w=0.4|things_to_do:lead=0:w=0.6)_anchor=myrtle_beach"
+# Anchor name is BARE (no state) — Myrtle Beach is unique and the natural
+# query people actually type is "Myrtle Beach hotels", not "Myrtle Beach SC
+# hotels". State suffixes are only added to the rare corpus names that
+# collide across states (see ambiguous_bare_names()).
+ANCHOR_NAME = "Myrtle Beach"
 FLOOR_PER_M = 100      # below this, no measurable tourist seasonality
 CEIL_PER_M = 10_000    # at this, full tourist saturation (5/5)
 LOG_RANGE = math.log10(CEIL_PER_M / FLOOR_PER_M)
@@ -112,11 +135,24 @@ QUERY_TEMPLATES = [
 
 CACHE_PATH = os.path.join(os.path.dirname(__file__), ".crowd-season-cache.json")
 
-# Calibration file is the permanent record of the anchor curves (Mackinac's
-# 12-month per-template curves from the sweep that defined this method's
-# epoch). New cities onboarded after the sweep query [Mackinac, NewCity]
-# and rescale NewCity using stored_peak / current_Mackinac_peak so they
-# land on the same ruler. Committed to the repo so the next session has it.
+# ── Super-conservative pacing ────────────────────────────────────────────
+# Google's compare-query quota is cumulative and recovers slowly; today's
+# blocks were largely self-inflicted by over-probing + restarts. Policy now:
+# go painfully slow, cache every single fetch the instant it lands, and STOP
+# gracefully the moment we look throttled (resume next window from cache).
+SLEEP_BASE_S = 240            # 4 min between successful fetches (paranoid)
+SLEEP_JITTER_S = 90           # + 0..90s, so cadence isn't a fixed fingerprint
+MAX_CONSEC_BLOCKS = 2         # after N cities fail ALL retries in a row → we're
+                              # throttled; save and exit, don't keep hammering
+# Deterministic jitter (no random module dependence): cycle through offsets.
+_JITTER_CYCLE = [13, 71, 37, 89, 5, 53, 29, 61]
+
+# Calibration file is the permanent record of the anchor curves (Myrtle
+# Beach's 12-month per-template curves from the sweep that defined this
+# method's epoch). New cities onboarded after the sweep query
+# [Myrtle Beach, NewCity] and rescale NewCity using
+# stored_peak / current_anchor_peak so they land on the same ruler.
+# Committed to the repo so the next session has it.
 CALIBRATION_PATH = os.path.join(
     os.path.dirname(__file__), "..", "lib", "calibrations", "crowd-season-v3.json"
 )
@@ -135,10 +171,27 @@ def parse_name(name):
     return city, state
 
 
-def city_query(name, template):
-    """Build the Trends query for one row + one template."""
+def ambiguous_bare_names(rows):
+    """Set of bare city names that appear under 2+ distinct states in the
+    corpus and therefore NEED a state suffix to disambiguate the Trends query
+    (e.g. Lewisburg PA vs WV, Newport RI vs VT). Every other name is unique,
+    so it gets the bare, natural query people actually type — higher volume,
+    better resolution, and it sidesteps the awkward 'things to do in X SC'
+    phrasing. Computed from the live corpus so it stays correct as cities are
+    added."""
+    states_by_bare = {}
+    for r in rows:
+        city, state = parse_name(r["name"])
+        states_by_bare.setdefault(city, set()).add(state)
+    return {bare for bare, states in states_by_bare.items() if len(states) > 1}
+
+
+def city_query(name, template, ambiguous=frozenset()):
+    """Build the Trends query for one row + one template. State suffix is
+    applied only when the bare name collides with another state's city."""
     city, state = parse_name(name)
-    return template["build"](city, state)
+    eff_state = state if city in ambiguous else ""
+    return template["build"](city, eff_state)
 
 
 def get_secret(name):
@@ -299,7 +352,10 @@ def fetch_with_retry(cities, max_tries=5):
     """Honor Google's transient errors (429 rate-limit AND 5xx server errors)
     with exponential backoff. Google sometimes returns 500/502 to scrapers as
     a soft block — the correct response is the same backoff treatment as 429.
-    Non-transient errors (malformed payload, network unreachable) re-raise."""
+    Non-transient errors (malformed payload, network unreachable) re-raise.
+
+    Skips the final sleep — once we know we're giving up, don't burn 16 min
+    on a sleep nobody will return to."""
     delay = 60
     transient = ("429", "TooManyRequests", "code 500", "code 502", "code 503", "code 504", "ResponseError")
     for i in range(max_tries):
@@ -308,13 +364,18 @@ def fetch_with_retry(cities, max_tries=5):
         except Exception as e:
             msg = str(e)
             if any(m in msg for m in transient):
+                if i == max_tries - 1:
+                    # Last attempt — don't sleep, just give up.
+                    break
                 kind = "rate-limited" if ("429" in msg or "TooManyRequests" in msg) else "transient-error"
                 print(f"    {kind}: {msg[:80]} — sleeping {delay}s (attempt {i+1}/{max_tries})")
                 time.sleep(delay)
                 delay *= 2
                 continue
             raise
-    raise RuntimeError(f"trends fetch gave up after {max_tries} attempts for {cities}")
+    # Gave up after backoff — return None so the caller can count this as a
+    # block and stop the run gracefully (rather than crash the whole sweep).
+    return None
 
 
 # ─── Scaling ────────────────────────────────────────────────────────────────
@@ -483,6 +544,13 @@ def main():
     rows = [by_name[r["name"]] for r in rows if r["name"] in by_name]
     rows = [r for r in rows if r["population_total"]]
 
+    # Collision set is computed over the FULL corpus (rows_all), not the
+    # filtered measurement subset — otherwise a --only run on one half of a
+    # collision pair would wrongly treat its name as unique.
+    ambiguous = ambiguous_bare_names(rows_all)
+    if ambiguous:
+        print(f"state-suffixed (collisions): {', '.join(sorted(ambiguous))}")
+
     if not refresh:
         # Resume: only re-measure cities that DON'T have the current v3
         # method tag. v2 (hotels-only) rows are stale and get re-measured.
@@ -493,86 +561,99 @@ def main():
         print("\nNothing to measure for crowd_season (all current). --refresh to recompute.")
         return
 
-    # ── Pass 2: Google Trends, two passes (one per query template) ────────
-    # Each pass independently runs all the cities in batches with the
-    # template's own anchor. Results live in cache["trends"][template_key].
-    # After both passes complete, per-city: shift each curve by its
-    # template's lead_months, weighted-average to get blended per-capita.
+    # ── Pass 2: Google Trends — 2-term calls (anchor + 1 city) ────────────
+    # 3+ term compare queries hit a tight quota that returns persistent 500s
+    # once spent; 2-term is far more permissive. Each call is [anchor, city].
     print(f"\nPASS 2: trends  ({len(rows)} cities, {len(QUERY_TEMPLATES)} templates)")
     print("-" * 70)
-    BATCH = 4  # 4 distinct queries + 1 anchor = 5 total per Trends call
 
-    # per_million_by_city_template[(city_id, template_key)] = [12 floats]
-    per_million_by_city_template = {}
+    # ── FETCH PASS — durable per-city cache, paranoid pacing ──────────────
+    # Cache shape (anchor-independent, never re-query a fetched city):
+    #   cache["trends"][template][city_query] = {"anchor":[12], "city":[12]}
+    # Each 2-term call returns BOTH the anchor's curve and the city's curve on
+    # that call's shared 0-100 scale; we store both so scaling is recomputable
+    # offline. Every successful fetch is written to disk immediately.
+    fetched_this_run = 0
+    consec_blocks = 0
+    throttled = False
 
     for tmpl in QUERY_TEMPLATES:
+        if throttled:
+            break
         tkey = tmpl["key"]
         anchor_q = tmpl["anchor"]
         tmpl_cache = cache.setdefault("trends", {}).setdefault(tkey, {})
 
-        # Group rows by their template-specific query string.
         query_groups = {}
         for r in rows:
-            q = city_query(r["name"], tmpl)
+            q = city_query(r["name"], tmpl, ambiguous)
             query_groups.setdefault(q, []).append(r)
         unique_queries = [q for q in query_groups if q != anchor_q]
-        print(f"\n  TEMPLATE '{tkey}'  ({tmpl['rationale']})")
-        print(f"    {len(rows)} rows → {len(unique_queries)} distinct queries")
+        todo = [q for q in unique_queries if q not in tmpl_cache]
+        print(f"\n  TEMPLATE '{tkey}': {len(unique_queries)} queries — "
+              f"{len(unique_queries)-len(todo)} cached, {len(todo)} to fetch")
 
-        batches = [unique_queries[i:i + BATCH] for i in range(0, len(unique_queries), BATCH)]
-        # Reference anchor curve for rescaling. Priority order:
-        #   1. Stored calibration (permanent ruler across all sweeps + onboards)
-        #   2. This run's batch-1 anchor (fallback when no calibration exists yet)
+        for qi, q in enumerate(todo):
+            print(f"    [{qi+1}/{len(todo)}] fetch: {q!r}")
+            raw = fetch_with_retry([anchor_q, q])
+            if raw is None:
+                consec_blocks += 1
+                print(f"    ✗ blocked ({consec_blocks}/{MAX_CONSEC_BLOCKS} consecutive)")
+                if consec_blocks >= MAX_CONSEC_BLOCKS:
+                    print("    → throttled. Saving and exiting; resume next window.")
+                    throttled = True
+                    break
+                continue
+            consec_blocks = 0
+            # Store both curves; default to zeros if Google omitted a column.
+            tmpl_cache[q] = {
+                "anchor": raw.get(anchor_q, [0]*12),
+                "city":   raw.get(q, [0]*12),
+            }
+            save_cache(cache)          # persist the instant it lands
+            fetched_this_run += 1
+            # Paranoid, jittered sleep between successful fetches.
+            nap = SLEEP_BASE_S + _JITTER_CYCLE[fetched_this_run % len(_JITTER_CYCLE)]
+            if qi < len(todo) - 1:
+                print(f"    ✓ cached. sleeping {nap}s")
+                time.sleep(nap)
+
+    print(f"\nfetch pass done: {fetched_this_run} new this run"
+          f"{' (stopped early — throttled)' if throttled else ''}")
+
+    # ── BUILD per-capita curves from whatever is in the cache (cached +
+    # just-fetched). Cities not yet fetched are simply skipped this run. ──
+    # per_million_by_city_template[(city_id, template_key)] = [12 floats]
+    per_million_by_city_template = {}
+    for tmpl in QUERY_TEMPLATES:
+        tkey = tmpl["key"]
+        tmpl_cache = cache.get("trends", {}).get(tkey, {})
+        # Reference anchor peak: stored calibration, else the strongest anchor
+        # peak we've cached (Myrtle dominates ~every pairing, so this ≈ 100).
         if calibration and tkey in calibration.get("templates", {}):
             reference_curve = calibration["templates"][tkey]["anchor_curve"]
-            print(f"    rescaling against stored calibration anchor (peak {max(reference_curve):.0f})")
+        elif tmpl_cache:
+            reference_curve = max((e["anchor"] for e in tmpl_cache.values()),
+                                  key=lambda a: max(a) if a else 0)
+            fresh_anchors[tkey] = reference_curve
         else:
-            reference_curve = None  # will be set from batch 1
-
-        for bi, batch_queries in enumerate(batches):
-            payload = [anchor_q] + batch_queries
-            cache_key = "|".join(payload)
-            if cache_key in tmpl_cache:
-                raw = tmpl_cache[cache_key]
-                print(f"    batch {bi+1}: cached")
-            else:
-                print(f"    batch {bi+1}: fetching {batch_queries}")
-                raw = fetch_with_retry(payload)
-                tmpl_cache[cache_key] = raw
-                save_cache(cache)
-
-            anchor_curve = raw[anchor_q]
-            if reference_curve is None:
-                # No prior calibration — this template's batch-1 anchor BECOMES
-                # the reference for the rest of this run, and gets persisted.
-                reference_curve = anchor_curve
-                fresh_anchors[tkey] = anchor_curve
-                scale = 1.0
-            else:
-                peak_ref = max(v for v in reference_curve if v is not None) or 1
-                peak_now = max(v for v in anchor_curve if v is not None) or 1
-                scale = peak_ref / peak_now
-
-            batch_rows = [r for q in batch_queries for r in query_groups[q]]
-            for r in batch_rows:
-                q = city_query(r["name"], tmpl)
-                series = raw[q]
-                scaled_abs = [(v or 0) * scale for v in series]
-                per_million = [(v / r["population_total"]) * 1_000_000 for v in scaled_abs]
-                per_million_by_city_template[(r["id"], tkey)] = per_million
-
-            if bi < len(batches) - 1:
-                time.sleep(120)
-
-        # Between templates: extra cooldown so Google doesn't see two
-        # back-to-back compare sweeps from the same IP.
-        if tmpl is not QUERY_TEMPLATES[-1]:
-            print(f"    template '{tkey}' done. Sleeping 180s before next template.")
-            time.sleep(180)
+            continue
+        ref_peak = max(reference_curve) or 1
+        for r in rows:
+            q = city_query(r["name"], tmpl, ambiguous)
+            entry = tmpl_cache.get(q)
+            if not entry:
+                continue
+            call_peak = max(entry["anchor"]) or 1
+            scale = ref_peak / call_peak
+            per_million = [(v or 0) * scale / r["population_total"] * 1_000_000
+                           for v in entry["city"]]
+            per_million_by_city_template[(r["id"], tkey)] = per_million
 
     # ── Combine + write ───────────────────────────────────────────────────
     print(f"\nCOMBINE + WRITE  ({len(rows)} cities)")
     print("-" * 70)
+    written = 0
     for r in rows:
         # Blend per-capita curves across templates with shift + weight.
         blended = [0.0] * 12
@@ -587,8 +668,11 @@ def main():
             for m in range(12):
                 blended[m] += shifted[m] * tmpl["weight"]
             used_weight += tmpl["weight"]
-        if used_weight > 0:
-            blended = [v / used_weight for v in blended]  # renormalize if a pass missing
+        # No data fetched for this city yet → leave it NULL (honest blank),
+        # don't write an all-zeros curve that masquerades as "measured".
+        if used_weight == 0:
+            continue
+        blended = [v / used_weight for v in blended]  # renormalize if a pass missing
 
         shape = shape_within_city(blended)
         intensity = intensity_log_scaled(blended)
@@ -598,18 +682,11 @@ def main():
             (json.dumps(shape), METHOD, intensity, r["id"]),
         )
         conn.commit()
+        written += 1
         dbg = " ".join(f"{k}_peak={v:.0f}" for k, v in per_template_dbg.items())
         print(f"  {r['name']:<28} pop {r['population_total']:>7,}  blended_peak {peak_pc:>7,.0f}/M  intensity {intensity}  shape {shape}  [{dbg}]")
 
-        # Throttle between batches. With the UA rotation in fetch_trends_batch
-        # we're already much less recognizable as a scraper, but Google's
-        # compare-query rate limit appears tighter than its single-term limit.
-        # 120s + UA rotation has held in testing without triggering 429s.
-        # Tradeoff at 120s: ~22 batches × 2min ≈ 45 min for a full run, vs
-        # near-certain hard-ban below 60s.
-        if bi < len(batches) - 1:
-            time.sleep(120)
-
+    print(f"\nwrote {written} cities; {len(rows)-written} still pending (null until fetched)")
     cur.close()
     conn.close()
 
