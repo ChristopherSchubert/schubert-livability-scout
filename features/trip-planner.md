@@ -265,8 +265,13 @@ Planner-specific tokens:
 
 ## Status
 - **Design: locked** (owner sign-off on the mockup, 2026-06-07).
-- **Implementation: LIVE** at `/visit/calendar` (2026-06-07). The swim-lane
-  planner replaced the old drag-onto-a-wall-calendar model:
+- **Implementation: LIVE.** Routing (Visit section):
+  - **`/visit`** → the planner (the **default Visit view**, 2026-06-07).
+  - **`/visit/planned`** → `VisitWorkspace` ("Planned and active trips" — the
+    committed-trip list + per-city logistics); linked from the planner header
+    ("Planned trips →").
+  - **`/visit/calendar`** → also the planner (back-compat).
+  The swim-lane planner replaced the old drag-onto-a-wall-calendar model:
   - `lib/planner-data.js#weeklyVisitScore(cityItem, viewStart)` — the real
     cited curve (Phase 1).
   - `components/TripPlanner.jsx` — the component. CSS-var geometry + pixel-
@@ -298,8 +303,9 @@ Planner-specific tokens:
 - **Lane drag-to-reorder** — grip (⠿) on each lane label; pointer-drag ↕
   reorders. Dragging snapshots the visible order and switches sort to
   **None** (manual `order` state), re-merged when the planning set changes.
-- **Demote from Planning** — `×` on the lane label (hover) sets
-  `status:"Idea"` → the lane drops back to the Backlog.
+- **Demote from Planning** — `×` on the lane label (always faintly visible)
+  opens a **confirm popover** ("Remove <city> from planning?" · Remove /
+  Cancel); Remove sets `status:"Idea"` → the lane drops back to the Backlog.
 - **Backlog drag-into-lanes** — pointer-drag a Backlog card; a ghost follows
   the cursor; dropping over the lanes promotes it (`status:"Shortlist"`), and
   dropping **on a lane's timeline** also sets the trip to that week (reads

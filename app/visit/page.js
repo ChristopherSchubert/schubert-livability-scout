@@ -1,7 +1,7 @@
-import VisitWorkspace from "../../components/VisitWorkspace";
+import TripPlanner from "../../components/TripPlanner";
 
 export const metadata = { title: "Visit — Livability Scout" };
 
 export default function VisitPage() {
-  return <VisitWorkspace />;
+  return <TripPlanner />;
 }

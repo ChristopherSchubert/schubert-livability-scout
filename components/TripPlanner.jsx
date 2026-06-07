@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   cityImageQuery,
@@ -194,6 +195,13 @@ export default function TripPlanner() {
   // sortMode: "next" (by scheduled trip), "best" (peak score first), "none"
   // (manual — set by dragging a lane's grip; persists in `order`).
   const [sortMode, setSortMode] = useState("next");
+  const [confirmId, setConfirmId] = useState(null); // lane pending remove-confirm
+  useEffect(() => {
+    if (!confirmId) return;
+    const onDown = (e) => { if (!e.target.closest(".ldemote-confirm") && !e.target.closest(".ldemote")) setConfirmId(null); };
+    document.addEventListener("pointerdown", onDown);
+    return () => document.removeEventListener("pointerdown", onDown);
+  }, [confirmId]);
   const [order, setOrder] = useState([]);
   useEffect(() => {
     const ids = planLanes.map((l) => l.city.id);
@@ -861,17 +869,20 @@ export default function TripPlanner() {
     <AppShell activeMode="visit">
       <section className="canvas-header trip-pl-head">
         <div>
-          <p className="page-eyebrow">Visit · Calendar</p>
+          <p className="page-eyebrow">Visit · Planner</p>
           <h1>Trip planner</h1>
           <p className="canvas-sub">
             Each city is a lane — the fill shows its <strong>visit score</strong> across the year; slide the white box to the best week.
           </p>
         </div>
-        <div className="trip-pl-zoom" role="group" aria-label="Zoom">
-          <button type="button" data-w="9">Season</button>
-          <button type="button" data-w="12">Months</button>
-          <button type="button" data-w="16" className="is-active">Weeks</button>
-          <button type="button" data-w="30">Days</button>
+        <div className="trip-pl-head-ctl">
+          <Link className="ghost-link" href="/visit/planned">Planned trips →</Link>
+          <div className="trip-pl-zoom" role="group" aria-label="Zoom">
+            <button type="button" data-w="9">Season</button>
+            <button type="button" data-w="12">Months</button>
+            <button type="button" data-w="16" className="is-active">Weeks</button>
+            <button type="button" data-w="30">Days</button>
+          </div>
         </div>
       </section>
 
@@ -995,8 +1006,17 @@ export default function TripPlanner() {
                     className="ldemote"
                     title="Remove from planning"
                     onPointerDown={(e) => e.stopPropagation()}
-                    onClick={() => updateCity(l.city.id, { status: "Idea" })}
+                    onClick={() => setConfirmId(confirmId === l.city.id ? null : l.city.id)}
                   >×</button>
+                  {confirmId === l.city.id ? (
+                    <div className="ldemote-confirm" onPointerDown={(e) => e.stopPropagation()}>
+                      <span className="ldc-msg">Remove <b>{l.city.name.replace(/,.*/, "")}</b> from planning?</span>
+                      <div className="ldc-actions">
+                        <button type="button" className="ldc-yes" onClick={() => { updateCity(l.city.id, { status: "Idea" }); setConfirmId(null); }}>Remove</button>
+                        <button type="button" className="ldc-no" onClick={() => setConfirmId(null)}>Cancel</button>
+                      </div>
+                    </div>
+                  ) : null}
                 </div>
                 <div className="lbody">
                   <div className="trip-pl-scroller">

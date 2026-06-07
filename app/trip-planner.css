@@ -16,6 +16,7 @@
 
 /* header zoom control (lives outside .trip-pl, in the canvas header) */
 .trip-pl-head { align-items: flex-end; }
+.trip-pl-head-ctl { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
 .trip-pl-zoom {
   display: inline-flex; border: 1px solid var(--text); border-radius: 1px;
   background: var(--panel); overflow: hidden; font-size: 0.7rem;
@@ -98,7 +99,20 @@
   opacity: 0.94; position: relative; z-index: 20; background: var(--panel);
   box-shadow: 0 14px 30px -12px rgba(13, 76, 68, 0.5);
 }
-.llabel { display: flex; align-items: center; gap: 9px; padding: 0 12px 0 0; min-width: 0; }
+.llabel { display: flex; align-items: center; gap: 9px; padding: 0 12px 0 0; min-width: 0; position: relative; }
+.ldemote-confirm {
+  position: absolute; top: calc(50% + 16px); right: 6px; z-index: 60; width: 212px;
+  background: var(--panel); border: 1px solid var(--text); border-radius: 3px;
+  box-shadow: 0 12px 28px -10px rgba(0, 0, 0, 0.4); padding: 9px 11px; font-family: var(--font-ui);
+}
+.ldc-msg { font-size: 0.74rem; color: var(--text); display: block; margin-bottom: 8px; line-height: 1.35; }
+.ldc-actions { display: flex; gap: 8px; justify-content: flex-end; }
+.ldc-actions button {
+  font-size: 0.64rem; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 600;
+  padding: 5px 11px; border-radius: 1px; cursor: pointer; border: 1px solid var(--accent); font-family: var(--font-ui);
+}
+.ldc-yes { background: #b5402c; border-color: #b5402c; color: var(--panel); }
+.ldc-no { background: transparent; color: var(--muted); border-color: var(--border); }
 .lgrip {
   flex: 0 0 auto; cursor: grab; color: var(--border); font-size: 1rem; line-height: 1;
   letter-spacing: -2px; user-select: none; touch-action: none; padding: 4px 1px;
