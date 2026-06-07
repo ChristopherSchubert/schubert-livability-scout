@@ -44,14 +44,19 @@ def to5(v):
     return [round((x - lo) / (hi - lo) * 5) if hi > lo else 0 for x in v]
 
 def shape_within_city(per_million):
-    vals = [x for x in per_million if x]
-    if not vals:
+    # Min/max over the FULL array (not just non-zero months) — otherwise a
+    # zero month gets (0 - lo)/span < 0 and the shape goes negative. With
+    # lo = min(all), every value maps into [0, scale_to] ⊆ [0, 5].
+    vals = [v or 0 for v in per_million]
+    if not any(vals):
         return [0] * 12
     lo, hi = min(vals), max(vals)
     span = hi - lo
-    MIN_SPAN = 100 * 0.25
-    scale_to = 5 if span >= MIN_SPAN else 5 * (span / MIN_SPAN if MIN_SPAN else 0)
-    return [0 if v is None or span <= 0 else int(round((v - lo) / span * scale_to)) for v in per_million]
+    if span <= 0:
+        return [0] * 12
+    MIN_SPAN = 100 * 0.25                       # anti-amplification floor
+    scale_to = 5.0 if span >= MIN_SPAN else 5.0 * (span / MIN_SPAN)
+    return [int(round((v - lo) / span * scale_to)) for v in vals]
 
 def log_intensity(peak, floor, ceil):
     if not peak or peak <= floor:
