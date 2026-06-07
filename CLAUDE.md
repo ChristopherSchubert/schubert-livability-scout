@@ -3,335 +3,171 @@
 A decision tool for finding a US place to live part-time that reproduces the
 lived feeling of Bled and Piran, Slovenia: walkable, nature-adjacent, real
 public life, alive year-round. It ranks candidate places to **visit**, then
-captures the owner's firsthand reaction after each visit. It does not certify
-a winner — final judgment happens on the ground.
+captures the owner's firsthand reaction after each visit. Final judgment
+happens on the ground.
 
 ## The one rule that overrides everything
 
 **Never invent data.** Every value is either (a) computed from a real, cited
-source, or (b) explicitly empty/`null` ("not yet measured"). Hand-entered 0–10
+source, or (b) explicitly `null` ("not yet measured"). Hand-entered 0–10
 "scores" dressed as measurements are the original sin this project exists to
-correct. An honest blank beats a confident guess. If a thing can be quantified,
-it must come from a cited source identical across all cities.
+correct. An honest blank beats a confident guess.
 
-Corollary: do not attribute the model's outputs to the owner's gut. The owner's
-judgment enters in exactly one place — the felt-score questionnaire (Track 2).
+Corollary: do not attribute the model's outputs to the owner's gut. The
+owner's judgment enters in exactly one place — the felt-score questionnaire
+(Track 2).
 
-Corollary 2 — **zero is not null**. The OSM pipeline's failure mode (fixed
-2026-06-04) was that Overpass returning HTTP 200 with a `remark: "Query timed
-out..."` and an empty body got counted as "zero of everything," then those
-zeros got persisted to the DB. The symptom was Bled / Ljubljana / Piran
-showing `cafe_n=0, street_km=0, …` despite OSM having dozens of cafés around
-the cluster center. `osmMetrics()` in `lib/measure.js` now detects this
-(remark field check + street_km==0 sanity check) and returns `{}` instead, so
-existing values are preserved. When you write any new Overpass-backed
-measurer, follow the same pattern: a non-null response is not the same as a
-successful response. Real cities have streets — if you got back zero of
-those, the query lied.
+**Corollary 2 — zero is not null.** Overpass HTTP 200 with a `remark`
+field + empty body was being persisted as "zero of everything" (2026-06-04
+incident: Bled / Ljubljana / Piran). `osmMetrics()` in `lib/measure.js`
+rejects these now. Every new Overpass-backed measurer must do the same —
+real cities have streets; zero of those means the query lied.
 
-## ⛔ NEVER USE PUBLIC OVERPASS — LOCAL DOCKER ONLY
+## ⛔ Overpass: local Docker only, no public fallback
 
-**We run our own Overpass instance at `http://localhost:12345/api/interpreter`
-with the full planet file already loaded.** Every measurement script, every
-ad-hoc audit probe, every `overpass()` call goes through it. The public
-mirrors (`overpass-api.de`, `overpass.kumi.systems`, etc.) are slow,
-rate-limited, and — worst — silently return HTTP 200 with truncated bodies
-that look like "this town has zero cafés." That failure mode is the source
-of multiple data-quality incidents (Bled/Ljubljana/Piran 2026-06-04; the
-new-cities audit 2026-06-05).
+We run our own Overpass at `http://localhost:12345/api/interpreter` with
+the planet file loaded. Public mirrors silently return truncated bodies that
+look like "this town has zero cafés" (data-quality incidents 2026-06-04,
+2026-06-05). Rules:
 
-The rules are absolute:
-
-1. **`lib/measure.js`'s `overpass()` defaults to `localhost:12345` with NO
-   public fallback.** If you change this, you are reintroducing the bug. If
-   local is down, the script must fail loudly — never degrade onto a public
-   mirror.
-2. **Every ad-hoc script you write that hits Overpass uses
-   `OVERPASS_URL=http://localhost:12345/api/interpreter` (or just imports
-   `overpass()` from `lib/measure.js`).** No `fetch("https://overpass-api.de/...")`
-   in audit one-offs. No "I'll just probe quickly via the public mirror" —
-   that's how data-quality bugs get masked by transient mirror failures.
-3. **If you ever write a fallback chain to a public Overpass endpoint, stop.**
-   The fail-fast behavior is intentional — we'd rather the script error than
-   silently produce wrong measurements again. Restart the local Docker
-   instance (`docker ps | grep overpass`) and re-run.
-4. **Production deploys do not measure.** The live Vercel site never calls
-   Overpass — measurement happens locally via the scripts. So "but Vercel
-   can't see localhost" is not a valid reason to add a public fallback.
-
-When in doubt: if your terminal shows a request to `overpass-api.de` or any
-other public mirror, that is a bug. Fix it before continuing.
+1. `lib/measure.js#overpass()` defaults to localhost with **no** public
+   fallback. If local is down, fail loudly. Restart Docker (`docker ps |
+   grep overpass`); don't degrade onto a mirror.
+2. Ad-hoc scripts use `OVERPASS_URL=http://localhost:12345/api/interpreter`
+   or import `overpass()` from `lib/measure.js`. No raw fetches to
+   `overpass-api.de`.
+3. Production never measures — measurement is local. "Vercel can't see
+   localhost" is not a reason to add a public fallback.
 
 ## Supabase is the source of truth
 
-**All city/place data lives in Supabase.** No CSVs in the repo, no in-source
-seed maps keyed by city name, no `const someThingByCity = { … }` literals in
-JS modules. When you need to add a new per-city attribute:
+All city/place data lives in Supabase. **No CSVs, no in-source seed maps
+keyed by city name, no `const someThingByCity = { … }` literals.** To add a
+per-city attribute:
 
-1. Add a column (or table) in `supabase/schema.sql` + a one-off migration
-   file in `supabase/migrations/`.
-2. Round-trip it through `lib/city-row.js` (`rowToCity` / `cityToRow`) and
-   add it to the `mapPatch` map in `lib/db.js` so updates persist.
-3. The runtime reads it from the row at load time — never from a literal.
+1. Column/table in `supabase/schema.sql` + migration in `supabase/migrations/`.
+2. Round-trip through `lib/city-row.js` (`rowToCity`/`cityToRow`) and add
+   to `mapPatch` in `lib/db.js`.
+3. Runtime reads from the row — never from a literal.
 
-If you find yourself reaching for a CSV to commit, or typing
-`{ "Annapolis, MD": 4.5, … }` into a JS file, stop. That's the anti-pattern
-this rule exists to prevent. Existing in-source seeds (e.g.
-`visitClimateSeed`) are debt to migrate, not a pattern to copy.
+Existing in-source seeds (e.g. `visitClimateSeed`) are debt to migrate, not
+a pattern to copy.
 
 ## The three data tracks (never blend them)
 
-1. **Measured (objective)** — `cityItem.measuredMetrics`, defined by
-   `metricTaxonomy` in `lib/planner-data.js`. ~20 metrics grouped under 5 axes,
-   each with one canonical source (OSM, USGS/SRTM DEM, NOAA NCEI, Census ACS,
-   Redfin, AirDNA, Walk Score). Filled only by the pipeline. Stored as
-   `{ value, asOf }`. The 5 groups are: Setting, Aliveness, Fabric, Realness,
-   January.
+1. **Measured (objective)** — `cityItem.measuredMetrics`, ~20 metrics under 5
+   axes (Setting, Aliveness, Fabric, Realness, January) defined by
+   `metricTaxonomy` in `lib/planner-data.js`. Each metric has one canonical
+   source. Filled only by the pipeline. Stored as `{ value, asOf }`.
+2. **Felt (subjective)** — `cityItem.survey`. Same 5 axes, scored 1–5 against
+   fixed anchors, plus a 0–10 **Slovenia score** — the regression target the
+   measured metrics aim to predict. Captured via `SurveyFlow` after a visit;
+   baselines on the Baseline tab. 5 felt axes ≪ 20 metrics on purpose:
+   humans honestly distinguish a handful, not twenty. Machines do the rest.
+3. **Visit window** — `visitClimate` (NOAA normals), `crowdSeason`,
+   `seasonNotes`. `cityVisitWindow()` computes a **Charm** trip (comfortable
+   + crowds thinned) and a **Truth** trip (coldest month). Pass both.
 
-2. **Felt (subjective)** — `cityItem.survey`, defined by `surveyAxes`. The same
-   5 axes the metrics roll up into, scored 1–5 against fixed anchors (places the
-   owner has stood in), plus a 0–10 **Slovenia score** (the gut number — this is
-   the regression *target*, the thing the measured metrics aim to predict) and a
-   free note. Captured via the questionnaire (`SurveyFlow`), after a visit.
-   Baselines are captured from memory on the Baseline tab.
+## App architecture (Next.js app router)
 
-   Why 5 felt axes but ~20 metrics: a machine measures many things cheaply and
-   the regression decides which matter; a human can only *honestly* distinguish
-   a handful from memory. More subjective sub-scores = false precision. The 5
-   axes are the human-perceivable rollups of the metric families, so felt-vs-
-   measured is legible per axis.
+- `lib/planner-data.js` — data model + derived helpers; **the godfile**.
+  Single source of truth for taxonomy, survey, visit-window logic, city
+  factory. Split is the top architecture backlog item.
+- `lib/city-detail-view.js` — `buildCityDetailView`: shapes a `cityItem`
+  into the magazine-chapter envelope. Backs the live page + `/api/mockup-data`.
+- `components/PlannerProvider.jsx` — React context. **Supabase is the system
+  of record**: loads cities + per-user surveys/baselines/weights on mount,
+  debounce-writes edits back. No localStorage persistence of planner state.
+- Routes and components: see [features/README.md](features/README.md).
 
-3. **Visit window** — `visitClimate` (NOAA normals), `crowdSeason` (qualitative
-   0–5), `seasonNotes`. `cityVisitWindow()` computes two diagnostic trips:
-   **Charm** (comfortable + crowds thinned) and **Truth** (the coldest month —
-   the January test made literal). A candidate should pass both.
+## Deployment
 
-## App architecture (Next.js, app router)
-
-- `lib/planner-data.js` — the data model + all derived helpers. Single source
-  of truth for the taxonomy, survey, visit-window logic, and the city factory.
-  **Most domain logic lives here.** (Big godfile — split is the top architecture
-  backlog item; see `ARCHITECTURE.md`.)
-- `lib/city-detail-view.js` — the shared shaper (`buildCityDetailView`) that
-  turns a `cityItem` into the chapter-ready envelope the magazine detail page
-  consumes. Backs both the live page and `/api/mockup-data`, so they can't drift.
-- `components/PlannerProvider.jsx` — React context. **Supabase is the system of
-  record**: on mount it loads cities + per-user surveys/baselines/weights from
-  Supabase and debounce-writes edits back (no localStorage persistence of
-  planner state). Also `imageState.version` cache-bust; `resolveImage` /
-  `appendBust`.
-- `components/AppShell.jsx` — top nav (workflow modes), city context strip.
-- Workflow modes / routes:
-  - `/board` — funnel kanban (all stages). `FunnelBoard.jsx`.
-  - `/calibrate` — weighted ranking + collapsed weights strip. `Calibrate.jsx`.
-  - `/visit` — trip queue. `VisitWorkspace.jsx`.
-  - `/decide` — post-visit survey queue. `DecideWorkspace.jsx`.
-  - `/decided` — verdict archive. `DecidedArchive.jsx`.
-  - `/baseline` — rate known places from memory (Track 2 answer key). `Baseline.jsx`.
-  - `/cities/[slug]` — per-city detail, the **magazine chapter layout**
-    (`CityDetailRoute` → `components/city-detail/MagazineDetail.jsx`, styled by
-    `app/city-detail.css` scoped under `.cd-root`). See
-    `features/magazine-detail.md`.
-  - `/cities/[slug]/{visit,images,decide}` — per-city pages via `VisitPlanRoute`
-    / `ImagesPageRoute` / `DecideRoute`, wrapping `VisitPlan` / `ImagesPage`
-    (still in `PlannerShell.jsx`).
-  - `/overview/board`, `/overview/matrix`, `/shortlist`,
-    `/cities/[slug]/decision` — legacy URLs, now one-line `redirect()` shims to
-    the routes above.
-- `SurveyFlow.jsx` — the facilitated questionnaire (used by both Decide and Baseline).
-- `app/api/images/{search,save}/route.js` + `lib/image-manifest.js` — image
-  search (Unsplash → Openverse → Commons) and content-addressable hero save.
-  One hero per city; filename is `sha256(bytes).slice(0,12)`.
-
-## Deployment (Vercel — pushing to `main` IS deploying)
-
-Hosted on **Vercel**, auto-deploying from `main` via the Vercel GitHub App.
-**Production: https://schubert-livability-scout.vercel.app** — there is no
-`vercel.json` / `.vercel/` / CI workflow in the repo (the link lives in the
-Vercel dashboard), so don't go looking for deploy config files; their absence
-is expected. Every push to `main` triggers a `next build` + production deploy
-(~1–3 min) — no separate deploy step. Live env vars are set in the Vercel
-dashboard, not the repo (mirror any new var into both `.env.local` and Vercel).
-"The live site looks unchanged" almost always = deploy still building, a stale
-CDN/tab cache, or a genuinely subtle change — never a skipped manual step.
-
-**Two secret stores, no overlap:** the local measurement pipeline reads from the
-**macOS Keychain** (account `livability-scout`: `supabase-db-password`,
-`census-api-key`, `walkscore-api-key`, via `security find-generic-password`),
-never `.env.local`; the **Vercel dashboard** holds the live app's runtime env
-vars. Vercel can't see your Keychain, so a missing Keychain item breaks your
-local scripts, not the live site. Full details + the Supabase redirect-allowlist
-gotcha: **features/deployment.md**.
+Vercel auto-deploys from `main`. Production:
+https://schubert-livability-scout.vercel.app. Every push to `main` triggers
+a build (~1–3 min). **Two secret stores, no overlap**: local measurement
+pipeline reads the **macOS Keychain** (account `livability-scout`); Vercel
+dashboard holds the runtime env vars. Mirror any new var into both
+`.env.local` and Vercel. Full notes + auth/redirect gotchas:
+[features/deployment.md](features/deployment.md).
 
 ## Commit and push incrementally (overrides the harness default)
 
-The Claude Code default is "never commit unless the user asks." For this
-project, **invert it**: when you finish a logically-distinct piece of work —
-a bug fix, a feature, a doc update — commit it and push it before moving on.
-Don't batch unrelated changes. Don't wait to be asked. Pushing to `main` is
-how this project ships (see Deployment above), and an unpushed commit is
-indistinguishable from "didn't happen" the next time a session opens this
-repo.
+The Claude Code default is "never commit unless asked." **Invert it.** When
+you finish a logically-distinct piece of work, commit and push before moving
+on. Pushing to `main` is how this project ships; an unpushed commit reads as
+"didn't happen" the next session. Update the relevant `features/*.md` and
+`METRICS_COMPLETION.md` in the **same** commit as the code change.
 
-The shape of a good commit here:
-- One logical change per commit. Bug fix + the CLAUDE.md note documenting it
-  belong together; bug fix + an unrelated UI tweak do not.
-- Update the relevant `features/*.md` and `METRICS_COMPLETION.md` rows in the
-  same commit as the code change, so docs never lag the code.
-- Push right after committing. No accumulated local-only history.
-
-**The unrelated-WIP gotcha.** This is a long-running solo workspace, so the
-tree will frequently have uncommitted changes from prior sessions, scripts
-you ran, or experiments in flight — work that isn't yours and shouldn't ride
-along with your commit. **Do not `git add -A` or `git add .`**. Use
-`git add <specific paths>` or `git add -p` to stage only the hunks your work
-produced. If your change touches a file that *also* has pre-existing
-uncommitted edits you can't cleanly separate from, stop and ask the user how
-to slice it — a commit that names a narrow change but contains diffs across
-30 unrelated files makes history unbisectable and the next session has no
-signal about what shipped with what.
-
-When to pause and confirm before committing:
-- Your change touches a file with pre-existing uncommitted edits you can't
-  cleanly separate.
-- The change is destructive enough that a rollback path matters (schema
-  migrations, force-pushes, deleting columns).
-- The user explicitly said hold off.
-
-Otherwise: commit, push, move on.
-
-## Image model
-
-One hero image per city. No slots, no choices array. Save writes a
-content-addressable file and overwrites `manifest.images[query]`. The Images
-tab offers search + paste-a-URL (the Google-Images workflow without an API).
-`UNSPLASH_ACCESS_KEY` lives in `.env.local` (gitignored).
+**The unrelated-WIP gotcha.** This is a long-running solo workspace; the
+tree often carries uncommitted changes from prior sessions. **Never `git add
+-A` or `git add .`** — stage only the specific paths your work produced (or
+`git add -p`). If your change touches a file that also has pre-existing
+edits you can't cleanly separate, **stop and ask** how to slice it. A commit
+that names a narrow change but contains 30 unrelated diffs makes history
+unbisectable. Same rule for destructive changes (schema migrations,
+force-pushes, column drops): confirm first.
 
 ## Stay-zone boundary + adaptive measurement
 
-A city has a *stay zone* (broader walkable area, polygon stored in
-`stay_zone_boundary`) and a *measurement field* (700 m around the densest
-social-POI cluster *inside* the stay zone). The score is "best 700 m within
-the stay zone," not "700 m around whichever pin was saved."
-
-- **Boundary policy**: Census Place / CDP → OSM polygon → OSM reverse-geocode
-  → Census Tract → NRHP historic district → point-circle → 2 km anchor circle.
-  Filters: real polygon area (shoelace) in [0.5, 30] km², pin must be inside
-  the bbox. Code lives in `lib/measure.js` (`fetchStayZoneBoundary`).
-- **Measurement field**: `measureAround(lat, lon, { boundary })` calls
-  `findVisitCenters` to find the densest 700 m cluster inside the polygon,
-  then measures there. The saved pin is NOT moved by routine re-measure —
-  only when the user explicitly drags it. The adaptive center is recorded in
-  `geo_source` for transparency.
-- **API cascade**: `POST /api/measure` ensures the boundary is current
-  (lazy-fetches via the chain above, or `refreshBoundary: true` to force),
-  then runs the boundary-aware measurement. No batch scripts needed for
-  routine maintenance — boundaries and measurements update through the API.
-- **One-time bulk migration** lives in `scripts/measure-cities.mjs` (run
-  after a policy change like raising the boundary cap). Boundary metadata
-  (`boundary_source`, `boundary_set_at`) is stored on the row so callers can
-  detect "measurement stale vs boundary."
-
-## The Python pipeline (separate from the app)
-
-- `scripts/measure_places.py` — computes the objective metrics from cited
-  sources. Edit `PLACES` (name, lat, lon, radius_m), run, get `measured_metrics.json`.
-- `scripts/fit_weights.py` — learns Calibrate weights by ridge regression of
-  the measured metrics against the owner's felt Slovenia scores (the answer
-  key). Reports leave-one-out R² — if low, the metrics don't capture the
-  feeling; add metrics, don't fudge weights. Needs ≥ ~8 baselined ratings.
-- `scripts/import-scores.mjs` — imports pipeline output into app state.
-- `_files_thread/HANDOFF.md` — the original methodology doc. Read it for the
-  reasoning behind the no-fake-data rule and the metric taxonomy.
+A city has a stay zone (polygon in `stay_zone_boundary`) and a measurement
+field (700 m around the densest social-POI cluster *inside* the polygon).
+The score is "best 700 m within the stay zone," not "700 m around the saved
+pin." Boundary cascade (Census Place → OSM polygon → Tract → NRHP →
+point-circle) and the API auto-refresh live in `lib/measure.js`. Full notes:
+[features/stay-zone-map.md](features/stay-zone-map.md).
 
 ## Standing direction: complete every city's measurements
 
-**Every city should carry a complete, cited measurement set.** Today no city
-is fully complete — see **METRICS_COMPLETION.md** for the live coverage
-table per metric, the gaps, and the exact script that fills each one. Treat
-that file as the project's running ledger: when you backfill a metric,
-update the coverage column so the next session sees an honest snapshot.
+**Every city should carry a complete, cited measurement set.**
+[METRICS_COMPLETION.md](METRICS_COMPLETION.md) is the live coverage table.
+When you backfill a metric, update the coverage column in the same commit.
+On a new city, run the full pipeline
+([features/city-onboarding.md](features/city-onboarding.md)) so it lands
+measured, not waiting in queue. When work isn't time-sensitive, moving a
+row closer to N/N is the default productive thing.
 
-When the work in front of you isn't time-sensitive, the default productive
-thing to do is move a row in that table closer to 78/78. The highest-value
-gap right now is the OSM batch (44 cities). When you onboard a new city,
-run the full pipeline (METRICS_COMPLETION § "Onboarding a new city") so it
-lands measured, not waiting in queue.
+## Authoring city prose
+
+When you write or edit a city's `why` / `if_wins` / `if_fails`, read
+[features/why-prose.md](features/why-prose.md) first — the 2-paragraph form
+and voice rules are project rules, not suggestions. Run
+`scripts/.audit-whys.mjs` after any onboarding batch.
 
 ## Feature documentation
 
-Major features each get a markdown file under **`features/`**. See
-**features/README.md** for the index. When you change a feature, update
-its file in the same diff — including the TODOs / future-direction
-section. Stale feature docs are worse than no feature docs; they actively
-mislead the next session.
-
-If you're touching a feature that doesn't have a doc yet (most don't), the
-polite move is to write a stub before you leave so the next session starts
-ahead of where you did. The stub should at minimum say what the feature is,
-the entry-point files, and what state it's in.
-
-Current docs (see `features/README.md` for the full index):
-- **features/city-onboarding.md** — end-to-end Supabase-first procedure for
-  adding a new city. Replaces the old `CITY_ONBOARDING.md`.
-- **features/measurer-pipeline.md** — the measurer registry, runner, and
-  the per-measurer contract. Per-key coverage in `METRICS_COMPLETION.md`.
-- **features/chips.md** — the city attribute strip on the detail page:
-  vocabulary, selection rules, current coverage, future direction.
-- **features/magazine-detail.md** — the chapter-based city detail redesign
-  (mockup at `public/city-detail-redesign.html`; live route not yet wired).
-- **features/visit-window.md** — Charm + Truth windows, year-shape, curves.
-- **features/stay-zone-map.md** — boundary cascade + adaptive measurement
-  field; polygon-on-map UI still pending.
-- **features/baseline-comparison.md** — the "always show vs Allison Park"
-  pattern from the mockup; live route doesn't render deltas yet.
-- **features/six-blocks.md** — curated walk list; data live, UI pending.
-- **features/why-prose.md** — `why` / `if_wins` / `if_fails` editorial
-  fields, the 2026-06-03 audit baseline.
+Major features each get a markdown file under [features/](features/) (index:
+[features/README.md](features/README.md)). **Update the relevant feature
+file in the same diff as the code change** — including the TODOs section.
+If you touch a feature without a doc, leave a stub.
 
 ## Conventions
 
-- Keep `lib/planner-data.js` the home for domain logic; components stay thin.
-- Per-city data lives in Supabase (see "Supabase is the source of truth").
-  `normalizeState` only fills in missing top-level fields and defaults — it
-  does not re-seed values from JS-side maps. User-entered data (surveys, trip
-  details) is preserved and never overwritten by normalize.
-- When adding a metric: add it to `metricTaxonomy` *with its source*, and the
-  Detail page renders it automatically. Don't add a metric without a citation.
-- Dev server: `npm run dev` (port 3000). The repo has no test suite; verify by
-  hitting routes and checking the rendered pages.
+- `lib/planner-data.js` is the home for domain logic; components stay thin.
+- `normalizeState` fills missing top-level fields only; it never re-seeds
+  from JS maps and never overwrites user-entered data (surveys, trips).
+- New metric → add to `metricTaxonomy` *with its source*. **Never add a
+  metric without a citation.** The Detail page renders it automatically.
+- Dev server: `npm run dev` (port 3000). No test suite — verify by driving
+  routes (auth-bypass section below).
 
 ## Verifying in the preview (auth bypass)
 
-The app is auth-gated by Supabase. To drive the preview from `preview_*`
-tools, use the local `/api/dev-login` endpoint — it's hard-disabled in
-production and mints a real Supabase session from `DEV_LOGIN_EMAIL` /
-`DEV_LOGIN_PASSWORD` (set in `.env.local`).
+The app is Supabase-auth-gated. To drive the preview, use `/api/dev-login` —
+hard-disabled in production, mints a real session from `DEV_LOGIN_EMAIL` /
+`DEV_LOGIN_PASSWORD` in `.env.local`. Two ways in:
 
-Two ways in, depending on whether the page has rendered:
-
-1. **Form rendered** — wait for `button.auth-ghost` ("Dev sign-in
-   (localhost only)") to appear, then `preview_click` it. AuthGate's
-   `devSignIn()` handles the rest. Simplest path.
-2. **Form never renders / page stuck on "Loading…"** — call the endpoint
-   directly and adopt the session via the Supabase client:
-
+1. **Form rendered** — `preview_click` on `button.auth-ghost` ("Dev
+   sign-in"). AuthGate's `devSignIn()` handles the rest.
+2. **Stuck on "Loading…"** — call the endpoint and adopt the session:
    ```js
    const r = await fetch('/api/dev-login', { method: 'POST' });
    const { access_token, refresh_token } = await r.json();
    await window.__supabase?.auth.setSession({ access_token, refresh_token });
    location.reload();
    ```
+   Do **not** hand-craft the `sb-<ref>-auth-token` localStorage entry —
+   `getSession()` will hang refreshing a session it didn't mint.
 
-   `window.__supabase` is only available if exposed; otherwise click the
-   button (option 1). Do NOT hand-craft the `sb-<ref>-auth-token`
-   localStorage entry — Supabase's `getSession()` will hang trying to
-   refresh a session it didn't mint, leaving the page in permanent
-   "Loading…".
-
-Symptoms that the dev server is itself broken (not the auth path):
-repeated `FATAL: Turbopack ... Next.js package not found` in
-`preview_logs`. GET / still returns 200 (the SSR shell renders), but the
-client chunks fail to build, so React never hydrates and no buttons appear.
-Fix by restarting the dev server; auth bypass cannot work until that's
-healthy.
+`preview_logs` showing `FATAL: Turbopack ... Next.js package not found`
+means the dev server is broken (SSR still returns 200; React never
+hydrates). Restart the dev server before retrying auth.
