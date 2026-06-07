@@ -24,6 +24,9 @@ import csv, json, statistics, subprocess, sys, os, warnings
 warnings.filterwarnings("ignore")
 import psycopg2, psycopg2.extras
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from _crowd_db import save_raw   # noqa: E402  (Supabase = source of truth)
+
 CSV_PATH = os.path.join(os.path.dirname(__file__), "..", "data", "nps", "visitation_main.csv")
 MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
 SOURCE = "nps_trv_v1"   # + ":<UNITCODE>"
@@ -52,10 +55,10 @@ def nps_shape(code):
                 except ValueError: pass
     med = [int(statistics.median(by[m])) if by[m] else 0 for m in range(1, 13)]
     if max(med) == 0:
-        return None, None
+        return None, None, None
     lo, hi = min(med), max(med)
     shape = [round((v - lo) / (hi - lo) * 5) for v in med]
-    return shape, MONTHS[med.index(hi)]
+    return shape, MONTHS[med.index(hi)], med   # med = raw monthly TRV series
 
 
 def get_secret(n):
@@ -79,11 +82,14 @@ def main():
         if not row:
             print(f"{name:<20}{code:<7}— city not in corpus, skipping")
             continue
-        shape, peak = nps_shape(code)
+        shape, peak, trv = nps_shape(code)
         if shape is None:
             print(f"{name:<20}{code:<7}NO NPS DATA — skipping")
             continue
         if do_write:
+            # Persist the raw TRV series to crowd_raw.nps (source of truth),
+            # plus the derived shape + provenance unit code.
+            save_raw(conn, cur, row["id"], "nps", {"unit": code, "trv": trv})
             cur.execute(
                 "update cities set nps_unit_code=%s, crowd_season=%s::jsonb, crowd_season_source=%s where id=%s",
                 (code, json.dumps(shape), f"{SOURCE}:{code}", row["id"]))

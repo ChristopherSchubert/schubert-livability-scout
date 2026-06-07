@@ -12,18 +12,25 @@ Cascade position: this is the FALLBACK. NPS (park towns) and Google Trends
 (primary) override it where available — they write the same crowd_season
 column with a higher-priority source tag, run after this.
 
-Durable cache (data/wiki/pageviews-cache.json): per-city raw monthly series
-for WP + WV, written after every city. Wikimedia is generous and never blocked
-us, but we still never want to re-pull. Title resolution is cached too.
+Raw per-city monthly series for WP + WV (and resolved titles) persist to
+Supabase (cities.crowd_raw.wiki) after every city — the source of truth, so we
+never re-pull and there's no local cache to go stale.
 
 Usage:
-  python3 scripts/measure-crowd-wiki.py            # pull + cache + report only
-  python3 scripts/measure-crowd-wiki.py --write     # also compute blend + write DB
-  python3 scripts/measure-crowd-wiki.py --refresh   # re-pull even if cached
+  python3 scripts/measure-crowd-wiki.py            # pull raw → DB + report
+  python3 scripts/measure-crowd-wiki.py --write     # also compute blend → crowd_season
+  python3 scripts/measure-crowd-wiki.py --refresh   # re-pull even if present
+
+Raw WP/WV series persist to Supabase (cities.crowd_raw.wiki) the instant each
+city is pulled — the DB is the source of truth; crowd_season is recomputed
+from it. Resume reads crowd_raw from the DB, not a local file.
 """
 import json, os, re, statistics, subprocess, sys, time, math, urllib.request, urllib.parse, warnings
 warnings.filterwarnings("ignore")
 import psycopg2, psycopg2.extras
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from _crowd_db import save_raw   # noqa: E402  (Supabase = source of truth)
 
 UA = "livability-scout/1.0 (tourism-seasonality research; non-commercial)"
 WV_TRAFFIC_GATE = 100   # min Wikivoyage peak monthly views to trust it in the blend
@@ -42,7 +49,6 @@ SOURCE_WP    = "wiki_wp_only_v1(wikivoyage_below_gate)"
 WIKI_INTENSITY_FLOOR = 50_000      # per-million-residents WP peak → intensity 0
 WIKI_INTENSITY_CEIL  = 3_000_000   # → intensity 5
 _WIKI_LOG_RANGE = math.log10(WIKI_INTENSITY_CEIL / WIKI_INTENSITY_FLOOR)
-CACHE_PATH = os.path.join(os.path.dirname(__file__), "..", "data", "wiki", "pageviews-cache.json")
 
 STATES = {"AL":"Alabama","AK":"Alaska","AZ":"Arizona","AR":"Arkansas","CA":"California","CO":"Colorado",
 "CT":"Connecticut","DE":"Delaware","FL":"Florida","GA":"Georgia","HI":"Hawaii","ID":"Idaho","IL":"Illinois",
@@ -151,15 +157,6 @@ def wiki_intensity(wp_peak, population):
     return int(round(math.log10(percap / WIKI_INTENSITY_FLOOR) / _WIKI_LOG_RANGE * 5))
 
 
-def load_cache():
-    if os.path.exists(CACHE_PATH):
-        return json.load(open(CACHE_PATH))
-    return {}
-
-def save_cache(c):
-    os.makedirs(os.path.dirname(CACHE_PATH), exist_ok=True)
-    json.dump(c, open(CACHE_PATH, "w"), indent=1)
-
 def get_secret(n):
     return subprocess.check_output(["security","find-generic-password","-a","livability-scout","-s",n,"-w"]).decode().strip()
 
@@ -174,12 +171,16 @@ def main():
     conn = psycopg2.connect(host="aws-1-us-west-2.pooler.supabase.com", port=5432,
         user="postgres.fitjkrmiwkdolxhitroc", password=pw, dbname="postgres", sslmode="require")
     cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-    cur.execute("select id,name,population_total from cities where lat is not null order by name")
+    cur.execute("""select id,name,population_total,
+                          coalesce(crowd_raw,'{}'::jsonb) as crowd_raw
+                   from cities where lat is not null order by name""")
     rows = cur.fetchall()
 
-    cache = load_cache()
+    # Resume state from Supabase (cities.crowd_raw.wiki), not a local file.
+    cache = {r["name"]: (r["crowd_raw"].get("wiki") or {}) for r in rows if (r["crowd_raw"] or {}).get("wiki")}
+    id_by_name = {r["name"]: r["id"] for r in rows}
 
-    # ── Pull pass: resolve titles + pull WP & WV monthly, cache per city ──
+    # ── Pull pass: resolve titles + pull WP & WV monthly, persist per city ──
     print(f"PULL: {len(rows)} cities")
     print("-" * 78)
     for r in rows:
@@ -198,8 +199,9 @@ def main():
         wv_t = resolve_title("en.wikivoyage.org", wv_cands, bare); time.sleep(0.6)
         wp, wp_pk = monthly_views("en.wikipedia", wp_t); time.sleep(0.3)
         wv, wv_pk = monthly_views("en.wikivoyage", wv_t)
-        cache[key] = {"wp_title": wp_t, "wv_title": wv_t, "wp": wp, "wv": wv, "wp_peak": wp_pk, "wv_peak": wv_pk}
-        save_cache(cache)
+        payload = {"wp_title": wp_t, "wv_title": wv_t, "wp": wp, "wv": wv, "wp_peak": wp_pk, "wv_peak": wv_pk}
+        cache[key] = payload
+        save_raw(conn, cur, r["id"], "wiki", payload)   # persist to Supabase now
         print(f"  {key:<30} WP={wp_pk:>7} ({wp_t or '—'})   WV={wv_pk:>6} ({wv_t or '—'})")
         time.sleep(0.4)
 

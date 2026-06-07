@@ -1,0 +1,16 @@
+-- 0007 — crowd_raw: the durable raw inputs behind crowd_season.
+--
+-- "Supabase is the source of truth." crowd_season (the 0–5 shape) is a DERIVED
+-- value; the raw measured signals it's computed from must live in the DB too,
+-- not in gitignored local cache files. crowd_raw stores the per-tier raw
+-- series so crowd_season / crowd_intensity are fully recomputable from
+-- Supabase alone — and so a resume run reads what's already fetched from the
+-- DB, not from disk.
+--
+-- Shape (any subset present):
+--   {
+--     "wiki":   { "wp_title","wv_title","wp":[12],"wv":[12],"wp_peak","wv_peak","asof" },
+--     "trends": { "hotels":{"anchor":[12],"city":[12]}, "things_to_do":{...}, "asof" },
+--     "nps":    { "unit","trv":[12],"asof" }
+--   }
+alter table cities add column if not exists crowd_raw jsonb;

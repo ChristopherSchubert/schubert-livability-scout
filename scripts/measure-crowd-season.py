@@ -78,8 +78,9 @@ captures Mackinac's per-template anchor curves and persists them. Every
 later run — corpus refresh OR per-city onboarding — rescales against
 those stored curves, so the corpus stays on a single ruler across years.
 
-Caches partial progress to scripts/.crowd-season-cache.json so a 429
-mid-run doesn't lose work.
+Resume state is persisted to Supabase (cities.crowd_raw.trends) the instant
+each fetch lands — the DB is the source of truth, so a 429 mid-run never
+loses work and there's no local cache file to go stale.
 """
 import re, warnings, json, math, os, statistics, subprocess, sys, time
 warnings.filterwarnings("ignore")
@@ -88,6 +89,9 @@ import psycopg2
 import psycopg2.extras
 import requests
 from pytrends.request import TrendReq
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from _crowd_db import save_raw_nested   # noqa: E402  (Supabase = source of truth)
 
 
 # Versioned method identifier — bake the anchors into the source string so a
@@ -142,7 +146,6 @@ QUERY_TEMPLATES = [
     },
 ]
 
-CACHE_PATH = os.path.join(os.path.dirname(__file__), ".crowd-season-cache.json")
 
 # ── Super-conservative pacing ────────────────────────────────────────────
 # Google's compare-query quota is cumulative and recovers slowly; today's
@@ -465,16 +468,21 @@ def intensity_log_scaled(per_million):
     return int(round(x))
 
 
-# ─── Cache ──────────────────────────────────────────────────────────────────
+# ─── Resume state (from Supabase, the source of truth) ──────────────────────
 
-def load_cache():
-    if os.path.exists(CACHE_PATH):
-        return json.load(open(CACHE_PATH))
-    return {"trends": {}, "pop": {}}
-
-
-def save_cache(c):
-    json.dump(c, open(CACHE_PATH, "w"), indent=2)
+def seed_cache_from_db(rows, ambiguous):
+    """Build the in-memory {trends: {template: {query: {anchor,city}}}} resume
+    map from cities.crowd_raw — NOT a local file. A run resumes from whatever
+    raw is already persisted in the DB."""
+    cache = {"trends": {t["key"]: {} for t in QUERY_TEMPLATES}}
+    for r in rows:
+        traw = (r.get("crowd_raw") or {}).get("trends") or {}
+        for tmpl in QUERY_TEMPLATES:
+            entry = traw.get(tmpl["key"])
+            if entry and entry.get("anchor") and entry.get("city"):
+                q = city_query(r["name"], tmpl, ambiguous)
+                cache["trends"][tmpl["key"]][q] = {"anchor": entry["anchor"], "city": entry["city"]}
+    return cache
 
 
 def load_calibration():
@@ -523,7 +531,8 @@ def main():
     conn = db()
     cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
     cur.execute("""
-        select id, name, lat, lon, population_total, crowd_season
+        select id, name, lat, lon, population_total, crowd_season,
+               coalesce(crowd_raw, '{}'::jsonb) as crowd_raw
         from cities
         where lat is not null and lon is not null
         order by name
@@ -534,12 +543,13 @@ def main():
     if limit:
         rows = rows[:limit]
 
-    cache = load_cache()
+    # Resume state comes from Supabase (cities.crowd_raw), not a local file.
+    ambiguous = ambiguous_bare_names(rows)
+    cache = seed_cache_from_db(rows, ambiguous)
 
     # --status: report resume progress (cached vs remaining per template)
     # with ZERO Google calls. Safe to run anytime to see how far the sweep got.
     if "--status" in argv:
-        ambiguous = ambiguous_bare_names(rows)
         have_pop = sum(1 for r in rows if r["population_total"])
         print(f"\nSTATUS (no fetches) — {len(rows)} cities, population {have_pop}/{len(rows)}")
         for tmpl in QUERY_TEMPLATES:
@@ -577,7 +587,8 @@ def main():
 
     # Refresh rows after population update
     cur.execute("""
-        select id, name, lat, lon, population_total, crowd_season
+        select id, name, lat, lon, population_total, crowd_season,
+               coalesce(crowd_raw, '{}'::jsonb) as crowd_raw
         from cities
         where lat is not null and lon is not null
         order by name
@@ -593,6 +604,9 @@ def main():
     ambiguous = ambiguous_bare_names(rows_all)
     if ambiguous:
         print(f"state-suffixed (collisions): {', '.join(sorted(ambiguous))}")
+    # Re-seed the resume map from the refreshed rows with the corpus-wide
+    # collision set, so the query keys match exactly what the fetch loop builds.
+    cache = seed_cache_from_db(rows, ambiguous)
 
     if not refresh:
         # Resume: only re-measure cities that DON'T have the current v3
@@ -655,11 +669,12 @@ def main():
                     break
                 continue   # tolerate one; skip this city, it resumes next run
             # Store both curves; default to zeros if Google omitted a column.
-            tmpl_cache[q] = {
-                "anchor": raw.get(anchor_q, [0]*12),
-                "city":   raw.get(q, [0]*12),
-            }
-            save_cache(cache)          # persist the instant it lands
+            entry = {"anchor": raw.get(anchor_q, [0]*12), "city": raw.get(q, [0]*12)}
+            tmpl_cache[q] = entry      # in-memory, for the compute pass
+            # Persist to Supabase immediately — one row per city sharing this
+            # query (e.g. Cleveland neighborhoods). crowd_raw.trends.<template>.
+            for r in query_groups[q]:
+                save_raw_nested(conn, cur, r["id"], "trends", tkey, entry)
             fetched_this_run += 1
             # Paranoid, jittered sleep between successful fetches.
             nap = SLEEP_BASE_S + _JITTER_CYCLE[fetched_this_run % len(_JITTER_CYCLE)]

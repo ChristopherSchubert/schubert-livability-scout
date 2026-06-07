@@ -85,6 +85,7 @@ alter table cities add column if not exists population_source   text;
 alter table cities add column if not exists crowd_season_source text;
 alter table cities add column if not exists crowd_intensity     int;
 alter table cities add column if not exists nps_unit_code       text;
+alter table cities add column if not exists crowd_raw           jsonb;
 alter table cities add column if not exists block_geometries    jsonb default '[]';
 alter table cities add column if not exists eu_lau              jsonb;
 
