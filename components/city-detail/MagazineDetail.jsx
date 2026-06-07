@@ -142,8 +142,8 @@ function ChapterWalks({ cityItem, blocks, blockGeometries }) {
   return (
     <section id="walks" className="walks" aria-label="Where to walk">
       <div className="walks-head">
-        <h2>Six blocks</h2>
-        <p className="sub">Six walks through the stay zone, ordered as a resident might do them.</p>
+        <h2>{capitalize(numberWord(blocks.length))} block{blocks.length === 1 ? "" : "s"}</h2>
+        <p className="sub">{capitalize(numberWord(blocks.length))} walk{blocks.length === 1 ? "" : "s"} through the stay zone, ordered as a resident might do them.</p>
       </div>
       <div className="walks-grid">
         {blocks.map((block, i) => {
@@ -195,6 +195,18 @@ function zoomForAccuracy(accuracy) {
     default:
       return 17;
   }
+}
+
+// Spell out small counts ("six blocks") so the header reads naturally; fall
+// back to the digit past twelve. Keeps the section title honest — it reflects
+// however many blocks the city actually carries, not a hard-coded "Six".
+const NUMBER_WORDS = ["zero", "one", "two", "three", "four", "five", "six",
+  "seven", "eight", "nine", "ten", "eleven", "twelve"];
+function numberWord(n) {
+  return NUMBER_WORDS[n] ?? String(n);
+}
+function capitalize(s) {
+  return s ? s[0].toUpperCase() + s.slice(1) : s;
 }
 
 function splitName(name) {
