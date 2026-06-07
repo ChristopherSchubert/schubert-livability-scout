@@ -158,13 +158,37 @@ export default function TripPlanner() {
     return lanes;
   }, [planning, laneWeeks, viewStart, todayDay]);
 
-  const committedLanes = useMemo(() => committed.map((c) => {
-    const arrive = fromYmd(c.arriveDate);
-    const depart = fromYmd(c.departDate);
-    const start = arrive ? daysBetween(viewStart, arrive) : todayDay;
-    const len = arrive && depart ? Math.max(1, daysBetween(arrive, depart) + 1) : DEFAULT_TRIP_LEN;
-    return { city: c, weeks: laneWeeks(c), start, len };
-  }).sort((a, b) => a.start - b.start), [committed, laneWeeks, viewStart, todayDay]);
+  const committedLanes = useMemo(() => {
+    const arr = committed.map((c) => {
+      const arrive = fromYmd(c.arriveDate);
+      const depart = fromYmd(c.departDate);
+      const start = arrive ? daysBetween(viewStart, arrive) : todayDay;
+      const len = arrive && depart ? Math.max(1, daysBetween(arrive, depart) + 1) : DEFAULT_TRIP_LEN;
+      return { city: c, weeks: laneWeeks(c), start, len, row: 0 };
+    }).sort((a, b) => a.start - b.start);
+    // greedy row assignment so overlapping trips stack instead of colliding
+    const rowEnds = [];
+    for (const l of arr) {
+      let row = rowEnds.findIndex((end) => end <= l.start);
+      if (row < 0) { row = rowEnds.length; rowEnds.push(l.start + l.len); }
+      else rowEnds[row] = l.start + l.len;
+      l.row = row;
+    }
+    return arr;
+  }, [committed, laneWeeks, viewStart, todayDay]);
+  const committedRows = useMemo(
+    () => committedLanes.reduce((m, l) => Math.max(m, l.row + 1), 1),
+    [committedLanes],
+  );
+
+  // Pan-left bound: today, OR earlier if a committed trip is already under way
+  // (so an in-progress trip renders whole instead of clipping at the edge).
+  // Planning into the past stays blocked separately (the box clamps to today).
+  const leftBound = useMemo(() => {
+    let lb = todayDay;
+    for (const l of committedLanes) if (l.start < lb) lb = l.start;
+    return Math.max(0, lb);
+  }, [committedLanes, todayDay]);
 
   // ── lane order (session-local; drag the grip to override the start sort) ─
   const [order, setOrder] = useState([]);
@@ -296,7 +320,7 @@ export default function TripPlanner() {
     const vw = () => (ruler ? ruler.clientWidth : root.clientWidth);
     const content = () => S.dayW * N;
     function clampPan() {
-      const maxP = -(todayDay * S.dayW);
+      const maxP = -(leftBound * S.dayW);
       const minP = Math.min(maxP, vw() - content());
       if (S.panX > maxP) S.panX = maxP;
       if (S.panX < minP) S.panX = minP;
@@ -383,8 +407,9 @@ export default function TripPlanner() {
       redraw();
     }
 
-    // initial pan: today at the left edge
-    S.panX = -(todayDay * S.dayW);
+    // initial pan: earliest-needed day at the left edge (today, or an
+    // in-progress committed trip's start if it began before today)
+    S.panX = -(leftBound * S.dayW);
     clampPan();
     apply();
 
@@ -504,7 +529,7 @@ export default function TripPlanner() {
       for (let w = a; w <= b; w++) { st += weeks[w].t || 0; sx += weeks[w].x; ss += weeks[w].score; n++; }
       n = n || 1;
       pop.textContent = "";
-      setHero(bgUrl(lane.querySelector(".trip-pl-thumb")));
+      setHero(bgUrl(lane.querySelector(".lthumb")));
       const cy = document.createElement("div"); cy.className = "pcity"; cy.textContent = "Your trip · " + lane.dataset.city; pop.appendChild(cy);
       const h = document.createElement("h4");
       const t = document.createElement("span"); t.textContent = fmt(off, len);
@@ -789,7 +814,7 @@ export default function TripPlanner() {
       if (thresh) thresh.removeEventListener("input", onThresh);
       pop.remove(); editor.remove();
     };
-  }, [wiringKey, todayDay, viewStart]);
+  }, [wiringKey, todayDay, viewStart, leftBound]);
 
   // ── render helpers ────────────────────────────────────────────────────
   function heroFor(cityItem) {
@@ -868,7 +893,7 @@ export default function TripPlanner() {
           <div className="llabel" />
           <div className="lbody">
             <div className="trip-pl-scroller">
-              <div className="track planned-track">
+              <div className="track planned-track" style={{ height: 12 + committedRows * 48 }}>
                 <div className="trip-pl-today" style={{ left: `calc(var(--day-w)*${todayDay})` }} />
                 {committedLanes.map((l) => {
                   const hero = heroFor(l.city);
@@ -881,7 +906,7 @@ export default function TripPlanner() {
                       data-start={l.start}
                       data-len={l.len}
                       data-weeks={l.weeks ? JSON.stringify(l.weeks) : ""}
-                      style={{ left: `calc(var(--day-w)*${l.start})`, width: `calc(var(--day-w)*${l.len})` }}
+                      style={{ left: `calc(var(--day-w)*${l.start})`, width: `calc(var(--day-w)*${l.len})`, top: 6 + l.row * 48, transform: "none" }}
                     >
                       <span className="trip-pl-thumb" style={hero ? { backgroundImage: `url(${hero})` } : undefined}>{hero ? "" : l.city.name.slice(0, 1)}</span>
                       <span className="btext">
@@ -943,7 +968,7 @@ export default function TripPlanner() {
                   <span className="lthumb" style={hero ? { backgroundImage: `url(${hero})` } : undefined}>{hero ? "" : l.city.name.slice(0, 1)}</span>
                   <span className="ltext">
                     <span className="lcity">{l.city.name}</span>
-                    {best ? <span className="lrec">best ≈ {best.label}</span> : <span className="lrec lmuted">conditions not measured</span>}
+                    {best ? <span className="lrec">Best score {best.score} · week of {best.label}</span> : <span className="lrec lmuted">conditions not measured</span>}
                   </span>
                   <button
                     type="button"

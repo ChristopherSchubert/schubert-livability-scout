@@ -304,6 +304,28 @@ Planner-specific tokens:
 - All three verified in-browser (Chromium): reorder moves the dragged lane;
   ghost tracks + cancels cleanly on an off-target drop.
 
+### Audit vs the mockup (2026-06-07)
+Fixed after a side-by-side audit with real data populated in Planning:
+- **Planning-box hover hero** was querying `.trip-pl-thumb` (committed-bar
+  class) instead of the planning lane's `.lthumb` → no photo. Fixed.
+- **`.lrec`** restored to the mockup wording "Best score N · week of …".
+- **Committed trips that overlap in time now stack on rows** (greedy
+  assignment) instead of colliding on one track; the Planned track height
+  grows with the row count. The mockup only ever had one committed trip.
+- **In-progress committed trip** (started before today) no longer clips at
+  the left edge — the pan-left bound is `min(today, earliest committed
+  start)`; planning a box into the past is still blocked.
+- **↩ un-commit** moved to a hover-only corner chip (was crowding the bar).
+
+Minor, intentionally not matched (additions/divergences, flag if wanted):
+- No day-of-week letter row in the ruler (mockup had M T W… + weekend
+  shading). Day **hash lines** are present via the track background.
+- Grip is a single `⠿` and drags from the grip only (mockup: `⠿⠿`, whole
+  label draggable).
+- Backlog card subtitle is "drag up ↑" (mockup: "~7 nights").
+- ✓ commit / ↩ un-commit / × demote / backlog drag-to-place are additions
+  beyond the static mockup.
+
 ## TODOs / future direction
 - Decide whether lane order / the planning set persists (a column) or stays
   session-local. (Promote/commit/demote persist via `status`; order does not.)

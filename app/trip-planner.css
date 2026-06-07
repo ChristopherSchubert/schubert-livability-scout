@@ -219,7 +219,7 @@
 }
 .trip-pl-bar:hover .bcommit { opacity: 1; }
 .bcommit:hover { filter: brightness(1.12); }
-.bcommit.unlock { background: var(--panel); color: var(--accent); top: 50%; right: 6px; transform: translateY(-50%); opacity: 0.85; }
+.bcommit.unlock { background: var(--panel); color: var(--accent); top: -9px; right: -9px; opacity: 0; }
 .trip-pl-bar.is-planned:hover .bcommit.unlock { opacity: 1; }
 
 /* planning section controls */
