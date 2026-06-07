@@ -5,6 +5,39 @@ season: **Charm** (the month that's comfortable *after* crowds thin) and
 **Truth** (the coldest month — the January test made literal). A
 candidate should pass both before it advances.
 
+## Crowd-season source cascade (current)
+
+`crowd_season` (the 12-month SHAPE) comes from the best available source
+per city. Higher tiers override lower; `crowd_season_source` records which
+tier produced each city's curve.
+
+1. **NPS recreation-visits** (`nps_trv_v1:<UNIT>`, ground-truth *presence*) —
+   6 towns where a National Park Service unit's visitors are the town's
+   tourists on the same trip (St. Augustine/Castillo, Charleston/Fort Sumter,
+   Savannah/Fort Pulaski, Salem/Salem Maritime, Manteo/Fort Raleigh,
+   Astoria/Lewis & Clark). Monthly entrance counts → seasonality. The unit is
+   stored in `cities.nps_unit_code`. Script: `scripts/measure-crowd-nps.py`.
+   Data: `data/nps/` (see SOURCE.md). This is the most honest signal — actual
+   bodies, not search interest — and notably beat Wikipedia where it matters
+   (Salem's October Haunted-Happenings dominance; St. Augustine's
+   Nights-of-Lights December surge).
+2. **Google Trends** (`gtrends_pop_norm_v3_…`, tourism-coded *intent*) — the
+   intended primary for the bulk of the corpus, but Google's compare-query
+   quota rate-limits bulk runs. Engine is hardened + resumable
+   (`scripts/measure-crowd-season.py`); run from fresh quota windows to
+   upgrade cities. Not yet broadly applied.
+3. **Wikipedia × Wikivoyage blend** (`wiki_blend_v1` / `wiki_wp_only_v1`,
+   *interest* proxy) — the live fallback covering the remaining 115 cities.
+   Traffic-gated geometric mean of within-city-normalized Wikipedia and
+   Wikivoyage monthly pageviews: the two cancel each other's noise
+   (Wikipedia's event/university contamination spikes vs Wikivoyage's
+   low-traffic jitter). Script: `scripts/measure-crowd-wiki.py`.
+
+`crowd_intensity` (cross-city MAGNITUDE, drives chart line-muting) is set by
+whichever tier wrote the city; bases differ per tier (NPS leaves the Wiki
+intensity in place; Wiki uses per-capita WP-peak log-scaled 50k/M–3M/M;
+Trends uses hotel-search per-capita). Documented as tier-specific.
+
 ## How it works today
 
 - **Data**:
