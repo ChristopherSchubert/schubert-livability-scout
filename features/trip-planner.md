@@ -298,8 +298,9 @@ Planner-specific tokens:
 
 ### Interactions ported (full set, 2026-06-07)
 - **Lane sort** — a segmented control in the Planning header: **None**
-  (manual), **Next trip** (by the scheduled box, the default), **Best time**
-  (by each city's peak visit score, highest first). Session-local `sortMode`.
+  (manual), **Next trip** (by the scheduled box, the default), **Best now**
+  (by each city's visit score *this week*, highest first — surfaces where to
+  go right now, not the yearly peak). Session-local `sortMode`.
 - **Lane drag-to-reorder** — grip (⠿) on each lane label; pointer-drag ↕
   reorders. Dragging snapshots the visible order and switches sort to
   **None** (manual `order` state), re-merged when the planning set changes.

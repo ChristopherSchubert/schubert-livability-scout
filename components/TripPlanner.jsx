@@ -153,8 +153,9 @@ export default function TripPlanner() {
       if (start < todayDay) start = todayDay;
       if (start + len > N) start = N - len;
       if (start < 0) start = 0;
-      const bestScore = weeks ? weeks.reduce((m, w) => Math.max(m, w.score), -1) : -1;
-      return { city: c, weeks, start, len, bestScore };
+      const wkNow = Math.min(WEEKS - 1, Math.max(0, Math.floor(todayDay / 7)));
+      const scoreNow = weeks ? (weeks[wkNow]?.score ?? -1) : -1;
+      return { city: c, weeks, start, len, scoreNow };
     });
     return lanes; // base order; display order is applied by sortMode below
   }, [planning, laneWeeks, viewStart, todayDay]);
@@ -215,7 +216,7 @@ export default function TripPlanner() {
   const displayLanes = useMemo(() => {
     const lanes = [...planLanes];
     if (sortMode === "next") return lanes.sort((a, b) => a.start - b.start);
-    if (sortMode === "best") return lanes.sort((a, b) => b.bestScore - a.bestScore);
+    if (sortMode === "best") return lanes.sort((a, b) => b.scoreNow - a.scoreNow);
     // "none" → manual order
     if (order.length) {
       const byId = new Map(lanes.map((l) => [l.city.id, l]));
@@ -963,7 +964,7 @@ export default function TripPlanner() {
                 <span className="sortlbl">Sort</span>
                 <button type="button" className={sortMode === "none" ? "on" : ""} onClick={() => setSortMode("none")}>None</button>
                 <button type="button" className={sortMode === "next" ? "on" : ""} onClick={() => setSortMode("next")}>Next trip</button>
-                <button type="button" className={sortMode === "best" ? "on" : ""} onClick={() => setSortMode("best")} title="Best time to visit (peak score first)">Best time</button>
+                <button type="button" className={sortMode === "best" ? "on" : ""} onClick={() => setSortMode("best")} title="Highest visit score this week">Best now</button>
               </div>
               <div className="togs">
                 <label className="tog"><input type="checkbox" id="tpFeels" /> <span style={{ color: "#a8651c" }}>Feels-like</span></label>
