@@ -21,6 +21,8 @@ docs are worse than no feature docs.
 | Measurer pipeline (objective data → Supabase) | [measurer-pipeline.md](measurer-pipeline.md) | documented; per-key coverage in [METRICS_COMPLETION.md](../METRICS_COMPLETION.md) |
 | Chips (city attribute strip) | [chips.md](chips.md) | documented |
 | Visit window (Charm + Truth months) | [visit-window.md](visit-window.md) | stub — live but mockup adds year-shape + curves |
+| Trip calendar (drag-to-schedule wall-planner) | [trip-calendar.md](trip-calendar.md) | live at `/visit/calendar` |
+| Trip planner (swim-lane year view + design study) | [trip-planner.md](trip-planner.md) | design locked; mockup in `/public`, port pending |
 | Baseline comparison (vs Allison Park) | [baseline-comparison.md](baseline-comparison.md) | stub — only in mockup |
 | Six blocks (curated walk list) | [six-blocks.md](six-blocks.md) | stub — data live, UI pending |
 | Deployment (Vercel auto-deploy from `main`) | [deployment.md](deployment.md) | documented |
