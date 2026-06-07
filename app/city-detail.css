@@ -701,81 +701,169 @@
 .cd-root .climate-legend .sw.crowd { background: var(--warn); }
 .cd-root .climate-legend .sw.crowd.low-intensity { background: var(--warn); opacity: 0.4; }
 .cd-root .climate-legend .sw.visit { background: #1b1814; }
-.cd-root .climatology {
-      margin-top: 1.5rem;
-      padding-top: 1.5rem;
-      border-top: 1px solid var(--hair);
-    }
-.cd-root .climatology svg { display: block; width: 100%; height: auto; overflow: visible; }
-.cd-root .climatology .row-label {
-      font-family: 'Inter Tight', sans-serif;
-      font-size: 15px;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      fill: var(--ink);
-      font-weight: 600;
-    }
-.cd-root .climatology .row-unit {
-      font-family: 'Inter Tight', sans-serif;
-      font-size: 13px;
-      letter-spacing: 0.1em;
-      fill: var(--ink-mute);
-    }
-.cd-root .climatology .row-rule { stroke: var(--hair); stroke-width: 1; }
-.cd-root .climatology .bar {
-      fill: rgba(27,24,20,0.32);
-    }
-.cd-root .climatology .bar.high { fill: #b86a3f; opacity: 0.62; }
-.cd-root .climatology .bar.feel { fill: #a23a30; opacity: 0.62; }
-.cd-root .climatology .bar.low { fill: #4a78a8; opacity: 0.62; }
-.cd-root .climatology .bar.precip { fill: #6e7d8c; opacity: 0.62; }
-.cd-root .climatology .bar.ref.high { fill: url(#hatch-high);   stroke: #b86a3f; stroke-width: 0.7; opacity: 0.95; }
-.cd-root .climatology .bar.ref.feel { fill: url(#hatch-feel);   stroke: #a23a30; stroke-width: 0.7; opacity: 0.95; }
-.cd-root .climatology .bar.ref.low { fill: url(#hatch-low);    stroke: #4a78a8; stroke-width: 0.7; opacity: 0.95; }
-.cd-root .climatology .bar.ref.precip { fill: url(#hatch-precip); stroke: #6e7d8c; stroke-width: 0.7; opacity: 0.95; }
-.cd-root .climatology .val {
-      font-family: 'Fraunces', serif;
-      font-variation-settings: "opsz" 20, "wght" 600;
-      font-size: 18px;
-      fill: var(--ink);
-      text-anchor: middle;
-    }
-.cd-root .climatology .delta {
-      font-family: 'Inter Tight', sans-serif;
-      font-size: 12px;
-      font-weight: 600;
-      letter-spacing: 0.02em;
-      text-anchor: middle;
-    }
-.cd-root .climatology .delta.pos { fill: #b86a3f; }
-.cd-root .climatology .delta.neg { fill: #4a78a8; }
-.cd-root .climatology .delta.zero { fill: var(--ink-mute); }
-.cd-root .climatology .gridline { stroke: rgba(27,24,20,0.06); stroke-width: 1; }
-.cd-root .climatology .month-label {
-      font-family: 'Inter Tight', sans-serif;
-      font-size: 14px;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      fill: var(--ink-mute);
-      text-anchor: middle;
-    }
-.cd-root .climatology-caption {
-      margin-top: 0.6rem;
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-      font-family: 'Inter Tight', sans-serif;
-      font-size: 0.72rem;
-      letter-spacing: 0.06em;
-      color: var(--ink-mute);
-    }
-.cd-root .climatology-caption .ref-swatch {
-      display: inline-block;
-      width: 10px; height: 12px;
-      background-image: repeating-linear-gradient(45deg, rgba(27,24,20,0.55) 0 1px, transparent 1px 3.5px);
-      border: 1px solid rgba(27,24,20,0.55);
-      vertical-align: -2px;
-    }
+/* ===== Climate heatmap (Chapter V: When to go) =============================
+ * Replaces the prior small-multiples SVG (bars + deltas vs Allison Park).
+ * One colored cell per month per metric, on a scale consistent across every
+ * city. Color carries the meaning; the legends underneath each block (temp
+ * after Low, precip after Precip) calibrate against well-known anchor
+ * cities. Diverging temp ramp pivots on 74°F to match monthComfort()'s
+ * outdoor-ideal target. */
+.cd-root .climate-heatmap {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--hair);
+  display: grid;
+  grid-template-columns: 70px repeat(12, 1fr);
+  column-gap: 3px;
+  row-gap: 3px;
+}
+.cd-root .climate-heatmap .ch-corner {}
+.cd-root .climate-heatmap .ch-month {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 6px;
+  font-family: 'Inter Tight', 'Inter', sans-serif;
+  font-size: 10.5px;
+  color: var(--ink-mute);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.cd-root .climate-heatmap .ch-label {
+  display: flex;
+  align-items: center;
+  padding-right: 12px;
+  font-family: 'Inter Tight', 'Inter', sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+}
+.cd-root .climate-heatmap .ch-cell {
+  aspect-ratio: 3 / 1;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Fraunces', serif;
+  font-variation-settings: "opsz" 24, "wght" 600;
+  font-size: 14px;
+  color: var(--ink);
+  line-height: 1;
+}
+.cd-root .climate-heatmap .ch-cell.light-text { color: #fbf9f3; }
+.cd-root .climate-heatmap .ch-cell.dim { opacity: 0.55; }
+.cd-root .climate-heatmap .ch-cell.dim.light-text { color: rgba(251,249,243,0.92); }
+.cd-root .climate-heatmap .ch-cell.ch-empty { background: transparent; }
+
+/* Inline legends — temp sits under the temp rows, precip under the precip row. */
+.cd-root .climate-heatmap .ch-legend {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 70px 1fr;
+}
+.cd-root .climate-heatmap .ch-legend-temp { margin: 14px 0 18px; }
+.cd-root .climate-heatmap .ch-legend-precip { margin: 14px 0 6px; }
+.cd-root .climate-heatmap .ch-legend-label {
+  font-family: 'Inter Tight', 'Inter', sans-serif;
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  padding-right: 12px;
+  display: flex;
+  align-items: center;
+}
+.cd-root .climate-heatmap .ch-ramp {
+  position: relative;
+  height: 8px;
+  border-radius: 2px;
+  box-shadow: inset 0 0 0 1px rgba(27,24,20,0.08);
+  align-self: center;
+}
+.cd-root .climate-heatmap .ch-ramp-temp {
+  background: linear-gradient(to right,
+    rgb(22,35,70) 0%, rgb(40,70,122) 9%, rgb(78,122,168) 17%,
+    rgb(130,175,200) 27%, rgb(196,220,210) 38%,
+    rgb(231,228,195) 48%, rgb(232,196,130) 58%,
+    rgb(216,138,78) 72%, rgb(186,72,50) 85%, rgb(128,30,30) 100%);
+}
+.cd-root .climate-heatmap .ch-ramp-precip {
+  height: 6px;
+  background: linear-gradient(to right,
+    rgb(248,244,230) 0%, rgb(220,212,188) 12.5%,
+    rgb(170,178,178) 37.5%, rgb(110,130,156) 62.5%, rgb(50,76,124) 100%);
+}
+
+/* Tick marks + labels on the ramps */
+.cd-root .climate-heatmap .ch-tick {
+  position: absolute;
+  top: 100%;
+  transform: translateX(-50%);
+  padding-top: 3px;
+  font-family: 'Inter Tight', 'Inter', sans-serif;
+  font-size: 9px;
+  color: var(--ink-mute);
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.cd-root .climate-heatmap .ch-tick::before {
+  content: "";
+  position: absolute;
+  top: -3px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1px;
+  height: 4px;
+  background: rgba(27,24,20,0.3);
+}
+.cd-root .climate-heatmap .ch-tick.ch-above {
+  top: auto;
+  bottom: 100%;
+  padding-top: 0;
+  padding-bottom: 1px;
+}
+.cd-root .climate-heatmap .ch-extreme {
+  font-style: italic;
+  color: #aaa498;
+  font-size: 10px;
+}
+.cd-root .climate-heatmap .ch-extreme::before { display: none; }
+.cd-root .climate-heatmap .ch-extreme-left { transform: translateX(0); }
+.cd-root .climate-heatmap .ch-extreme-right { transform: translateX(-100%); }
+.cd-root .climate-heatmap .ch-ref .ch-tick-name {
+  font-style: italic;
+  color: var(--ink-mute);
+  font-weight: 500;
+}
+.cd-root .climate-heatmap .ch-ref .ch-tick-name::after {
+  content: " · ";
+  color: #aaa498;
+  font-weight: 400;
+}
+.cd-root .climate-heatmap .ch-ref .ch-tick-val {
+  color: var(--ink-mute);
+  font-weight: 700;
+}
+.cd-root .climate-heatmap .ch-now {
+  color: var(--ink);
+  font-weight: 700;
+}
+.cd-root .climate-heatmap .ch-now::before { background: var(--ink); height: 6px; top: -4px; }
+.cd-root .climate-heatmap .ch-now .ch-tick-name {
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.cd-root .climate-heatmap .ch-now .ch-tick-name::after {
+  content: " · ";
+  color: #aaa498;
+  font-weight: 400;
+}
+.cd-root .climate-heatmap .ch-now .ch-tick-val { font-weight: 700; color: var(--ink); }
 .cd-root .climate-foot {
       display: flex;
       justify-content: space-between;

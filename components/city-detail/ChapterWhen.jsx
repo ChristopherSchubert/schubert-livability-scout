@@ -3,6 +3,8 @@
 // mockup's hand-pinned Newport numbers. When a city has no climate data yet we
 // render an honest "pending" stub instead of a fabricated chart.
 
+import { Fragment } from "react";
+
 const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 const MONTH_LONG = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 const X = (i) => 60 + i * (960 / 11);
@@ -139,68 +141,177 @@ function Annotation({ idx, y, cls, label, sub }) {
   );
 }
 
-// Three small-multiples rows (high / low / precip), each pairing the city's
-// month against the home base (Allison Park) when its climate is known.
-function Climatology({ climate, homebase }) {
-  const ref = Array.isArray(homebase?.visitClimate) && homebase.visitClimate.length === 12 ? homebase.visitClimate : null;
-  // "Feels" earns a row when the felt high (heat index OR wind chill) diverges
-  // from the air-temp high by ≥3°F in any month. Hot/humid cities qualify in
-  // summer; cold/windy cities qualify in winter. Mild-everywhere cities skip
-  // the row so it doesn't just echo the High line.
-  const hasFeel = Array.isArray(climate) && climate.some((m) => m?.feltHigh != null && m.hi != null && Math.abs(m.feltHigh - m.hi) >= 3);
-  const rows = [
-    ...(hasFeel ? [{ key: "feel", label: "Feels", pick: (m) => m?.feltHigh, max: 110, fmt: (v) => String(Math.round(v)) }] : []),
-    { key: "high",   label: "High",   pick: (m) => m?.hi,       max: 90, fmt: (v) => String(Math.round(v)) },
-    { key: "low",    label: "Low",    pick: (m) => m?.lo,       max: 80, fmt: (v) => String(Math.round(v)) },
-    { key: "precip", label: "Precip", pick: (m) => m?.precipIn, max: 7,  fmt: (v) => v.toFixed(1) },
+// ---- Climate heatmap (replaces the old bar+delta SVG) ---------------------
+//
+// One colored cell per month per metric. Color encodes value on a single
+// scale that's consistent across every city, so the user can flip between
+// detail pages and compare at a glance without re-reading the scale.
+//
+// Temperature uses a diverging ramp centered on 74°F — the same outdoor-ideal
+// pivot monthComfort() penalizes around — so the legend matches the math
+// driving Charm/Truth window selection. Precipitation is sequential: 0″ pale
+// paper → 8″+ deep blue. City reference anchors on each legend (Minneapolis
+// Jan, Phoenix Jul, Miami Sep) let the user calibrate without reading numbers.
+const TEMP_STOPS = [
+  { t:  -5, c: [22, 35, 70] },
+  { t:  20, c: [40, 70, 122] },
+  { t:  35, c: [78, 122, 168] },
+  { t:  52, c: [130, 175, 200] },
+  { t:  66, c: [196, 220, 210] },
+  { t:  74, c: [231, 228, 195] },   // pivot — sweet spot, pale warm cream
+  { t:  82, c: [232, 196, 130] },
+  { t:  92, c: [216, 138,  78] },
+  { t: 100, c: [186,  72,  50] },
+  { t: 112, c: [128,  30,  30] },
+];
+const PRECIP_STOPS = [
+  { t: 0, c: [248, 244, 230] },
+  { t: 1, c: [220, 212, 188] },
+  { t: 3, c: [170, 178, 178] },
+  { t: 5, c: [110, 130, 156] },
+  { t: 8, c: [ 50,  76, 124] },
+];
+const TEMP_REFS = [
+  { v: 22,  name: "Minneapolis Jan" },
+  { v: 74,  name: "Outdoor ideal", cls: "now" },
+  { v: 89,  name: "Atlanta Jul" },
+  { v: 106, name: "Phoenix Jul" },
+];
+const PRECIP_REFS = [
+  { v: 0.4, name: "Phoenix Jul" },
+  { v: 3.0, name: "Typical US Jul" },
+  { v: 7.5, name: "Miami Sep" },
+];
+function rampColor(v, stops) {
+  if (v == null) return [240, 235, 220];
+  for (let i = 0; i < stops.length - 1; i++) {
+    const a = stops[i], b = stops[i + 1];
+    if (v >= a.t && v <= b.t) {
+      const k = (v - a.t) / (b.t - a.t);
+      return a.c.map((ca, j) => Math.round(ca + (b.c[j] - ca) * k));
+    }
+  }
+  return v < stops[0].t ? stops[0].c : stops[stops.length - 1].c;
+}
+const tempColor = (v) => rampColor(v, TEMP_STOPS);
+const precipColor = (v) => rampColor(v, PRECIP_STOPS);
+function needsLightText([r, g, b]) {
+  const norm = [r, g, b].map((c) => {
+    const s = c / 255;
+    return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+  });
+  return (0.2126 * norm[0] + 0.7152 * norm[1] + 0.0722 * norm[2]) < 0.45;
+}
+const rgbStr = (c) => `rgb(${c[0]}, ${c[1]}, ${c[2]})`;
+const tempPct = (v) => {
+  const min = TEMP_STOPS[0].t, max = TEMP_STOPS[TEMP_STOPS.length - 1].t;
+  return Math.max(0, Math.min(100, ((v - min) / (max - min)) * 100));
+};
+const precipPct = (v) => {
+  const max = PRECIP_STOPS[PRECIP_STOPS.length - 1].t;
+  return Math.max(0, Math.min(100, (v / max) * 100));
+};
+
+function Climatology({ climate }) {
+  // "Feels" earns its own row when the felt high (heat index OR wind chill)
+  // diverges from the air-temp high by ≥3°F somewhere in the year. Hot/humid
+  // cities qualify in summer; cold/windy cities qualify in winter. Mild-air
+  // cities skip the row so it doesn't echo High.
+  const hasFeel = Array.isArray(climate) && climate.some(
+    (m) => m?.feltHigh != null && m.hi != null && Math.abs(m.feltHigh - m.hi) >= 3
+  );
+  const tempRows = [
+    ...(hasFeel ? [{ key: "feel", label: "Feels", pick: (m) => m?.feltHigh, dimmed: false }] : []),
+    { key: "high", label: "High", pick: (m) => m?.hi, dimmed: true },
+    { key: "low",  label: "Low",  pick: (m) => m?.lo, dimmed: true },
   ];
-  const vbH = 200 + rows.length * 90;
-  const labelY = vbH - 15;
   return (
-    <div className="climatology" aria-label="Monthly normals — daily high, daily low, precipitation">
-      <svg viewBox={`0 0 1080 ${vbH}`} preserveAspectRatio="xMinYMid meet" role="img">
-        <defs>
-          <pattern id="hatch-high" patternUnits="userSpaceOnUse" width="3.5" height="3.5" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="3.5" stroke="#b86a3f" strokeWidth="1.3" /></pattern>
-          <pattern id="hatch-feel" patternUnits="userSpaceOnUse" width="3.5" height="3.5" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="3.5" stroke="#a23a30" strokeWidth="1.3" /></pattern>
-          <pattern id="hatch-low" patternUnits="userSpaceOnUse" width="3.5" height="3.5" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="3.5" stroke="#4a78a8" strokeWidth="1.3" /></pattern>
-          <pattern id="hatch-precip" patternUnits="userSpaceOnUse" width="3.5" height="3.5" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="3.5" stroke="#6e7d8c" strokeWidth="1.3" /></pattern>
-        </defs>
-        {rows.map((row, r) => (
-          <g key={row.key} transform={`translate(0, ${r * 90})`}>
-            <text className="row-label" x="0" y="10">{row.label}</text>
-            <line className="row-rule" x1="0" y1="16" x2="1080" y2="16" />
-            <line className="gridline" x1="60" y1="80" x2="1020" y2="80" />
-            {climate.map((m, i) => {
-              const v = row.pick(m);
-              if (v == null) return null;
-              const cx = X(i);
-              const h = Math.max(0, (v / row.max) * 28);
-              const rv = ref ? row.pick(ref[i]) : null;
-              const rh = rv != null ? Math.max(0, (rv / row.max) * 28) : null;
-              const delta = rv != null ? v - rv : null;
-              return (
-                <g key={i}>
-                  {delta != null ? (
-                    <text className={`delta ${delta > 0 ? "pos" : delta < 0 ? "neg" : "zero"}`} x={cx} y="30">
-                      {delta > 0 ? "+" : ""}{row.key === "precip" ? delta.toFixed(1) : Math.round(delta)}
-                    </text>
-                  ) : null}
-                  <text className="val" x={cx} y="48">{row.fmt(v)}</text>
-                  <rect className={`bar ${row.key}`} x={cx - 14} y={80 - h} width="12" height={h} />
-                  {rh != null ? <rect className={`bar ref ${row.key}`} x={cx + 2} y={80 - rh} width="12" height={rh} /> : null}
-                </g>
-              );
-            })}
-          </g>
+    <div className="climate-heatmap" aria-label="Monthly climate normals — felt high, dry-air high, low, precipitation">
+      {/* Month header row */}
+      <div className="ch-corner" />
+      {MONTHS.map((mo) => <div key={`hdr-${mo}`} className="ch-month">{mo}</div>)}
+
+      {/* Temperature data rows */}
+      {tempRows.map((row) => (
+        <Fragment key={row.key}>
+          <div className="ch-label">{row.label}</div>
+          {climate.map((m, i) => {
+            const v = row.pick(m);
+            if (v == null) {
+              return <div key={i} className="ch-cell ch-empty" aria-hidden="true" />;
+            }
+            const c = tempColor(v);
+            return (
+              <div
+                key={i}
+                className={"ch-cell" + (row.dimmed ? " dim" : "") + (needsLightText(c) ? " light-text" : "")}
+                style={{ background: rgbStr(c) }}
+              >
+                {Math.round(v)}
+              </div>
+            );
+          })}
+        </Fragment>
+      ))}
+
+      {/* Temp legend, inline directly under the temperature rows */}
+      <Legend
+        kind="temp"
+        label="Temp °F"
+        extremes={["frigid", "brutal heat"]}
+        refs={TEMP_REFS}
+        pct={tempPct}
+        fmtVal={(v) => `${Math.round(v)}°`}
+      />
+
+      {/* Precip row */}
+      <div className="ch-label">Precip</div>
+      {climate.map((m, i) => {
+        const v = m?.precipIn;
+        if (v == null) return <div key={i} className="ch-cell ch-empty" aria-hidden="true" />;
+        const c = precipColor(v);
+        return (
+          <div
+            key={i}
+            className={"ch-cell" + (needsLightText(c) ? " light-text" : "")}
+            style={{ background: rgbStr(c) }}
+          >
+            {v.toFixed(1).replace(/\.0$/, "")}
+          </div>
+        );
+      })}
+
+      {/* Precip legend, inline directly under the precip row */}
+      <Legend
+        kind="precip"
+        label="Precip ″"
+        extremes={["dry", "tropical wet"]}
+        refs={PRECIP_REFS}
+        pct={precipPct}
+        fmtVal={(v) => `${v.toFixed(1).replace(/\.0$/, "")}″`}
+      />
+    </div>
+  );
+}
+
+function Legend({ kind, label, extremes, refs, pct, fmtVal }) {
+  return (
+    <div className={`ch-legend ch-legend-${kind}`}>
+      <div className="ch-legend-label">{label}</div>
+      <div className={`ch-ramp ch-ramp-${kind}`}>
+        <span className="ch-tick ch-extreme ch-above ch-extreme-left" style={{ left: "0%" }}>{extremes[0]}</span>
+        <span className="ch-tick ch-extreme ch-above ch-extreme-right" style={{ left: "100%" }}>{extremes[1]}</span>
+        {refs.map((r) => (
+          <span
+            key={r.v}
+            className={`ch-tick ${r.cls === "now" ? "ch-now" : "ch-ref"}`}
+            style={{ left: `${pct(r.v)}%` }}
+          >
+            <span className="ch-tick-name">{r.name}</span>
+            <span className="ch-tick-val">{fmtVal(r.v)}</span>
+          </span>
         ))}
-        <g transform={`translate(0, ${labelY})`}>
-          {MONTHS.map((mo, i) => <text key={mo} className="month-label" x={X(i)} y="0">{mo}</text>)}
-        </g>
-      </svg>
-      <p className="climatology-caption">
-        High/Low{hasFeel ? " / Feels-like (heat index)" : ""} in °F · Precip in inches
-        {ref ? <> · <span className="ref-swatch" aria-hidden="true" /> hatched bars show the same months in <strong style={{ color: "var(--ink)", fontWeight: 600 }}>{homebase.name}</strong> (your home base) for comparison.</> : null}
-      </p>
+      </div>
     </div>
   );
 }
