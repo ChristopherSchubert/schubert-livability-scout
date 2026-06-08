@@ -1,16 +1,34 @@
 "use client";
 
-// Tiny read-only Leaflet mini-map for one "Six blocks" card. Mirrors the
-// recipe from public/city-detail-redesign.html (lines ~2208-2240 in the
-// mockup script): no controls, no drag, no zoom, just OSM tiles + a dark
-// double-ring marker centered on the block. The vintage-atlas tile filter
-// is applied via .walk-leaflet .leaflet-tile-pane img in app/city-detail.css.
+// Tiny read-only Leaflet mini-map for one "Six blocks" card. No controls, no
+// drag, no zoom — just OSM tiles + a marker centered on the block. The
+// vintage-atlas tile filter is applied via .walk-leaflet .leaflet-tile-pane img
+// in app/city-detail.css.
+//
+// The marker is a CSS divIcon (not a plain CircleMarker) so it can carry the
+// app's editorial palette and depth: an accent-green dot in a paper ring, a
+// soft drop shadow, and a faint accent halo so it reads clearly over the
+// vintage tiles. Styles are inline here on purpose, to stay self-contained.
 //
 // Lives next to WhereMap.jsx (the big stay-zone map). Both are imported
 // dynamically with ssr:false by MagazineDetail — Leaflet needs `window`.
 
-import { MapContainer, TileLayer, CircleMarker } from "react-leaflet";
+import { MapContainer, TileLayer, Marker } from "react-leaflet";
+import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+
+// App palette (city-detail.css): accent #0d4c44, paper #fbf6ea, ink #1b1814.
+const blockPin = L.divIcon({
+  className: "block-pin-icon",
+  iconSize: [20, 20],
+  iconAnchor: [10, 10],
+  html:
+    '<span style="' +
+    "display:block;box-sizing:border-box;width:20px;height:20px;border-radius:50%;" +
+    "background:#0d4c44;border:3px solid #fbf6ea;" +
+    "box-shadow:0 1px 5px rgba(27,24,20,.55), 0 0 0 6px rgba(13,76,68,.16);" +
+    '"></span>',
+});
 
 export default function BlockMap({ lat, lon, zoom }) {
   if (lat == null || lon == null) return null;
@@ -32,12 +50,7 @@ export default function BlockMap({ lat, lon, zoom }) {
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         maxZoom={19}
       />
-      <CircleMarker
-        center={[lat, lon]}
-        radius={9}
-        pathOptions={{ color: "#fbf6ea", weight: 3, fillColor: "#0d4c44", fillOpacity: 1 }}
-        interactive={false}
-      />
+      <Marker position={[lat, lon]} icon={blockPin} interactive={false} keyboard={false} />
     </MapContainer>
   );
 }
