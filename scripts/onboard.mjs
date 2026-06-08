@@ -41,16 +41,20 @@ import { dirname, join } from "node:path";
   }
 }
 
+import { execFileSync } from "node:child_process";
 import { connect, listCities } from "../lib/measurers/_db.js";
 import { pickMeasurers } from "../lib/measurers/_registry.js";
 import { runForCity, formatResultRow } from "../lib/measurers/_runner.js";
 
+const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));   // reuses imports above
+
 function parseArgs(argv) {
-  const args = { measurer: "all", slug: null, force: false, dryRun: false, limit: null };
+  const args = { measurer: "all", slug: null, force: false, dryRun: false, limit: null, noCrowd: false };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === "--force") args.force = true;
     else if (a === "--dry-run") args.dryRun = true;
+    else if (a === "--no-crowd") args.noCrowd = true;
     else if (a === "--measurer") args.measurer = argv[++i];
     else if (a === "--slug") args.slug = argv[++i];
     else if (a === "--limit") args.limit = Number(argv[++i]);
@@ -60,6 +64,26 @@ function parseArgs(argv) {
   return args;
 }
 
+// crowd_season isn't a JS measurer (its signals come from Python: Wikimedia +
+// Google Trends). After the JS measurers fill the row (incl. population_total,
+// which the scorer needs), kick off the crowd pipeline so a newly-onboarded
+// city gets a crowd_season too — collect raw (Wiki tier; pulls only cities
+// lacking crowd_raw.wiki) then run the master scorer. NPS (curated) and Trends
+// (rate-limited windowed sweep) layer on later per the cascade.
+function runCrowdPipeline() {
+  const py = (script, ...a) => {
+    console.log(`  → python3 ${script} ${a.join(" ")}`);
+    try {
+      execFileSync("python3", [join(SCRIPT_DIR, script), ...a], { stdio: "inherit" });
+    } catch (e) {
+      console.error(`  crowd step ${script} FAILED: ${e.message} (run it manually)`);
+    }
+  };
+  console.log("\n# crowd_season pipeline (collect raw → score)");
+  py("measure-crowd-wiki.py");            // pulls WP+WV for cities missing crowd_raw.wiki
+  py("score-crowd-season.py", "--write"); // crowd_raw → crowd_season (cascade)
+}
+
 function printHelp() {
   console.error(`onboard.mjs — measure cities into Supabase
 
@@ -67,10 +91,14 @@ function printHelp() {
   --measurer <id[,id,...]>   subset of measurers (default: all)
   --force                    re-run measurers even if outputs already present
   --dry-run                  run measurers but skip the DB write
+  --no-crowd                 skip the crowd_season pipeline at the end
   --limit <n>                cap city count (test runs)
 
   measurers: climate, snowfall, water, osm_context, osm_core, terrain,
              horizon, skyline, admin, blocks, census, walkscore
+
+  After a full run (--measurer all), the crowd_season pipeline runs:
+  measure-crowd-wiki.py (collect raw) → score-crowd-season.py --write.
 `);
 }
 
@@ -105,4 +133,11 @@ try {
   console.log(`\n${cities.length} cities | ok ${ok} | skipped ${skipped} | errored ${errored}`);
 } finally {
   await client.end();
+}
+
+// Crowd pipeline runs after the JS measurers (and after the DB client closes —
+// the Python scripts open their own connection). Skip on dry-run, on targeted
+// --measurer subsets (crowd isn't one of those), or when --no-crowd is given.
+if (!args.dryRun && args.measurer === "all" && !args.noCrowd) {
+  runCrowdPipeline();
 }

@@ -77,6 +77,21 @@ will leave `snowfall_in_yr` as `null` — that is the correct outcome.
 Anything the pipeline couldn't source stays `null`. **Do not hand-enter a
 value to fill a gap.**
 
+After the JS measurers, a **full onboard (`--measurer all`, the default) also
+runs the crowd_season pipeline** — it's not a JS measurer because its signals
+come from Python (Wikimedia + Google Trends). `onboard.mjs` shells out to:
+
+```
+measure-crowd-wiki.py        # collect WP+WV raw → cities.crowd_raw.wiki
+score-crowd-season.py --write  # crowd_raw → crowd_season (NPS>Trends>Wiki cascade)
+```
+
+So a newly-onboarded city gets a `crowd_season` (Wiki tier) automatically. The
+NPS tier (curated park towns) and the Trends tier (rate-limited windowed sweep,
+`measure-crowd-season.py`) layer on later and re-score via the same scorer. Pass
+`--no-crowd` to skip this. The crowd pipeline runs *after* the census measurer
+so `population_total` (the scorer's per-capita denominator) is already set.
+
 For the live per-metric coverage table and which measurer fills which key,
 see [METRICS_COMPLETION.md](../METRICS_COMPLETION.md).
 
@@ -85,8 +100,8 @@ see [METRICS_COMPLETION.md](../METRICS_COMPLETION.md).
 The `climate` measurer writes `visit_climate` (12 months of NASA-POWER-derived
 normals) as part of step 3. If a city is somewhere POWER can't reach (very
 small islands, etc.) the column stays null and you write the months directly
-into the row. Crowd season and notes are qualitative — they go in the same
-row's `crowd_season` (12 ints 0–5) and `season_notes` (`{ charm, truth }`).
+into the row. `crowd_season` is now measured by the crowd pipeline above (not
+qualitative); only `season_notes` (`{ charm, truth }`) is hand-authored prose.
 
 ### 5. Set `drive_hrs_from_pit`
 
