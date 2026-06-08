@@ -61,10 +61,11 @@ less location string.
   `.save-block-proposals.mjs --commit` applies picks (excludes the
   Slovenia anchors + Allison Park homebase). After saving, re-run the
   measurer below to resolve coordinates.
-  **Allison Park is the owner's *actual current house*** — its pin is a
-  residential address, not a downtown. ~0 walkable POIs is the correct,
-  expected reading: it is the unwalkable **baseline** every candidate is
-  scored against, not a coverage bug. Do not "fix" it.
+  **Allison Park is the owner's home** — its pin is a residential
+  address, not a downtown, so ~0 walkable POIs is the correct, expected
+  reading, not a coverage bug. It's the familiar place the owner compares
+  others against. Describe it neutrally as a home; do not "fix" it. (See
+  CLAUDE.md Corollary 3 — no place is "set up to look bad.")
   **NOTE:** the measured Aliveness metrics (`cafe_n`/`bar_n`/`rest_n` in
   `lib/measure.js`) still come from OSM and carry the same coverage gap —
   a known follow-up, not yet migrated to Google.
@@ -122,8 +123,9 @@ less location string.
 - **Data layer (blocks)**: backfilled corpus-wide (2026-06-07) via the
   Google Places + DBSCAN generator. **106 of 117** candidate cities carry
   a full 6; the rest land lower by honest density (small towns: Jim Thorpe
-  2, Lewisburg WV / Sewickley 3, Beacon / Verona 4). The 4 reference
-  anchors (Bled, Piran, Ljubljana, Allison Park) intentionally carry none.
+  2, Lewisburg WV / Sewickley 3, Beacon / Verona 4). The 4 reference places
+  (Bled, Piran, Ljubljana, Allison Park) carry none — they're the owner's
+  known benchmarks, not scored candidates, so the generator skips them.
   An earlier OSM-only pass undercounted badly (only 72 reached 6, Lewisburg
   read as ~0) — switching the POI signal to Google fixed it. New blocks
   came from [scripts/.gen-block-candidates.mjs](../scripts/.gen-block-candidates.mjs),

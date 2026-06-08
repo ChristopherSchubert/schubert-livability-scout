@@ -149,13 +149,18 @@ if (slugArg) {
   cities = rows;
 } else { console.error("pass --slug <slug[,slug]> or --all"); await client.end(); process.exit(2); }
 
+// --skip-cached: opt-in resume. NOT the default — a bbox count includes POIs
+// spilled in from an adjacent city's fetch, so auto-skipping silently left
+// dense neighborhoods (Strip District, Squirrel Hill) with only partial data.
+// Default is to (re)fetch every requested city; the upsert is idempotent.
+const skipCached = argv.includes("--skip-cached");
 let total = 0;
 for (const city of cities) {
-  if (!force) {
+  if (skipCached && !force) {
     const { rows } = await client.query(
       `select count(*)::int n from pois where lat between $1 and $2 and lon between $3 and $4`,
       [city.lat - 0.012, city.lat + 0.012, city.lon - 0.012, city.lon + 0.012]);
-    if (rows[0].n > 0) { console.log(`${city.slug}: ${rows[0].n} cached, skip (--force to refetch)`); continue; }
+    if (rows[0].n > 0) { console.log(`${city.slug}: ${rows[0].n} cached, skip`); continue; }
   }
   try {
     const n = await fetchCity(client, city);
