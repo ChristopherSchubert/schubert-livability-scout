@@ -30,15 +30,23 @@ numbers → When to go → Where to walk). This is the live layout at
     polygon, the saved visit pin, and the 700 m measurement field.
   - [FloatingToc.jsx](../components/city-detail/FloatingToc.jsx) — the editorial
     chapter rail; scroll-driven active-section highlight, reveals after the Why.
-    It's `position: fixed; right: 0` and floats in the right gutter, so it only
-    works when the centered text/data columns (≤1200 px) leave gutter to spare.
-    Three bands (all in `city-detail.css`): **≥1640 px** full titles; **1281–
-    1640 px** collapses to numerals-only (titles on hover/focus) to fit the
-    thin gutter; **≤1280 px** hidden entirely (`@media (max-width: 1280px)`) —
-    below that the columns fill the width and even a numeral would graze the
-    metrics; the top nav + in-page DETAIL/VISIT tabs carry wayfinding there.
-    Full-bleed sections (hero, where-map) intentionally pass under the rail;
-    the left-fading gradient scrim is its legibility layer.
+    `position: fixed; right: 0`, living in a **reserved right lane** (`--rail-
+    gutter`, 4rem). Every centered text/data section (`.why`, `.where-head/foot`,
+    `.data`, `.when`, `.walks`) adds that much right padding so the rail's
+    numerals never touch the content — at *any* width (verified clearance ≥26px
+    from 430→1700px). Full-bleed sections (hero, where-map) opt out and let the
+    rail float over them; the left-fading gradient scrim is its legibility layer.
+    - **One small form at every width.** At rest the rail is numerals only (no
+      width-based hide/disclose bands — resizing never pops titles in or out).
+      On hover/focus the titles slide out *to the left* of the numerals as an
+      overlay; `flex-direction: row-reverse` keeps the numerals pinned at the
+      right edge so they don't shift. The expanded state swaps to a near-opaque
+      background gradient (`:hover/:focus-within`) so titles stay legible over
+      the content they cover.
+    - **Gotcha:** the title toggles via `display` (none↔block), *not* an
+      animated `width`/`max-width`. In this shrink-to-fit fixed rail, a grid/flex
+      item with `overflow:hidden` contributes zero intrinsic width, so a width
+      animation silently collapses the track to 0 and the title never appears.
   - **Grid blowout guard.** The axis grid (`.axes`) and the climate heatmap
     (`.climate-heatmap`) both use `repeat(N, minmax(0, 1fr))`, **not**
     `repeat(N, 1fr)`. Plain `1fr` is `minmax(auto, 1fr)`, so a `white-space:

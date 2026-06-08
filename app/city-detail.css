@@ -22,6 +22,11 @@
   --map-land:   #ece4d0;
   --map-water:  #c5d4d8;
   --map-street: #fbf6ea;
+  /* Right-side lane the collapsed chapter rail (FloatingToc) lives in. Every
+     centered text/data section reserves this much on its right so the rail's
+     numerals never touch the content, at any width. Full-bleed sections (hero,
+     where-map) opt out and let the rail float over them. */
+  --rail-gutter: 4rem;
   background: var(--paper); color: var(--ink);
   font-family: 'Fraunces', Georgia, serif; font-variation-settings: "opsz" 14, "SOFT" 50, "wght" 400; font-size: 18px; line-height: 1.7; -webkit-font-smoothing: antialiased;
 }
@@ -129,7 +134,7 @@
 .cd-root .why {
       max-width: 46rem;
       margin: 5rem auto 4rem;
-      padding: 0 1.5rem;
+      padding: 0 var(--rail-gutter) 0 1.5rem;
     }
 .cd-root .why .eyebrow { margin-bottom: 1.4rem; }
 .cd-root .why-lead {
@@ -199,7 +204,7 @@
 .cd-root .where-head {
       max-width: 1180px;
       margin: 0 auto;
-      padding: 1rem 2rem 0.85rem;
+      padding: 1rem var(--rail-gutter) 0.85rem 2rem;
       display: flex;
       justify-content: space-between;
       align-items: baseline;
@@ -361,7 +366,7 @@
 .cd-root .where-foot {
       max-width: 1180px;
       margin: 0 auto;
-      padding: 0.6rem 2rem 0.85rem;
+      padding: 0.6rem var(--rail-gutter) 0.85rem 2rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -407,7 +412,7 @@
 .cd-root .data {
       max-width: 1180px;
       margin: 3rem auto;
-      padding: 0 2rem;
+      padding: 0 var(--rail-gutter) 0 2rem;
     }
 .cd-root .data-head {
       display: flex;
@@ -574,7 +579,7 @@
     }
 .cd-root .when {
       background: linear-gradient(180deg, var(--paper) 0%, var(--paper-deep) 100%);
-      padding: 4rem 2rem 5rem;
+      padding: 4rem var(--rail-gutter) 5rem 2rem;
       border-top: 1px solid var(--hair);
     }
 .cd-root .when-inner { max-width: 1080px; margin: 0 auto; }
@@ -965,7 +970,7 @@
 .cd-root .walks {
       max-width: 1200px;
       margin: 6rem auto 0;
-      padding: 0 2rem;
+      padding: 0 var(--rail-gutter) 0 2rem;
     }
 .cd-root .walks-head {
       padding-bottom: 1.3rem;
@@ -1142,30 +1147,30 @@
       letter-spacing: 0.06em;
     }
 .cd-root .osm-attribution a { color: inherit; }
+/* The chapter rail sits in the reserved right lane (--rail-gutter). At rest it
+   shows numerals only — the same small form at EVERY width, so resizing never
+   pops titles in or out. Titles slide out on hover/focus as a temporary overlay
+   over the content, which is why that state switches to a near-solid backing. */
 .cd-root .toc {
       position: fixed;
       right: 0;
       top: 50%;
       transform: translateY(-50%);
-      
       z-index: 1100;
-      
       opacity: 0;
       pointer-events: none;
-      transition: opacity 320ms ease;
+      transition: opacity 320ms ease, background 200ms ease;
       display: flex;
       flex-direction: column;
       align-items: flex-end;
       gap: 0.35rem;
-      padding: 1.4rem 1.6rem 1.4rem 3.5rem;
+      padding: 0.9rem 0.95rem 0.9rem 3.5rem;
       background: linear-gradient(
         to left,
-        rgba(251, 246, 234, 0.92) 0%,
-        rgba(251, 246, 234, 0.78) 40%,
-        rgba(251, 246, 234, 0.35) 80%,
+        rgba(251, 246, 234, 0.9) 0%,
+        rgba(251, 246, 234, 0.7) 55%,
         rgba(251, 246, 234, 0) 100%
       );
-      pointer-events: none;
     }
 .cd-root .toc.is-visible {
       opacity: 1;
@@ -1173,11 +1178,26 @@
 .cd-root .toc.is-visible a {
       pointer-events: auto;
     }
+/* Expanded: titles overlay the content, so the backing goes nearly opaque. */
+.cd-root .toc.is-visible:hover,
+.cd-root .toc.is-visible:focus-within {
+      background: linear-gradient(
+        to left,
+        rgba(251, 246, 234, 0.98) 0%,
+        rgba(251, 246, 234, 0.97) 72%,
+        rgba(251, 246, 234, 0.9) 88%,
+        rgba(251, 246, 234, 0) 100%
+      );
+    }
 .cd-root .toc a {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      column-gap: 0.85rem;
+      /* flex + justify-end keeps the numeral pinned to the right edge whether or
+         not the title is present, so toggling the title's `display` never shifts
+         the numerals. (Animating a grid track's width in this shrink-to-fit fixed
+         rail is unreliable — display toggle is robust.) */
+      display: flex;
+      flex-direction: row-reverse;
       align-items: baseline;
+      gap: 0.85rem;
       text-decoration: none;
       color: var(--ink-mute);
       padding: 0.15rem 0;
@@ -1190,9 +1210,15 @@
       font-size: 0.92rem;
       letter-spacing: 0.005em;
       color: var(--ink-mute);
-      white-space: nowrap;
       text-align: right;
-      transition: color 220ms ease;
+      white-space: nowrap;
+      /* collapsed at every width — the rail shrinks to just the numerals, which
+         live in the reserved gutter. Shown on hover/focus (with the opaque bg). */
+      display: none;
+    }
+.cd-root .toc:hover .title,
+.cd-root .toc:focus-within .title {
+      display: block;
     }
 .cd-root .toc .num {
       font-family: 'Fraunces', serif;
@@ -1200,7 +1226,7 @@
       font-variation-settings: "opsz" 30, "SOFT" 80, "wght" 400;
       font-size: 0.78rem;
       letter-spacing: 0.06em;
-      width: 1.6rem;
+      width: 1.4rem;
       text-align: left;
       color: var(--ink-mute);
       opacity: 0.55;
@@ -1212,6 +1238,8 @@
       font-variation-settings: "opsz" 18, "SOFT" 80, "wght" 500;
     }
 .cd-root .toc a.is-current .num { color: var(--accent); opacity: 1; }
+/* The current-chapter dash only shows when expanded (it would otherwise poke
+   left of the numeral, out of the reserved lane and into the content). */
 .cd-root .toc a.is-current::before {
       content: "—";
       position: absolute;
@@ -1220,43 +1248,12 @@
       font-family: 'Fraunces', serif;
       letter-spacing: 0;
       font-size: 0.88rem;
+      opacity: 0;
+      transition: opacity 200ms ease;
     }
+.cd-root .toc:hover a.is-current::before,
+.cd-root .toc:focus-within a.is-current::before { opacity: 1; }
 .cd-root .toc .rule { display: none; }
-@media (max-width: 1640px) {
-  .cd-root .toc {
-        padding: 0.85rem 0.9rem 0.85rem 2.4rem;
-        background: linear-gradient(
-          to left,
-          rgba(251, 246, 234, 0.92) 0%,
-          rgba(251, 246, 234, 0.78) 55%,
-          rgba(251, 246, 234, 0) 100%
-        );
-      }
-  .cd-root .toc .title {
-        max-width: 0;
-        opacity: 0;
-        overflow: hidden;
-        white-space: nowrap;
-        transition: max-width 280ms ease, opacity 200ms ease 60ms, margin 280ms ease;
-        margin-right: 0;
-      }
-  .cd-root .toc:hover .title, .cd-root .toc:focus-within .title {
-        max-width: 160px;
-        opacity: 1;
-      }
-  .cd-root .toc .num {
-        font-size: 0.78rem;
-        width: 1.4rem;
-      }
-}
-/* The rail floats in the right gutter. The centered text/data columns only
-   spare gutter at wider viewports; below ~1280px they fill the width and even
-   the numeral rail has nowhere to sit without grazing the metrics — so retire
-   it there. Wayfinding falls back to the top nav + in-page DETAIL/VISIT tabs.
-   (Raises the old 760px hide point.) */
-@media (max-width: 1280px) {
-  .cd-root .toc { display: none; }
-}
 
 /* keyframes (global names) */
 @keyframes candidate-pulse {
