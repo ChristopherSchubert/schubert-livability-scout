@@ -128,6 +128,31 @@ create table if not exists user_weights (
   weights jsonb not null default '{}'
 );
 
+-- ── pois (SHARED, cached) ───────────────────────────────────────────────────
+-- Local cache of social POIs from Google Places (New). OSM coverage was too
+-- thin to measure social life; this is the durable store so Google is hit once
+-- per city (scripts/.fetch-pois.mjs) and queried offline after. Global (one row
+-- per place_id) — a POI is looked up by lat/lon radius, so it serves every
+-- nearby city. See migrations/0008_pois.sql.
+create table if not exists pois (
+  place_id          text primary key,
+  name              text,
+  lat               double precision not null,
+  lon               double precision not null,
+  primary_type      text,
+  types             text[],
+  rating            real,
+  user_rating_count integer,
+  price_level       text,
+  business_status   text,
+  street            text,
+  formatted_address text,
+  source            text not null default 'google_places',
+  fetched_at        timestamptz not null default now()
+);
+create index if not exists pois_lat_lon_idx on pois (lat, lon);
+create index if not exists pois_primary_type_idx on pois (primary_type);
+
 -- ── Row-Level Security ──────────────────────────────────────────────────────
 alter table profiles        enable row level security;
 alter table cities          enable row level security;

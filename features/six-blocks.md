@@ -18,17 +18,23 @@ less location string.
   proposes new ones from real social-POI density — it never invents. A
   block is a *spot* (an intersection or named place), found with a
   principled two-layer algorithm rather than hand-tuned thresholds:
-  1. Gather social POIs (food/drink + stroll retail + arts/culture)
-     within ~1 km of the pin from **Google Places** (Nearby Search New),
-     **tiled** (the API caps at 20 results/call) and deduped by place id.
-     **Why Google, not OSM:** OSM POI coverage is too thin — it had *zero*
-     of The Wine Cave, Tú y Yo Café, Barrel Junction (all real, hundreds
-     of reviews) and showed Lewisburg WV / Verona as near-empty when
-     Google finds 20+. Treating OSM's absence as "no social life" was the
-     classic *zero-is-not-null* trap. Car/big-box types are omitted so
-     suburbs don't false-inflate (Allison Park still reads ~0, correctly).
-     **No polygon clip** — the saved `stay_zone_boundary` is often
-     mis-sized (Saratoga's clipped 69 of 95 POIs), so we work from density.
+  1. Read social POIs (food/drink + stroll retail + arts/culture) within
+     ~1 km of the pin from the **local `pois` cache** — a Supabase table
+     populated from **Google Places** (Nearby Search New) by
+     [scripts/.fetch-pois.mjs](../scripts/.fetch-pois.mjs), which tiles
+     each city (the API caps at 20 results/call), dedupes by place id, and
+     stores the full Enterprise field set (rating, userRatingCount, types,
+     priceLevel, businessStatus, street). Google is hit **once per city**;
+     generation runs offline against the cache. Permanently/temporarily
+     **closed places are excluded**. **Why Google, not OSM:** OSM POI
+     coverage is too thin — it had *zero* of The Wine Cave, Tú y Yo Café,
+     Barrel Junction (all real, hundreds of reviews) and showed Lewisburg
+     WV / Verona as near-empty when Google finds 20+. Treating OSM's
+     absence as "no social life" was the classic *zero-is-not-null* trap.
+     Car/big-box types are omitted so suburbs don't false-inflate (Allison
+     Park still reads ~0, correctly). **No polygon clip** — the saved
+     `stay_zone_boundary` is often mis-sized (Saratoga's clipped 69 of 95
+     POIs), so we work from density.
   2. **DBSCAN** (`eps` ~85 m, `minPts` 3) finds the genuine dense
      region(s) and labels sparser POIs as noise → dropped. This is the
      honest cut-losses rule.

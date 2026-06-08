@@ -45,20 +45,8 @@ import { dirname, join } from "node:path";
 }
 process.env.OVERPASS_URL ||= "http://localhost:12345/api/interpreter";
 
-import { execFileSync } from "node:child_process";
 import { overpass, haversine } from "../lib/measure.js";
 import { connect } from "../lib/measurers/_db.js";
-
-// Google Places API key — env override, else macOS Keychain (account
-// livability-scout, like the DB password). The pipeline runs locally only.
-function googleKey() {
-  if (process.env.GOOGLE_PLACES_API_KEY) return process.env.GOOGLE_PLACES_API_KEY;
-  if (process.env.GKEY) return process.env.GKEY;
-  return execFileSync("security",
-    ["find-generic-password", "-a", "livability-scout", "-s", "google-places-api-key", "-w"],
-    { encoding: "utf8" }).trim();
-}
-const GKEY = googleKey();
 
 const TARGET = 6;          // cap on blocks shown per city; the real count is
                            //   whatever DBSCAN finds (often fewer). Dynamic header.
@@ -132,73 +120,24 @@ async function allSlugs(client) {
   return rows;
 }
 
-// ── POI gather: Google Places (New), tiled ────────────────────────────────────
-// OSM POI coverage is too thin for this — it had ZERO of The Wine Cave, Tú y Yo,
-// Barrel Junction (all real, hundreds of Google reviews), and showed Lewisburg
-// WV / Verona as near-empty when Google finds 20+. So the *social-POI signal*
-// comes from Google; OSM stays only for street geometry + parks (well-mapped).
-//
-// "Social POI" = what creates street life: food & drink, stroll retail, arts &
-// culture. Car/big-box types are simply omitted from includedTypes so suburbs
-// don't false-inflate. Nearby Search (New) caps at 20 results/call, so we tile a
-// grid of small-radius searches over the gather area and dedupe by place id.
-const GOOGLE_TYPES = [
-  "restaurant", "cafe", "coffee_shop", "bakery", "bar", "pub", "wine_bar",
-  "ice_cream_shop", "meal_takeaway", "art_gallery", "book_store", "clothing_store",
-  "gift_shop", "jewelry_store", "shoe_store", "florist", "liquor_store", "market",
-  "museum", "tourist_attraction", "performing_arts_theater", "movie_theater",
-];
-const TILE_R = 350;   // radius of each Nearby search
-const TILE_STEP = 450; // grid spacing (< 2·TILE_R so circles overlap, no holes)
-
-async function googleNearby(lat, lon, radius) {
-  const body = JSON.stringify({
-    includedTypes: GOOGLE_TYPES,
-    maxResultCount: 20,
-    locationRestriction: { circle: { center: { latitude: lat, longitude: lon }, radius } },
-  });
-  let lastErr;
-  for (let attempt = 0; attempt < 3; attempt++) {
-    try {
-      const r = await fetch("https://places.googleapis.com/v1/places:searchNearby", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-Goog-Api-Key": GKEY,
-          "X-Goog-FieldMask": "places.id,places.location,places.displayName,places.addressComponents",
-        },
-        body,
-      });
-      const j = await r.json();
-      if (j.error) throw new Error(j.error.message || JSON.stringify(j.error));
-      return j.places || [];
-    } catch (e) { lastErr = e; await sleep(800 * (attempt + 1)); }
-  }
-  throw new Error(`Google Places (after retries): ${lastErr?.message || lastErr}`);
-}
-
-async function socialPois(lat, lon) {
-  const mPerLat = 111320, mPerLon = 111320 * Math.cos((lat * Math.PI) / 180);
-  const seen = new Map();
-  for (let dy = -RADIUS_M; dy <= RADIUS_M; dy += TILE_STEP) {
-    for (let dx = -RADIUS_M; dx <= RADIUS_M; dx += TILE_STEP) {
-      if (Math.hypot(dx, dy) > RADIUS_M + TILE_R) continue; // skip corners outside the disk
-      const tlat = lat + dy / mPerLat, tlon = lon + dx / mPerLon;
-      const places = await googleNearby(tlat, tlon, TILE_R);
-      for (const p of places) {
-        if (!p.id || !p.location) continue;
-        if (haversine(lat, lon, p.location.latitude, p.location.longitude) > RADIUS_M) continue;
-        const route = (p.addressComponents || []).find((a) => (a.types || []).includes("route"));
-        if (!seen.has(p.id)) seen.set(p.id, {
-          lat: p.location.latitude, lon: p.location.longitude,
-          name: p.displayName?.text || null,
-          street: route ? (route.shortText || route.longText) : null,
-        });
-      }
-      await sleep(40);
-    }
-  }
-  return [...seen.values()];
+// ── POI gather: local `pois` cache (populated from Google Places) ─────────────
+// The social-POI signal lives in the local `pois` table — fetched from Google
+// Places once per city by scripts/.fetch-pois.mjs, queried offline here. OSM was
+// too thin (zero of The Wine Cave / Tú y Yo / Barrel Junction; Lewisburg read as
+// near-empty), so OSM is kept only for street geometry + parks. Permanently/
+// temporarily closed places are excluded — we're caching, so a shuttered spot
+// shouldn't seed a block.
+async function socialPois(client, lat, lon) {
+  const d = 0.013; // ~1.4 km bbox prefilter; haversine refine below
+  const { rows } = await client.query(
+    `select lat, lon, name, street, user_rating_count
+       from pois
+      where lat between $1 and $2 and lon between $3 and $4
+        and (business_status is null or business_status = 'OPERATIONAL')`,
+    [lat - d, lat + d, lon - d, lon + d]);
+  return rows
+    .filter((r) => haversine(lat, lon, r.lat, r.lon) <= RADIUS_M)
+    .map((r) => ({ lat: r.lat, lon: r.lon, name: r.name, street: r.street, reviews: r.user_rating_count ?? 0 }));
 }
 
 async function namedRoads(lat, lon) {
@@ -419,10 +358,9 @@ function nameSpot(c, members, feats, roadIndex, roads) {
   return { block: tidyStreet(street), why: null, street: sN };
 }
 
-async function generate(city, originalBlocks) {
+async function generate(client, city, originalBlocks) {
   const { lat, lon } = city;
-  const pois = await socialPois(lat, lon);
-  await sleep(250);
+  const pois = await socialPois(client, lat, lon);
   const roads = await namedRoads(lat, lon);
   await sleep(250);
   const feats = await namedFeatures(lat, lon);
@@ -465,7 +403,7 @@ for (const slug of targets) {
   if (!city) { console.error(`! no city ${slug}`); continue; }
   const original = ORIGINALS[slug] ?? city.blocks ?? [];
   try {
-    const res = await generate(city, original);
+    const res = await generate(client, city, original);
     out[slug] = { name: city.name, existing: original, ...res };
     if (!asJson) {
       console.log(`\n## ${city.name} (${slug}) — have ${original.length}, need ${res.need}  [${res.poiCount} POIs]`);
