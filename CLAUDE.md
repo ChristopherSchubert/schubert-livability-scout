@@ -148,8 +148,44 @@ suggestions. Run `scripts/.audit-whys.mjs` after any onboarding batch.
 
 Major features each get a markdown file under [features/](features/) (index:
 [features/README.md](features/README.md)). **Update the relevant feature
-file in the same diff as the code change** — including the TODOs section.
-If you touch a feature without a doc, leave a stub.
+file in the same diff as the code change** — including the follow-ups
+section. If you touch a feature without a doc, leave a stub.
+
+## TODOs and follow-ups
+
+When you ship a feature with deferred work, the deferred work goes to a
+**GitHub issue**, not an inline checkbox. The feature doc links to the
+issue numbers so the explanation that makes the work legible stays
+right next to the design that created it. Pattern (see
+[features/walking-core.md](features/walking-core.md#follow-ups-tracked-as-github-issues)
+for an example):
+
+```
+## Follow-ups (tracked as GitHub issues)
+
+- **#42 — One-line title.** A paragraph or two explaining what the
+  work is and why it's deferred, with file links to the relevant
+  code. The issue itself can be tight; this is where future-you
+  rediscovers context.
+```
+
+When to use this vs. the project's other TODO surfaces:
+
+- **GitHub issues** — concrete shippable units of work. "Drop the legacy
+  `_n` measurers." "Investigate why Piran's score is zero." Things you'd
+  realistically do as one commit.
+- **`features/*.md` follow-up sections** — list the issue numbers + the
+  context. The list IS the issue tracker for that feature; reading it
+  refreshes why each item exists.
+- **`TODO.md`** — project-level wishlist, cross-feature priorities, ideas
+  not yet shaped enough to be issues.
+- **`METRICS_COMPLETION.md`** — the metric-coverage ledger with its
+  built-in "Remaining gaps" + "Backfill plan" sections. Don't duplicate
+  metric backfill work into issues; it lives there.
+
+Labels in use: `data-quality`, `polish`, `follow-up` (created
+2026-06-08 alongside the walking-core ship). Plus GitHub defaults
+(`bug`, `enhancement`, `documentation`).
 
 ## Conventions
 

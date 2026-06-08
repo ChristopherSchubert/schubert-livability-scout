@@ -186,18 +186,28 @@ POIs within the bbox, almost always because its pin is in suburbia or off
 the main grid. Allison Park sits in this state legitimately; for any other
 city it usually means the pin is in the wrong place.
 
-## TODOs
+## Follow-ups (tracked as GitHub issues)
 
-- [ ] Adaptive centering. The measurer currently uses the saved visit pin
-  directly. The osm-core measurer uses `findVisitCenters` to slide to the
-  densest 700 m cluster inside the stay-zone polygon — walking-core should
-  do the same. ([lib/measure.js](../lib/measure.js#findVisitCenters))
-- [ ] Drop the legacy `_n` measurers + taxonomy entries after one
-  measurement cycle confirms the new scores look right (see above).
-- [ ] Region label per city for the full-screen view. Currently the
-  subtitle is synthesized from the city name (Slovenia / Pennsylvania); a
-  curated `nearby_feature` column would let us render "Adriatic Sea" /
-  "Lake Bled" / "Walnut Street" properly.
-- [ ] Re-run [`fit_weights.py`](../scripts/fit_weights.py) once every city
-  has `_score` values, to absorb the new metric scale into the calibrate
-  weights.
+Per the project's TODO convention — concrete shippable work that's
+distinct from this feature's design goes to GitHub issues; the
+explanation that makes them legible stays here. See
+[CLAUDE.md](../CLAUDE.md) → "TODOs and follow-ups" for the rule.
+
+- **#1 — Adaptive centering**: walking-core uses the saved visit pin.
+  osm-core uses `findVisitCenters` to slide to the densest 700 m cluster
+  inside the stay-zone polygon — walking-core should do the same.
+  ([lib/measure.js](../lib/measure.js#findVisitCenters))
+- **#2 — Drop legacy `_n` measurers + taxonomy entries** after one
+  measurement cycle confirms the new scores look right. See "Legacy `_n`
+  counts" above for the migration plan.
+- **#3 — Region label per city**: the full-screen view's subtitle is
+  synthesized from the city name. A curated `cities.nearby_feature`
+  column would let us render "Adriatic Sea" / "Lake Bled" / "Walnut
+  Street" the way the standalone mockup did.
+- **#4 — Re-run [`fit_weights.py`](../scripts/fit_weights.py)** to
+  absorb the new metric scale (`_n` integer counts → `_score` weighted
+  floats) into the calibrate weights stored in `user_weights`.
+- **#5 — Piran's `daily_needs_score = 0`**: Google Places didn't
+  categorize Piran's old-town grocers under our `daily` bucket. Audit
+  + decide whether to broaden the bucket or cross-reference OSM where
+  Places returns 0.
