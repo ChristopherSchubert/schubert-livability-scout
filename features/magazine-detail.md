@@ -34,8 +34,11 @@ numbers → When to go → Where to walk). This is the live layout at
     gutter`, 4rem). Every centered text/data section (`.why`, `.where-head/foot`,
     `.data`, `.when`, `.walks`) adds that much right padding so the rail's
     numerals never touch the content — at *any* width (verified clearance ≥26px
-    from 430→1700px). Full-bleed sections (hero, where-map) opt out and let the
+    from 700→1700px). Full-bleed sections (hero, where-map) opt out and let the
     rail float over them; the left-fading gradient scrim is its legibility layer.
+    On **phones (≤640px)** the rail is hidden and `--rail-gutter` drops to a
+    normal 1.25rem so content reclaims the lane (the top nav + in-page tabs cover
+    wayfinding there).
     - **One small form at every width.** At rest the rail is numerals only (no
       width-based hide/disclose bands — resizing never pops titles in or out).
       On hover/focus the titles slide out *to the left* of the numerals as an

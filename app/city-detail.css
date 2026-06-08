@@ -1254,6 +1254,12 @@
 .cd-root .toc:hover a.is-current::before,
 .cd-root .toc:focus-within a.is-current::before { opacity: 1; }
 .cd-root .toc .rule { display: none; }
+/* Phones: drop the rail entirely (the top nav + in-page DETAIL/VISIT tabs cover
+   wayfinding) and reclaim its reserved lane so content uses the full width. */
+@media (max-width: 640px) {
+  .cd-root { --rail-gutter: 1.25rem; }
+  .cd-root .toc { display: none; }
+}
 
 /* keyframes (global names) */
 @keyframes candidate-pulse {
