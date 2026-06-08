@@ -146,8 +146,8 @@ Per city, via `rowToCity` / `cityItem`:
   `clampPan`: max = `-(TODAY_DAY*dayW)` (today at left, no past). On mount,
   shift any planning trip with `start < today` to start today.
 - **State**: threshold (default **65**) + Feels-like/Crowds toggles are
-  local UI state. Lane order is local (no persisted order column yet —
-  flag if persistence wanted).
+  local UI state. Lane order **persists** to the shared `planning_order`
+  column (migration 0009) — see the Interactions section.
 
 ### Build sequence
 1. `weeklyVisitScore` + helpers in `lib/planner-data.js` (+ method string).
@@ -307,7 +307,10 @@ Planner-specific tokens:
   go right now, not the yearly peak). Session-local `sortMode`.
 - **Lane drag-to-reorder** — grip (⠿) on each lane label; pointer-drag ↕
   reorders. Dragging snapshots the visible order and switches sort to
-  **None** (manual `order` state), re-merged when the planning set changes.
+  **None** (manual). The manual order is **persisted** to the shared
+  `planning_order` integer column (migration 0009): written debounced from
+  the `order` state on drag, and on load the lanes seed from it and default
+  to the **None** sort. Null = no manual position (sorts after positioned).
 - **Demote from Planning** — `×` on the lane label (always faintly visible)
   opens a **confirm popover** ("Remove <city> from planning?" · Remove /
   Cancel); Remove sets `status:"Idea"` **and clears arrive/depart dates** →
@@ -344,8 +347,6 @@ Minor, intentionally not matched (additions/divergences, flag if wanted):
   beyond the static mockup.
 
 ## TODOs / future direction
-- Decide whether lane order / the planning set persists (a column) or stays
-  session-local. (Promote/commit/demote persist via `status`; order does not.)
 - Manual **Safari** pass on a populated Planning section (the pixel-space
   fix is structurally in place; Chromium verified).
 - Onboard **Bar Harbor, ME** (only demo city missing from `cities`).

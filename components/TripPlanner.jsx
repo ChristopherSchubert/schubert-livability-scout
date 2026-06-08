@@ -204,6 +204,21 @@ export default function TripPlanner() {
     return () => document.removeEventListener("pointerdown", onDown);
   }, [confirmId]);
   const [order, setOrder] = useState([]);
+  // One-time seed from the persisted planning_order column. If any lane has a
+  // saved position, restore that manual arrangement and default to the manual
+  // ("none") sort so the user sees it on load.
+  const orderInitedRef = useRef(false);
+  useEffect(() => {
+    if (orderInitedRef.current || !planLanes.length) return;
+    orderInitedRef.current = true;
+    if (planLanes.some((l) => l.city.planningOrder != null)) {
+      setOrder([...planLanes]
+        .sort((a, b) => (a.city.planningOrder ?? 1e9) - (b.city.planningOrder ?? 1e9))
+        .map((l) => l.city.id));
+      setSortMode("none");
+    }
+  }, [planLanes]);
+  // keep order in sync as the planning set changes (promote/demote)
   useEffect(() => {
     const ids = planLanes.map((l) => l.city.id);
     setOrder((prev) => {
@@ -213,6 +228,16 @@ export default function TripPlanner() {
       return [...kept, ...added];
     });
   }, [planLanes]);
+  // Persist the manual order to planning_order (debounced) once the user has
+  // actually dragged — never on the initial seed or promote/demote merges.
+  const userReorderedRef = useRef(false);
+  useEffect(() => {
+    if (!userReorderedRef.current || !order.length) return;
+    const t = setTimeout(() => {
+      order.forEach((id, i) => updateCityRef.current(id, { planningOrder: i }));
+    }, 400);
+    return () => clearTimeout(t);
+  }, [order]);
   const displayLanes = useMemo(() => {
     const lanes = [...planLanes];
     if (sortMode === "next") return lanes.sort((a, b) => a.start - b.start);
@@ -237,6 +262,7 @@ export default function TripPlanner() {
       .map((el) => el.getAttribute("data-lane-id")).filter(Boolean);
     if (visible.length) setOrder(visible);
     setSortMode("none");
+    userReorderedRef.current = true; // subsequent order changes now persist
     setDragLaneId(id);
     const move = (ev) => {
       const wrap = document.querySelector(".trip-pl-lanes");
@@ -253,7 +279,11 @@ export default function TripPlanner() {
         return next.length === prev.length && next.every((v, i) => v === prev[i]) ? prev : next;
       });
     };
-    const up = () => { setDragLaneId(null); window.removeEventListener("pointermove", move); window.removeEventListener("pointerup", up); };
+    const up = () => {
+      setDragLaneId(null); // persistence handled by the debounced effect on `order`
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", up);
+    };
     window.addEventListener("pointermove", move);
     window.addEventListener("pointerup", up);
   }

@@ -1,0 +1,12 @@
+-- 0009 — planning_order: persisted manual order of the Trip planner's
+-- "Cities looking for a slot" (Planning) lanes.
+--
+-- The swim-lane planner (features/trip-planner.md) lets you drag lanes into a
+-- custom order (the "None" sort). That order is session-local React state
+-- unless persisted. Per the project rule ("Supabase is the source of truth;
+-- no localStorage persistence of planner state"), the order lives here.
+--
+-- Shared, not per-user: cities are a collaborative slate, so the manual lane
+-- order is shared like every other city attribute. A null means "no manual
+-- position yet" → such lanes sort after positioned ones.
+alter table cities add column if not exists planning_order integer;
