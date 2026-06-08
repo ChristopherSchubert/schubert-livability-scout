@@ -65,6 +65,8 @@ const SPOT_SEP = 250;      // distinct spots sit at least this far apart. This i
                            //   cap — a long spine (a mile of Main St) earns as
                            //   many spots as it has, they just can't be
                            //   contiguous. ~250 m ≈ a couple blocks between stops.
+                           //   Compact downtowns honestly land below 6 (they
+                           //   don't hold six non-contiguous spots) — that's fine.
 const SPOT_FLOOR = 3;      // a spot still needs this many POIs within DENS_R
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -322,6 +324,17 @@ function nearestRoadName(c, roads, maxM = 50) {
 // Majority addr:street among a spot's member POIs — the most reliable signal of
 // which street a spot belongs to (works even on pedestrian malls where the road
 // geometry has no detectable intersections).
+// A real street name has a word component (not bad address data like "1 62a").
+// Strip directions + street-type words + digits; require something ≥3 letters
+// left ("Walker St" → "walker" ✓; "1 62a" → nothing → reject).
+function isPlausibleStreet(name) {
+  const core = norm(name).split(" ")
+    .filter((t) => !DIR_FULL[t] && !["street", "avenue", "boulevard", "road", "drive",
+      "lane", "square", "court", "place", "parkway", "highway", "terrace", "trail", "circle"].includes(t))
+    .filter((t) => /[a-z]/.test(t));
+  return core.some((t) => t.replace(/[^a-z]/g, "").length >= 3);
+}
+
 function majorityStreet(members) {
   const tally = new Map();
   for (const m of members) if (m.street) tally.set(m.street, (tally.get(m.street) || 0) + 1);
@@ -342,7 +355,7 @@ function nameSpot(c, members, feats, roadIndex, roads) {
   if (bf.f && bf.d <= 80) return { block: bf.f.name, why: `${bf.f.kind} at this spot`, street: null };
 
   const street = majorityStreet(members) || nearestRoadName(c, roads, 60);
-  if (!street) return null;
+  if (!street || !isPlausibleStreet(street)) return null;
   const sN = norm(street);
 
   // nearest intersection that involves this street, to name the cross-street
