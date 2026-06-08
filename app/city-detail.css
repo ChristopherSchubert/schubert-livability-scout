@@ -1215,7 +1215,7 @@
   .cd-root .toc .num { font-size: 0.72rem; }
   .cd-root .toc a { column-gap: 0.6rem; }
 }
-@media (max-width: 1080px) {
+@media (max-width: 1640px) {
   .cd-root .toc {
         padding: 0.85rem 0.9rem 0.85rem 2.4rem;
         background: linear-gradient(
@@ -1233,7 +1233,7 @@
         transition: max-width 280ms ease, opacity 200ms ease 60ms, margin 280ms ease;
         margin-right: 0;
       }
-  .cd-root .toc:hover .title, .cd-root .toc a.is-current .title {
+  .cd-root .toc:hover .title, .cd-root .toc:focus-within .title {
         max-width: 160px;
         opacity: 1;
       }

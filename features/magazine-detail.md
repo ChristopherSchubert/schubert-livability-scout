@@ -30,6 +30,14 @@ numbers → When to go → Where to walk). This is the live layout at
     polygon, the saved visit pin, and the 700 m measurement field.
   - [FloatingToc.jsx](../components/city-detail/FloatingToc.jsx) — the editorial
     chapter rail; scroll-driven active-section highlight, reveals after the Why.
+    It's `position: fixed; right: 0` and floats in the right gutter. Because the
+    text/data sections are centered at ≤1200 px, the rail only clears them when
+    the gutter is wide enough for the full titles (~210 px, i.e. viewport
+    ≳1640 px). Below that it **collapses to numerals-only** (titles on
+    hover/focus) so it tucks into the thin gutter instead of crashing into the
+    Realness column — see the `@media (max-width: 1640px)` block in
+    `city-detail.css`. Full-bleed sections (hero, where-map) intentionally pass
+    under the rail; the left-fading gradient scrim is its legibility layer.
 - **Styles**: [app/city-detail.css](../app/city-detail.css), ported from the
   mockup and **scoped under `.cd-root`** so the generic class names
   (`.hero`, `.data`, `.metric`, `.eyebrow`…) never collide with `globals.css`.
