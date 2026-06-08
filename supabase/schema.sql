@@ -40,6 +40,7 @@ create table if not exists cities (
   why                text,
   blocks             jsonb default '[]',
   block_geometries   jsonb default '[]',        -- per-block { name, lat, lon, accuracy, source, meta, asOf } — populated by lib/measurers/blocks.js
+  poi_positions      jsonb default '[]',        -- per-POI { lat, lon, category, weight } — populated by lib/measurers/walking-core.js
   status             text default 'Idea',
   decision           text default 'Undecided',
   is_calibration     boolean not null default false,  -- cohort flag: baseline place, not a candidate
@@ -89,6 +90,7 @@ alter table cities add column if not exists crowd_raw           jsonb;
 alter table cities add column if not exists block_geometries    jsonb default '[]';
 alter table cities add column if not exists eu_lau              jsonb;
 alter table cities add column if not exists planning_order      integer;
+alter table cities add column if not exists poi_positions       jsonb default '[]';
 
 -- ── felt_surveys (PER-USER) ────────────────────────────────────────────────
 -- Each person's post-visit survey for a city. Readable by both (to compare),

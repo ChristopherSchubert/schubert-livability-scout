@@ -27,7 +27,18 @@ numbers → When to go → Where to walk). This is the live layout at
     survive. Honest "pending" stub when a city has no climate.
   - [WhereMap.jsx](../components/city-detail/WhereMap.jsx) — read-only Leaflet
     map (client-only via `next/dynamic`): the real `stay_zone_boundary`
-    polygon, the saved visit pin, and the 700 m measurement field.
+    polygon, the saved visit pin, and the **plateau-decay walking-core
+    measurement field** (500 m solid plateau disk + 800 m dashed reference
+    ring + 1500 m dashed outer cutoff) with per-POI dots whose opacity is
+    the precomputed decay weight. Replaces the old 700 m hard disk; see
+    [walking-core.md](walking-core.md) for the model.
+  - **Chapter III panel** ([MagazineDetail.jsx](../components/city-detail/MagazineDetail.jsx)
+    → `WalkabilityBreakdown`). The stay-zone overlay now carries a "Walkability
+    field" subsection — three rows (Cafés / Bars & pubs / Restaurants) with
+    `N in plateau · M beyond` and the weighted score — and a "See the full
+    walking-core map →" link to `/cities/[slug]/walking-core`. Renders only
+    when at least one `_score` envelope has a value, so cities pre-measurement
+    don't show an empty box.
   - [FloatingToc.jsx](../components/city-detail/FloatingToc.jsx) — the editorial
     chapter rail; scroll-driven active-section highlight, reveals after the Why.
     `position: fixed; right: 0`, living in a **reserved right lane** (`--rail-

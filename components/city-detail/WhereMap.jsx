@@ -2,6 +2,7 @@
 
 import { MapContainer, TileLayer, CircleMarker, Circle, Polygon, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
+import { PLATEAU, D_HALF, MAX_RADIUS } from "../../lib/measurers/walking-core.js";
 
 // GeoJSON Polygon/MultiPolygon → Leaflet [lat,lon] ring arrays. GeoJSON is
 // [lon,lat]; Leaflet wants [lat,lon].
@@ -27,11 +28,22 @@ function FitView({ polys, center }) {
   return null;
 }
 
-// The "Where you'd live" chapter map. Read-only: the real stay-zone boundary
-// from cities.stay_zone_boundary, the saved visit pin, and the 700 m
-// measurement field around it. Candidate-core selection (findVisitCenters) is
-// server-side and not in the envelope yet — see features/magazine-detail.md.
-export default function WhereMap({ lat, lon, boundary }) {
+// The "Where you'd live" chapter map.
+//
+// Three layers, anchored at the saved visit pin:
+//   1. Stay-zone polygon (cities.stay_zone_boundary), dashed warn-red — the
+//      broader walkable area you'd consider staying in.
+//   2. Measurement field — the plateau-decay walking core. A solid green
+//      disk at PLATEAU (everything inside counts equally), a dashed ochre
+//      ring at 800 m (10-min reference shed), and a dashed green ring at
+//      MAX_RADIUS (outer cutoff). Replaces the old 700 m hard disk.
+//   3. POI dots from cities.poi_positions (Google Places via the local
+//      cache) with opacity = the precomputed plateau-decay weight, so the
+//      reader can see which spots are contributing how much.
+//
+// Plateau / d_half / max_radius come from lib/measurers/walking-core.js — one
+// source of truth shared by the measurer and the renderer.
+export default function WhereMap({ lat, lon, boundary, poiPositions = [] }) {
   const hasPin = lat != null && lon != null;
   const center = hasPin ? [lat, lon] : [39.5, -98.35]; // US centroid fallback
   const polys = geojsonToLeafletPolys(boundary);
@@ -59,8 +71,45 @@ export default function WhereMap({ lat, lon, boundary }) {
       ))}
       {hasPin ? (
         <>
-          <Circle center={center} radius={700} pathOptions={{ color: "#fbf6ea", weight: 8, opacity: 0.9, fill: false }} />
-          <Circle center={center} radius={700} pathOptions={{ color: "#0d4c44", weight: 4, opacity: 1, fillColor: "#0d4c44", fillOpacity: 0.16 }} />
+          {/* Plateau — solid accent disk. Everything in here counts equally. */}
+          <Circle
+            center={center}
+            radius={PLATEAU}
+            pathOptions={{ color: "#0d4c44", weight: 3, opacity: 0.9, fillColor: "#0d4c44", fillOpacity: 0.10 }}
+          />
+          {/* 10-min reference shed at 800 m — dashed ochre. */}
+          <Circle
+            center={center}
+            radius={800}
+            pathOptions={{ color: "#b66f1a", weight: 2, opacity: 0.85, fill: false, dashArray: "5 5" }}
+          />
+          {/* Outer cutoff at MAX_RADIUS — dashed accent green. */}
+          <Circle
+            center={center}
+            radius={MAX_RADIUS}
+            pathOptions={{ color: "#0d4c44", weight: 2, opacity: 0.75, fill: false, dashArray: "5 5" }}
+          />
+
+          {/* POI dots, opacity = w(d). Skips anything past the cutoff (already
+              filtered by the measurer; the .filter here is belt-and-suspenders). */}
+          {poiPositions
+            .filter((p) => p.weight != null && p.weight > 0)
+            .map((p, i) => (
+              <CircleMarker
+                key={i}
+                center={[p.lat, p.lon]}
+                radius={4.5}
+                pathOptions={{
+                  color: "#c25a1f",
+                  fillColor: "#c25a1f",
+                  weight: 1,
+                  fillOpacity: p.weight,
+                  opacity: Math.max(0.25, p.weight * 1.1),
+                }}
+              />
+            ))}
+
+          {/* Visit-center pin — double ring so it reads at every zoom. */}
           <CircleMarker center={center} radius={18} pathOptions={{ color: "#0d4c44", weight: 1, opacity: 0.4, fillColor: "#fbf6ea", fillOpacity: 0.9 }} />
           <CircleMarker center={center} radius={10} pathOptions={{ color: "#fbf6ea", weight: 4, fillColor: "#0d4c44", fillOpacity: 1 }} />
         </>

@@ -300,6 +300,89 @@
       margin: 0;
     }
 .cd-root .stay-overlay .heart strong { color: var(--ink); font-weight: 600; }
+
+/* Walkability-field breakdown — three rows showing weighted POI scores for
+   the selected anchor's measurement field, plus a link to the full-screen
+   walking-core view. Lives inside .stay-overlay; only renders when at least
+   one _score envelope has a value. See components/city-detail/MagazineDetail.jsx
+   → WalkabilityBreakdown. */
+.cd-root .measure-breakdown {
+      margin: 0.9rem -0.4rem 0;
+      padding: 0.85rem 0.4rem 0;
+      border-top: 1px solid var(--hair);
+    }
+.cd-root .measure-breakdown .mb-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 0.45rem;
+    }
+.cd-root .measure-breakdown .mb-label {
+      font-family: 'Inter Tight', sans-serif;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      font-size: 0.66rem;
+      color: var(--accent);
+    }
+.cd-root .measure-breakdown .mb-meta {
+      font-family: 'Fraunces', serif;
+      font-style: italic;
+      font-variation-settings: "opsz" 12, "wght" 400;
+      font-size: 0.72rem;
+      color: var(--ink-mute);
+    }
+.cd-root .measure-breakdown .mb-rows { list-style: none; margin: 0; padding: 0; }
+.cd-root .measure-breakdown .mb-rows li {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 0.45rem 0.65rem;
+      align-items: baseline;
+      padding: 0.3rem 0;
+      font-family: 'Inter Tight', sans-serif;
+      font-size: 0.78rem;
+      border-bottom: 1px solid var(--hair-soft);
+    }
+.cd-root .measure-breakdown .mb-rows li:last-child { border-bottom: 0; }
+.cd-root .measure-breakdown .kind { color: var(--ink); font-weight: 500; }
+.cd-root .measure-breakdown .raw {
+      color: var(--ink-mute);
+      font-size: 0.7rem;
+      letter-spacing: 0.02em;
+      font-variant-numeric: tabular-nums;
+    }
+.cd-root .measure-breakdown .score {
+      font-family: 'Fraunces', serif;
+      font-variation-settings: "opsz" 14, "wght" 600;
+      font-size: 1rem;
+      font-variant-numeric: tabular-nums;
+      color: var(--ink);
+      min-width: 2.6ch;
+      text-align: right;
+    }
+.cd-root .measure-breakdown .mb-fullmap {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      margin-top: 0.7rem;
+      font-family: 'Inter Tight', sans-serif;
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      color: var(--accent);
+      text-decoration: none;
+      border-bottom: 1px dotted var(--accent);
+      padding-bottom: 1px;
+      transition: color 120ms ease, border-color 120ms ease;
+    }
+.cd-root .measure-breakdown .mb-fullmap:hover {
+      color: var(--accent-2);
+      border-bottom-color: var(--accent-2);
+    }
+.cd-root .measure-breakdown .mb-fullmap svg {
+      width: 12px;
+      height: 12px;
+    }
 .cd-root .candidate-panel-pulse {
       animation: candidate-pulse 1.6s ease-out 2;
     }

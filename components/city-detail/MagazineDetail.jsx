@@ -71,21 +71,27 @@ export default function MagazineDetail({ cityItem }) {
       <section id="where" className="where" aria-label="Where you'd live">
         <div className="where-head">
           <h2>Stay zone</h2>
-          <p className="note">The stay zone is the broader walkable area; the green field is the best 700 m within it — where the measurements are actually taken.</p>
+          <p className="note">The stay zone is the broader walkable area. The green disk is the plateau (full credit); POIs beyond it contribute less the further out they are, until the 1500 m cutoff.</p>
         </div>
         <div className="where-map-wrap">
-          <WhereMap lat={cityItem.lat} lon={cityItem.lon} boundary={cityItem.stayZoneBoundary} />
+          <WhereMap
+            lat={cityItem.lat}
+            lon={cityItem.lon}
+            boundary={cityItem.stayZoneBoundary}
+            poiPositions={cityItem.poiPositions}
+          />
           <div className="verdict-card" role="group" aria-label="Measured composite score">
             <div className="axis">
               <div className="lab">Measured</div>
               <div className="num">{view.measuredScore != null ? <>{view.measuredScore.toFixed(1)}<small>/10</small></> : "—"}</div>
             </div>
           </div>
-          {cityItem.stayZone || cityItem.heartIntersection ? (
+          {cityItem.stayZone || cityItem.heartIntersection || hasWalkabilityBreakdown(cityItem) ? (
             <div className="stay-overlay">
               <p className="eyebrow">Stay zone</p>
               {cityItem.stayZone ? <h3>{cityItem.stayZone}</h3> : null}
               {cityItem.heartIntersection ? <p className="heart">Heart of the zone: <strong>{cityItem.heartIntersection}</strong></p> : null}
+              <WalkabilityBreakdown cityItem={cityItem} />
             </div>
           ) : null}
         </div>
@@ -102,6 +108,74 @@ export default function MagazineDetail({ cityItem }) {
 
       {/* Chapter VI — where to walk */}
       <ChapterWalks cityItem={cityItem} blocks={view.blocks} blockGeometries={view.blockGeometries} />
+    </div>
+  );
+}
+
+// Does this city have any walking-core score measured? If none of the four
+// _score envelopes are present we suppress the breakdown — the panel keeps
+// just stay_zone + heart_intersection, the same as a city that hasn't been
+// re-measured yet.
+function hasWalkabilityBreakdown(cityItem) {
+  const mm = cityItem.measuredMetrics || {};
+  return (
+    mm.cafe_score?.value != null ||
+    mm.bar_score?.value != null ||
+    mm.rest_score?.value != null
+  );
+}
+
+// "Walkability field" block inside the stay-overlay. Three rows (Cafés /
+// Bars & pubs / Restaurants) with the weighted score and a small "N in
+// plateau · M beyond" annotation, plus a link to the full-screen walking
+// core view. Source: cities.measured_metrics.{cafe,bar,rest}_score, written
+// by lib/measurers/walking-core.js. Daily-needs intentionally lives on the
+// Realness axis and is not shown here.
+function WalkabilityBreakdown({ cityItem }) {
+  if (!hasWalkabilityBreakdown(cityItem)) return null;
+  const mm = cityItem.measuredMetrics || {};
+  const rows = [
+    { key: "cafe_score", label: "Cafés" },
+    { key: "bar_score",  label: "Bars & pubs" },
+    { key: "rest_score", label: "Restaurants" },
+  ];
+  const slug = citySlug(cityItem);
+  return (
+    <div className="measure-breakdown" aria-label="Walkability-field breakdown">
+      <div className="mb-head">
+        <span className="mb-label">Walkability field</span>
+        <span className="mb-meta">500 m plateau · 1500 m cutoff</span>
+      </div>
+      <ul className="mb-rows">
+        {rows.map((r) => {
+          const env = mm[r.key];
+          const meta = env?.meta || {};
+          if (env?.value == null) return null;
+          return (
+            <li key={r.key}>
+              <span className="kind">{r.label}</span>
+              <span className="raw">
+                {meta.in_plateau != null
+                  ? `${meta.in_plateau} in plateau · ${meta.beyond ?? 0} beyond`
+                  : ""}
+              </span>
+              <span className="score">{env.value.toFixed(1)}</span>
+            </li>
+          );
+        })}
+      </ul>
+      {slug ? (
+        <a
+          className="mb-fullmap"
+          href={`/cities/${slug}/walking-core`}
+          aria-label="Open the full walking-core map for this city"
+        >
+          See the full walking-core map
+          <svg viewBox="0 0 20 20" aria-hidden="true">
+            <path d="M4 8 V4 H8 M12 4 H16 V8 M16 12 V16 H12 M8 16 H4 V12" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+          </svg>
+        </a>
+      ) : null}
     </div>
   );
 }

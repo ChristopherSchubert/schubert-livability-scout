@@ -1,0 +1,318 @@
+/* components/walking-core/walking-core.css
+ *
+ * Atlas-style full-screen walking-core view. Single canvas, no AppShell.
+ * Lives at /cities/[slug]/walking-core. Mirrors the project palette (paper
+ * cream, accent green, Fraunces serif headings, Inter Tight UI) so the page
+ * feels native even though it bypasses the AppShell.
+ *
+ * Layout:
+ *   .wc-root        full-bleed container, position: relative
+ *   .wc-back        top-left pill (Link), always-visible
+ *   .wc-headline    top-center city name + subtitle, italic Fraunces
+ *   .wc-map         Leaflet canvas (fills the page)
+ *   .wc-panel       left sidebar with parameters, formula, breakdown
+ *
+ * Leaflet zoom is top-right, scale bar bottom-left — both restyled to the
+ * paper palette via .wc-map descendant selectors.
+ */
+
+:root {
+  --wc-paper:      #fbf6ea;
+  --wc-paper-deep: #f4eddc;
+  --wc-ink:        #1b1814;
+  --wc-ink-soft:   #2c2823;
+  --wc-ink-mute:   #7a7268;
+  --wc-accent:     #0d4c44;
+  --wc-accent-2:   #1e7a6e;
+  --wc-hair:       rgba(27, 24, 20, 0.14);
+  --wc-hair-soft:  rgba(27, 24, 20, 0.06);
+  --wc-r800:       #b66f1a;
+  --wc-poi:        #c25a1f;
+}
+
+.wc-root {
+  position: fixed;
+  inset: 0;
+  background: var(--wc-paper);
+  color: var(--wc-ink);
+  font-family: 'Inter Tight', sans-serif;
+  overflow: hidden;
+}
+
+/* Back pill — top-left, leaves clearance for Leaflet's zoom controls on the
+   top-right (so they don't fight). */
+.wc-back {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  z-index: 1100;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(251, 246, 234, 0.96);
+  border: 1px solid var(--wc-hair);
+  border-radius: 999px;
+  padding: 7px 14px 7px 11px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--wc-ink);
+  text-decoration: none;
+  box-shadow: 0 4px 18px -8px rgba(27, 24, 20, 0.15);
+  transition: color 120ms ease, border-color 120ms ease;
+}
+.wc-back:hover {
+  color: var(--wc-accent);
+  border-color: var(--wc-ink-mute);
+}
+.wc-back svg { width: 14px; height: 14px; }
+
+/* City headline — italic Fraunces, top-center, paper-shadowed so it reads
+   over the map tiles. */
+.wc-headline {
+  position: absolute;
+  top: 22px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 900;
+  text-align: center;
+  pointer-events: none;
+}
+.wc-headline-name {
+  display: block;
+  font-family: 'Fraunces', Georgia, serif;
+  font-variation-settings: "opsz" 36, "SOFT" 80, "wght" 500;
+  font-style: italic;
+  font-size: 28px;
+  line-height: 1;
+  letter-spacing: -0.005em;
+  color: var(--wc-ink);
+  text-shadow:
+    0 0 6px rgba(251, 246, 234, 0.95),
+    0 0 16px rgba(251, 246, 234, 0.85);
+}
+.wc-headline-sub {
+  display: block;
+  margin-top: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--wc-ink-mute);
+  text-shadow: 0 0 4px rgba(251, 246, 234, 0.9);
+}
+
+/* Map canvas fills the page. */
+.wc-map {
+  position: absolute;
+  inset: 0;
+  background: var(--wc-paper-deep);
+  cursor: grab;
+}
+.wc-map:active { cursor: grabbing; }
+.wc-map .leaflet-tile-pane img {
+  filter: saturate(0.88) sepia(0.06) contrast(1.04);
+}
+.wc-map-empty {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: var(--wc-paper);
+  color: var(--wc-ink-mute);
+}
+
+/* Move Leaflet zoom to top-right; restyle to paper palette. */
+.wc-map .leaflet-control-zoom {
+  border: 1px solid var(--wc-hair);
+  background: rgba(251, 246, 234, 0.92);
+  border-radius: 2px;
+  box-shadow: none;
+  margin: 18px !important;
+}
+.wc-map .leaflet-control-zoom a {
+  background: transparent;
+  color: var(--wc-ink);
+  border-bottom: 1px solid var(--wc-hair);
+  font-family: 'Fraunces', serif;
+  font-variation-settings: "opsz" 30, "wght" 500;
+  width: 28px; height: 28px; line-height: 28px;
+}
+.wc-map .leaflet-control-zoom a:last-child { border-bottom: 0; }
+.wc-map .leaflet-control-zoom a:hover {
+  background: rgba(27, 24, 20, 0.05);
+  color: var(--wc-accent);
+}
+.wc-map .leaflet-control-attribution {
+  background: rgba(251, 246, 234, 0.85);
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 0.6rem;
+  color: rgba(27, 24, 20, 0.55);
+}
+.wc-map .leaflet-control-scale {
+  margin: 0 18px 78px 18px !important;
+}
+.wc-map .leaflet-control-scale-line {
+  background: rgba(251, 246, 234, 0.92);
+  border: 1px solid var(--wc-ink-mute);
+  border-top: none;
+  color: var(--wc-ink);
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  padding: 2px 6px;
+}
+
+/* Left sidebar — the parameters / formula / breakdown. */
+.wc-panel {
+  position: absolute;
+  top: 62px;
+  left: 18px;
+  z-index: 1000;
+  width: 340px;
+  background: rgba(251, 246, 234, 0.96);
+  backdrop-filter: saturate(150%) blur(8px);
+  border: 1px solid var(--wc-hair);
+  border-radius: 10px;
+  padding: 20px 22px 18px;
+  box-shadow: 0 6px 28px rgba(27, 24, 20, 0.10);
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
+}
+.wc-eyebrow {
+  margin: 0 0 6px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.7rem;
+  color: var(--wc-accent);
+}
+.wc-title {
+  margin: 0 0 4px;
+  font-family: 'Fraunces', Georgia, serif;
+  font-variation-settings: "opsz" 18, "SOFT" 60, "wght" 500;
+  font-size: 26px;
+  line-height: 1.05;
+  color: var(--wc-ink);
+  letter-spacing: -0.005em;
+}
+.wc-sub {
+  margin: 4px 0 18px;
+  color: var(--wc-ink-mute);
+  font-size: 12.5px;
+  font-family: 'Fraunces', Georgia, serif;
+  font-style: italic;
+  line-height: 1.45;
+}
+
+.wc-section-label {
+  margin: 16px 0 8px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.66rem;
+  color: var(--wc-ink-mute);
+}
+
+.wc-specs { display: grid; grid-template-columns: 1fr auto; gap: 5px 12px; margin: 0; }
+.wc-specs dt { color: var(--wc-ink); font-size: 13px; }
+.wc-lbl-sub { color: var(--wc-ink-mute); font-style: italic; font-family: 'Fraunces', serif; font-size: 12px; margin-left: 0.4em; }
+.wc-specs dd { margin: 0; font-weight: 600; font-variant-numeric: tabular-nums; font-size: 13px; color: var(--wc-ink); text-align: right; }
+
+.wc-rings { margin: 6px 0 0; }
+.wc-ring {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 0;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  border-bottom: 1px solid var(--wc-hair-soft);
+}
+.wc-ring:last-child { border-bottom: 0; }
+.wc-dot {
+  width: 12px; height: 12px; border-radius: 50%;
+  border: 2px dashed; background: transparent; flex-shrink: 0;
+}
+.wc-dot-plateau { border-color: var(--wc-accent); border-style: solid; }
+.wc-dot-800     { border-color: var(--wc-r800); }
+.wc-dot-outer   { border-color: var(--wc-accent); }
+.wc-r { font-weight: 500; color: var(--wc-ink); }
+.wc-m { color: var(--wc-ink-mute); margin-left: auto; font-size: 11px; font-style: italic; }
+.wc-w { font-weight: 600; min-width: 42px; text-align: right; color: var(--wc-ink); }
+
+.wc-formula {
+  margin-top: 12px;
+  padding: 9px 12px;
+  background: var(--wc-paper-deep);
+  border-radius: 5px;
+  font-family: 'Fraunces', Georgia, serif;
+  font-variation-settings: "opsz" 12, "wght" 400;
+  font-style: italic;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--wc-ink-soft);
+}
+.wc-formula b { font-style: normal; font-weight: 600; color: var(--wc-ink); }
+
+/* Per-anchor breakdown — three rows + the daily-needs row at the bottom. */
+.wc-breakdown {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--wc-hair);
+}
+.wc-bd-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 6px;
+}
+.wc-bd-name {
+  font-family: 'Fraunces', serif;
+  font-variation-settings: "opsz" 18, "wght" 500;
+  font-size: 16px;
+  color: var(--wc-ink);
+}
+.wc-bd-sub {
+  font-size: 11px;
+  color: var(--wc-ink-mute);
+  font-style: italic;
+}
+.wc-breakdown ul { list-style: none; margin: 0; padding: 0; }
+.wc-breakdown li {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 0.5rem 0.8rem;
+  align-items: baseline;
+  padding: 4px 0;
+  font-size: 13px;
+  border-bottom: 1px solid var(--wc-hair-soft);
+}
+.wc-breakdown li:last-child { border-bottom: 0; }
+.wc-bd-kind { color: var(--wc-ink); }
+.wc-bd-raw {
+  color: var(--wc-ink-mute);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+.wc-bd-score {
+  font-family: 'Fraunces', serif;
+  font-variation-settings: "opsz" 14, "wght" 500;
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+  color: var(--wc-ink);
+  min-width: 2.6ch;
+  text-align: right;
+}
+.wc-bd-empty {
+  margin: 0;
+  font-size: 12px;
+  color: var(--wc-ink-mute);
+  line-height: 1.5;
+}
+.wc-bd-empty code {
+  background: var(--wc-paper-deep);
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-size: 11px;
+}

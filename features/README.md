@@ -18,6 +18,7 @@ docs are worse than no feature docs.
 | Magazine-format city detail (redesign) | [magazine-detail.md](magazine-detail.md) | stub — wire-up pending |
 | Why prose (why / if-wins / if-fails) | [why-prose.md](why-prose.md) | stub |
 | Stay-zone map + boundary | [stay-zone-map.md](stay-zone-map.md) | stub — data live, polygon UI pending |
+| Walking core (plateau-decay measurement field + full-screen view) | [walking-core.md](walking-core.md) | documented; rolled out 2026-06-08 |
 | Measurer pipeline (objective data → Supabase) | [measurer-pipeline.md](measurer-pipeline.md) | documented; per-key coverage in [METRICS_COMPLETION.md](../METRICS_COMPLETION.md) |
 | Chips (city attribute strip) | [chips.md](chips.md) | documented |
 | Visit window (Charm + Truth months) | [visit-window.md](visit-window.md) | stub — live but mockup adds year-shape + curves |

@@ -44,7 +44,11 @@ function googleKey() {
 }
 const GKEY = googleKey();
 
-const RADIUS_M = 1000;   // gather radius around each city pin
+// Gather radius around each city pin. Bumped from 1000 → 1500 m on 2026-06-08
+// so the walking-core measurer (lib/measurers/walking-core.js) sees POIs all
+// the way out to its 1500 m outer cutoff. Tile-step kept at 450 so adjacent
+// tiles still overlap by 250 m, no coverage gaps.
+const RADIUS_M = 1500;
 const TILE_R = 350;
 const TILE_STEP = 450;
 const FIELD_MASK = [

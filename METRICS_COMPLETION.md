@@ -26,16 +26,20 @@ covers 112/115 — only the 3 SI cities remain.
 | Setting | `mtn_horizon_pct` | 115/115 | Open-Meteo elevation + OSM peaks | `scripts/onboard.mjs --measurer horizon` |
 | Setting | `water_dist_m` | 115/115 | OpenStreetMap (Overpass) | `scripts/onboard.mjs --measurer water` |
 | Setting | `water_extent_km2` | 115/115 | OpenStreetMap (Overpass) | `scripts/onboard.mjs --measurer water` |
-| Aliveness | `cafe_n` | 115/115 | OSM (osmnx) | `scripts/onboard.mjs --measurer osm_core` |
-| Aliveness | `bar_n` | 115/115 | OSM (osmnx) | `scripts/onboard.mjs --measurer osm_core` |
-| Aliveness | `rest_n` | 115/115 | OSM (osmnx) | `scripts/onboard.mjs --measurer osm_core` |
+| Aliveness | `cafe_score` | 122/122 | Google Places (New) via local `pois` cache | `scripts/onboard.mjs --measurer walking_core` — plateau-decay weighted sum, 500 m plateau + 400 m d_half + 1500 m cutoff. See [features/walking-core.md](features/walking-core.md). |
+| Aliveness | `bar_score` | 122/122 | Google Places (New) via local `pois` cache | `scripts/onboard.mjs --measurer walking_core` |
+| Aliveness | `rest_score` | 122/122 | Google Places (New) via local `pois` cache | `scripts/onboard.mjs --measurer walking_core` |
+| Aliveness | `cafe_n` | 115/115 | OSM (osmnx) | `scripts/onboard.mjs --measurer osm_core` — legacy 700 m hard ring; superseded by `cafe_score`, kept as a sanity check |
+| Aliveness | `bar_n` | 115/115 | OSM (osmnx) | `scripts/onboard.mjs --measurer osm_core` — legacy 700 m hard ring; superseded by `bar_score` |
+| Aliveness | `rest_n` | 115/115 | OSM (osmnx) | `scripts/onboard.mjs --measurer osm_core` — legacy 700 m hard ring; superseded by `rest_score` |
 | Aliveness | `walk_score` | 115/115 | walkscore.com | `scripts/onboard.mjs --measurer walkscore` |
 | Fabric | `intersection_den` | 115/115 | OSM (osmnx) | `scripts/onboard.mjs --measurer osm_core` |
 | Fabric | `mean_block_m` | 115/115 | OSM (osmnx) | `scripts/onboard.mjs --measurer osm_core` |
 | Fabric | `carfree_frac` | 115/115 | OSM (osmnx) | `scripts/onboard.mjs --measurer osm_core` |
 | Fabric | `bldg_coverage` | 115/115 | OSM (osmnx) | `scripts/onboard.mjs --measurer osm_core` |
 | _diagnostic_ | `street_km` | 115/115 | OSM (osmnx) | `scripts/onboard.mjs --measurer osm_core` — measured but not in the Fabric rollup (dropped 2026-06-04: penalized peninsula/lakeside/park-heavy cores by counting "missing streets on water" as a deficit). Kept as a stored diagnostic. |
-| Realness | `daily_needs_n` | 115/115 | OSM (osmnx) | `scripts/onboard.mjs --measurer osm_core` |
+| Realness | `daily_needs_score` | 122/122 | Google Places (New) via local `pois` cache | `scripts/onboard.mjs --measurer walking_core` |
+| Realness | `daily_needs_n` | 115/115 | OSM (osmnx) | `scripts/onboard.mjs --measurer osm_core` — legacy 700 m hard ring; superseded by `daily_needs_score` |
 | Realness | `core_density` | 115/115 | US Census ACS (tract) for US; Eurostat GISCO LAU 2021 for EU | `scripts/onboard.mjs --measurer census,eurostat_lau` |
 | Realness | `owner_occ_pct` | 115/115 | US Census ACS (B25003) for US; SURS PxWeb table 0861102 (2021) for SI | `scripts/onboard.mjs --measurer census,surs_obcina` |
 | Realness | `seasonal_vac_pct` | 115/115 | US Census ACS (B25004) for US; SURS PxWeb table 0861110 (2018 — most recent year with seasonal/secondary breakdown) for SI | `scripts/onboard.mjs --measurer census,surs_obcina`. Other EU countries still need per-NSO adapters |

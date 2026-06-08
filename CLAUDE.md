@@ -107,13 +107,24 @@ that names a narrow change but contains 30 unrelated diffs makes history
 unbisectable. Same rule for destructive changes (schema migrations,
 force-pushes, column drops): confirm first.
 
-## Stay-zone boundary + adaptive measurement
+## Stay-zone boundary + walking-core measurement
 
 A city has a stay zone (polygon in `stay_zone_boundary`) and a measurement
-field (700 m around the densest social-POI cluster *inside* the polygon).
-The score is "best 700 m within the stay zone," not "700 m around the saved
-pin." Boundary cascade (Census Place → OSM polygon → Tract → NRHP →
-point-circle) and the API auto-refresh live in `lib/measure.js`. Full notes:
+field. The field used to be a 700 m hard disk; as of 2026-06-08 it's a
+**plateau-decay walking core**: 500 m solid plateau (full credit) + 400 m
+decay constant + 1500 m outer cutoff. POI source is **Google Places** via
+the local `pois` cache, not OSM (OSM coverage was too thin). Per-POI
+positions + decay weights are cached in `cities.poi_positions` so the chapter
+map can render the dots without a runtime API call.
+
+The osm-core measurer (the legacy 700 m hard ring → `cafe_n / bar_n / rest_n /
+daily_needs_n`) still runs as a sanity check but no longer drives the
+Aliveness composite — those metrics carry `supersededBy` in the taxonomy
+and `axisRollup` skips them when the new `_score` metrics are present.
+
+Boundary cascade (Census Place → OSM polygon → Tract → NRHP → point-circle)
+and the API auto-refresh live in `lib/measure.js`. Full notes:
+[features/walking-core.md](features/walking-core.md),
 [features/stay-zone-map.md](features/stay-zone-map.md).
 
 ## Standing direction: complete every city's measurements
