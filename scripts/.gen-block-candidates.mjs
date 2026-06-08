@@ -141,12 +141,31 @@ async function socialPois(client, lat, lon) {
     .map((r) => ({ lat: r.lat, lon: r.lon, name: r.name, street: r.street, reviews: r.user_rating_count ?? 0 }));
 }
 
+// Retry an Overpass query until it returns a non-empty body. A populated area
+// ALWAYS has named roads (CLAUDE.md Corollary 2: zero of those means the query
+// lied) — under the rapid --all load the local container intermittently returns
+// an empty 200, which silently degraded random cities to bare-street names. Treat
+// empty as a transient failure and retry with backoff.
+async function overpassNonEmpty(q, { minElements = 1, tries = 5 } = {}) {
+  let last = [];
+  for (let i = 0; i < tries; i++) {
+    try {
+      const d = await overpass(q);
+      const els = d?.elements || [];
+      if (els.length >= minElements) return els;
+      last = els;
+    } catch { /* retry */ }
+    await sleep(600 * (i + 1));
+  }
+  return last; // give up after retries; caller still proceeds with what it has
+}
+
 async function namedRoads(lat, lon) {
   const q = `[out:json][timeout:60];
     way["highway"~"^(residential|living_street|unclassified|tertiary|secondary|primary|pedestrian)$"]["name"](around:${RADIUS_M},${lat},${lon});
     out geom;`;
-  const d = await overpass(q);
-  return (d?.elements || [])
+  const els = await overpassNonEmpty(q); // a real city center always has named roads
+  return els
     .filter((w) => w.tags?.name && Array.isArray(w.geometry))
     .map((w) => ({ name: w.tags.name, geom: w.geometry }));
 }
@@ -162,8 +181,13 @@ async function namedFeatures(lat, lon) {
      nwr["amenity"="marketplace"]["name"](around:${RADIUS_M},${lat},${lon});
      way["highway"="pedestrian"]["area"="yes"]["name"](around:${RADIUS_M},${lat},${lon}););
     out center tags;`;
-  const d = await overpass(q);
-  return (d?.elements || []).map((el) => {
+  // 0 features is legitimate (not every core has a named park), so don't force
+  // non-empty — but retry on an actual throw so a transient hiccup isn't a zero.
+  let els = [];
+  for (let i = 0; i < 3; i++) {
+    try { els = (await overpass(q))?.elements || []; break; } catch { await sleep(600 * (i + 1)); }
+  }
+  return els.map((el) => {
     const p = el.center || (el.lat != null ? { lat: el.lat, lon: el.lon } : null);
     if (!p || !el.tags?.name) return null;
     const kind = el.tags.place === "square" ? "square"
