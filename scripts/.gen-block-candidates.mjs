@@ -348,15 +348,15 @@ function nearestRoadName(c, roads, maxM = 50) {
 // Majority addr:street among a spot's member POIs — the most reliable signal of
 // which street a spot belongs to (works even on pedestrian malls where the road
 // geometry has no detectable intersections).
-// A real street name has a word component (not bad address data like "1 62a").
-// Strip directions + street-type words + digits; require something ≥3 letters
-// left ("Walker St" → "walker" ✓; "1 62a" → nothing → reject).
+// A real street name has a word OR an ordinal-number component. Strip directions
+// + street-type words, then accept if anything left is a ≥3-letter word
+// ("Walker St" → "walker" ✓) or an ordinal ("5th St" → "5th" ✓). Reject bad
+// address fragments ("1 62a" → "1","62a" → neither → reject).
+const TYPE_WORDS = new Set(["street", "avenue", "boulevard", "road", "drive",
+  "lane", "square", "court", "place", "parkway", "highway", "terrace", "trail", "circle"]);
 function isPlausibleStreet(name) {
-  const core = norm(name).split(" ")
-    .filter((t) => !DIR_FULL[t] && !["street", "avenue", "boulevard", "road", "drive",
-      "lane", "square", "court", "place", "parkway", "highway", "terrace", "trail", "circle"].includes(t))
-    .filter((t) => /[a-z]/.test(t));
-  return core.some((t) => t.replace(/[^a-z]/g, "").length >= 3);
+  const core = norm(name).split(" ").filter((t) => t && !DIR_FULL[t] && !TYPE_WORDS.has(t));
+  return core.some((t) => /[a-z]{3,}/.test(t) || /^\d+(st|nd|rd|th)$/.test(t));
 }
 
 function majorityStreet(members) {
