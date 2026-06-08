@@ -60,13 +60,12 @@ const MIN_PTS = 3;         // a cluster needs this many POIs; sparser is noise.
                            //   Lewisburg WV's Washington St shouldn't read as empty
 // Within a dense region, blocks are spaced spots, not the whole blob:
 const DENS_R = 80;         // radius that defines one spot's local density
-const SPOT_SEP = 140;      // distinct spots sit at least this far apart — small
-                           //   enough to tell adjacent streets apart (Saratoga's
-                           //   Broadway vs Caroline), with the per-street cap
-                           //   (below) doing the don't-resample-one-spine job
+const SPOT_SEP = 250;      // distinct spots sit at least this far apart. This is
+                           //   the whole anti-clustering mechanism: no per-street
+                           //   cap — a long spine (a mile of Main St) earns as
+                           //   many spots as it has, they just can't be
+                           //   contiguous. ~250 m ≈ a couple blocks between stops.
 const SPOT_FLOOR = 3;      // a spot still needs this many POIs within DENS_R
-const MAX_PER_STREET = 3;  // one street contributes at most this many stretches —
-                           //   so Carson gives a few distinct corners, not six
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 // ── street-name normalization ─────────────────────────────────────────────────
@@ -255,26 +254,25 @@ function pickBlocks(pois, _occupied, ctx, existingNorms) {
   const regions = dbscan(pois);
   const spots = regions.flatMap(spotsInRegion);
 
-  // name every spot, then add densest-first respecting the per-street cap
+  // name every spot, add densest-first. Spacing (SPOT_SEP, enforced in
+  // spotsInRegion) already guarantees spots aren't contiguous, so there's no
+  // per-street cap — a long spine earns as many well-spread stops as it has.
   const named = spots.map((s) => ({ s, n: nameSpot(s, s.members, ctx.feats, ctx.roadIndex, ctx.roads) }))
     .filter((x) => x.n)
     .sort((a, b) => b.s.density - a.s.density);
 
   const seen = new Set(existingNorms);
-  const streetCount = new Map();
   const out = [];
   for (const { s, n } of named) {
     if (out.length >= TARGET) break;
     const k = norm(n.block);
     if (!k || seen.has(k)) continue;
-    if (n.street && (streetCount.get(n.street) || 0) >= MAX_PER_STREET) continue;
     // overlap guard: skip "A & B" if a hand-authored block already names both
     if (n.block.includes(" & ")) {
       const [a, b] = n.block.split(" & ").map(norm);
       if (existingNorms.some((e) => e.includes(a) && e.includes(b))) continue;
     }
     seen.add(k);
-    if (n.street) streetCount.set(n.street, (streetCount.get(n.street) || 0) + 1);
     const why = n.why ? `${n.why}, ${s.density} social POIs within ${DENS_R} m`
                       : `${s.density} social POIs within ${DENS_R} m`;
     out.push({ block: n.block, why, density: s.density });
