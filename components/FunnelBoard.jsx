@@ -12,6 +12,7 @@ import {
   weightedAxisScore,
 } from "../lib/planner-data";
 import AppShell from "./AppShell";
+import { WorkspaceLoading } from "./Loading";
 import { appendBust, resolveImage, usePlanner } from "./PlannerProvider";
 import {
   CityFilterDrawer,
@@ -38,7 +39,7 @@ const EQUAL_WEIGHTS = { setting: 1, aliveness: 1, fabric: 1, realness: 1, januar
 
 export default function FunnelBoard({ focusStage }) {
   const router = useRouter();
-  const { planner, imageState, advanceCityStage, setCityStage } = usePlanner();
+  const { planner, imageState, advanceCityStage, setCityStage, hydrated } = usePlanner();
   const filters = useCityFilters();
   const [hideCalibration, setHideCalibration] = useState(true);
   const [dragOver, setDragOver] = useState(null);
@@ -91,10 +92,12 @@ export default function FunnelBoard({ focusStage }) {
           <p className="page-eyebrow">Board</p>
           <h1>Every candidate, by stage</h1>
           <p className="funnel-meta">
-            {focusStage
+            {!hydrated
+              ? "Loading…"
+              : focusStage
               ? `${totalForFocus} ${totalForFocus === 1 ? "city" : "cities"} in ${STAGES.find((stage) => stage.id === focusStage)?.label}`
               : `${filteredCities.length} of ${planner.cities.filter((c) => !hideCalibration || !c.isCalibration).length} candidates`}
-            <span className="funnel-meta-hint"> · drag to move · click to open</span>
+            {hydrated ? <span className="funnel-meta-hint"> · drag to move · click to open</span> : null}
           </p>
         </div>
         <button
@@ -125,6 +128,7 @@ export default function FunnelBoard({ focusStage }) {
         ) : null}
       </section>
 
+      {!hydrated ? <WorkspaceLoading label="Loading candidates…" /> : (
       <section className="funnel-grid">
           {visibleStages.map((stage) => {
             const cities = grouped[stage.id] || [];
@@ -167,6 +171,7 @@ export default function FunnelBoard({ focusStage }) {
             );
           })}
       </section>
+      )}
 
       <CityFilterDrawer filters={filters} options={options} />
     </AppShell>

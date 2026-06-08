@@ -10,6 +10,7 @@ import {
   surveyComplete,
 } from "../lib/planner-data";
 import AppShell from "./AppShell";
+import { WorkspaceLoading } from "./Loading";
 import { appendBust, resolveImage, usePlanner } from "./PlannerProvider";
 
 /**
@@ -18,7 +19,7 @@ import { appendBust, resolveImage, usePlanner } from "./PlannerProvider";
  * ones prompt to run the questionnaire.
  */
 export default function DecideWorkspace() {
-  const { planner, imageState } = usePlanner();
+  const { planner, imageState, hydrated } = usePlanner();
 
   const queue = useMemo(
     () => planner.cities.filter((c) => cityStage(c) === "decide"),
@@ -32,14 +33,18 @@ export default function DecideWorkspace() {
           <p className="page-eyebrow">Decide</p>
           <h1>Back from the trip</h1>
           <p className="canvas-sub">
-            {queue.length === 0
+            {!hydrated
+              ? "Loading…"
+              : queue.length === 0
               ? "No cities back from a trip yet. They show up here once you mark a Visit complete."
               : `${queue.length} ${queue.length === 1 ? "city" : "cities"} to survey. Run the questionnaire soon after the trip while the impression is fresh.`}
           </p>
         </div>
       </section>
 
-      {queue.length === 0 ? (
+      {!hydrated ? (
+        <WorkspaceLoading />
+      ) : queue.length === 0 ? (
         <section className="workspace-empty">
           <h2>Nothing to decide right now</h2>
           <p>Finish a Visit and the city lands here for its post-visit survey.</p>

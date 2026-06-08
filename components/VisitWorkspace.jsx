@@ -9,6 +9,7 @@ import {
   weightedAxisScore,
 } from "../lib/planner-data";
 import AppShell from "./AppShell";
+import { WorkspaceLoading } from "./Loading";
 import { resolveImage, usePlanner } from "./PlannerProvider";
 
 // Equal-weight measured composite — same engine as the Detail and Board
@@ -25,7 +26,7 @@ const EQUAL_WEIGHTS = { setting: 1, aliveness: 1, fabric: 1, realness: 1, januar
  * opening them.
  */
 export default function VisitWorkspace() {
-  const { planner, imageState } = usePlanner();
+  const { planner, imageState, hydrated } = usePlanner();
 
   const trips = useMemo(() => {
     return planner.cities
@@ -50,11 +51,13 @@ export default function VisitWorkspace() {
         <div>
           <p className="page-eyebrow">Visit</p>
           <h1>Planned and active trips</h1>
-          <p className="canvas-sub">{trips.length === 0 ? "Move a candidate from Calibrate to Visit once you've booked the trip." : `${trips.length} ${trips.length === 1 ? "trip" : "trips"}, sorted by arrival date.`}</p>
+          <p className="canvas-sub">{!hydrated ? "Loading…" : trips.length === 0 ? "Move a candidate from Calibrate to Visit once you've booked the trip." : `${trips.length} ${trips.length === 1 ? "trip" : "trips"}, sorted by arrival date.`}</p>
         </div>
       </section>
 
-      {trips.length === 0 ? (
+      {!hydrated ? (
+        <WorkspaceLoading />
+      ) : trips.length === 0 ? (
         <EmptyState
           title="No trips scheduled"
           body="When a candidate becomes real enough to book, advance it to Visit. Trips will appear here grouped by arrival date with logistics at a glance."

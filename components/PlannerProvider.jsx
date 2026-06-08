@@ -24,7 +24,7 @@ export function PlannerProvider({ children, initialManifest }) {
   const [imageState, setImageState] = useState(() => initialManifest);
   const [weights, setWeightsState] = useState(() => defaultWeights());
   const [references, setReferences] = useState({});
-  const [hydrated, setHydrated] = useState(false);
+  const [hydrated, setHydrated] = useState(false); // gates pre-load empty states
   const [saveState, setSaveState] = useState({ status: "idle", at: 0 });
 
   // Debounced city-field writers, one timer per city id.

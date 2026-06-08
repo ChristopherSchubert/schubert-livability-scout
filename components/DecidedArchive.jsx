@@ -9,6 +9,7 @@ import {
   weightedAxisScore,
 } from "../lib/planner-data";
 import AppShell from "./AppShell";
+import { WorkspaceLoading } from "./Loading";
 import { resolveImage, usePlanner } from "./PlannerProvider";
 
 // Equal-weight measured composite — same engine as Detail / Board.
@@ -24,7 +25,7 @@ const DECISIONS = ["Advance", "Winter Revisit", "Eliminate"];
  * what advanced, what got winter-revisited, what dropped out.
  */
 export default function DecidedArchive() {
-  const { planner, imageState } = usePlanner();
+  const { planner, imageState, hydrated } = usePlanner();
   const [filter, setFilter] = useState("All");
 
   const decided = useMemo(() => {
@@ -50,11 +51,13 @@ export default function DecidedArchive() {
         <div>
           <p className="page-eyebrow">Decided</p>
           <h1>Decided cities</h1>
-          <p className="canvas-sub">{decided.length === 0 ? "No decided cities yet. Cities you mark advance, winter-revisit, or eliminate on the Decide page show up here." : `${decided.length} ${decided.length === 1 ? "city" : "cities"} decided. Filter by outcome.`}</p>
+          <p className="canvas-sub">{!hydrated ? "Loading…" : decided.length === 0 ? "No decided cities yet. Cities you mark advance, winter-revisit, or eliminate on the Decide page show up here." : `${decided.length} ${decided.length === 1 ? "city" : "cities"} decided. Filter by outcome.`}</p>
         </div>
       </section>
 
-      {decided.length === 0 ? (
+      {!hydrated ? (
+        <WorkspaceLoading />
+      ) : decided.length === 0 ? (
         <EmptyState
           title="No verdicts yet"
           body="Cities you advance, winter-revisit, or eliminate will appear here as a portfolio of decisions."

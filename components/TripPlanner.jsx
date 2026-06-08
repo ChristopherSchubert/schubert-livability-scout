@@ -74,7 +74,7 @@ function packFor(hi, rain) {
 }
 
 export default function TripPlanner() {
-  const { planner, updateCity, imageState } = usePlanner();
+  const { planner, updateCity, imageState, hydrated } = usePlanner();
   const rootRef = useRef(null);
   const updateCityRef = useRef(updateCity);
   updateCityRef.current = updateCity;
@@ -943,7 +943,7 @@ export default function TripPlanner() {
 
         {/* Planned */}
         <div className="trip-pl-section">
-          <div className="st"><span className="eyebrow">Planned</span><h2>Committed trips</h2><span className="sub">{committedLanes.length ? "Locked in." : "Nothing committed yet."}</span></div>
+          <div className="st"><span className="eyebrow">Planned</span><h2>Committed trips</h2><span className="sub">{!hydrated ? "Loading…" : committedLanes.length ? "Locked in." : "Nothing committed yet."}</span></div>
         </div>
         <div className="trip-pl-lane is-planned">
           <div className="llabel" />
@@ -979,7 +979,7 @@ export default function TripPlanner() {
                     </div>
                   );
                 })}
-                {committedLanes.length === 0 ? <div className="trip-pl-empty-inline">Commit a planning trip (✓) to lock it in here.</div> : null}
+                {hydrated && committedLanes.length === 0 ? <div className="trip-pl-empty-inline">Commit a planning trip (✓) to lock it in here.</div> : null}
               </div>
             </div>
           </div>
@@ -1086,7 +1086,11 @@ export default function TripPlanner() {
                 </div>
               </div>
             );
-          }) : (
+          }) : !hydrated ? (
+            <div className="trip-pl-empty">
+              <p>Loading…</p>
+            </div>
+          ) : (
             <div className="trip-pl-empty">
               <p>No cities in planning yet.</p>
               <p className="trip-pl-empty-sub">Promote one from the backlog below.</p>
@@ -1096,7 +1100,7 @@ export default function TripPlanner() {
 
         {/* Backlog */}
         <section className="trip-pl-backlog">
-          <div className="bh"><span className="eyebrow">Backlog</span><h2>Not yet in planning</h2><span className="sub">{backlog.length ? "Promote to add a lane." : "Empty."}</span></div>
+          <div className="bh"><span className="eyebrow">Backlog</span><h2>Not yet in planning</h2><span className="sub">{!hydrated ? "Loading…" : backlog.length ? "Promote to add a lane." : "Empty."}</span></div>
           <div className="bl">
             {backlog.map((c) => {
               const hero = heroFor(c);

@@ -12,6 +12,7 @@ import {
   weightedAxisScore,
 } from "../lib/planner-data";
 import AppShell from "./AppShell";
+import { WorkspaceLoading } from "./Loading";
 import { appendBust, resolveImage, usePlanner } from "./PlannerProvider";
 import {
   CityFilterDrawer,
@@ -37,7 +38,7 @@ import {
  */
 export default function Calibrate() {
   const router = useRouter();
-  const { planner, imageState } = usePlanner();
+  const { planner, imageState, hydrated } = usePlanner();
   const filters = useCityFilters();
   const [sort, setSort] = useState([{ key: "overall", dir: "desc" }]);
   const [hideCalibration, setHideCalibration] = useState(true);
@@ -116,6 +117,7 @@ export default function Calibrate() {
         ) : null}
       </section>
 
+      {!hydrated ? <WorkspaceLoading label="Loading cities…" /> : (
       <section className="rank-table-wrap">
         <div className="rank-count">
           {rows.length} of {cityRows.length} candidates{filters.activeFilterCount > 0 ? " match filters" : ""}
@@ -173,6 +175,7 @@ export default function Calibrate() {
           </tbody>
         </table>
       </section>
+      )}
 
       <CityFilterDrawer filters={filters} options={options} />
     </AppShell>
