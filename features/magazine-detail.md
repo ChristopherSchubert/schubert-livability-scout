@@ -30,14 +30,23 @@ numbers → When to go → Where to walk). This is the live layout at
     polygon, the saved visit pin, and the 700 m measurement field.
   - [FloatingToc.jsx](../components/city-detail/FloatingToc.jsx) — the editorial
     chapter rail; scroll-driven active-section highlight, reveals after the Why.
-    It's `position: fixed; right: 0` and floats in the right gutter. Because the
-    text/data sections are centered at ≤1200 px, the rail only clears them when
-    the gutter is wide enough for the full titles (~210 px, i.e. viewport
-    ≳1640 px). Below that it **collapses to numerals-only** (titles on
-    hover/focus) so it tucks into the thin gutter instead of crashing into the
-    Realness column — see the `@media (max-width: 1640px)` block in
-    `city-detail.css`. Full-bleed sections (hero, where-map) intentionally pass
-    under the rail; the left-fading gradient scrim is its legibility layer.
+    It's `position: fixed; right: 0` and floats in the right gutter, so it only
+    works when the centered text/data columns (≤1200 px) leave gutter to spare.
+    Three bands (all in `city-detail.css`): **≥1640 px** full titles; **1281–
+    1640 px** collapses to numerals-only (titles on hover/focus) to fit the
+    thin gutter; **≤1280 px** hidden entirely (`@media (max-width: 1280px)`) —
+    below that the columns fill the width and even a numeral would graze the
+    metrics; the top nav + in-page DETAIL/VISIT tabs carry wayfinding there.
+    Full-bleed sections (hero, where-map) intentionally pass under the rail;
+    the left-fading gradient scrim is its legibility layer.
+  - **Grid blowout guard.** The axis grid (`.axes`) and the climate heatmap
+    (`.climate-heatmap`) both use `repeat(N, minmax(0, 1fr))`, **not**
+    `repeat(N, 1fr)`. Plain `1fr` is `minmax(auto, 1fr)`, so a `white-space:
+    nowrap` source citation (or a `grid-column: 1/-1` legend) inflates the
+    tracks past the container and the grid overflows the viewport — which was
+    shoving column 5 off-screen and sliding content under the rail. The
+    `minmax(0, …)` floor lets tracks shrink so `text-overflow: ellipsis`
+    actually engages. `.axes` also steps 5→3→2→1 columns down the width range.
 - **Styles**: [app/city-detail.css](../app/city-detail.css), ported from the
   mockup and **scoped under `.cd-root`** so the generic class names
   (`.hero`, `.data`, `.metric`, `.eyebrow`…) never collide with `globals.css`.

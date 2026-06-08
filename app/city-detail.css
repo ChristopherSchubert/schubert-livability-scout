@@ -499,7 +499,11 @@
     }
 .cd-root .axes {
       display: grid;
-      grid-template-columns: repeat(5, 1fr);
+      /* minmax(0, …) lets tracks shrink below their content's intrinsic width.
+         Without it, .metric-source's `white-space: nowrap` forces each track to
+         the full citation width, the 5-col grid blows past its 1180px container,
+         and column 5 + the overflow shove content under the floating rail. */
+      grid-template-columns: repeat(5, minmax(0, 1fr));
       gap: 2.2rem;
     }
 .cd-root .axis-col h3 {
@@ -716,7 +720,10 @@
   padding-top: 1.5rem;
   border-top: 1px solid var(--hair);
   display: grid;
-  grid-template-columns: 70px repeat(12, 1fr);
+  /* minmax(0, …) keeps the 12 month tracks from inflating to their cell
+     min-content; without it the grid (and the grid-column:1/-1 legends/ramps
+     that span it) overflow the container on narrow viewports. */
+  grid-template-columns: 70px repeat(12, minmax(0, 1fr));
   column-gap: 3px;
   row-gap: 3px;
 }
@@ -988,8 +995,17 @@
       grid-template-columns: repeat(2, 1fr);
       gap: 2.4rem;
     }
-@media (max-width: 900px) {
-  .cd-root .axes { grid-template-columns: 1fr 1fr; }
+/* Responsive axis ladder: 5 columns while each stays ≥~180px, then step down
+   so the metrics never crowd or overflow. minmax(0, …) on every step keeps the
+   nowrap source citations from re-inflating the tracks. */
+@media (max-width: 1100px) {
+  .cd-root .axes { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.8rem 2rem; }
+}
+@media (max-width: 700px) {
+  .cd-root .axes { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 440px) {
+  .cd-root .axes { grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-width: 640px) {
   .cd-root .walks-grid { grid-template-columns: 1fr; }
@@ -1058,7 +1074,6 @@
   .cd-root .verdict-card { position: static; margin: 1rem; }
   .cd-root .stay-overlay { position: static; margin: 1rem; max-width: none; }
   .cd-root .hero-bottom { flex-direction: column; align-items: flex-start; }
-  .cd-root .toc { display: none; }
 }
 .cd-root .leaflet-where {
       position: absolute;
@@ -1207,14 +1222,6 @@
       font-size: 0.88rem;
     }
 .cd-root .toc .rule { display: none; }
-@media (max-width: 1320px) {
-  .cd-root .toc {
-        padding: 1rem 1.1rem 1rem 2.6rem;
-      }
-  .cd-root .toc .title { font-size: 0.84rem; }
-  .cd-root .toc .num { font-size: 0.72rem; }
-  .cd-root .toc a { column-gap: 0.6rem; }
-}
 @media (max-width: 1640px) {
   .cd-root .toc {
         padding: 0.85rem 0.9rem 0.85rem 2.4rem;
@@ -1241,6 +1248,14 @@
         font-size: 0.78rem;
         width: 1.4rem;
       }
+}
+/* The rail floats in the right gutter. The centered text/data columns only
+   spare gutter at wider viewports; below ~1280px they fill the width and even
+   the numeral rail has nowhere to sit without grazing the metrics — so retire
+   it there. Wayfinding falls back to the top nav + in-page DETAIL/VISIT tabs.
+   (Raises the old 760px hide point.) */
+@media (max-width: 1280px) {
+  .cd-root .toc { display: none; }
 }
 
 /* keyframes (global names) */
