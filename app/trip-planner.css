@@ -221,8 +221,8 @@
   padding: 0; opacity: 0; transition: opacity 0.12s; font-family: var(--font-ui);
 }
 .bjump.bj-l { left: -22px; } .bjump.bj-r { right: -22px; }
-.trip-pl-bar:hover .bjump { opacity: 1; }
-.bjump:hover { background: var(--accent); color: var(--panel); }
+.trip-pl-lane:hover .bjump, .trip-pl-bar:hover .bjump { opacity: 0.85; }
+.bjump:hover { background: var(--accent); color: var(--panel); opacity: 1; }
 .bcommit {
   position: absolute; top: -9px; right: -9px; z-index: 8;
   width: 20px; height: 20px; border-radius: 50%; border: 1px solid var(--accent);

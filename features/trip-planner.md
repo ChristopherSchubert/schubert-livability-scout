@@ -29,7 +29,11 @@ toggles).
   - drag the **middle** to move,
   - drag an **edge** to resize,
   - **jump ‹ ›** to the next/previous week scoring ≥ threshold (hover the
-    button to preview the destination; never jumps into the past),
+    button to preview the destination; never jumps into the past). The chips
+    reveal on **lane hover** (not just box hover) so they're easy to hit.
+    Jump-right only moves to a *later* qualifying week — if the box already
+    sits in/after a city's last qualifying window, there is none later and it
+    won't move (use ‹ or drag),
   - **double-click** to type exact dates (start picker min = today).
 - **Rich hovers, photo-topped** (real Supabase hero):
   - planning box → conditions for the span + "double-click to edit dates",
