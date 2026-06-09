@@ -7,7 +7,7 @@ import { PlannerProvider } from "../components/PlannerProvider";
 import { readImageManifest } from "../lib/image-manifest";
 
 export const metadata = {
-  title: "J&C",
+  title: "Schubert Atlas",
   description: "Find wonderful places to go, and enjoy them.",
 };
 
