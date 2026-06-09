@@ -30,6 +30,13 @@
 
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; }
+
+/* Keyboard focus safety net (WCAG 2.4.7). Many interactive elements (tabs,
+   buttons, clickable cards/rows) had no explicit focus style; form inputs that
+   set their own `:focus { outline: none; border-color: accent }` keep that via
+   higher specificity, so this only fills the gaps. :focus-visible → only on
+   keyboard focus, never on mouse click. (Phase 4, features/mobile.md) */
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
 body {
   background: var(--bg);
   color: var(--text);
@@ -3009,7 +3016,7 @@ button:hover, .button-link:hover {
 
 /* Visit-now column — informational, set apart from the fit columns */
 .rank-table th.rt-visitnow, .rank-table td.rt-visitnow { border-left: 2px solid #e7dcc6; }
-.rank-table th.rt-visitnow { color: #3a78c2; }
+.rank-table th.rt-visitnow { color: #3066a8; }  /* was #3a78c2 (4.19:1, fail); now 5.42:1 on cream. a11y */
 
 /* Visit-now badge on the When-to-visit panel */
 .visit-now-badge { display: flex; flex-direction: column; align-items: flex-end; gap: 0.1rem; padding: 0.55rem 0.85rem; border: 1px solid #cfe0db; border-radius: 12px; background: #f1f7f6; min-width: 180px; }

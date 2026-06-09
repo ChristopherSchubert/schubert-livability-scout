@@ -223,8 +223,8 @@
 .rt-rank {
   font-family: var(--font-display);
   font-variation-settings: "opsz" 72, "SOFT" 40, "wght" 500;
-  font-size: 1.5rem;
-  color: #c3b59a;
+  font-size: 1.5rem;        /* 24px = WCAG "large text" (3:1 threshold) */
+  color: #94835f;           /* was #c3b59a (1.87:1, fail); now 3.43:1 on cream. a11y */
   width: 2.5rem;
 }
 .rank-table tbody td.rt-city { text-align: left; min-width: 260px; padding-left: 0; }
@@ -1159,6 +1159,19 @@
   }
   .backup-trigger { width: 44px; height: 44px; }
 
+  /* Remaining sub-44px tap targets (WCAG 2.5.5): Board card advance/back
+     buttons, the ranking Filters button, search field, and calibration toggle. */
+  .funnel-card-foot .advance,
+  .funnel-card-foot .ghost,
+  .rank-filters-btn,
+  .rank-toggle {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .rank-search { min-height: 44px; }
+
   /* On a city page the global funnel is redundant — the context strip's
      back-arrow returns to the stage workspace. Collapse it so the sub-nav owns
      the second row and we reclaim the vertical space. */
@@ -1200,7 +1213,7 @@
   .rank-table td.rt-rank {
     flex: 0 0 auto;
     width: 1.9rem;
-    font-size: 1.4rem;
+    font-size: 1.5rem;     /* keep at 24px so the muted numeral counts as WCAG large text */
     text-align: center;
     line-height: 1;
   }

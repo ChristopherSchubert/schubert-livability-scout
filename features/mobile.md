@@ -94,8 +94,24 @@ semantics), not eyeballed.
   **Board (#5): decided to keep** the horizontal-scroll kanban — it's
   functional on a phone and already has non-drag advance buttons; stacking it
   loses the kanban metaphor for little gain. Revisit only if it tests poorly.
-- **Phase 4 — a11y cleanup** (#8, #9, #10): input labels, meaningful image alt,
-  focus-visible verification.
+- **Phase 4 — a11y cleanup** ✅ (#6 rest, #8, #10; #9 resolved-as-correct):
+  - **Contrast:** faint rank numeral `#c3b59a` (1.87:1) → `#94835f` (3.64:1),
+    kept at 24px so it qualifies as WCAG large text. Blue Visit-now header
+    `#3a78c2` (4.19:1) → `#3066a8` (5.42:1). `app/workspace.css`, `app/globals.css`.
+  - **Touch targets (#6 rest):** Board card advance/back buttons (22px), ranking
+    Filters button (31px), search field (36px), calibration toggle → all 44px
+    at ≤640px. (Brand wordmark stays an inline text link — WCAG inline exception.)
+  - **Labels (#8):** search input got `aria-label="Search city name"`. The
+    "Hide calibration" checkbox was already correctly labelled by its wrapping
+    `<label>` (my audit's flag was a false positive — it only checked `for`/aria).
+  - **Focus (#10):** added a global `:focus-visible` ring (WCAG 2.4.7) as a
+    safety net; inputs with their own `:focus` border-accent treatment keep it
+    via specificity, so this only fills the gaps on tabs/buttons/clickable rows.
+  - **Image alt (#9): resolved as already-correct.** The city hero/card/thumb
+    images use `alt=""`, but every one sits adjacent to the city **name as
+    text** (`.place` h1, card `<strong>`, rank-table name). Per WCAG, an image
+    redundant with adjacent text should have empty alt to avoid double
+    announcement — so `alt=""` is conformant here, not a defect. Left as-is.
 - **Trip planner** (#7 scope): graceful "best on a larger screen" affordance on
   phone instead of a broken drag surface.
 

@@ -113,6 +113,7 @@ export default function Calibrate() {
           type="search"
           className="rank-search"
           placeholder="Search city name…"
+          aria-label="Search city name"
           value={filters.query}
           onChange={(e) => filters.setQuery(e.target.value)}
         />
