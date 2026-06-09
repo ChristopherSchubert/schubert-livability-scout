@@ -642,6 +642,42 @@ button:hover, .button-link:hover {
 .form-grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .form-grid.three { grid-template-columns: 0.7fr 1fr 1fr; }
 .form-grid.four { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+/* Short scheduling controls live in their own row instead of dragging a tall
+   textarea alongside them (the old "tiny field beside a 5-row box" gap). */
+.form-grid.schedule { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.form-grid.logistics { align-items: start; }
+
+/* Small eyebrow that splits Trip Setup into Schedule / Logistics groups so
+   the panel reads as deliberate sections instead of one long stack. */
+.form-subhead {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 1.25rem 0 0.7rem;
+}
+.form-subhead:first-of-type { margin-top: 0; }
+.form-subhead-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.form-subhead::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+.form-subhead-pill {
+  order: 1;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--accent);
+  background: var(--accent-soft);
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+}
 
 .field {
   display: grid;
@@ -649,23 +685,55 @@ button:hover, .button-link:hover {
 }
 
 .field span {
-  font-size: 0.84rem;
-  font-weight: 800;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
   color: var(--muted);
   text-transform: uppercase;
 }
 
-.field input, .field textarea, .field select, .itinerary-row input, .itinerary-row textarea, .check-row input[type="text"], .image-search-body input {
+.field input, .field textarea, .field select,
+.day-plan, .day-title, .check-row input:not([type="checkbox"]), .image-search-body input {
   width: 100%;
   border: 1px solid var(--border);
   border-radius: 12px;
   background: #fffdf9;
   padding: 0.78rem 0.9rem;
   color: var(--text);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
 }
 
-.field textarea, .itinerary-row textarea {
+.field input:hover, .field textarea:hover, .field select:hover {
+  border-color: #c2b298;
+}
+
+.field input:focus, .field textarea:focus, .field select:focus,
+.day-plan:focus, .day-title:focus, .check-row input:not([type="checkbox"]):focus, .image-search-body input:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: #fffdf8;
+  box-shadow: 0 0 0 3px rgba(13, 76, 68, 0.14);
+}
+
+.field input::placeholder, .field textarea::placeholder,
+.day-plan::placeholder, .check-row input::placeholder {
+  color: #b3a890;
+}
+
+.field textarea, .day-plan {
   resize: vertical;
+  line-height: 1.5;
+}
+
+/* Native select gets a custom chevron so it matches the inputs instead of
+   the OS default control. */
+.field select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='none' stroke='%237a7268' stroke-width='1.6' stroke-linecap='round' d='M1 1.5 6 6.5 11 1.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.9rem center;
+  padding-right: 2.2rem;
 }
 
 .itinerary-list, .checklist-list {
@@ -673,23 +741,87 @@ button:hover, .button-link:hover {
   gap: 0.8rem;
 }
 
-.itinerary-row {
+/* Each day is a self-contained card: number chip + inline title + actions on
+   top, free-text plan below. */
+.day-card {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #fffdf8;
+  padding: 0.85rem 0.95rem;
   display: grid;
-  grid-template-columns: 280px minmax(0, 1fr) auto;
-  gap: 0.8rem;
-  align-items: start;
+  gap: 0.7rem;
 }
+.day-card:focus-within { border-color: #c2b298; }
+.day-card-head {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 0.7rem;
+  align-items: center;
+}
+.day-index {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 800;
+  font-size: 0.95rem;
+  font-variant-numeric: tabular-nums;
+}
+.day-title {
+  font-family: var(--font-display);
+  font-variation-settings: "opsz" 24, "wght" 500;
+  font-size: 1.05rem;
+  border-color: transparent;
+  background: transparent;
+  padding: 0.35rem 0.5rem;
+}
+.day-title:hover { border-color: var(--border); background: #fffdf9; }
 
 .row-actions {
-  display: grid;
-  gap: 0.45rem;
+  display: flex;
+  gap: 0.35rem;
 }
 
 .row-actions button {
-  width: 42px;
-  height: 42px;
+  width: 36px;
+  height: 36px;
   padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  line-height: 1;
+  color: var(--muted);
 }
+.row-actions button:disabled { opacity: 0.35; cursor: default; }
+.row-action-remove:hover:not(:disabled) { border-color: #c98b7a; color: #b1573f; }
+
+.plan-empty {
+  display: grid;
+  justify-items: center;
+  gap: 0.7rem;
+  padding: 1.75rem 1rem;
+  border: 1px dashed var(--border);
+  border-radius: 12px;
+  color: var(--muted);
+  text-align: center;
+}
+.plan-empty p { margin: 0; }
+
+/* Ghost "add" affordance — reads as a secondary action, not a heavy button. */
+.add-row-btn {
+  border: 1px dashed var(--border);
+  background: transparent;
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 0.88rem;
+  padding: 0.55rem 0.85rem;
+}
+.add-row-btn:hover { border-color: var(--accent); background: var(--accent-soft); }
 
 .checklist-grid {
   display: grid;
@@ -697,18 +829,80 @@ button:hover, .button-link:hover {
   gap: 1rem;
 }
 
+.checklist-card {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+.checklist-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.7rem;
+}
+.checklist-card-head h3 { margin: 0; font-size: 1.05rem; }
+.checklist-blurb {
+  margin: 0.2rem 0 0;
+  font-size: 0.8rem;
+  color: var(--muted);
+  line-height: 1.4;
+}
+.checklist-count {
+  flex: none;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--accent);
+  background: var(--accent-soft);
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  font-variant-numeric: tabular-nums;
+}
+.checklist-empty {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #b3a890;
+  font-style: italic;
+}
+.checklist-add { width: 100%; margin-top: auto; }
+
 .check-row {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
-  gap: 0.6rem;
+  gap: 0.55rem;
   align-items: center;
+  cursor: text;
+}
+.check-row input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--accent);
+  cursor: pointer;
+  flex: none;
+}
+.check-row input:not([type="checkbox"]) {
+  border-color: transparent;
+  background: transparent;
+  padding: 0.4rem 0.5rem;
+}
+.check-row input:not([type="checkbox"]):hover { border-color: var(--border); background: #fffdf9; }
+.check-row.done input:not([type="checkbox"]) {
+  text-decoration: line-through;
+  color: var(--muted);
 }
 
 .check-row button {
-  width: 42px;
-  height: 42px;
+  width: 34px;
+  height: 34px;
   padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  opacity: 0;
+  transition: opacity 0.15s ease;
 }
+.check-row:hover button, .check-row button:focus-visible { opacity: 1; }
 
 .image-sections {
   display: grid;
@@ -968,6 +1162,8 @@ button:hover, .button-link:hover {
   .summary-grid, .checklist-grid, .selection-board, .image-choice-grid, .image-search-results { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .spot-grid, .form-grid.four, .form-grid.three { grid-template-columns: 1fr; }
   .image-research-grid { grid-template-columns: 1fr; }
+  .checklist-grid { grid-template-columns: 1fr; }
+  .form-grid.schedule { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 @media (max-width: 900px) {
@@ -984,13 +1180,7 @@ button:hover, .button-link:hover {
   .tabs, .topbar {
     flex-direction: column;
   }
-  .itinerary-row {
-    grid-template-columns: 1fr;
-  }
-  .row-actions {
-    grid-auto-flow: column;
-    justify-content: start;
-  }
+  .form-grid.schedule { grid-template-columns: 1fr; }
 }
 
 /* =========================================================================

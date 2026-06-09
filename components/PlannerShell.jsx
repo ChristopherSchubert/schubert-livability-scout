@@ -112,10 +112,12 @@ function VisitWindowPanel({ cityItem }) {
 
 export function VisitPlan({ cityItem, onPatch, onChangeDay, onChangeChecklist }) {
   const checklistKeys = [
-    ["before", "Before Booking"],
-    ["during", "During Visit"],
-    ["after", "After Visit"],
+    ["before", "Before Booking", "Bookings, dates, money down."],
+    ["during", "During Visit", "What to actually test on the ground."],
+    ["after", "After Visit", "Capture the verdict before it fades."],
   ];
+  const days = cityItem.days || [];
+  const nights = tripNights(cityItem.arriveDate, cityItem.departDate);
   return (
     <>
       <VisitWindowPanel cityItem={cityItem} />
@@ -127,7 +129,12 @@ export function VisitPlan({ cityItem, onPatch, onChangeDay, onChangeChecklist })
             <p>Schedule the trip here, then fill in the real-world details as the visit comes together.</p>
           </div>
         </div>
-        <div className="form-grid four">
+
+        <div className="form-subhead">
+          <span className="form-subhead-label">Schedule</span>
+          {nights != null ? <span className="form-subhead-pill">{nights} night{nights === 1 ? "" : "s"}</span> : null}
+        </div>
+        <div className="form-grid schedule">
           <Field label="Status">
             <select value={cityItem.status} onChange={(event) => onPatch({ status: event.target.value })}>
               {["Idea", "Shortlist", "Scheduled", "Visited", "Eliminated"].map((status) => <option key={status}>{status}</option>)}
@@ -136,6 +143,9 @@ export function VisitPlan({ cityItem, onPatch, onChangeDay, onChangeChecklist })
           <Field label="Trip week">
             <input value={cityItem.tripWeek || ""} onChange={(event) => onPatch({ tripWeek: event.target.value })} placeholder="Jun week 1" />
           </Field>
+          <Field label="Trip length">
+            <input value={cityItem.tripLength || ""} onChange={(event) => onPatch({ tripLength: event.target.value })} placeholder="7 nights" />
+          </Field>
           <Field label="Arrive">
             <input type="date" value={cityItem.arriveDate || ""} onChange={(event) => onPatch({ arriveDate: event.target.value })} />
           </Field>
@@ -143,23 +153,22 @@ export function VisitPlan({ cityItem, onPatch, onChangeDay, onChangeChecklist })
             <input type="date" value={cityItem.departDate || ""} onChange={(event) => onPatch({ departDate: event.target.value })} />
           </Field>
         </div>
-        <div className="form-grid three">
-          <Field label="Trip length">
-            <input value={cityItem.tripLength || ""} onChange={(event) => onPatch({ tripLength: event.target.value })} placeholder="7 nights" />
-          </Field>
+
+        <div className="form-subhead">
+          <span className="form-subhead-label">Logistics</span>
+        </div>
+        <div className="form-grid two logistics">
           <Field label="Flight details">
-            <textarea rows={5} value={cityItem.flightDetails || ""} onChange={(event) => onPatch({ flightDetails: event.target.value })} placeholder="Airline, confirmation, arrival airport, notes" />
+            <textarea rows={4} value={cityItem.flightDetails || ""} onChange={(event) => onPatch({ flightDetails: event.target.value })} placeholder="Airline, confirmation, arrival airport, notes" />
           </Field>
           <Field label="Car details">
-            <textarea rows={5} value={cityItem.carDetails || ""} onChange={(event) => onPatch({ carDetails: event.target.value })} placeholder="Rental company, pickup/dropoff, parking notes" />
+            <textarea rows={4} value={cityItem.carDetails || ""} onChange={(event) => onPatch({ carDetails: event.target.value })} placeholder="Rental company, pickup/dropoff, parking notes" />
           </Field>
-        </div>
-        <div className="form-grid two">
           <Field label="Lodging">
-            <textarea rows={6} value={cityItem.lodgingDetails || ""} onChange={(event) => onPatch({ lodgingDetails: event.target.value })} placeholder="Address, confirmation, check-in, why this location" />
+            <textarea rows={4} value={cityItem.lodgingDetails || ""} onChange={(event) => onPatch({ lodgingDetails: event.target.value })} placeholder="Address, confirmation, check-in, why this location" />
           </Field>
           <Field label="Logistics notes">
-            <textarea rows={6} value={cityItem.logisticsNotes || ""} onChange={(event) => onPatch({ logisticsNotes: event.target.value })} placeholder="Groceries, coworking, gym, weather, backup plans" />
+            <textarea rows={4} value={cityItem.logisticsNotes || ""} onChange={(event) => onPatch({ logisticsNotes: event.target.value })} placeholder="Groceries, coworking, gym, weather, backup plans" />
           </Field>
         </div>
       </section>
@@ -170,28 +179,41 @@ export function VisitPlan({ cityItem, onPatch, onChangeDay, onChangeChecklist })
             <h2>In-City Itinerary</h2>
             <p>Build the week around ordinary life first, then layer in the beautiful stuff.</p>
           </div>
-          <button type="button" onClick={() => onChangeDay([...(cityItem.days || []), { title: `Day ${(cityItem.days || []).length + 1}`, plan: "" }])}>Add day</button>
+          <button type="button" className="add-row-btn" onClick={() => onChangeDay([...days, { title: `Day ${days.length + 1}`, plan: "" }])}>+ Add day</button>
         </div>
-        <div className="itinerary-list">
-          {(cityItem.days || []).map((day, index) => (
-            <div className="itinerary-row" key={`${day.title}-${index}`}>
-              <input
-                value={day.title}
-                onChange={(event) => onChangeDay(cityItem.days.map((item, itemIndex) => itemIndex === index ? { ...item, title: event.target.value } : item))}
-              />
-              <textarea
-                rows={3}
-                value={day.plan}
-                onChange={(event) => onChangeDay(cityItem.days.map((item, itemIndex) => itemIndex === index ? { ...item, plan: event.target.value } : item))}
-              />
-              <div className="row-actions">
-                <button type="button" onClick={() => onChangeDay(moveItem(cityItem.days, index, -1))}>↑</button>
-                <button type="button" onClick={() => onChangeDay(moveItem(cityItem.days, index, 1))}>↓</button>
-                <button type="button" onClick={() => onChangeDay(cityItem.days.filter((_, itemIndex) => itemIndex !== index))}>×</button>
-              </div>
-            </div>
-          ))}
-        </div>
+        {days.length === 0 ? (
+          <div className="plan-empty">
+            <p>No days mapped yet.</p>
+            <button type="button" className="add-row-btn" onClick={() => onChangeDay([{ title: "Day 1", plan: "" }])}>+ Add the first day</button>
+          </div>
+        ) : (
+          <div className="itinerary-list">
+            {days.map((day, index) => (
+              <article className="day-card" key={`${day.title}-${index}`}>
+                <header className="day-card-head">
+                  <span className="day-index">{index + 1}</span>
+                  <input
+                    className="day-title"
+                    value={day.title}
+                    onChange={(event) => onChangeDay(cityItem.days.map((item, itemIndex) => itemIndex === index ? { ...item, title: event.target.value } : item))}
+                  />
+                  <div className="row-actions">
+                    <button type="button" aria-label="Move up" disabled={index === 0} onClick={() => onChangeDay(moveItem(cityItem.days, index, -1))}>↑</button>
+                    <button type="button" aria-label="Move down" disabled={index === days.length - 1} onClick={() => onChangeDay(moveItem(cityItem.days, index, 1))}>↓</button>
+                    <button type="button" aria-label="Remove day" className="row-action-remove" onClick={() => onChangeDay(cityItem.days.filter((_, itemIndex) => itemIndex !== index))}>×</button>
+                  </div>
+                </header>
+                <textarea
+                  className="day-plan"
+                  rows={3}
+                  value={day.plan}
+                  placeholder="Mornings at the market, a long walk, the ordinary stuff first…"
+                  onChange={(event) => onChangeDay(cityItem.days.map((item, itemIndex) => itemIndex === index ? { ...item, plan: event.target.value } : item))}
+                />
+              </article>
+            ))}
+          </div>
+        )}
       </section>
 
       <section className="panel">
@@ -202,56 +224,81 @@ export function VisitPlan({ cityItem, onPatch, onChangeDay, onChangeChecklist })
           </div>
         </div>
         <div className="checklist-grid">
-          {checklistKeys.map(([key, label]) => (
-            <article className="card" key={key}>
-              <div className="section-head compact">
-                <h3>{label}</h3>
+          {checklistKeys.map(([key, label, blurb]) => {
+            const items = cityItem.checklists?.[key] || [];
+            const doneCount = items.filter((item) => item.done).length;
+            return (
+              <article className="card checklist-card" key={key}>
+                <div className="checklist-card-head">
+                  <div>
+                    <h3>{label}</h3>
+                    <p className="checklist-blurb">{blurb}</p>
+                  </div>
+                  {items.length > 0 ? <span className="checklist-count">{doneCount}/{items.length}</span> : null}
+                </div>
+                <div className="checklist-list">
+                  {items.length === 0 ? (
+                    <p className="checklist-empty">Nothing here yet.</p>
+                  ) : items.map((item, index) => (
+                    <label className={`check-row${item.done ? " done" : ""}`} key={`${key}-${index}`}>
+                      <input
+                        type="checkbox"
+                        checked={item.done}
+                        onChange={(event) => onChangeChecklist({
+                          ...cityItem.checklists,
+                          [key]: cityItem.checklists[key].map((entry, entryIndex) => entryIndex === index ? { ...entry, done: event.target.checked } : entry),
+                        })}
+                      />
+                      <input
+                        value={item.text}
+                        placeholder="Add a check…"
+                        onChange={(event) => onChangeChecklist({
+                          ...cityItem.checklists,
+                          [key]: cityItem.checklists[key].map((entry, entryIndex) => entryIndex === index ? { ...entry, text: event.target.value } : entry),
+                        })}
+                      />
+                      <button
+                        type="button"
+                        aria-label="Remove check"
+                        className="row-action-remove"
+                        onClick={() => onChangeChecklist({
+                          ...cityItem.checklists,
+                          [key]: cityItem.checklists[key].filter((_, entryIndex) => entryIndex !== index),
+                        })}
+                      >
+                        ×
+                      </button>
+                    </label>
+                  ))}
+                </div>
                 <button
                   type="button"
+                  className="add-row-btn checklist-add"
                   onClick={() => onChangeChecklist({
                     ...cityItem.checklists,
-                    [key]: [...(cityItem.checklists?.[key] || []), { text: "", done: false }],
+                    [key]: [...items, { text: "", done: false }],
                   })}
                 >
-                  Add
+                  + Add
                 </button>
-              </div>
-              <div className="checklist-list">
-                {(cityItem.checklists?.[key] || []).map((item, index) => (
-                  <div className="check-row" key={`${key}-${index}`}>
-                    <input
-                      type="checkbox"
-                      checked={item.done}
-                      onChange={(event) => onChangeChecklist({
-                        ...cityItem.checklists,
-                        [key]: cityItem.checklists[key].map((entry, entryIndex) => entryIndex === index ? { ...entry, done: event.target.checked } : entry),
-                      })}
-                    />
-                    <input
-                      value={item.text}
-                      onChange={(event) => onChangeChecklist({
-                        ...cityItem.checklists,
-                        [key]: cityItem.checklists[key].map((entry, entryIndex) => entryIndex === index ? { ...entry, text: event.target.value } : entry),
-                      })}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => onChangeChecklist({
-                        ...cityItem.checklists,
-                        [key]: cityItem.checklists[key].filter((_, entryIndex) => entryIndex !== index),
-                      })}
-                    >
-                      ×
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </article>
-          ))}
+              </article>
+            );
+          })}
         </div>
       </section>
     </>
   );
+}
+
+// Whole nights between two YYYY-MM-DD dates, or null when either is missing
+// or the range is degenerate. Pure date math — no invented values.
+function tripNights(arrive, depart) {
+  if (!arrive || !depart) return null;
+  const a = new Date(`${arrive}T00:00:00`);
+  const d = new Date(`${depart}T00:00:00`);
+  if (Number.isNaN(a.getTime()) || Number.isNaN(d.getTime())) return null;
+  const nights = Math.round((d - a) / 86400000);
+  return nights > 0 ? nights : null;
 }
 
 export function ImagesPage({ cityItem, imageState, searchState, setSearchState, onPatch, onSaved }) {
