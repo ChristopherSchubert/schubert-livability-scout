@@ -134,28 +134,50 @@
 /* Board ⇄ Ranking view switch — the two lenses on the same candidate set. */
 .view-toggle {
   display: inline-flex;
+  align-items: center;
   gap: 2px;
-  padding: 2px;
+  padding: 3px;
   background: #f0ead9;
   border: 1px solid var(--border);
   border-radius: 10px;
   margin: 0 0.5rem 0 0;
 }
+.view-toggle-label {
+  font-size: 0.6rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--muted);
+  padding: 0 0.4rem 0 0.35rem;
+}
 .view-toggle-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.38rem;
   font-family: var(--font-display);
   font-variation-settings: "opsz" 40, "SOFT" 60, "wght" 500;
   font-size: 0.95rem;
-  padding: 0.25rem 0.7rem;
+  padding: 0.28rem 0.72rem;
   border-radius: 8px;
   color: var(--muted);
   text-decoration: none;
   line-height: 1.3;
+  transition: background 0.14s, color 0.14s, box-shadow 0.14s;
+}
+.view-toggle-tab svg { opacity: 0.75; flex: 0 0 auto; }
+/* inactive tab reads as clickable: lifts on hover/focus */
+.view-toggle-tab:not(.active):hover,
+.view-toggle-tab:not(.active):focus-visible {
+  background: rgba(255, 253, 248, 0.65);
+  color: var(--text);
+  outline: none;
 }
 .view-toggle-tab.active {
   background: #fffdf8;
   color: var(--text);
-  box-shadow: 0 1px 3px rgba(41,33,19,0.1);
+  box-shadow: 0 1px 3px rgba(41,33,19,0.12);
 }
+.view-toggle-tab.active svg { opacity: 1; color: var(--accent); }
 .rank-table-wrap {
   background: transparent;
   border: 0;

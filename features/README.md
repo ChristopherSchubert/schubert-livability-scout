@@ -27,8 +27,9 @@ docs are worse than no feature docs.
 | Baseline comparison (vs Allison Park) | [baseline-comparison.md](baseline-comparison.md) | stub — only in mockup |
 | Six blocks (curated walk list) | [six-blocks.md](six-blocks.md) | stub — data live, UI pending |
 | Deployment (Vercel auto-deploy from `main`) | [deployment.md](deployment.md) | documented |
-| Funnel board (5-stage kanban) | _todo_ | undocumented |
-| Calibrate (weighted ranking + learned weights) | _todo_ | undocumented |
+| Candidate funnel (Board ⇄ Ranking + shared filters + ViewToggle) | [candidate-funnel.md](candidate-funnel.md) | stub — created 2026-06-09 |
+| Funnel board (5-stage kanban) | [candidate-funnel.md](candidate-funnel.md) | stub |
+| Calibrate (weighted ranking + learned weights) | [candidate-funnel.md](candidate-funnel.md) | stub |
 | Visit plan (logistics, days, checklists) | _todo_ | undocumented |
 | Decide questionnaire (post-visit survey) | _todo_ | undocumented |
 | Baseline ratings (reference places) | _todo_ | undocumented |

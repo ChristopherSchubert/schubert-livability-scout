@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import {
@@ -15,6 +14,7 @@ import {
 import AppShell from "./AppShell";
 import { WorkspaceLoading } from "./Loading";
 import { appendBust, resolveImage, usePlanner } from "./PlannerProvider";
+import ViewToggle from "./ViewToggle";
 import {
   CityFilterDrawer,
   CityFiltersBar,
@@ -100,10 +100,7 @@ export default function Calibrate() {
   return (
     <AppShell activeMode="board">
       <section className="rank-controls">
-        <div className="view-toggle" role="tablist" aria-label="Candidate view">
-          <Link href="/board" className="view-toggle-tab" role="tab">Board</Link>
-          <Link href="/ranking" className="view-toggle-tab active" role="tab" aria-selected="true">Ranking</Link>
-        </div>
+        <ViewToggle active="ranking" />
         <input
           type="search"
           className="rank-search"

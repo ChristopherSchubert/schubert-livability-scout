@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import {
@@ -15,6 +14,7 @@ import {
 import AppShell from "./AppShell";
 import { WorkspaceLoading } from "./Loading";
 import { appendBust, resolveImage, usePlanner } from "./PlannerProvider";
+import ViewToggle from "./ViewToggle";
 import {
   CityFilterDrawer,
   CityFiltersBar,
@@ -117,10 +117,7 @@ export default function FunnelBoard({ focusStage }) {
       </section>
 
       <section className="rank-controls" aria-label="Filter candidates">
-        <div className="view-toggle" role="tablist" aria-label="Candidate view">
-          <Link href="/board" className="view-toggle-tab active" role="tab" aria-selected="true">Board</Link>
-          <Link href="/ranking" className="view-toggle-tab" role="tab">Ranking</Link>
-        </div>
+        <ViewToggle active="board" />
         <input
           type="search"
           className="rank-search"
