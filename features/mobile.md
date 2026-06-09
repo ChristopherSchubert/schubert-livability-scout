@@ -247,7 +247,10 @@ scannable list instead:
   (planning-stage candidates, ranked by their best upcoming visit window). It
   reuses the *same* `weeklyVisitScore` curve the timeline draws — the best
   window is that curve's peak from today forward (date + a 0–100 quality). Each
-  card links to `/cities/[slug]/plan` to lock dates.
+  card links to `/cities/[slug]/plan` to lock dates. A third **Backlog** section
+  lists candidates not yet in planning, ranked by their best upcoming window —
+  the same triage lens the desktop backlog provides (calibration/reference
+  places are excluded).
 - `/planning/calendar` still renders the full timeline (a deliberate
   power-user/desktop destination); the mobile list links to it as "Calendar
   view →".

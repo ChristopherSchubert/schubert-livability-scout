@@ -58,28 +58,13 @@ export default function PlanningMobile() {
     return learned.weights || EQUAL_WEIGHTS;
   }, [planner.cities]);
 
-  const { committed, queue } = useMemo(() => {
+  const { committed, queue, backlog } = useMemo(() => {
     const today = startOfDay(new Date());
     const viewStart = startOfWeek(new Date(today.getFullYear(), today.getMonth(), 1));
     const todayDay = daysBetween(viewStart, today);
 
-    const committed = [];
-    const queue = [];
-    for (const c of planner.cities) {
-      const stage = cityStage(c);
-      if (stage === "planned") {
-        const arrive = fromYmd(c.arriveDate);
-        const depart = fromYmd(c.departDate);
-        committed.push({
-          city: c,
-          overall: weightedAxisScore(c, weights),
-          dates: fmtRange(arrive, depart) || c.tripWeek || "Dates TBD",
-        });
-        continue;
-      }
-      if (stage !== "planning") continue;
-
-      // Best upcoming week = peak of the weekly visit-score curve from today on.
+    // Best upcoming week = peak of the weekly visit-score curve from today on.
+    const bestWindow = (c) => {
       const scores = weeklyVisitScore(c, viewStart, WEEKS);
       let bestW = -1;
       let bestScore = -Infinity;
@@ -89,17 +74,39 @@ export default function PlanningMobile() {
           if (scores[w] > bestScore) { bestScore = scores[w]; bestW = w; }
         }
       }
-      const bestDate = bestW >= 0 ? addDays(viewStart, bestW * 7) : null;
-      queue.push({
+      return {
         city: c,
         overall: weightedAxisScore(c, weights),
-        bestDate,
+        bestDate: bestW >= 0 ? addDays(viewStart, bestW * 7) : null,
         bestScore: bestW >= 0 ? bestScore : null,
-      });
+      };
+    };
+
+    const committed = [];
+    const queue = [];
+    const backlog = [];
+    for (const c of planner.cities) {
+      if (c.isCalibration) continue; // reference places aren't trips to plan
+      const stage = cityStage(c);
+      if (stage === "planned") {
+        const arrive = fromYmd(c.arriveDate);
+        const depart = fromYmd(c.departDate);
+        committed.push({
+          city: c,
+          overall: weightedAxisScore(c, weights),
+          dates: fmtRange(arrive, depart) || c.tripWeek || "Dates TBD",
+        });
+      } else if (stage === "planning") {
+        queue.push(bestWindow(c));
+      } else if (stage === "backlog") {
+        backlog.push(bestWindow(c));
+      }
     }
-    // Soonest strong window first: rank the queue by its best visit score.
-    queue.sort((a, b) => (b.bestScore ?? -1) - (a.bestScore ?? -1));
-    return { committed, queue };
+    // Soonest strong window first.
+    const byWindow = (a, b) => (b.bestScore ?? -1) - (a.bestScore ?? -1);
+    queue.sort(byWindow);
+    backlog.sort(byWindow);
+    return { committed, queue, backlog };
   }, [planner.cities, weights]);
 
   function thumb(city) {
@@ -161,6 +168,28 @@ export default function PlanningMobile() {
               </div>
             )}
           </section>
+
+          {backlog.length > 0 ? (
+            <section className="plan-m-section">
+              <h2 className="plan-m-section-head">
+                Backlog <span className="plan-m-count">{backlog.length}</span>
+              </h2>
+              <p className="plan-m-sub">Candidates not yet in planning, by their best upcoming window.</p>
+              <ol className="plan-m-list">
+                {backlog.map(({ city, overall, bestDate, bestScore }) => (
+                  <PlanCard
+                    key={city.id}
+                    city={city}
+                    overall={overall}
+                    src={thumb(city)}
+                    primary={bestDate ? fmtDate(bestDate) : "No window yet"}
+                    primaryLabel="Best window"
+                    badge={bestScore != null ? `${Math.round(bestScore)}/100` : null}
+                  />
+                ))}
+              </ol>
+            </section>
+          ) : null}
         </>
       )}
     </AppShell>
