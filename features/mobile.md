@@ -231,6 +231,27 @@ switcher is desktop-`display:none`). Verified rest states + dropdown on a clean
 server (the hidden preview tab freezes CSS transitions, so the easing itself is
 device-verified, like the scroll trigger).
 
+## Simplified mobile planning view (2026-06-09, owner request)
+
+The desktop planning surface is a pan/zoom swim-lane timeline
+(`components/TripPlanner.jsx`) — genuinely unusable on a phone (an earlier
+"keep it desktop-only" call was wrong). At ≤640px `/planning` now renders a
+scannable list instead:
+
+- `components/PlanningView.jsx` picks by viewport (`matchMedia`, mounted-gated
+  to avoid SSR mismatch): `TripPlanner` on desktop, `PlanningMobile` on phones —
+  so the heavy timeline never mounts on a phone.
+- `components/PlanningMobile.jsx` distills the timeline's core question — "which
+  candidates should I plan a trip for, and when?" — into cards: **Committed
+  trips** (planned, with their date ranges) and **Looking for a slot**
+  (planning-stage candidates, ranked by their best upcoming visit window). It
+  reuses the *same* `weeklyVisitScore` curve the timeline draws — the best
+  window is that curve's peak from today forward (date + a 0–100 quality). Each
+  card links to `/cities/[slug]/plan` to lock dates.
+- `/planning/calendar` still renders the full timeline (a deliberate
+  power-user/desktop destination); the mobile list links to it as "Calendar
+  view →".
+
 ## Follow-ups (tracked as GitHub issues)
 
 - ~~**Climate-heatmap legibility on phones.**~~ ✅ Fixed 2026-06-09 (from owner

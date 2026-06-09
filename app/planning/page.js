@@ -1,7 +1,7 @@
-import TripPlanner from "../../components/TripPlanner";
+import PlanningView from "../../components/PlanningView";
 
 export const metadata = { title: "Visit — Livability Scout" };
 
 export default function VisitPage() {
-  return <TripPlanner />;
+  return <PlanningView />;
 }

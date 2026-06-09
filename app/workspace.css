@@ -1410,3 +1410,49 @@
     border-bottom-color: transparent;
   }
 }
+
+/* ── Simplified mobile planning view (components/PlanningMobile.jsx) ──────────
+   The desktop swim-lane timeline is unusable on a phone; this is the scannable
+   list that replaces it at <=640px (PlanningView picks which to render). */
+.plan-m-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+.plan-m-cal { white-space: nowrap; flex: none; }
+.plan-m-section { margin-top: 1.5rem; }
+.plan-m-section-head {
+  font-family: var(--font-ui);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--muted);
+  margin: 0 0 0.7rem;
+}
+.plan-m-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; }
+.plan-m-card {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.6rem 0.75rem;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  text-decoration: none;
+  color: var(--text);
+}
+.plan-m-card.is-committed { border-left: 4px solid var(--stage-visit); }
+.plan-m-thumb { width: 64px; height: 48px; border-radius: 8px; object-fit: cover; flex: none; background: #f1ead9; }
+.plan-m-thumb-empty { display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-weight: 700; color: var(--muted); }
+.plan-m-main { flex: 1 1 auto; min-width: 0; }
+.plan-m-top { display: flex; align-items: baseline; justify-content: space-between; gap: 0.5rem; }
+.plan-m-name {
+  font-family: var(--font-display);
+  font-variation-settings: "opsz" 40, "SOFT" 60, "wght" 540;
+  font-size: 1.05rem; line-height: 1.15;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.plan-m-overall { font-family: var(--font-display); font-variation-settings: "opsz" 60, "wght" 700; font-size: 1.05rem; color: var(--accent); flex: none; }
+.plan-m-window { display: flex; align-items: baseline; gap: 0.4rem; margin-top: 0.15rem; }
+.plan-m-window-label { font-family: var(--font-ui); text-transform: uppercase; letter-spacing: 0.06em; font-size: 0.6rem; font-weight: 600; color: var(--muted); }
+.plan-m-window-val { font-family: var(--font-ui); font-size: 0.9rem; font-weight: 600; color: var(--text); }
+.plan-m-window-score { color: var(--muted); font-weight: 500; margin-left: 0.15rem; }
+.plan-m-go { flex: none; color: var(--muted); font-size: 1.1rem; }
+.plan-m-empty { color: var(--muted); font-size: 0.9rem; line-height: 1.5; padding: 0.5rem 0; max-width: 40ch; }
