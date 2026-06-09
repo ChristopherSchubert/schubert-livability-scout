@@ -263,16 +263,19 @@ export default function TripPlanner() {
     setSortMode("none");
     userReorderedRef.current = true; // subsequent order changes now persist
     setDragLaneId(id);
+    // Snapshot each lane's midpoint ONCE. Measuring against live rects made the
+    // target oscillate as the list reordered under the cursor (the jitter). With
+    // a fixed reference, the drop target advances smoothly with the pointer.
+    const slots = [...document.querySelectorAll(".trip-pl-lanes .trip-pl-lane")]
+      .map((el) => { const r = el.getBoundingClientRect(); return { id: el.getAttribute("data-lane-id"), mid: r.top + r.height / 2 }; })
+      .filter((s) => s.id);
     const move = (ev) => {
-      const wrap = document.querySelector(".trip-pl-lanes");
-      if (!wrap) return;
-      const els = [...wrap.children].filter((c) => c.classList && c.classList.contains("trip-pl-lane"));
-      let overId = null;
-      for (const el of els) { const r = el.getBoundingClientRect(); if (ev.clientY < r.top + r.height / 2) { overId = el.getAttribute("data-lane-id"); break; } }
+      let beforeId = null;
+      for (const s of slots) { if (s.id === id) continue; if (ev.clientY < s.mid) { beforeId = s.id; break; } }
       setOrder((prev) => {
         if (prev.indexOf(id) < 0) return prev;
         const without = prev.filter((x) => x !== id);
-        let to = overId ? without.indexOf(overId) : without.length;
+        let to = beforeId ? without.indexOf(beforeId) : without.length;
         if (to < 0) to = without.length;
         const next = [...without.slice(0, to), id, ...without.slice(to)];
         return next.length === prev.length && next.every((v, i) => v === prev[i]) ? prev : next;
