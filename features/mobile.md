@@ -123,6 +123,30 @@ semantics), not eyeballed.
   added — that would be unwanted chrome on a working screen. Status moves
   without dragging already work via the Board advance buttons (Phase 1 finding).
 
+## Real-device fixes (2026-06-09, from owner iPhone screenshots)
+
+The preview sweep used 390px; the owner's iPhone surfaced two bugs the
+synthetic pass missed (both on surfaces not in the original 5-surface audit):
+
+- **Planned-trips cards overlapped (`/planned`, `/visited`).** `.trip-row` is a
+  rigid 3-column grid (`140px | 1fr | auto`); at phone width the columns can't
+  fit, the city name overflowed its squeezed cell, and the opaque green "Open
+  trip plan" button painted on top of the name. Fixed in `app/workspace.css`
+  (CSS-only — the JSX lives in the WIP-dirty `VisitWorkspace.jsx`, untouched):
+  at ≤640px the card restacks to image+details on row 1, action buttons
+  full-width on row 2, and long stay-zone/heart values wrap instead of clipping.
+- **City sub-nav hid the active tab.** On a city page the centering effect used
+  `offsetLeft` (relative to the offsetParent, not the scroll container), so for
+  the first tab it mis-computed and scrolled the row to its end — hiding the
+  active **Detail** tab off the left edge. Fixed two ways: the centering helper
+  now uses `getBoundingClientRect` deltas (`components/AppShell.jsx`), and the
+  city-context strip stacks on mobile so the sub-nav gets its own full-width
+  row where all four tabs fit with no scroll at all (`app/workspace.css`).
+
+Re-swept the other un-audited workspace pages (`/visited`, `/assessed`,
+`/decided`, `/planning`) — empty states are clean, trip planner functional,
+zero horizontal overflow.
+
 ## Follow-ups (tracked as GitHub issues)
 
 - **Climate-heatmap legibility on phones.** Horizontal overflow is fixed, but

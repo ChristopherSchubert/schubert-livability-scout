@@ -30,6 +30,20 @@ const STAGE_TO_MODE = {
 
 const MODE_HREF = Object.fromEntries(NAV_MODES.map((mode) => [mode.id, mode.href]));
 
+// Horizontally scroll a tab row so its active tab is centered/in view. Uses
+// getBoundingClientRect deltas (robust to offsetParent) and only adjusts the
+// container's own scrollLeft, so the page never scrolls. No-op if the row
+// isn't actually overflowing (e.g. when it fits full-width on a phone).
+function scrollActiveTabIntoView(nav, activeSelector) {
+  const active = nav?.querySelector(activeSelector);
+  if (!nav || !active) return;
+  if (nav.scrollWidth <= nav.clientWidth + 1) return;
+  const navRect = nav.getBoundingClientRect();
+  const tabRect = active.getBoundingClientRect();
+  const delta = (tabRect.left - navRect.left) - (nav.clientWidth - tabRect.width) / 2;
+  nav.scrollLeft += delta;
+}
+
 // Which workflow-mode tab should light up when you're looking at a specific
 // city? The mode whose stage the city is currently sitting in. Used by the
 // Detail / Images routes (Visit / Decide override with a fixed mode).
@@ -70,14 +84,12 @@ function TopBar({ activeMode }) {
   const navRef = useRef(null);
 
   // On a phone the tab row scrolls horizontally; keep the active stage centered
-  // and in view rather than clipped off the right edge. Sets the container's
-  // scrollLeft directly so the window never moves. (Phase 1, features/mobile.md)
+  // and in view rather than clipped off the right edge. Uses live rects (not
+  // offsetLeft, which is relative to the offsetParent and mis-scrolls) and only
+  // nudges the container's scrollLeft, so the window never moves.
+  // (Phase 1/5, features/mobile.md)
   useEffect(() => {
-    const nav = navRef.current;
-    const active = nav?.querySelector(".stage-tab.active");
-    if (nav && active) {
-      nav.scrollLeft = active.offsetLeft - (nav.clientWidth - active.clientWidth) / 2;
-    }
+    scrollActiveTabIntoView(navRef.current, ".stage-tab.active");
   }, [activeMode]);
 
   return (
@@ -178,13 +190,9 @@ function CityContextStrip({ cityItem, cityNav }) {
   const navRef = useRef(null);
 
   // Keep the active sub-tab (Detail/Plan/Images/Assess) centered when the row
-  // scrolls horizontally on a phone. (Phase 1, features/mobile.md)
+  // scrolls horizontally on a phone. (Phase 1/5, features/mobile.md)
   useEffect(() => {
-    const nav = navRef.current;
-    const active = nav?.querySelector(".city-context-tab.active");
-    if (nav && active) {
-      nav.scrollLeft = active.offsetLeft - (nav.clientWidth - active.clientWidth) / 2;
-    }
+    scrollActiveTabIntoView(navRef.current, ".city-context-tab.active");
   }, [cityNav]);
 
   return (

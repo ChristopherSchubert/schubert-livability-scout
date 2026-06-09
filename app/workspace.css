@@ -1176,7 +1176,12 @@
      back-arrow returns to the stage workspace. Collapse it so the sub-nav owns
      the second row and we reclaim the vertical space. */
   .sticky-header.has-city .stage-nav { display: none; }
-}
+
+  /* Give the city sub-nav (Detail/Plan/Images/Assess) its own full-width row
+     below the name instead of fighting it for space on one cramped line —
+     all four tabs then fit at phone width with no clipping or scroll. */
+  .city-context { flex-direction: column; align-items: stretch; gap: 0.5rem; }
+  .city-context-nav { width: 100%; }
 
 /* ── Ranking table → card list (Phase 2, features/mobile.md) ──────────────────
    The 9-column table is 843px wide; on a phone all 6 score columns are clipped
@@ -1249,4 +1254,36 @@
   /* Drop the desktop visit-now separator stub; the chip label already sets it
      apart, and a short floating vertical rule reads as an accident on a card. */
   .rank-table tbody td.rt-visitnow { border-left: none; }
+}
+
+/* ── Planned-trips cards (Phase 5, features/mobile.md) ────────────────────────
+   The trip cards (/planned, /visited) are a rigid 3-column grid
+   (140px | 1fr | auto). At phone width the columns can't fit, the city name
+   overflows its squeezed cell, and the opaque green "Open trip plan" actions
+   column paints on top of it. Restack: image + details on row 1, the action
+   buttons full-width on row 2, and let the long fact values wrap. */
+@media (max-width: 640px) {
+  .trip-row {
+    grid-template-columns: 104px minmax(0, 1fr);
+    grid-template-areas:
+      "media meta"
+      "actions actions";
+    column-gap: 0.85rem;
+    row-gap: 0.7rem;
+  }
+  .trip-media { grid-area: media; width: 100%; }
+  .trip-meta { grid-area: meta; }
+  .trip-actions {
+    grid-area: actions;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.5rem;
+  }
+  .trip-actions .button-link,
+  .trip-actions .ghost-link { flex: 0 0 auto; min-height: 44px; display: inline-flex; align-items: center; }
+  .trip-row-head { flex-wrap: wrap; }
+  .trip-name { min-width: 0; }
+  .trip-facts { grid-template-columns: 1fr; }
+  .trip-fact dd { white-space: normal; }   /* show full stay-zone / heart, no ellipsis clip */
 }
