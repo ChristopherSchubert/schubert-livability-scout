@@ -1359,12 +1359,45 @@
   }
 
   /* Hide-on-scroll-down: when the page is scrolled down (AppShell toggles
-     `nav-condensed`), drop the brand identity + settings so only the menu rows
-     stay pinned. Scrolling up restores them. */
+     `nav-condensed`), the brand identity + settings collapse so only the menu
+     rows stay pinned; scrolling up restores them. Animated via max-height +
+     opacity (not display:none) so it eases rather than snaps.
+
+     overflow:hidden lives on the brand + the ⋯ TRIGGER (not on .topbar-v2 or
+     .backup-menu) so it never clips the absolutely-positioned ⋯ dropdown. The
+     topbar just animates its padding away; its height follows the collapsing
+     children. max-height values sit just above real content so easing engages
+     immediately. */
+  .topbar-brand,
+  .backup-trigger {
+    overflow: hidden;
+    transition: max-height 0.28s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease;
+  }
+  .topbar-brand { max-height: 30px; }
+  .backup-trigger { max-height: 44px; }
+  .sticky-header.has-city .topbar-v2 {
+    transition: padding-top 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+                padding-bottom 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+                border-color 0.28s ease;
+  }
+
   .sticky-header.nav-condensed .topbar-brand,
-  .sticky-header.nav-condensed .backup-menu { display: none; }
+  .sticky-header.nav-condensed .backup-trigger {
+    max-height: 0;
+    opacity: 0;
+    border-width: 0;
+  }
+  /* The ⋯ button leaves a ~20px line-box on its wrapper even at max-height 0;
+     zero it so the bar fully closes. Gated by the taller trigger during the
+     animation, so collapsing it doesn't cause a visible jump. */
+  .sticky-header.nav-condensed .backup-menu { line-height: 0; }
   /* On a city page the topbar is only the brand row (the funnel is already
-     collapsed), so hide the whole bar when condensed — the city-context menu
-     stays pinned at the top of the header. */
-  .sticky-header.nav-condensed.has-city .topbar-v2 { display: none; }
+     collapsed), so its padding collapses too — the children above are already
+     animating to 0, so the whole bar eases shut and the city-context menu stays
+     pinned. */
+  .sticky-header.nav-condensed.has-city .topbar-v2 {
+    padding-top: 0;
+    padding-bottom: 0;
+    border-bottom-color: transparent;
+  }
 }

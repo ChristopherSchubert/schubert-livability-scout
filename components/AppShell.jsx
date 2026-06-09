@@ -104,6 +104,19 @@ export default function AppShell({ activeMode, activeStage, cityItem, cityNav, c
     return () => window.removeEventListener("resize", setVar);
   }, [condensed, cityItem]);
 
+  // Track the header's height *continuously* (every frame of the collapse
+  // animation) so the frozen stats chips follow it smoothly rather than jumping
+  // to the end value. ResizeObserver fires throughout a CSS max-height transition.
+  useEffect(() => {
+    const el = headerRef.current;
+    if (!el || typeof ResizeObserver === "undefined") return;
+    const ro = new ResizeObserver(() =>
+      document.documentElement.style.setProperty("--app-header-h", `${el.offsetHeight}px`)
+    );
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
   return (
     <div className="shell">
       {/* `has-city` lets the mobile CSS collapse the redundant global funnel on

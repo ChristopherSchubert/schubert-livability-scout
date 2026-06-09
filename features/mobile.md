@@ -219,10 +219,17 @@ Two interlocking scroll behaviors on phones, both driven from `AppShell.jsx`:
   collapses.
 
 Implementation notes: the scroll handler updates state directly (no rAF) so it
-doesn't depend on animation-frame scheduling; `--app-header-h` is tied to state
-changes rather than a ResizeObserver. Desktop is unaffected (all the collapse /
-sticky CSS is ≤640px; the chip switcher is desktop-`display:none`). Verified the
-full down/up cycle on a clean server, no console errors.
+doesn't depend on animation-frame scheduling. The collapse is **animated**
+(max-height + opacity, 0.28s eased) rather than a `display:none` snap — the
+`overflow:hidden` lives on the brand + the ⋯ trigger (never on `.topbar-v2` or
+`.backup-menu`) so it can't clip the absolutely-positioned ⋯ dropdown; the
+topbar just eases its padding away. `--app-header-h` is set both on state change
+(rest values) and continuously by a ResizeObserver (so the frozen stats chips
+track the header smoothly through the collapse animation, not just at the end).
+Desktop is unaffected (all the collapse / sticky CSS is ≤640px; the chip
+switcher is desktop-`display:none`). Verified rest states + dropdown on a clean
+server (the hidden preview tab freezes CSS transitions, so the easing itself is
+device-verified, like the scroll trigger).
 
 ## Follow-ups (tracked as GitHub issues)
 
