@@ -1,8 +1,10 @@
 # Mobile / responsive
 
-**Status:** in progress (started 2026-06-09). Goal: near-full mobile parity at
-phone width (≈390px). The owner uses a phone in the field for the felt-score
-survey, so mobile is a real workflow, not a nice-to-have.
+**Status:** Phases 0–4 shipped 2026-06-09; trip planner assessed (no change
+needed). Every audited surface is now usable and horizontal-overflow-free at
+phone width (≈390px), and the WCAG findings are closed. Remaining work is
+polish, tracked in Follow-ups below. The owner uses a phone in the field for
+the felt-score survey, so mobile is a real workflow, not a nice-to-have.
 
 ## Scope decision (owner, 2026-06-09)
 
@@ -112,8 +114,14 @@ semantics), not eyeballed.
     text** (`.place` h1, card `<strong>`, rank-table name). Per WCAG, an image
     redundant with adjacent text should have empty alt to avoid double
     announcement — so `alt=""` is conformant here, not a defect. Left as-is.
-- **Trip planner** (#7 scope): graceful "best on a larger screen" affordance on
-  phone instead of a broken drag surface.
+- **Trip planner** ✅ (assessed — no change needed): the owner scoped the heavy
+  drag UI as desktop-primary. On a phone it already degrades gracefully — the
+  swim-lane is a self-contained pan/zoom scroller (touch-native "drag to pan ·
+  pinch to zoom"), the controls/legend reflow, and crucially the **page itself
+  has zero horizontal overflow** (the wide timeline lives inside its own scroll
+  container). It is not a broken drag surface, so no "open on desktop" wall was
+  added — that would be unwanted chrome on a working screen. Status moves
+  without dragging already work via the Board advance buttons (Phase 1 finding).
 
 ## Follow-ups (tracked as GitHub issues)
 
