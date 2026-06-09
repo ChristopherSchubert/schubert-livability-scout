@@ -12,6 +12,7 @@ import {
   weightedAxisScore,
 } from "../lib/planner-data";
 import AppShell from "./AppShell";
+import FunnelHeader from "./FunnelHeader";
 import { WorkspaceLoading } from "./Loading";
 import { appendBust, resolveImage, usePlanner } from "./PlannerProvider";
 import ViewToggle from "./ViewToggle";
@@ -93,28 +94,18 @@ export default function FunnelBoard({ focusStage }) {
 
   return (
     <AppShell activeMode="board">
-      <section className="funnel-header">
-        <div className="funnel-header-titles">
-          <p className="page-eyebrow">Board</p>
-          <h1>Every candidate, by stage</h1>
-          <p className="funnel-meta">
+      <FunnelHeader
+        meta={
+          <>
             {!hydrated
               ? "Loading…"
               : focusStage
               ? `${totalForFocus} ${totalForFocus === 1 ? "city" : "cities"} in ${STAGES.find((stage) => stage.id === focusStage)?.label}`
               : `${filteredCities.length} of ${planner.cities.filter((c) => !hideCalibration || !c.isCalibration).length} candidates`}
             {hydrated ? <span className="funnel-meta-hint"> · drag to move · click to open</span> : null}
-          </p>
-        </div>
-        <button
-          type="button"
-          className="primary"
-          disabled
-          title="Adding candidates is paused"
-        >
-          + Add candidate
-        </button>
-      </section>
+          </>
+        }
+      />
 
       <section className="rank-controls" aria-label="Filter candidates">
         <ViewToggle active="board" />

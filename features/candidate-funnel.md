@@ -30,6 +30,19 @@ extend this module. A shared `SortControl` dropdown also lives here (used by
 the backlog; Board/Ranking don't need it since they sort by stage / column
 header).
 
+## Shared header ([`components/FunnelHeader.jsx`](../components/FunnelHeader.jsx))
+
+Both views render an **identical** compact header (eyebrow "Candidates" + h1
+"Every candidate" + a one-line `meta`). This exists because Board used to
+carry a tall editorial header while Ranking had none, so switching views
+jumped the ViewToggle and all content ~124px vertically (2026-06-09: the owner
+flagged that toggling "moves"). With the same header on both, the controls bar
++ toggle sit at the same Y on each page → no shift. The title was also
+shrunk (`.funnel-header h1` scoped override in
+[`workspace.css`](../app/workspace.css)) since it ate a lot of space. The
+disabled "+ Add candidate" button was dropped (it was paused/non-functional).
+Keep the `meta` to one line on both views so the header heights stay equal.
+
 ## View toggle ([`components/ViewToggle.jsx`](../components/ViewToggle.jsx))
 
 The Board/Ranking switch. Originally two bare words that didn't read as

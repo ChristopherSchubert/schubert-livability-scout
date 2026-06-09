@@ -12,6 +12,7 @@ import {
   weightedAxisScore,
 } from "../lib/planner-data";
 import AppShell from "./AppShell";
+import FunnelHeader from "./FunnelHeader";
 import { WorkspaceLoading } from "./Loading";
 import { appendBust, resolveImage, usePlanner } from "./PlannerProvider";
 import ViewToggle from "./ViewToggle";
@@ -99,6 +100,13 @@ export default function Calibrate() {
 
   return (
     <AppShell activeMode="board">
+      <FunnelHeader
+        meta={
+          !hydrated
+            ? "Loading…"
+            : `${rows.length} of ${cityRows.length} candidates${filters.activeFilterCount > 0 ? " match filters" : ""}`
+        }
+      />
       <section className="rank-controls">
         <ViewToggle active="ranking" />
         <input
@@ -121,7 +129,6 @@ export default function Calibrate() {
       {!hydrated ? <WorkspaceLoading label="Loading cities…" /> : (
       <section className="rank-table-wrap">
         <div className="rank-count">
-          {rows.length} of {cityRows.length} candidates{filters.activeFilterCount > 0 ? " match filters" : ""}
           <WeightNote learned={learned} />
         </div>
         <table className="rank-table">
@@ -193,7 +200,7 @@ function WeightNote({ learned }) {
   if (learned.weights) {
     return (
       <span className="weight-note-inline" title={`Learned from ${learned.n} surveyed visits (cities with a Gut score)`}>
-        {" · weights learned: "}
+        {"Weights learned: "}
         {calibrateAxes.map(([k, l], i) => (
           <span key={k}>{i ? " · " : ""}{shortAxisLabel(l)}×{(learned.weights[k] ?? 1).toFixed(1)}</span>
         ))}
@@ -202,7 +209,7 @@ function WeightNote({ learned }) {
   }
   return (
     <span className="weight-note-inline" title="Survey visited cities (give each a Gut score) so Overall can learn which axes predict your gut.">
-      {` · axes equal-weighted (${learned.n}/${learned.need} surveyed)`}
+      {`Axes equal-weighted (${learned.n}/${learned.need} surveyed)`}
     </span>
   );
 }

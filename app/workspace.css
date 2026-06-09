@@ -93,9 +93,13 @@
 .canvas-header,
 .funnel-header {
   border-bottom: 1px solid var(--border);
-  padding-bottom: 1.25rem;
+  padding-bottom: 0.8rem;
   align-items: flex-end;
 }
+/* Compact title for the funnel header — the full canvas-header size ate a lot
+   of vertical space on Board/Ranking. Scoped to .funnel-header so other pages'
+   .canvas-header h1 keeps its larger display size. */
+.funnel-header h1 { font-size: clamp(1.5rem, 2.6vw, 2rem); }
 .canvas-header h1,
 .funnel-header h1 {
   font-family: var(--font-display);
