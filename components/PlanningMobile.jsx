@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import {
   cityImageQuery,
   citySlug,
@@ -25,6 +25,20 @@ import { appendBust, resolveImage, usePlanner } from "./PlannerProvider";
 const WEEKS = 53;
 const MONTHS_SHORT = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const EQUAL_WEIGHTS = { setting: 1, aliveness: 1, fabric: 1, realness: 1, january: 1 };
+
+// Backlog sort options. "window" = best week from today forward; the season
+// options = best week whose midpoint falls in those months (mirrors the desktop
+// per-season best-week sort); "overall" = fit score. A season sort also changes
+// which window each card shows, so the card reflects the lens you picked.
+const SORTS = [
+  { id: "window", label: "Soonest window", chip: "Best window" },
+  { id: "spring", label: "Best in spring", chip: "Spring", months: [2, 3, 4] },
+  { id: "summer", label: "Best in summer", chip: "Summer", months: [5, 6, 7] },
+  { id: "fall", label: "Best in fall", chip: "Fall", months: [8, 9, 10] },
+  { id: "winter", label: "Best in winter", chip: "Winter", months: [11, 0, 1] },
+  { id: "overall", label: "Overall fit", chip: "Best window" },
+];
+const SORT_BY_ID = Object.fromEntries(SORTS.map((s) => [s.id, s]));
 
 function startOfDay(d) { return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
 function startOfWeek(d) {
@@ -50,6 +64,28 @@ function fmtRange(a, b) {
     : `${fmtDate(a)} – ${fmtDate(b)}`;
 }
 
+// Best visit window for a city under a given lens. With `months` (a season), the
+// peak week whose midpoint falls in those months; otherwise the peak week from
+// `todayDay` forward (the soonest upcoming window). Returns { date, score }.
+function windowFor(city, viewStart, todayDay, months) {
+  const scores = weeklyVisitScore(city, viewStart, WEEKS);
+  if (!scores) return { date: null, score: null };
+  let bestW = -1;
+  let bestScore = -Infinity;
+  for (let w = 0; w < WEEKS; w++) {
+    if (months) {
+      if (!months.includes(addDays(viewStart, w * 7 + 3).getMonth())) continue;
+    } else if (w * 7 < todayDay) {
+      continue;
+    }
+    if (scores[w] > bestScore) { bestScore = scores[w]; bestW = w; }
+  }
+  return {
+    date: bestW >= 0 ? addDays(viewStart, bestW * 7) : null,
+    score: bestW >= 0 ? bestScore : null,
+  };
+}
+
 export default function PlanningMobile() {
   const { planner, hydrated, imageState } = usePlanner();
 
@@ -58,56 +94,53 @@ export default function PlanningMobile() {
     return learned.weights || EQUAL_WEIGHTS;
   }, [planner.cities]);
 
-  const { committed, queue, backlog } = useMemo(() => {
+  const [sort, setSort] = useState("window");
+
+  const frame = useMemo(() => {
     const today = startOfDay(new Date());
     const viewStart = startOfWeek(new Date(today.getFullYear(), today.getMonth(), 1));
-    const todayDay = daysBetween(viewStart, today);
+    return { viewStart, todayDay: daysBetween(viewStart, today) };
+  }, []);
 
-    // Best upcoming week = peak of the weekly visit-score curve from today on.
-    const bestWindow = (c) => {
-      const scores = weeklyVisitScore(c, viewStart, WEEKS);
-      let bestW = -1;
-      let bestScore = -Infinity;
-      if (scores) {
-        for (let w = 0; w < WEEKS; w++) {
-          if (w * 7 < todayDay) continue;
-          if (scores[w] > bestScore) { bestScore = scores[w]; bestW = w; }
-        }
-      }
-      return {
-        city: c,
-        overall: weightedAxisScore(c, weights),
-        bestDate: bestW >= 0 ? addDays(viewStart, bestW * 7) : null,
-        bestScore: bestW >= 0 ? bestScore : null,
-      };
-    };
-
+  // Committed trips + the planning queue — sort-independent (the queue always
+  // leads with its soonest strong window).
+  const { committed, queue } = useMemo(() => {
+    const { viewStart, todayDay } = frame;
     const committed = [];
     const queue = [];
-    const backlog = [];
     for (const c of planner.cities) {
       if (c.isCalibration) continue; // reference places aren't trips to plan
       const stage = cityStage(c);
       if (stage === "planned") {
-        const arrive = fromYmd(c.arriveDate);
-        const depart = fromYmd(c.departDate);
         committed.push({
           city: c,
           overall: weightedAxisScore(c, weights),
-          dates: fmtRange(arrive, depart) || c.tripWeek || "Dates TBD",
+          dates: fmtRange(fromYmd(c.arriveDate), fromYmd(c.departDate)) || c.tripWeek || "Dates TBD",
         });
       } else if (stage === "planning") {
-        queue.push(bestWindow(c));
-      } else if (stage === "backlog") {
-        backlog.push(bestWindow(c));
+        const w = windowFor(c, viewStart, todayDay, null);
+        queue.push({ city: c, overall: weightedAxisScore(c, weights), bestDate: w.date, bestScore: w.score });
       }
     }
-    // Soonest strong window first.
-    const byWindow = (a, b) => (b.bestScore ?? -1) - (a.bestScore ?? -1);
-    queue.sort(byWindow);
-    backlog.sort(byWindow);
-    return { committed, queue, backlog };
-  }, [planner.cities, weights]);
+    queue.sort((a, b) => (b.bestScore ?? -1) - (a.bestScore ?? -1));
+    return { committed, queue };
+  }, [planner.cities, weights, frame]);
+
+  // Backlog — re-sorted (and re-windowed for season lenses) by the chosen sort.
+  const backlog = useMemo(() => {
+    const { viewStart, todayDay } = frame;
+    const months = SORT_BY_ID[sort]?.months || null;
+    const rows = [];
+    for (const c of planner.cities) {
+      if (c.isCalibration || cityStage(c) !== "backlog") continue;
+      const w = windowFor(c, viewStart, todayDay, months);
+      rows.push({ city: c, overall: weightedAxisScore(c, weights), bestDate: w.date, bestScore: w.score });
+    }
+    rows.sort(sort === "overall"
+      ? (a, b) => (b.overall ?? -1) - (a.overall ?? -1)
+      : (a, b) => (b.bestScore ?? -1) - (a.bestScore ?? -1));
+    return rows;
+  }, [planner.cities, weights, frame, sort]);
 
   function thumb(city) {
     return appendBust(resolveImage(city.heroImage, cityImageQuery(city.name), imageState), imageState.version);
@@ -171,10 +204,19 @@ export default function PlanningMobile() {
 
           {backlog.length > 0 ? (
             <section className="plan-m-section">
-              <h2 className="plan-m-section-head">
-                Backlog <span className="plan-m-count">{backlog.length}</span>
-              </h2>
-              <p className="plan-m-sub">Candidates not yet in planning, by their best upcoming window.</p>
+              <div className="plan-m-section-bar">
+                <h2 className="plan-m-section-head">
+                  Backlog <span className="plan-m-count">{backlog.length}</span>
+                </h2>
+                <label className="plan-m-sort">
+                  <span className="plan-m-sort-label">Sort</span>
+                  <select value={sort} onChange={(e) => setSort(e.target.value)} aria-label="Sort backlog">
+                    {SORTS.map((s) => (
+                      <option key={s.id} value={s.id}>{s.label}</option>
+                    ))}
+                  </select>
+                </label>
+              </div>
               <ol className="plan-m-list">
                 {backlog.map(({ city, overall, bestDate, bestScore }) => (
                   <PlanCard
@@ -183,7 +225,7 @@ export default function PlanningMobile() {
                     overall={overall}
                     src={thumb(city)}
                     primary={bestDate ? fmtDate(bestDate) : "No window yet"}
-                    primaryLabel="Best window"
+                    primaryLabel={SORT_BY_ID[sort]?.chip || "Best window"}
                     badge={bestScore != null ? `${Math.round(bestScore)}/100` : null}
                   />
                 ))}

@@ -1469,3 +1469,18 @@
 .plan-m-empty { color: var(--muted); font-size: 0.9rem; line-height: 1.5; padding: 0.5rem 0; max-width: 40ch; }
 .plan-m-count { color: var(--muted); font-weight: 500; }
 .plan-m-sub { font-size: 0.82rem; color: var(--muted); margin: -0.35rem 0 0.7rem; max-width: 44ch; line-height: 1.4; }
+.plan-m-section-bar { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; margin-bottom: 0.7rem; }
+.plan-m-section-bar .plan-m-section-head { margin: 0; }
+.plan-m-sort { display: inline-flex; align-items: center; gap: 0.4rem; flex: none; }
+.plan-m-sort-label { font-family: var(--font-ui); text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.62rem; font-weight: 600; color: var(--muted); }
+.plan-m-sort select {
+  font-family: var(--font-ui);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.3rem 0.5rem;
+  min-height: 38px;
+}

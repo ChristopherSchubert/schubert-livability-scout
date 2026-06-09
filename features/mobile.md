@@ -256,7 +256,11 @@ scannable list instead:
   card links to `/cities/[slug]/plan` to lock dates. A third **Backlog** section
   lists candidates not yet in planning, ranked by their best upcoming window —
   the same triage lens the desktop backlog provides (calibration/reference
-  places are excluded).
+  places are excluded). The backlog carries a compact **sort** (native
+  `<select>`): soonest window, best in spring/summer/fall/winter, or overall
+  fit. A season sort both reorders the list *and* re-windows each card to that
+  season's best week (e.g. "Best in winter" surfaces warm-winter destinations
+  with their Dec/Jan dates) — mirroring the desktop's per-season best-week sort.
 - `/planning/calendar` still renders the full timeline (a deliberate
   power-user/desktop destination); the mobile list links to it as "Calendar
   view →".
