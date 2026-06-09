@@ -273,7 +273,12 @@ export function defaultCityNav(cityItem, activeMode) {
   return [
     { href: `/cities/${slug}`, label: "Detail", active: activeMode === "detail" },
     { href: `/cities/${slug}/plan`, label: "Plan", active: activeMode === "plan" },
-    { href: `/cities/${slug}/images`, label: "Images", active: activeMode === "images" },
+    // Image management needs local API keys (Google Places via the Keychain) and
+    // is a measurement-time tool — surface it only on localhost/dev, never in
+    // the deployed app. Same NODE_ENV gate as the dev sign-in button.
+    ...(process.env.NODE_ENV !== "production"
+      ? [{ href: `/cities/${slug}/images`, label: "Images", active: activeMode === "images" }]
+      : []),
     { href: `/cities/${slug}/assess`, label: "Assess", active: activeMode === "assess" },
   ];
 }
