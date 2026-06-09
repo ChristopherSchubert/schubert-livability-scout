@@ -147,12 +147,18 @@ the model — orientation, case, tradeoff, done, no closer.
 
 ### Length
 
-- **600–1200 chars** is the typical band; current median across the
-  corpus is ~975. Don't aim at a target — let the place determine it.
-- **Under 700** is fine when the place is small or simple (Camden ~580,
-  Bled ~685, Greenport ~570). Short whys still get the paragraph break.
-- **Over 1400** only when the place genuinely needs the room (Santa
-  Barbara at 1592 earns it; most don't).
+- **Sentence floor (4 + 4):** every why runs **at least four sentences
+  in each paragraph** — orientation and case/tradeoff both. Set
+  2026-06-08 when the owner found several whys (Salem, the small-town
+  cohort) too thin at two or three sentences. This is a floor, not a
+  target: don't pad to hit it, but a paragraph that lands in two
+  sentences is under-argued and needs another concrete anchor (P1) or a
+  second supporting move before the tradeoff (P2).
+- **~900–1300 chars** is the typical band after the 2026-06-08
+  expansion; corpus median is ~1125, min ~875. Within that, let the
+  place determine the length — don't aim at a number.
+- **Over 1500** only when the place genuinely needs the room (Santa
+  Barbara at ~1680 earns it; most don't).
 
 ### Worked examples
 
@@ -185,6 +191,18 @@ The best models in the corpus right now:
 
 ## Status
 
+- **4 + 4 sentence floor met corpus-wide (2026-06-08):** all 122 cities
+  now carry ≥4 sentences in each paragraph. Started from a sentence-count
+  audit (median was 6; 119 of 122 had a 2- or 3-sentence second
+  paragraph) and expanded the case/tradeoff (and thin openers) in
+  batches, re-running `scripts/.audit-why-sentences.mjs` after each.
+  Length median moved ~975 → ~1125 chars. The pass also stripped a few
+  residual axis-meta terms that had crept into second paragraphs
+  ("the Realness/Aliveness axis," "the walkable-downtown axis") and two
+  Slovenia name-drops (Sausalito "Piran's silhouette," Cold Spring
+  "the cleanest Bled-shape"). Meta scan
+  (`scripts/.scan-why-meta.mjs`) is clean except the three Slovenia
+  cities legitimately naming themselves.
 - **121/121 cities** have a why with ≥2 paragraphs (2026-06-05 audit).
   Length distribution: min 427, median 975, max 1592. The 31 single-
   paragraph whys surfaced in this audit all already had the right
