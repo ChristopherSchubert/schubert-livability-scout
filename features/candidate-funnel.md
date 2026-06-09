@@ -6,6 +6,12 @@ Two lenses on the **same** candidate set, switched by a shared toggle:
   5-stage kanban (Backlog → Planning → Planned → Visited → Assessed). Drag a
   card between Backlog and Planning to move it; the later stages need data
   entered on their own pages, so the Board offers no advance button for them.
+  - **Header alignment (2026-06-09 fix).** Each column header carries help
+    text that runs 2–3 lines depending on the stage, which used to push the
+    shorter columns' first card higher than the rest. `.funnel-column-head p`
+    in [`workspace.css`](../app/workspace.css) now reserves 3 lines
+    (`min-height` + `-webkit-line-clamp: 3`) so every filled column's header
+    is the same height and the first cards line up.
 - **Ranking** (`/ranking`, [`Calibrate.jsx`](../components/Calibrate.jsx)) — a
   sortable table of the same cities with per-axis columns, an Overall column
   (weights **learned** from the owner's gut via `learnedAxisWeights`), and a

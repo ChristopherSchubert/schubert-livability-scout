@@ -276,6 +276,18 @@
   font-variation-settings: "opsz" 24, "SOFT" 80, "wght" 520;
   font-size: 1.15rem;
 }
+/* Equal-height column headers so the first card lines up across columns. The
+   help text runs 2–3 lines depending on the stage, which otherwise pushes the
+   shorter columns' cards higher than the rest. Reserve 3 lines and clamp so
+   every filled column's header is the same height. (Empty-slim rails hide the
+   help via a higher-specificity rule, so they're unaffected.) */
+.funnel-column-head p {
+  min-height: calc(0.82rem * 1.4 * 3);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+}
 .funnel-column-count {
   font-family: var(--font-display);
   font-variation-settings: "opsz" 40, "wght" 500;
