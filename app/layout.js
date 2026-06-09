@@ -7,8 +7,8 @@ import { PlannerProvider } from "../components/PlannerProvider";
 import { readImageManifest } from "../lib/image-manifest";
 
 export const metadata = {
-  title: "Livability Scout",
-  description: "A city-by-city planner for testing walkable, vivid places.",
+  title: "Sojourn",
+  description: "Find wonderful places to go, and enjoy them.",
 };
 
 // Explicit viewport (was relying on Next's implicit default). The app is used

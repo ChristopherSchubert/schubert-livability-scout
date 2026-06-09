@@ -1,5 +1,5 @@
 {
-  "name": "schubert-livability-scout",
+  "name": "schubert-sojourn",
   "private": true,
   "scripts": {
     "dev": "next dev",

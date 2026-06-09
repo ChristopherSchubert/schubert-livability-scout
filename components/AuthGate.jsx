@@ -85,7 +85,7 @@ function SignIn() {
   if (sent) {
     return (
       <div className="auth-card">
-        <span className="auth-eyebrow">Livability Scout</span>
+        <span className="auth-eyebrow">Sojourn</span>
         <h1 className="auth-title">Check your <em>email</em></h1>
         <p className="auth-muted">A sign-in link is on its way to <strong>{email}</strong>. Open it on this device to sign in. You’ll stay signed in afterward.</p>
         <button type="button" className="auth-ghost" onClick={() => setSent(false)}>Use a different email</button>
@@ -95,9 +95,9 @@ function SignIn() {
 
   return (
     <form className="auth-card" onSubmit={send}>
-      <span className="auth-eyebrow">Livability Scout</span>
-      <h1 className="auth-title">Find the next place to live <em>part-time</em>.</h1>
-      <p className="auth-muted">A tool for finding a US place that reproduces the feeling of Bled and Piran: walkable, alive year-round. Sign in with your email — we’ll send a one-tap link. No password to remember.</p>
+      <span className="auth-eyebrow">Sojourn</span>
+      <h1 className="auth-title">Find your next <em>wonderful</em> place to go.</h1>
+      <p className="auth-muted">A tool for finding wonderful places to go and enjoy. Sign in with your email — we’ll send a one-tap link. No password to remember.</p>
       <label className="auth-field">
         <span className="auth-field-label">Your email</span>
         <input

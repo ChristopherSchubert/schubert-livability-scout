@@ -178,7 +178,7 @@ function TopBar({ activeMode }) {
       <div className="topbar-brand">
         <Link href="/board" className="brand-mark">
           <span className="brand-dot" aria-hidden="true" />
-          <span>Livability Scout</span>
+          <span>Sojourn</span>
         </Link>
         <SavePill saveState={saveState} hydrated={hydrated} />
       </div>
@@ -207,7 +207,7 @@ function TopBar({ activeMode }) {
           const url = URL.createObjectURL(blob);
           const link = document.createElement("a");
           link.href = url;
-          link.download = "livability-scout-planner.json";
+          link.download = "sojourn-planner.json";
           link.click();
           URL.revokeObjectURL(url);
         }}
