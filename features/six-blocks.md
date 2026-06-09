@@ -169,6 +169,19 @@ the corpus from 629→670 of 675 pins; the 5 holdouts are genuinely-distant
 drive-to features — Blue Ridge Parkway overlook, Canaan Valley Resort —
 left as honest placeholders.)
 
+## Block blurbs (the "why" line)
+
+Each block card carries a one-sentence reason you'd stand there, in
+`cities.block_blurbs` (jsonb, parallel to `blocks`; migration 0011,
+round-tripped via `lib/city-row.js` + `mapPatch`). Rendered by
+`ChapterWalks` as `.walk-blurb` (falls back to the "In {city}" line when a
+block has no blurb yet). Blurbs are **hand-written but grounded in the real
+Google POIs at each block** (the cached anchors + character) — never
+invented. Authored via `scripts/.apply-blurbs.mjs` (reads
+`/tmp/blurbs.json` = `{ slug: [blurb, …] }`, validates the count matches
+the city's blocks before writing, so a mis-aligned list can't shift blurbs
+onto the wrong blocks).
+
 ## The 1.5 km audit (2026-06-09)
 
 A pin being "resolved" doesn't mean it's in the right place — the

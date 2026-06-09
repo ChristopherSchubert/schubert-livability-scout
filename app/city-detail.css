@@ -1144,6 +1144,14 @@
       line-height: 1.5;
       margin: 0 0 0.5rem;
     }
+.cd-root .walk-blurb {
+      font-family: 'Fraunces', serif;
+      font-variation-settings: "opsz" 14, "SOFT" 50, "wght" 400;
+      font-size: 0.92rem;
+      line-height: 1.5;
+      color: var(--ink-soft);
+      margin: 0;
+    }
 .cd-root .walk-start {
       font-family: 'Inter Tight', sans-serif;
       font-size: 0.76rem;

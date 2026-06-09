@@ -107,7 +107,7 @@ export default function MagazineDetail({ cityItem }) {
       <ChapterWhen view={view} homebase={homebase} />
 
       {/* Chapter VI — where to walk */}
-      <ChapterWalks cityItem={cityItem} blocks={view.blocks} blockGeometries={view.blockGeometries} />
+      <ChapterWalks cityItem={cityItem} blocks={view.blocks} blockGeometries={view.blockGeometries} blockBlurbs={view.blockBlurbs} />
     </div>
   );
 }
@@ -210,9 +210,10 @@ function ChapterWhy({ view }) {
 //   - unresolved (or null lat) → render the placeholder card
 // The measurer's integrity gate already rejected anything outside the
 // stay-zone polygon, so any non-unresolved entry is safe to render.
-function ChapterWalks({ cityItem, blocks, blockGeometries }) {
+function ChapterWalks({ cityItem, blocks, blockGeometries, blockBlurbs }) {
   if (!blocks?.length) return null;
   const geoms = Array.isArray(blockGeometries) ? blockGeometries : [];
+  const blurbs = Array.isArray(blockBlurbs) ? blockBlurbs : [];
   return (
     <section id="walks" className="walks" aria-label="Where to walk">
       <div className="walks-head">
@@ -243,7 +244,7 @@ function ChapterWalks({ cityItem, blocks, blockGeometries }) {
                 <div className="walk-num">{i + 1}</div>
               </div>
               <h3 className="walk-name">{block}</h3>
-              <p className="walk-start"><strong>In</strong> {cityItem.name}</p>
+              {blurbs[i] ? <p className="walk-blurb">{blurbs[i]}</p> : <p className="walk-start"><strong>In</strong> {cityItem.name}</p>}
             </article>
           );
         })}
