@@ -1,7 +1,5 @@
-import DecideWorkspace from "../../components/DecideWorkspace";
+import { redirect } from "next/navigation";
 
-export const metadata = { title: "Decide — Livability Scout" };
-
-export default function DecidePage() {
-  return <DecideWorkspace />;
+export default function LegacyRedirect() {
+  redirect("/visited");
 }

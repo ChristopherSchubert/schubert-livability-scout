@@ -1155,11 +1155,11 @@ button:hover, .button-link:hover {
   box-shadow: inset 0 3px 0 0 currentColor;
   color: var(--stage-decide);
 }
-.city-context.stage-shortlist { color: var(--stage-shortlist); }
-.city-context.stage-calibrate { color: var(--stage-calibrate); }
-.city-context.stage-visit     { color: var(--stage-visit); }
-.city-context.stage-decide    { color: var(--stage-decide); }
-.city-context.stage-decided   { color: var(--stage-decided); }
+.city-context.stage-backlog  { color: var(--stage-shortlist); }
+.city-context.stage-planning { color: var(--stage-calibrate); }
+.city-context.stage-planned  { color: var(--stage-visit); }
+.city-context.stage-visited  { color: var(--stage-decide); }
+.city-context.stage-assessed { color: var(--stage-decided); }
 .city-context-left { display: flex; align-items: center; gap: 0.9rem; }
 .city-context-back {
   display: inline-flex;
@@ -1387,11 +1387,11 @@ button:hover, .button-link:hover {
   gap: 0.6rem;
 }
 .funnel-column.drag-over { background: #f1f7f2; box-shadow: 0 0 0 2px var(--accent) inset; }
-.funnel-column.stage-shortlist { border-top-color: var(--stage-shortlist); }
-.funnel-column.stage-calibrate { border-top-color: var(--stage-calibrate); }
-.funnel-column.stage-visit     { border-top-color: var(--stage-visit); }
-.funnel-column.stage-decide    { border-top-color: var(--stage-decide); }
-.funnel-column.stage-decided   { border-top-color: var(--stage-decided); }
+.funnel-column.stage-backlog  { border-top-color: var(--stage-shortlist); }
+.funnel-column.stage-planning { border-top-color: var(--stage-calibrate); }
+.funnel-column.stage-planned  { border-top-color: var(--stage-visit); }
+.funnel-column.stage-visited  { border-top-color: var(--stage-decide); }
+.funnel-column.stage-assessed { border-top-color: var(--stage-decided); }
 .funnel-column-head {
   display: flex;
   justify-content: space-between;

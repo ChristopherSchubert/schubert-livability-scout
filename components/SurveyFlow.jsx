@@ -7,7 +7,7 @@ import { surveyAxes, SLOVENIA_ANCHORS, emptySurvey, surveyComplete } from "../li
  * SurveyFlow — the facilitated felt-score questionnaire.
  *
  * One axis per screen, each scored 1–5 against fixed anchors drawn from
- * places the owner has stood in, then the 0–10 gut "Slovenia score" and a
+ * places the owner has stood in, then the 0–10 "Gut score" and a
  * free note. Used for both baseline references (rated from memory) and
  * candidates (rated after a visit). Pure controlled component: it owns a
  * working copy, and commits the whole survey back via onSave.
@@ -104,7 +104,7 @@ function AxisStep({ axis, value, onPick }) {
 function SloveniaStep({ value, onPick }) {
   return (
     <>
-      <h2 className="survey-q">The Slovenia score</h2>
+      <h2 className="survey-q">The Gut score</h2>
       <p className="survey-prompt">Setting the breakdown aside — what does your gut say? How close did this get to the Bled / Piran feeling?</p>
       <div className="slovenia-scale">
         {Array.from({ length: 11 }, (_, n) => (

@@ -29,7 +29,7 @@ export default function DecidedArchive() {
   const [filter, setFilter] = useState("All");
 
   const decided = useMemo(() => {
-    return planner.cities.filter((cityItem) => cityStage(cityItem) === "decided");
+    return planner.cities.filter((cityItem) => cityStage(cityItem) === "assessed");
   }, [planner.cities]);
 
   const counts = useMemo(() => {
@@ -46,12 +46,12 @@ export default function DecidedArchive() {
   }, [decided, filter]);
 
   return (
-    <AppShell activeMode="decided">
+    <AppShell activeMode="assessed">
       <section className="canvas-header">
         <div>
-          <p className="page-eyebrow">Decided</p>
-          <h1>Decided cities</h1>
-          <p className="canvas-sub">{!hydrated ? "Loading…" : decided.length === 0 ? "No decided cities yet. Cities you mark advance, winter-revisit, or eliminate on the Decide page show up here." : `${decided.length} ${decided.length === 1 ? "city" : "cities"} decided. Filter by outcome.`}</p>
+          <p className="page-eyebrow">Assessed</p>
+          <h1>Assessed cities</h1>
+          <p className="canvas-sub">{!hydrated ? "Loading…" : decided.length === 0 ? "No assessed cities yet. Cities you mark advance, winter-revisit, or eliminate on the Visited page show up here." : `${decided.length} ${decided.length === 1 ? "city" : "cities"} assessed. Filter by outcome.`}</p>
         </div>
       </section>
 
@@ -61,8 +61,8 @@ export default function DecidedArchive() {
         <EmptyState
           title="No verdicts yet"
           body="Cities you advance, winter-revisit, or eliminate will appear here as a portfolio of decisions."
-          href="/decide"
-          cta="Go to Decide"
+          href="/visited"
+          cta="Go to Visited"
         />
       ) : (
         <>
@@ -99,13 +99,13 @@ export default function DecidedArchive() {
                     </div>
                     <div className="archive-body">
                       <header className="archive-head">
-                        <Link className="archive-name" href={`/cities/${slug}/decide`}>{cityItem.name}</Link>
+                        <Link className="archive-name" href={`/cities/${slug}/assess`}>{cityItem.name}</Link>
                         <span className="archive-score">{avg}</span>
                         <span className={`decision-chip ${chipClass(decision)}`}>{decision}</span>
                       </header>
                       {memo ? <p className="archive-memo">{truncate(memo, 220)}</p> : <p className="archive-memo archive-memo-empty">No memo recorded.</p>}
                     </div>
-                    <Link className="ghost-link" href={`/cities/${slug}/decide`}>Open</Link>
+                    <Link className="ghost-link" href={`/cities/${slug}/assess`}>Open</Link>
                   </li>
                 );
               })}

@@ -9,13 +9,13 @@ import { usePlanner } from "./PlannerProvider";
 /**
  * Decide — the felt-score questionnaire for a candidate, run after a visit.
  * If not yet surveyed (or the user hits "Re-survey"), shows the facilitated
- * SurveyFlow. Otherwise shows the recorded result: the gut Slovenia score,
+ * SurveyFlow. Otherwise shows the recorded result: the Gut score,
  * the five diagnostic axes, and the note.
  */
 export default function Decide({ cityItem }) {
   const { updateCity } = usePlanner();
   const [editing, setEditing] = useState(false);
-  const cityNav = defaultCityNav(cityItem, "decide");
+  const cityNav = defaultCityNav(cityItem, "assess");
   const survey = cityItem.survey || {};
   const done = surveyComplete(survey);
 
@@ -26,7 +26,7 @@ export default function Decide({ cityItem }) {
 
   if (!done || editing) {
     return (
-      <AppShell activeMode="decide" cityItem={cityItem} cityNav={cityNav}>
+      <AppShell activeMode="assess" cityItem={cityItem} cityNav={cityNav}>
         <SurveyFlow
           title={cityItem.name}
           subtitle="After the visit"
@@ -40,11 +40,11 @@ export default function Decide({ cityItem }) {
   }
 
   return (
-    <AppShell activeMode="decide" cityItem={cityItem} cityNav={cityNav}>
+    <AppShell activeMode="assess" cityItem={cityItem} cityNav={cityNav}>
       <section className="survey-result-head">
         <div className="felt-headline">
           <strong>{feltScore(survey).toFixed(0)}</strong>
-          <span>Slovenia score · surveyed {survey.takenAt || "recently"}</span>
+          <span>Gut score · surveyed {survey.takenAt || "recently"}</span>
         </div>
       </section>
 

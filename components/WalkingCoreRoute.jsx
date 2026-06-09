@@ -31,7 +31,7 @@ export default function WalkingCoreRoute({ slug }) {
       <main style={{ padding: "2rem", fontFamily: "Inter Tight, sans-serif" }}>
         <h1>City not found</h1>
         <p>This slug doesn't match anything in your planner.</p>
-        <Link href="/calibrate">← Back to Ranking</Link>
+        <Link href="/ranking">← Back to Ranking</Link>
       </main>
     );
   }

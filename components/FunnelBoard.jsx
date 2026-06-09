@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import {
@@ -82,7 +83,12 @@ export default function FunnelBoard({ focusStage }) {
   function onColDrop(e, stageId) {
     e.preventDefault(); setDragOver(null);
     const id = e.dataTransfer.getData("text/plain");
-    if (id) setCityStage(id, stageId);
+    if (!id) return;
+    // Only Backlog and Planning are free moves. Planned (commit dates), Visited
+    // (return), and Assessed (survey) require data entered on their own pages —
+    // block the drop rather than fake the transition.
+    if (stageId !== "backlog" && stageId !== "planning") return;
+    setCityStage(id, stageId);
   }
 
   return (
@@ -111,6 +117,10 @@ export default function FunnelBoard({ focusStage }) {
       </section>
 
       <section className="rank-controls" aria-label="Filter candidates">
+        <div className="view-toggle" role="tablist" aria-label="Candidate view">
+          <Link href="/board" className="view-toggle-tab active" role="tab" aria-selected="true">Board</Link>
+          <Link href="/ranking" className="view-toggle-tab" role="tab">Ranking</Link>
+        </div>
         <input
           type="search"
           className="rank-search"
@@ -160,7 +170,7 @@ export default function FunnelBoard({ focusStage }) {
                         imageState={imageState}
                         onOpen={() => router.push(`/cities/${citySlug(cityItem)}`)}
                         onAdvance={() => advanceCityStage(cityItem.id)}
-                        onSendBack={() => setCityStage(cityItem.id, "shortlist")}
+                        onSendBack={() => setCityStage(cityItem.id, "backlog")}
                         onDragStart={(e) => onCardDragStart(e, cityItem)}
                         stage={stage.id}
                       />
@@ -185,7 +195,11 @@ function CityCard({ cityItem, imageState, onOpen, onAdvance, onSendBack, onDragS
   const equal = { setting: 1, aliveness: 1, fabric: 1, realness: 1, january: 1 };
   const score = weightedAxisScore(cityItem, equal);
   const stageId = stage || cityStage(cityItem);
-  const isDecided = stageId === "decided";
+  const isAssessed = stageId === "assessed";
+  // Only Backlog → Planning is a free one-click advance. Planning→Planned,
+  // Planned→Visited, Visited→Assessed each need data entered on their own page,
+  // so the Board offers no advance button for them.
+  const canAdvanceFreely = stageId === "backlog";
   const nextStage = STAGES[STAGE_INDEX[stageId] + 1];
   const advanceLabel = nextStage ? `${nextStage.label} →` : null;
 
@@ -208,14 +222,16 @@ function CityCard({ cityItem, imageState, onOpen, onAdvance, onSendBack, onDragS
         </div>
       </button>
       <footer className="funnel-card-foot">
-        {isDecided ? (
-          <span className={`decision-chip ${cityItem.decision?.toLowerCase().replace(/\s+/g, "-") || "decided"}`}>{cityItem.decision || "Decided"}</span>
+        {isAssessed ? (
+          <span className={`decision-chip ${cityItem.decision?.toLowerCase().replace(/\s+/g, "-") || "assessed"}`}>{cityItem.decision || "Assessed"}</span>
         ) : (
           <>
-            {stageId !== "shortlist" ? (
-              <button type="button" className="ghost" onClick={onSendBack} title="Send back to Shortlist">← Shortlist</button>
+            {stageId !== "backlog" ? (
+              <button type="button" className="ghost" onClick={onSendBack} title="Send back to Backlog">← Backlog</button>
             ) : <span aria-hidden="true" />}
-            <button type="button" className="advance" onClick={onAdvance} title={`Move to ${nextStage?.label || "next stage"}`}>{advanceLabel}</button>
+            {canAdvanceFreely
+              ? <button type="button" className="advance" onClick={onAdvance} title={`Move to ${nextStage?.label || "next stage"}`}>{advanceLabel}</button>
+              : <span aria-hidden="true" />}
           </>
         )}
       </footer>

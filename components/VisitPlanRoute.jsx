@@ -11,12 +11,12 @@ export default function VisitPlanRoute({ slug }) {
 
   if (!cityItem) {
     return (
-      <AppShell activeMode="visit">
+      <AppShell activeMode="plan">
         <section className="canvas-header">
           <div>
             <h1>City not found</h1>
             <p className="canvas-sub">This slug doesn't match anything in your planner.</p>
-            <Link className="button-link" href="/visit">← Back to Visit queue</Link>
+            <Link className="button-link" href="/planning">← Back to Planning</Link>
           </div>
         </section>
       </AppShell>
@@ -24,7 +24,7 @@ export default function VisitPlanRoute({ slug }) {
   }
 
   return (
-    <AppShell activeMode="visit" cityItem={cityItem} cityNav={defaultCityNav(cityItem, "visit")}>
+    <AppShell activeMode="plan" cityItem={cityItem} cityNav={defaultCityNav(cityItem, "plan")}>
       <VisitPlan
         cityItem={cityItem}
         onPatch={(patch) => updateCity(cityItem.id, patch)}

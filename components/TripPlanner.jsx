@@ -119,11 +119,10 @@ export default function TripPlanner() {
     const committed = [], planning = [], backlog = [];
     for (const c of planner.cities) {
       const stage = cityStage(c);
-      if (stage === "decided" || stage === "decide") continue;
-      const hasDates = c.arriveDate && c.departDate;
-      if (c.status === "Scheduled" && hasDates) { committed.push(c); continue; }
-      if (stage === "visit" || stage === "calibrate") planning.push(c);
-      else backlog.push(c); // stage === "shortlist"
+      if (stage === "assessed" || stage === "visited") continue;
+      if (stage === "planned") { committed.push(c); continue; } // committed dates
+      if (stage === "planning") planning.push(c);
+      else backlog.push(c); // stage === "backlog"
     }
     return { committed, planning, backlog };
   }, [planner.cities]);
@@ -897,17 +896,17 @@ export default function TripPlanner() {
   const hasPlanning = planLanes.length > 0;
 
   return (
-    <AppShell activeMode="visit">
+    <AppShell activeMode="planning">
       <section className="canvas-header trip-pl-head">
         <div>
-          <p className="page-eyebrow">Visit · Planner</p>
+          <p className="page-eyebrow">Planning</p>
           <h1>Trip planner</h1>
           <p className="canvas-sub">
             Each city is a lane — the fill shows its <strong>visit score</strong> across the year; slide the white box to the best week.
           </p>
         </div>
         <div className="trip-pl-head-ctl">
-          <Link className="ghost-link" href="/visit/planned">Planned trips →</Link>
+          <Link className="ghost-link" href="/planned">Planned trips →</Link>
           <div className="trip-pl-zoom" role="group" aria-label="Zoom">
             <button type="button" data-w="9">Season</button>
             <button type="button" data-w="12">Months</button>

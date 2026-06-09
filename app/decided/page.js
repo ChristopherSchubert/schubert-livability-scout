@@ -1,7 +1,5 @@
-import DecidedArchive from "../../components/DecidedArchive";
+import { redirect } from "next/navigation";
 
-export const metadata = { title: "Decided — Livability Scout" };
-
-export default function DecidedPage() {
-  return <DecidedArchive />;
+export default function LegacyRedirect() {
+  redirect("/assessed");
 }

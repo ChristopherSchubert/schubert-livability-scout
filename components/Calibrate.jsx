@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import {
@@ -97,9 +98,12 @@ export default function Calibrate() {
   }
 
   return (
-    <AppShell activeMode="calibrate">
+    <AppShell activeMode="board">
       <section className="rank-controls">
-        <h1 className="rank-title">Ranking</h1>
+        <div className="view-toggle" role="tablist" aria-label="Candidate view">
+          <Link href="/board" className="view-toggle-tab" role="tab">Board</Link>
+          <Link href="/ranking" className="view-toggle-tab active" role="tab" aria-selected="true">Ranking</Link>
+        </div>
         <input
           type="search"
           className="rank-search"
@@ -135,7 +139,7 @@ export default function Calibrate() {
                 </th>
               ))}
               <th className="rt-overall sortable" onClick={(e) => clickSort("overall", e)}>Overall{sortBadge("overall")}</th>
-              <th className="rt-visitnow sortable" onClick={(e) => clickSort("visitnow", e)} title="How good this month is to visit, by climate comfort. Not part of the fit score.">
+              <th className="rt-visitnow sortable" onClick={(e) => clickSort("visitnow", e)} title="How good this month is to visit: climate comfort now, nudged up when the next two months get worse. Not part of the fit score.">
                 Visit now<span className="rt-weight">{MONTHS[filters.nowMonth]}</span>{sortBadge("visitnow")}
               </th>
             </tr>
@@ -191,7 +195,7 @@ function ScoreCell({ value }) {
 function WeightNote({ learned }) {
   if (learned.weights) {
     return (
-      <span className="weight-note-inline" title={`Learned from ${learned.n} gut ratings on Baseline`}>
+      <span className="weight-note-inline" title={`Learned from ${learned.n} surveyed visits (cities with a Gut score)`}>
         {" · weights learned: "}
         {calibrateAxes.map(([k, l], i) => (
           <span key={k}>{i ? " · " : ""}{shortAxisLabel(l)}×{(learned.weights[k] ?? 1).toFixed(1)}</span>
@@ -200,8 +204,8 @@ function WeightNote({ learned }) {
     );
   }
   return (
-    <span className="weight-note-inline" title="Rate places by gut on Baseline so Overall can learn axis weights">
-      {` · axes equal-weighted (${learned.n}/${learned.need} baselined)`}
+    <span className="weight-note-inline" title="Survey visited cities (give each a Gut score) so Overall can learn which axes predict your gut.">
+      {` · axes equal-weighted (${learned.n}/${learned.need} surveyed)`}
     </span>
   );
 }

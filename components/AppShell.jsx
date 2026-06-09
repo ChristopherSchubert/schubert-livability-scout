@@ -5,26 +5,27 @@ import { useEffect, useState } from "react";
 import { STAGES, citySlug, cityStage } from "../lib/planner-data";
 import { usePlanner } from "./PlannerProvider";
 
-// Top-nav workflow modes. The home is "Ranking" (the sortable ranked list);
-// the others are purpose-built workspaces. "Board" is an auxiliary kanban
-// utility, demoted to the end of the nav. Stage IDs from STAGES are still
-// used for city metadata (badges, context strip color).
+// Top-nav workflow modes. The home is "Board" (every candidate by stage);
+// "Ranking" is a view toggle on the Board page, not a separate tab. The other
+// tabs are the purpose-built stage workspaces. Stage IDs from STAGES drive the
+// city metadata (badges, context strip color).
 const NAV_MODES = [
-  { id: "calibrate", href: "/calibrate", label: "Ranking",   help: "Sortable table of candidates ranked by measured fit.", stageId: "calibrate" },
-  { id: "visit",     href: "/visit",     label: "Visit",     help: "Trips you've planned or are on.", stageId: "visit" },
-  { id: "decide",    href: "/decide",    label: "Decide",    help: "Cities back from a trip, awaiting their survey.", stageId: "decide" },
-  { id: "decided",   href: "/decided",   label: "Decided",   help: "Archive of verdicts you've made.", stageId: "decided" },
-  { id: "baseline",  href: "/baseline",  label: "Baseline",  help: "Rate places you already know — the calibration answer key.", stageId: null },
-  { id: "board",     href: "/board",     label: "Board",     help: "Auxiliary kanban view of where every candidate stands.", stageId: null },
+  { id: "board",    href: "/board",    label: "Board",    help: "Every candidate, by stage.", stageId: null },
+  { id: "planning", href: "/planning", label: "Planning", help: "Rank candidates and plan each trip's best week.", stageId: "planning" },
+  { id: "planned",  href: "/planned",  label: "Planned",  help: "Trips with committed dates.", stageId: "planned" },
+  { id: "visited",  href: "/visited",  label: "Visited",  help: "Back from a trip, awaiting the survey.", stageId: "visited" },
+  { id: "assessed", href: "/assessed", label: "Assessed", help: "Archive of verdicts you've made.", stageId: "assessed" },
+  { id: "baseline", href: "/baseline", label: "Baseline", help: "Rate places you already know — the answer key.", stageId: null },
 ];
 
 // Used by city context strip to know which workflow mode owns each stage.
+// Backlog has no dedicated workspace — it lives on the Board.
 const STAGE_TO_MODE = {
-  shortlist: "calibrate",
-  calibrate: "calibrate",
-  visit:     "visit",
-  decide:    "decide",
-  decided:   "decided",
+  backlog:  "board",
+  planning: "planning",
+  planned:  "planned",
+  visited:  "visited",
+  assessed: "assessed",
 };
 
 const MODE_HREF = Object.fromEntries(NAV_MODES.map((mode) => [mode.id, mode.href]));
@@ -33,8 +34,8 @@ const MODE_HREF = Object.fromEntries(NAV_MODES.map((mode) => [mode.id, mode.href
 // city? The mode whose stage the city is currently sitting in. Used by the
 // Detail / Images routes (Visit / Decide override with a fixed mode).
 export function modeForCity(cityItem) {
-  if (!cityItem) return "calibrate";
-  return STAGE_TO_MODE[cityStage(cityItem)] || "calibrate";
+  if (!cityItem) return "board";
+  return STAGE_TO_MODE[cityStage(cityItem)] || "board";
 }
 
 /**
@@ -46,9 +47,9 @@ export function modeForCity(cityItem) {
  * navigation now flows through the stage switcher and ⌘K (future) instead of
  * a left rail competing with the workspace for room.
  */
-// `activeMode` is the new top-nav prop ("board" | "calibrate" | "visit" |
-// "decide" | "decided"). We still accept the older `activeStage` name from
-// existing callers and treat it the same way.
+// `activeMode` is the top-nav prop ("board" | "planning" | "planned" |
+// "visited" | "assessed" | "baseline"). We still accept the older
+// `activeStage` name from existing callers and treat it the same way.
 export default function AppShell({ activeMode, activeStage, cityItem, cityNav, children }) {
   const mode = activeMode || activeStage;
   return (
@@ -68,7 +69,7 @@ function TopBar({ activeMode }) {
   return (
     <header className="topbar-v2">
       <div className="topbar-brand">
-        <Link href="/calibrate" className="brand-mark">
+        <Link href="/board" className="brand-mark">
           <span className="brand-dot" aria-hidden="true" />
           <span>Livability Scout</span>
         </Link>
@@ -162,7 +163,7 @@ function CityContextStrip({ cityItem, cityNav }) {
   return (
     <div className={`city-context stage-${stage}`}>
       <div className="city-context-left">
-        <Link href={MODE_HREF[STAGE_TO_MODE[stage]] || "/calibrate"} className="city-context-back">←</Link>
+        <Link href={MODE_HREF[STAGE_TO_MODE[stage]] || "/board"} className="city-context-back">←</Link>
         <div className="city-context-text">
           <span className="city-context-stage">{stageLabel}</span>
           <input
@@ -190,8 +191,8 @@ export function defaultCityNav(cityItem, activeMode) {
   const slug = citySlug(cityItem);
   return [
     { href: `/cities/${slug}`, label: "Detail", active: activeMode === "detail" },
-    { href: `/cities/${slug}/visit`, label: "Visit", active: activeMode === "visit" },
+    { href: `/cities/${slug}/plan`, label: "Plan", active: activeMode === "plan" },
     { href: `/cities/${slug}/images`, label: "Images", active: activeMode === "images" },
-    { href: `/cities/${slug}/decide`, label: "Decide", active: activeMode === "decide" },
+    { href: `/cities/${slug}/assess`, label: "Assess", active: activeMode === "assess" },
   ];
 }

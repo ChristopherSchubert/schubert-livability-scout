@@ -1,7 +1,5 @@
-import TripPlanner from "../../../components/TripPlanner";
+import { redirect } from "next/navigation";
 
-export const metadata = { title: "Trip planner — Livability Scout" };
-
-export default function VisitCalendarPage() {
-  return <TripPlanner />;
+export default function LegacyRedirect() {
+  redirect("/planning/calendar");
 }

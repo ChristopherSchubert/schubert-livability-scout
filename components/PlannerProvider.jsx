@@ -220,16 +220,18 @@ export function usePlannerCity(slug) {
 // Stage transitions translate "advance / set stage" into concrete fields.
 function applyStage(cityItem, stageId) {
   switch (stageId) {
-    case "shortlist": return { ...cityItem, status: "Idea", decision: "Undecided" };
-    case "calibrate": return { ...cityItem, status: "Shortlist", decision: "Undecided" };
-    case "visit":     return { ...cityItem, status: "Scheduled", decision: "Undecided" };
-    case "decide":    return { ...cityItem, status: "Visited", decision: "Undecided" };
-    case "decided":   return { ...cityItem, status: "Visited", decision: cityItem.decision === "Undecided" ? "Advance" : cityItem.decision };
+    case "backlog":   return { ...cityItem, status: "Idea", decision: "Undecided" };
+    case "planning":  return { ...cityItem, status: "Shortlist", decision: "Undecided" };
+    // Planned requires committed dates (set in the trip planner), so this is a
+    // fallback only — the Board never advances into it (see feedback rule).
+    case "planned":   return { ...cityItem, status: "Scheduled", decision: "Undecided" };
+    case "visited":   return { ...cityItem, status: "Visited", decision: "Undecided" };
+    case "assessed":  return { ...cityItem, status: "Visited", decision: cityItem.decision === "Undecided" ? "Advance" : cityItem.decision };
     default:          return cityItem;
   }
 }
 function advanceStage(cityItem) {
-  const order = ["shortlist", "calibrate", "visit", "decide", "decided"];
+  const order = ["backlog", "planning", "planned", "visited", "assessed"];
   const current = cityStage(cityItem);
   const next = order[Math.min(order.length - 1, order.indexOf(current) + 1)];
   return applyStage(cityItem, next);

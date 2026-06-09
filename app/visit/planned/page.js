@@ -1,7 +1,5 @@
-import VisitWorkspace from "../../../components/VisitWorkspace";
+import { redirect } from "next/navigation";
 
-export const metadata = { title: "Planned trips — Livability Scout" };
-
-export default function VisitPlannedPage() {
-  return <VisitWorkspace />;
+export default function LegacyRedirect() {
+  redirect("/planned");
 }

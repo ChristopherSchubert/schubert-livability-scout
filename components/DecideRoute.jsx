@@ -9,12 +9,12 @@ export default function DecideRoute({ slug }) {
   const cityItem = usePlannerCity(slug);
   if (!cityItem) {
     return (
-      <AppShell activeStage="decide">
+      <AppShell activeMode="assess">
         <section className="canvas-header">
           <div>
             <h1>City not found</h1>
-            <p className="canvas-sub">This slug doesn't match anything in your planner. Jump back to the funnel and pick a candidate.</p>
-            <Link className="button-link" href="/shortlist">← Back to Shortlist</Link>
+            <p className="canvas-sub">This slug doesn't match anything in your planner. Jump back to the board and pick a candidate.</p>
+            <Link className="button-link" href="/board">← Back to Board</Link>
           </div>
         </section>
       </AppShell>

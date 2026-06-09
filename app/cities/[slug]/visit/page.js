@@ -1,6 +1,6 @@
-import VisitPlanRoute from "../../../../components/VisitPlanRoute";
+import { redirect } from "next/navigation";
 
-export default async function CityVisitPage({ params }) {
+export default async function LegacyCityVisitRedirect({ params }) {
   const { slug } = await params;
-  return <VisitPlanRoute slug={slug} />;
+  redirect(`/cities/${slug}/plan`);
 }

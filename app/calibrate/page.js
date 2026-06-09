@@ -1,7 +1,5 @@
-import Calibrate from "../../components/Calibrate";
+import { redirect } from "next/navigation";
 
-export const metadata = { title: "Ranking — Livability Scout" };
-
-export default function CalibratePage() {
-  return <Calibrate />;
+export default function LegacyRedirect() {
+  redirect("/ranking");
 }

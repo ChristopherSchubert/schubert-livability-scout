@@ -1,6 +1,6 @@
-import DecideRoute from "../../../../components/DecideRoute";
+import { redirect } from "next/navigation";
 
-export default async function CityDecidePage({ params }) {
+export default async function LegacyCityDecideRedirect({ params }) {
   const { slug } = await params;
-  return <DecideRoute slug={slug} />;
+  redirect(`/cities/${slug}/assess`);
 }
