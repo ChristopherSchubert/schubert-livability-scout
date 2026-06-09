@@ -38,7 +38,8 @@ create table if not exists cities (
   heart_intersection text,
   trip_week          text,
   why                text,
-  blocks             jsonb default '[]',
+  blocks             jsonb default '[]',        -- rendered set = blocks_authored + generator picks
+  blocks_authored    jsonb default '[]',        -- human-curated baseline; never written by the pipeline (see migration 0009)
   block_geometries   jsonb default '[]',        -- per-block { name, lat, lon, accuracy, source, meta, asOf } — populated by lib/measurers/blocks.js
   poi_positions      jsonb default '[]',        -- per-POI { lat, lon, category, weight } — populated by lib/measurers/walking-core.js
   status             text default 'Idea',
@@ -91,6 +92,7 @@ alter table cities add column if not exists block_geometries    jsonb default '[
 alter table cities add column if not exists eu_lau              jsonb;
 alter table cities add column if not exists planning_order      integer;
 alter table cities add column if not exists poi_positions       jsonb default '[]';
+alter table cities add column if not exists blocks_authored     jsonb default '[]';
 
 -- ── felt_surveys (PER-USER) ────────────────────────────────────────────────
 -- Each person's post-visit survey for a city. Readable by both (to compare),
