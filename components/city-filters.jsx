@@ -130,6 +130,22 @@ export function shortAxisLabel(label) {
 
 // ── UI ────────────────────────────────────────────────────────────────────
 
+// Shared sort dropdown for card/list views (the planner backlog today; any
+// future list can reuse it). Filtering and sorting are different interaction
+// models — the Ranking table sorts by clicking column headers — so sort lives
+// as its own opt-in primitive rather than inside the filter drawer. `options`
+// is `[{ id, label }]`; the caller maps `id` → a comparator value itself.
+export function SortControl({ value, onChange, options, label = "Sort" }) {
+  return (
+    <label className="rank-sort">
+      <span className="rank-sort-label">{label}</span>
+      <select className="rank-sort-select" value={value} onChange={(e) => onChange(e.target.value)}>
+        {options.map((o) => <option key={o.id} value={o.id}>{o.label}</option>)}
+      </select>
+    </label>
+  );
+}
+
 export function CityFiltersBar({ filters }) {
   return (
     <>

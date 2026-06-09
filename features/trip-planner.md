@@ -326,45 +326,53 @@ Planner-specific tokens:
 
 ### Backlog sort + filter (2026-06-09)
 The Backlog grew to 100+ cities, so the pane below Planning gained a control
-bar (`.bl-ctl`) above the card grid. All controls are **session-local** (no
-persistence) and operate on real measurements — an unmeasured value is `null`,
-never a fake 0, so it always sorts last (per the no-invented-data rule).
+bar above the card grid. **Filtering reuses the app-wide shared system**
+([`components/city-filters.jsx`](../components/city-filters.jsx)) — the same
+`useCityFilters` + `CityFiltersBar` + `CityFilterDrawer` that Board and
+Ranking use, so the Backlog offers the identical vocabulary (search, region,
+state, chip, per-axis minimums, visit-now) and identical UI (Filters button
+with active count, slide-in drawer, active-chip strip). The first cut shipped
+a bespoke `.bl-ctl` bar (name search + state `<select>` + Measured/Surveyed
+toggles); it looked off and duplicated the shared system, so it was replaced
+the same day. **Don't reintroduce per-screen filter UI — extend the shared
+module instead.**
 
-- **Name filter** — `.bl-search` substring match (case-insensitive) on the
-  full city name. Backed by `blQuery`.
-- **Sort** — a `<select>` (`blSort`, options in module-level `BACKLOG_SORTS`):
-  four **Best week · {season}** options (Spring / Summer / Fall / Winter),
-  then **Overall** (`weightedAxisScore(c, EQUAL_WEIGHTS)`, 0–10), the **5
-  axes** (Setting / Aliveness / Fabric / Realness / Year-round, off
-  `axisRollup`), **Gut score** (`feltScore(c.survey)`), and **Name A–Z**.
-  Score sorts are descending with nulls last and ties broken by name; name
-  sorts A–Z. Default is the season we're in now (`best-${current season}`).
-  - **Why per-season, not a single peak (2026-06-09 fix).** The first cut
-    sorted by the *yearly* peak of `weeklyVisitScore`. That hid *when* the
-    good window was — a city peaking at 94 in November ranked next to one
-    great right now, so the owner promoted a city whose best week was three
-    months out. Now the best week is computed *within each meteorological
-    season* (`MONTH_SEASON` maps each week's month to a season; we keep the
-    max score per season in `seasonPeak`), and you sort by the season you're
-    actually considering. Summer surfaces mild-summer coastal CA and sinks
-    hot-humid Southeast; winter flips it.
-- **State** — a `<select>` (`blState`) populated from the states actually
-  present in the backlog (`backlogStates`), plus "All".
-- **Measured** / **Surveyed** toggles — keep only cities with an overall
-  measured score / a completed gut score, respectively (`blMeasuredOnly`,
-  `blSurveyedOnly`).
+**Sort** is the planner's own dimension (Board buckets by stage, Ranking is a
+click-to-sort table — neither needs a dropdown). It uses the shared
+`SortControl` dropdown (added to `city-filters.jsx` so any future list view
+can reuse it) fed planner-specific options from module-level `BACKLOG_SORTS`:
+four **Best week · {season}** options (Spring / Summer / Fall / Winter), then
+**Overall** (`weightedAxisScore`, 0–10), the **5 axes** (Setting / Aliveness /
+Fabric / Realness / Year-round, off `axisRollup`), **Gut score** (`feltScore`),
+and **Name A–Z**. Score sorts are descending with unmeasured values (`null`,
+never a fake 0 — the no-invented-data rule) last and ties broken by name.
+Default is the season we're in now (`best-${current season}`). Session-local,
+no persistence.
+
+- **Why per-season, not a single peak (2026-06-09 fix).** The first cut
+  sorted by the *yearly* peak of `weeklyVisitScore`. That hid *when* the good
+  window was — a city peaking at 94 in November ranked next to one great right
+  now, so the owner promoted a city whose best week was three months out. Now
+  the best week is computed *within each meteorological season* (`MONTH_SEASON`
+  maps each week's month to a season; we keep the max score per season in
+  `seasonPeak`), and you sort by the season you're actually considering.
+  Summer surfaces mild-summer coastal CA and sinks hot-humid Southeast; winter
+  flips it.
 - Each card shows a **score chip** (`.bkbadge`) in the thumbnail corner
-  reflecting the active sort's value (the 0–100 best-week score, or the 0–10
-  axis/overall/gut value), so the ranking is legible. Hidden for the Name
+  reflecting the active sort's value (the 0–100 best-week season score, or the
+  0–10 axis/overall/gut value), so the ranking is legible. Hidden for the Name
   sort and for unmeasured cities. Built by the `backlogBadge()` helper.
 - The header `.sub` shows `N cities` or `M of N` when filtered; a `.bl-none`
   message renders when filters exclude everything.
 
-Derived in `shownBacklog` (filter → sort) off `backlogRows` (per-city
-`seasonPeak` / rollup / overall / gut, memoized on `backlog` + `viewStart`).
-Verified in-browser: summer ranks coastal-CA top / hot-SE bottom, winter
-flips to FL-top / cold-N bottom, overall 7.6→3.1, CA state filter, no-match
-empty state.
+Derived in `shownBacklog` (shared `applyCityFilters` → planner sort) off
+`backlogRows` (each row is `augmentCityForFilters(c)` + `overall` + `visitNow`
++ `seasonPeak` + `gut` + display name parts, memoized on `backlog` +
+`viewStart` + `nowMonth`). Verified in-browser: summer ranks coastal-CA top /
+hot-SE bottom, winter flips to FL-top / cold-N bottom; the Pacific region
+filter yields 21 cities (CA/OR/WA/HI) with an active "Pacific" chip and a
+"21 of 111" count; switching sort re-orders within the filter; clicking the
+chip clears it.
 
 ### Audit vs the mockup (2026-06-07)
 Fixed after a side-by-side audit with real data populated in Planning:

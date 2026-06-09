@@ -2839,6 +2839,12 @@ button:hover, .button-link:hover {
 .rank-clear { background: transparent; border: 1px solid var(--border); padding: 0.35rem 0.7rem; border-radius: 8px; font-size: 0.8rem; cursor: pointer; color: var(--text); }
 .rank-clear:hover { border-color: var(--accent); color: var(--accent); }
 .rank-controls-spacer { flex: 1 1 auto; }
+/* Shared sort dropdown (SortControl) — matches the filter-button pill look */
+.rank-sort { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.82rem; color: var(--muted); }
+.rank-sort-label { font-weight: 600; letter-spacing: 0.02em; }
+.rank-sort-select { font: inherit; font-size: 0.85rem; padding: 0.4rem 1.6rem 0.4rem 0.7rem; border: 1px solid var(--border); border-radius: 8px; background: #fbf6ea; color: var(--text); cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23866' stroke-width='1.4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 0.6rem center; }
+.rank-sort-select:hover { border-color: var(--accent); }
+.rank-sort-select:focus { outline: none; border-color: var(--accent); background-color: #fffdf8; }
 .rank-count { font-size: 0.78rem; color: var(--muted); padding: 0.5rem 0.85rem 0.3rem; }
 .rt-empty { text-align: center; color: var(--muted); padding: 1.5rem; font-size: 0.9rem; }
 

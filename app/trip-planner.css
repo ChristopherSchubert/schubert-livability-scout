@@ -280,21 +280,8 @@
 /* backlog */
 .trip-pl-backlog { margin-top: 24px; border-top: 1px solid var(--text); padding-top: 16px; }
 .trip-pl-backlog .bh { display: flex; align-items: baseline; gap: 16px; margin-bottom: 12px; }
-.bl-ctl { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 14px; padding: 0 4px; }
-.bl-search {
-  flex: 0 1 220px; min-width: 140px; font-family: inherit; font-size: 0.82rem;
-  padding: 6px 9px; border: 1px solid var(--border); border-radius: 2px;
-  background: var(--panel); color: var(--text);
-}
-.bl-search:focus { outline: none; border-color: var(--accent); }
-.bl-field { display: inline-flex; align-items: center; gap: 7px; font-size: 0.7rem; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
-.bl-field select {
-  font-family: inherit; font-size: 0.8rem; text-transform: none; letter-spacing: 0; font-weight: 400;
-  padding: 5px 8px; border: 1px solid var(--border); border-radius: 2px;
-  background: var(--panel); color: var(--text); cursor: pointer;
-}
-.bl-field select:focus { outline: none; border-color: var(--accent); }
-.bl-tog { display: inline-flex; align-items: center; gap: 6px; font-size: 0.72rem; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); font-weight: 600; cursor: pointer; }
+/* Backlog sort + filter use the app-wide .rank-controls bar (globals.css). */
+.trip-pl-backlog .rank-controls { margin-bottom: 14px; }
 .bl-none { color: var(--muted); font-size: 0.85rem; padding: 4px; }
 .trip-pl-backlog .bl { display: grid; grid-template-columns: repeat(auto-fill, minmax(168px, 1fr)); gap: 14px; padding: 4px 4px 12px; }
 .bkbadge {

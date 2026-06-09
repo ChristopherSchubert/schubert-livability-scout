@@ -3,14 +3,23 @@
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
-  axisRollup,
   cityImageQuery,
   cityStage,
   feltScore,
+  visitNowScore,
   weeklyVisitScore,
   weightedAxisScore,
 } from "../lib/planner-data";
 import AppShell from "./AppShell";
+import {
+  CityFilterDrawer,
+  CityFiltersBar,
+  SortControl,
+  applyCityFilters,
+  augmentCityForFilters,
+  availableFilterOptions,
+  useCityFilters,
+} from "./city-filters";
 import { resolveImage, usePlanner } from "./PlannerProvider";
 
 // ── geometry constants (mirror the locked mockup) ───────────────────────
@@ -229,13 +238,12 @@ export default function TripPlanner() {
   // (manual — set by dragging a lane's grip; persists in `order`).
   const [sortMode, setSortMode] = useState("next");
   // ── backlog sort + filter ─────────────────────────────────────────────
-  // Default to the season we're in now, so the backlog opens on the most
-  // relevant window rather than a far-future peak.
+  // Filtering uses the app-wide shared system (region/state/chips/axis-mins/
+  // visit-now + search), same as Board and Ranking. Sort is the planner's own
+  // dimension; default to the season we're in now so the backlog opens on the
+  // most relevant window rather than a far-future peak.
+  const backlogFilters = useCityFilters();
   const [blSort, setBlSort] = useState(() => `best-${MONTH_SEASON[today.getMonth()]}`);
-  const [blState, setBlState] = useState("all"); // "all" or a state abbrev
-  const [blMeasuredOnly, setBlMeasuredOnly] = useState(false);
-  const [blSurveyedOnly, setBlSurveyedOnly] = useState(false);
-  const [blQuery, setBlQuery] = useState("");
   const [confirmId, setConfirmId] = useState(null); // lane pending remove-confirm
   useEffect(() => {
     if (!confirmId) return;
@@ -297,6 +305,9 @@ export default function TripPlanner() {
   // Each row carries its peak visit week, per-axis rollup, weighted overall,
   // and gut score so the sort/filter controls operate on real measurements
   // (null = unmeasured, which always sorts last — never a fake zero).
+  // Each row is the shared filter shape (cityItem/state/region/chipLabels/roll
+  // + overall + visitNow) augmented with the planner's own sort dimensions
+  // (per-season best week, gut, display name parts).
   const backlogRows = useMemo(() => {
     return backlog.map((c) => {
       const scores = weeklyVisitScore(c, viewStart, WEEKS);
@@ -314,30 +325,18 @@ export default function TripPlanner() {
       const base = lastComma > 0 ? c.name.slice(0, lastComma) : c.name;
       const st = lastComma > 0 ? c.name.slice(lastComma + 2) : "";
       return {
-        city: c, base, st, seasonPeak,
-        roll: axisRollup(c),
+        ...augmentCityForFilters(c),
         overall: weightedAxisScore(c, EQUAL_WEIGHTS),
-        gut: feltScore(c.survey),
+        visitNow: visitNowScore(c, backlogFilters.nowMonth),
+        seasonPeak, gut: feltScore(c.survey), base, st,
       };
     });
-  }, [backlog, viewStart]);
+  }, [backlog, viewStart, backlogFilters.nowMonth]);
 
-  // States present in the backlog, for the state filter dropdown.
-  const backlogStates = useMemo(() => {
-    const set = new Set();
-    for (const r of backlogRows) if (r.st) set.add(r.st);
-    return [...set].sort();
-  }, [backlogRows]);
+  const backlogOptions = useMemo(() => availableFilterOptions(backlogRows), [backlogRows]);
 
   const shownBacklog = useMemo(() => {
-    const q = blQuery.trim().toLowerCase();
-    let rows = backlogRows.filter((r) => {
-      if (blState !== "all" && r.st !== blState) return false;
-      if (blMeasuredOnly && r.overall == null) return false;
-      if (blSurveyedOnly && r.gut == null) return false;
-      if (q && !r.city.name.toLowerCase().includes(q)) return false;
-      return true;
-    });
+    const rows = applyCityFilters(backlogRows, backlogFilters);
     const opt = BACKLOG_SORTS.find((s) => s.id === blSort) || BACKLOG_SORTS[0];
     const valueOf = (r) => {
       if (opt.kind === "season") return r.seasonPeak?.[opt.season] ?? null;
@@ -346,12 +345,12 @@ export default function TripPlanner() {
       if (opt.kind === "axis") return r.roll?.[opt.axis] ?? null;
       return null; // name sort handled below
     };
-    rows = [...rows];
+    const out = [...rows];
     if (opt.kind === "name") {
-      rows.sort((a, b) => a.base.localeCompare(b.base));
+      out.sort((a, b) => a.base.localeCompare(b.base));
     } else {
       // descending by score; nulls (unmeasured) last; ties broken by name
-      rows.sort((a, b) => {
+      out.sort((a, b) => {
         const av = valueOf(a), bv = valueOf(b);
         if (av == null && bv == null) return a.base.localeCompare(b.base);
         if (av == null) return 1;
@@ -359,8 +358,8 @@ export default function TripPlanner() {
         return bv - av || a.base.localeCompare(b.base);
       });
     }
-    return rows;
-  }, [backlogRows, blSort, blState, blMeasuredOnly, blSurveyedOnly, blQuery]);
+    return out;
+  }, [backlogRows, blSort, backlogFilters]);
 
   const [dragLaneId, setDragLaneId] = useState(null);
   function startLaneReorder(e, id) {
@@ -1216,35 +1215,22 @@ export default function TripPlanner() {
             <span className="sub">{!hydrated ? "Loading…" : !backlog.length ? "Empty." : shownBacklog.length === backlog.length ? `${backlog.length} cities` : `${shownBacklog.length} of ${backlog.length}`}</span>
           </div>
           {backlog.length ? (
-            <div className="bl-ctl">
+            <section className="rank-controls" aria-label="Sort and filter the backlog">
+              <SortControl value={blSort} onChange={setBlSort} options={BACKLOG_SORTS} />
               <input
                 type="search"
-                className="bl-search"
-                placeholder="Filter by name…"
-                value={blQuery}
-                onChange={(e) => setBlQuery(e.target.value)}
-                aria-label="Filter backlog by name"
+                className="rank-search"
+                placeholder="Search city name…"
+                value={backlogFilters.query}
+                onChange={(e) => backlogFilters.setQuery(e.target.value)}
+                aria-label="Search backlog by name"
               />
-              <label className="bl-field">
-                <span>Sort</span>
-                <select value={blSort} onChange={(e) => setBlSort(e.target.value)}>
-                  {BACKLOG_SORTS.map((s) => <option key={s.id} value={s.id}>{s.label}</option>)}
-                </select>
-              </label>
-              <label className="bl-field">
-                <span>State</span>
-                <select value={blState} onChange={(e) => setBlState(e.target.value)}>
-                  <option value="all">All</option>
-                  {backlogStates.map((s) => <option key={s} value={s}>{s}</option>)}
-                </select>
-              </label>
-              <label className="bl-tog"><input type="checkbox" checked={blMeasuredOnly} onChange={(e) => setBlMeasuredOnly(e.target.checked)} /> Measured</label>
-              <label className="bl-tog"><input type="checkbox" checked={blSurveyedOnly} onChange={(e) => setBlSurveyedOnly(e.target.checked)} /> Surveyed</label>
-            </div>
+              <CityFiltersBar filters={backlogFilters} />
+            </section>
           ) : null}
           <div className="bl">
             {shownBacklog.map((r) => {
-              const c = r.city;
+              const c = r.cityItem;
               const hero = heroFor(c);
               const badge = backlogBadge(r, blSort);
               return (
@@ -1278,6 +1264,7 @@ export default function TripPlanner() {
           <div className="trip-pl-ghost" style={{ left: ghost.x + 14, top: ghost.y + 14 }}>{ghost.name}</div>
         ) : null}
       </div>
+      <CityFilterDrawer filters={backlogFilters} options={backlogOptions} />
     </AppShell>
   );
 }
