@@ -1140,10 +1140,19 @@
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;            /* Firefox — hide the scrollbar */
     scroll-snap-type: x proximity;
-    /* Edge-fade hint that there's more to scroll, without a visible scrollbar. */
-    -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 12px, #000 calc(100% - 12px), transparent 100%);
-    mask-image: linear-gradient(90deg, transparent 0, #000 12px, #000 calc(100% - 12px), transparent 100%);
+    /* DIRECTIONAL edge-fade: only the side that's actually cut off fades, so the
+       first tab isn't dimmed at the start. AppShell toggles can-left/can-right
+       by scroll position; the fade width is 0 unless that side can scroll. A
+       wide, deep fade reads clearly as "more this way" without a scrollbar. */
+    --fade-l: 0px;
+    --fade-r: 0px;
+    -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 var(--fade-l), #000 calc(100% - var(--fade-r)), transparent 100%);
+    mask-image: linear-gradient(90deg, transparent 0, #000 var(--fade-l), #000 calc(100% - var(--fade-r)), transparent 100%);
   }
+  .stage-nav.can-left,
+  .city-context-nav.can-left { --fade-l: 30px; }
+  .stage-nav.can-right,
+  .city-context-nav.can-right { --fade-r: 30px; }
   .stage-nav::-webkit-scrollbar,
   .city-context-nav::-webkit-scrollbar { display: none; }  /* WebKit — hide */
   .stage-tab,

@@ -46,6 +46,37 @@ function scrollActiveTabIntoView(nav, activeSelector) {
   nav.scrollLeft += delta;
 }
 
+// Toggle directional edge-fade classes so only the side that can actually
+// scroll fades — the first tab isn't dimmed at the start, and a cut-off side
+// reads clearly as "more this way."
+function updateScrollEdges(nav) {
+  if (!nav) return;
+  const scrollable = nav.scrollWidth > nav.clientWidth + 1;
+  const atStart = nav.scrollLeft <= 1;
+  const atEnd = nav.scrollLeft + nav.clientWidth >= nav.scrollWidth - 1;
+  nav.classList.toggle("can-left", scrollable && !atStart);
+  nav.classList.toggle("can-right", scrollable && !atEnd);
+}
+
+// Centers the active tab on mount/route change and keeps the directional
+// edge-fade in sync as the row is scrolled or the viewport resizes.
+function useTabNav(navRef, activeSelector, dep) {
+  useEffect(() => {
+    const nav = navRef.current;
+    if (!nav) return;
+    scrollActiveTabIntoView(nav, activeSelector);
+    updateScrollEdges(nav);
+    const onScroll = () => updateScrollEdges(nav);
+    nav.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      nav.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dep]);
+}
+
 // Which workflow-mode tab should light up when you're looking at a specific
 // city? The mode whose stage the city is currently sitting in. Used by the
 // Detail / Images routes (Visit / Decide override with a fixed mode).
@@ -138,13 +169,9 @@ function TopBar({ activeMode }) {
   const navRef = useRef(null);
 
   // On a phone the tab row scrolls horizontally; keep the active stage centered
-  // and in view rather than clipped off the right edge. Uses live rects (not
-  // offsetLeft, which is relative to the offsetParent and mis-scrolls) and only
-  // nudges the container's scrollLeft, so the window never moves.
-  // (Phase 1/5, features/mobile.md)
-  useEffect(() => {
-    scrollActiveTabIntoView(navRef.current, ".stage-tab.active");
-  }, [activeMode]);
+  // and in view (rect-based, never moves the window) and the directional
+  // edge-fade in sync. (features/mobile.md)
+  useTabNav(navRef, ".stage-tab.active", activeMode);
 
   return (
     <header className="topbar-v2">
@@ -243,11 +270,9 @@ function CityContextStrip({ cityItem, cityNav }) {
   const stageLabel = STAGES.find((entry) => entry.id === stage)?.label || stage;
   const navRef = useRef(null);
 
-  // Keep the active sub-tab (Detail/Plan/Images/Assess) centered when the row
-  // scrolls horizontally on a phone. (Phase 1/5, features/mobile.md)
-  useEffect(() => {
-    scrollActiveTabIntoView(navRef.current, ".city-context-tab.active");
-  }, [cityNav]);
+  // Keep the active sub-tab (Detail/Plan/Images/Assess) centered + the
+  // directional edge-fade in sync when the row scrolls. (features/mobile.md)
+  useTabNav(navRef, ".city-context-tab.active", cityNav);
 
   return (
     <div className={`city-context stage-${stage}`}>
