@@ -51,7 +51,7 @@ export default function VisitWorkspace() {
         <div>
           <p className="page-eyebrow">Visit</p>
           <h1>Planned and active trips</h1>
-          <p className="canvas-sub">{!hydrated ? "Loading…" : trips.length === 0 ? "Move a candidate from Calibrate to Visit once you've booked the trip." : `${trips.length} ${trips.length === 1 ? "trip" : "trips"}, sorted by arrival date.`}</p>
+          <p className="canvas-sub">{!hydrated ? "Loading…" : trips.length === 0 ? "Move a candidate from Ranking to Visit once you've booked the trip." : `${trips.length} ${trips.length === 1 ? "trip" : "trips"}, sorted by arrival date.`}</p>
         </div>
       </section>
 
@@ -62,7 +62,7 @@ export default function VisitWorkspace() {
           title="No trips scheduled"
           body="When a candidate becomes real enough to book, advance it to Visit. Trips will appear here grouped by arrival date with logistics at a glance."
           href="/calibrate"
-          cta="Go to Calibrate"
+          cta="Go to Ranking"
         />
       ) : (
         <ol className="trip-list">
