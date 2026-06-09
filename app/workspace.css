@@ -93,7 +93,7 @@
 .canvas-header,
 .funnel-header {
   border-bottom: 1px solid var(--border);
-  padding-bottom: 0.8rem;
+  padding-bottom: 0.6rem;
   align-items: flex-end;
 }
 /* Compact page titles. The display size used to run up to 2.9rem, which ate a
@@ -111,16 +111,14 @@
 }
 .funnel-header-titles { display: flex; flex-direction: column; gap: 0.35rem; }
 .funnel-header .funnel-meta { margin: 0.3rem 0 0; }
-/* An eyebrow injected before each page title (markup adds .page-eyebrow). */
-.page-eyebrow {
-  font-family: var(--font-ui);
-  text-transform: uppercase;
-  letter-spacing: 0.16em;
-  font-size: 0.7rem;
-  font-weight: 600;
-  color: var(--accent);
-  margin: 0 0 0.25rem;
-}
+/* The page eyebrow ("PLANNED", "VISITED"…) just repeats the highlighted nav
+   tab directly above it — nav "PLANNED" → eyebrow "Planned" → title "Planned
+   and active trips" is triple-labeling. It's dead weight, so hide it. Hidden
+   in CSS rather than deleted from each page's markup because a couple of those
+   page components carry unrelated in-progress edits right now that I shouldn't
+   touch; drop the <p class="page-eyebrow"> markup when those land.
+   (City-detail pages use .canvas-eyebrow, which is separate and kept.) */
+.page-eyebrow { display: none; }
 .canvas-sub { font-size: 0.9rem; color: var(--muted); line-height: 1.5; max-width: 64ch; }
 
 /* ============================================================== */
