@@ -1358,3 +1358,34 @@
       60%  { box-shadow: 0 18px 40px -18px rgba(27, 24, 20, 0.25), 0 0 0 14px rgba(13, 76, 68, 0); }
       100% { box-shadow: 0 18px 40px -18px rgba(27, 24, 20, 0.25), 0 0 0 0 rgba(13, 76, 68, 0); }
     }
+
+/* ── Phone fixes (Phase 3, features/mobile.md) ────────────────────────────────
+   Two ~24px horizontal-overflow culprits at 390px:
+   1. The hero meta row is a string of nowrap chips + separators with no break
+      opportunities, so it can't wrap and runs 68px past the edge.
+   2. The climate chart uses overflow:visible so its edge labels/annotations
+      paint past the box; on a narrow screen that bleed escapes the viewport. */
+@media (max-width: 640px) {
+  .cd-root .hero-bottom { padding-left: 1.25rem; padding-right: 1.25rem; }
+  .cd-root .hero-bottom .meta {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    text-align: left;
+    max-width: 100%;
+  }
+  /* The chip string (climate words joined with " · ") is nowrap on desktop;
+     let it wrap on a phone so it stops running off the right edge. */
+  .cd-root .hero-bottom .meta > span:not(.sep) { white-space: normal; min-width: 0; }
+  /* Clip the chart's horizontal paint bleed only; overflow-y stays visible so
+     vertical annotations (now-pill, charm/truth labels) are unaffected. */
+  .cd-root .climate { overflow-x: clip; }
+
+  /* The 4-up "extremes" row (cold/hot/wet/dark) is far too tight at phone
+     width — each value needs ~98px but a quarter-column gives ~49px, so the
+     numbers overflow. Drop to a 2×2 grid; fix up the cell borders for the
+     new layout. */
+  .cd-root .extremes { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .cd-root .extreme:nth-child(odd) { border-left: 0; }
+  .cd-root .extreme:nth-child(n + 3) { border-top: 1px solid var(--hair-soft); }
+}

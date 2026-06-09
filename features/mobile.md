@@ -83,8 +83,17 @@ semantics), not eyeballed.
   **Follow-up:** the column-header sort is `display:none` on mobile, so the only
   mobile sort is the default Overall-desc (which IS the ranking) + the
   search/filters. A mobile sort control (dropdown) is deferred — see follow-ups.
-- **Phase 3 — City-detail polish + Board** (#4, #5): kill overflow culprits;
-  decide whether Board columns stack on phone.
+- **Phase 3 — City-detail overflow + Board** ✅ (#4; #5 decided-keep):
+  city-detail horizontal overflow gone (24px → 1px sub-pixel). Three fixes at
+  ≤640px in `app/city-detail.css`: hero `.meta` chips now wrap (flex-wrap +
+  `white-space: normal` on the climate-word span); the climate chart gets
+  `overflow-x: clip` so its edge labels can't bleed past the viewport
+  (overflow-y stays visible for vertical annotations); the 4-up climate
+  "extremes" row drops to a 2×2 grid (each value needs ~98px, a quarter-column
+  gave ~49px). Desktop keeps 4-up; verified table/grid intact at 1100px.
+  **Board (#5): decided to keep** the horizontal-scroll kanban — it's
+  functional on a phone and already has non-drag advance buttons; stacking it
+  loses the kanban metaphor for little gain. Revisit only if it tests poorly.
 - **Phase 4 — a11y cleanup** (#8, #9, #10): input labels, meaningful image alt,
   focus-visible verification.
 - **Trip planner** (#7 scope): graceful "best on a larger screen" affordance on
@@ -92,6 +101,13 @@ semantics), not eyeballed.
 
 ## Follow-ups (tracked as GitHub issues)
 
+- **Climate-heatmap legibility on phones.** Horizontal overflow is fixed, but
+  in the city-detail "When to go" heatmap the temp/precip **reference-tick
+  labels collide** at 390px (e.g. "Outdoor ideal" overlaps "Atlanta Jul · 89°")
+  and the 12-month cell row is tight. Needs responsive tick handling (thin out
+  or stagger reference ticks, shrink/scroll the month row) in
+  `components/city-detail/ChapterWhen.jsx` + `.climate-heatmap` CSS. Legibility
+  polish, not breakage. _(promote to a GitHub issue when picked up)_
 - **Mobile sort control for Ranking.** On a phone the table's tap-to-sort
   column headers are hidden (the table is now cards), so the only sort is the
   default Overall-desc. Add a compact sort dropdown to `.rank-controls` (sort by
