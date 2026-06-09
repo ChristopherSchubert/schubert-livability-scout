@@ -163,9 +163,7 @@ export default function PlanningMobile() {
           <p className="page-eyebrow">Planning</p>
           <h1>When to visit</h1>
           <p className="canvas-sub">
-            {!hydrated
-              ? "Loading…"
-              : "Each candidate's best upcoming visit window, ranked. Open one to lock its dates."}
+            {!hydrated ? "Loading…" : "When to visit each candidate. Tap to lock dates."}
           </p>
         </div>
         <Link className="ghost-link plan-m-cal" href="/planning/calendar">Calendar view →</Link>

@@ -1428,9 +1428,9 @@
 /* ── Simplified mobile planning view (components/PlanningMobile.jsx) ──────────
    The desktop swim-lane timeline is unusable on a phone; this is the scannable
    list that replaces it at <=640px (PlanningView picks which to render). */
-.plan-m-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
-.plan-m-cal { white-space: nowrap; flex: none; }
-.plan-m-section { margin-top: 1.5rem; }
+.plan-m-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.4rem 1rem; flex-wrap: wrap; }
+.plan-m-cal { white-space: nowrap; flex: none; margin-left: auto; }
+.plan-m-section { margin-top: 1.1rem; }
 .plan-m-section-head {
   font-family: var(--font-ui);
   text-transform: uppercase;
@@ -1438,9 +1438,9 @@
   font-size: 0.72rem;
   font-weight: 600;
   color: var(--muted);
-  margin: 0 0 0.7rem;
+  margin: 0 0 0.5rem;
 }
-.plan-m-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; }
+.plan-m-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.5rem; }
 .plan-m-card {
   display: flex;
   align-items: center;
