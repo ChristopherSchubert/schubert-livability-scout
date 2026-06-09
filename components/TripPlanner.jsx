@@ -33,10 +33,24 @@ const CROWD_WORD = { 0: "empty", 1: "empty", 2: "quiet", 3: "steady", 4: "busy",
 
 // ── backlog sort/filter ─────────────────────────────────────────────────
 const EQUAL_WEIGHTS = { setting: 1, aliveness: 1, fabric: 1, realness: 1, january: 1 };
+// Meteorological seasons. A city's "best week" is computed PER SEASON (the
+// peak of its visit-score curve over weeks falling in that season), not as a
+// single yearly peak — a yearly peak hides WHEN the good window is, which made
+// the sort misleading (a Nov-peaking city ranked next to a now-great one).
+const SEASONS = [
+  { id: "spring", label: "Spring", months: [2, 3, 4] },
+  { id: "summer", label: "Summer", months: [5, 6, 7] },
+  { id: "fall",   label: "Fall",   months: [8, 9, 10] },
+  { id: "winter", label: "Winter", months: [11, 0, 1] },
+];
+const MONTH_SEASON = {}; // month index 0–11 → season id
+SEASONS.forEach((s) => s.months.forEach((m) => { MONTH_SEASON[m] = s.id; }));
+const SEASON_LABEL = Object.fromEntries(SEASONS.map((s) => [s.id, s.label]));
 // Each option carries its natural direction; score sorts are descending with
-// unmeasured cities pushed last, name is A–Z. `axis` keys read off axisRollup.
+// unmeasured cities pushed last, name is A–Z. `axis` keys read off axisRollup;
+// `season` keys read off the per-season best-week peaks.
 const BACKLOG_SORTS = [
-  { id: "best",      label: "Best week",  kind: "peak" },
+  ...SEASONS.map((s) => ({ id: `best-${s.id}`, label: `Best week · ${s.label}`, kind: "season", season: s.id })),
   { id: "overall",   label: "Overall",    kind: "overall" },
   { id: "setting",   label: "Setting",    kind: "axis", axis: "setting" },
   { id: "aliveness", label: "Aliveness",  kind: "axis", axis: "aliveness" },
@@ -215,7 +229,9 @@ export default function TripPlanner() {
   // (manual — set by dragging a lane's grip; persists in `order`).
   const [sortMode, setSortMode] = useState("next");
   // ── backlog sort + filter ─────────────────────────────────────────────
-  const [blSort, setBlSort] = useState("best");
+  // Default to the season we're in now, so the backlog opens on the most
+  // relevant window rather than a far-future peak.
+  const [blSort, setBlSort] = useState(() => `best-${MONTH_SEASON[today.getMonth()]}`);
   const [blState, setBlState] = useState("all"); // "all" or a state abbrev
   const [blMeasuredOnly, setBlMeasuredOnly] = useState(false);
   const [blSurveyedOnly, setBlSurveyedOnly] = useState(false);
@@ -284,12 +300,21 @@ export default function TripPlanner() {
   const backlogRows = useMemo(() => {
     return backlog.map((c) => {
       const scores = weeklyVisitScore(c, viewStart, WEEKS);
-      const peak = scores && scores.length ? Math.max(...scores) : null;
+      // Best visit-score week within each season (null if unmeasured).
+      const seasonPeak = { spring: null, summer: null, fall: null, winter: null };
+      if (scores) {
+        for (let w = 0; w < scores.length; w++) {
+          const v = scores[w];
+          if (v == null) continue;
+          const sid = MONTH_SEASON[addDays(viewStart, w * 7 + 3).getMonth()];
+          if (seasonPeak[sid] == null || v > seasonPeak[sid]) seasonPeak[sid] = v;
+        }
+      }
       const lastComma = c.name.lastIndexOf(", ");
       const base = lastComma > 0 ? c.name.slice(0, lastComma) : c.name;
       const st = lastComma > 0 ? c.name.slice(lastComma + 2) : "";
       return {
-        city: c, base, st, peak,
+        city: c, base, st, seasonPeak,
         roll: axisRollup(c),
         overall: weightedAxisScore(c, EQUAL_WEIGHTS),
         gut: feltScore(c.survey),
@@ -315,7 +340,7 @@ export default function TripPlanner() {
     });
     const opt = BACKLOG_SORTS.find((s) => s.id === blSort) || BACKLOG_SORTS[0];
     const valueOf = (r) => {
-      if (opt.kind === "peak") return r.peak;
+      if (opt.kind === "season") return r.seasonPeak?.[opt.season] ?? null;
       if (opt.kind === "overall") return r.overall;
       if (opt.kind === "gut") return r.gut;
       if (opt.kind === "axis") return r.roll?.[opt.axis] ?? null;
@@ -1264,12 +1289,12 @@ function backlogBadge(r, sortId) {
   const opt = BACKLOG_SORTS.find((s) => s.id === sortId);
   if (!opt || opt.kind === "name") return null;
   let v, label;
-  if (opt.kind === "peak") { v = r.peak; label = "Best visit week"; }
+  if (opt.kind === "season") { v = r.seasonPeak?.[opt.season] ?? null; label = `Best ${SEASON_LABEL[opt.season]} week`; }
   else if (opt.kind === "overall") { v = r.overall; label = "Overall measured score (0–10)"; }
   else if (opt.kind === "gut") { v = r.gut; label = "Gut score (0–10)"; }
   else { v = r.roll?.[opt.axis] ?? null; label = `${opt.label} (0–10)`; }
   if (v == null) return null;
-  const text = opt.kind === "peak" ? String(Math.round(v)) : (Math.round(v * 10) / 10).toFixed(1);
+  const text = opt.kind === "season" ? String(Math.round(v)) : (Math.round(v * 10) / 10).toFixed(1);
   return { text, title: `${label}: ${text}` };
 }
 

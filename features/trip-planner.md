@@ -333,12 +333,21 @@ never a fake 0, so it always sorts last (per the no-invented-data rule).
 - **Name filter** — `.bl-search` substring match (case-insensitive) on the
   full city name. Backed by `blQuery`.
 - **Sort** — a `<select>` (`blSort`, options in module-level `BACKLOG_SORTS`):
-  **Best week** (default — peak of `weeklyVisitScore` across the 53-week
-  window, the yearly high, distinct from the lanes' "Best now"), **Overall**
-  (`weightedAxisScore(c, EQUAL_WEIGHTS)`, 0–10), the **5 axes** (Setting /
-  Aliveness / Fabric / Realness / Year-round, off `axisRollup`), **Gut score**
-  (`feltScore(c.survey)`), and **Name A–Z**. Score sorts are descending with
-  nulls last and ties broken by name; name sorts A–Z.
+  four **Best week · {season}** options (Spring / Summer / Fall / Winter),
+  then **Overall** (`weightedAxisScore(c, EQUAL_WEIGHTS)`, 0–10), the **5
+  axes** (Setting / Aliveness / Fabric / Realness / Year-round, off
+  `axisRollup`), **Gut score** (`feltScore(c.survey)`), and **Name A–Z**.
+  Score sorts are descending with nulls last and ties broken by name; name
+  sorts A–Z. Default is the season we're in now (`best-${current season}`).
+  - **Why per-season, not a single peak (2026-06-09 fix).** The first cut
+    sorted by the *yearly* peak of `weeklyVisitScore`. That hid *when* the
+    good window was — a city peaking at 94 in November ranked next to one
+    great right now, so the owner promoted a city whose best week was three
+    months out. Now the best week is computed *within each meteorological
+    season* (`MONTH_SEASON` maps each week's month to a season; we keep the
+    max score per season in `seasonPeak`), and you sort by the season you're
+    actually considering. Summer surfaces mild-summer coastal CA and sinks
+    hot-humid Southeast; winter flips it.
 - **State** — a `<select>` (`blState`) populated from the states actually
   present in the backlog (`backlogStates`), plus "All".
 - **Measured** / **Surveyed** toggles — keep only cities with an overall
@@ -351,10 +360,11 @@ never a fake 0, so it always sorts last (per the no-invented-data rule).
 - The header `.sub` shows `N cities` or `M of N` when filtered; a `.bl-none`
   message renders when filters exclude everything.
 
-Derived in `shownBacklog` (filter → sort) off `backlogRows` (per-city peak /
-rollup / overall / gut, memoized on `backlog` + `viewStart`). Verified
-in-browser: best-week sort 94→49, overall 7.6→3.1, CA state filter 10/112,
-no-match empty state.
+Derived in `shownBacklog` (filter → sort) off `backlogRows` (per-city
+`seasonPeak` / rollup / overall / gut, memoized on `backlog` + `viewStart`).
+Verified in-browser: summer ranks coastal-CA top / hot-SE bottom, winter
+flips to FL-top / cold-N bottom, overall 7.6→3.1, CA state filter, no-match
+empty state.
 
 ### Audit vs the mockup (2026-06-07)
 Fixed after a side-by-side audit with real data populated in Planning:
