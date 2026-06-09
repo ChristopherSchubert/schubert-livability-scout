@@ -1384,9 +1384,10 @@
   }
   .topbar-brand { max-height: 30px; }
   .backup-trigger { max-height: 44px; }
-  .sticky-header.has-city .topbar-v2 {
+  .topbar-v2 {
     transition: padding-top 0.28s cubic-bezier(0.4, 0, 0.2, 1),
                 padding-bottom 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+                row-gap 0.28s cubic-bezier(0.4, 0, 0.2, 1),
                 border-color 0.28s ease;
   }
 
@@ -1396,14 +1397,24 @@
     opacity: 0;
     border-width: 0;
   }
-  /* The ⋯ button leaves a ~20px line-box on its wrapper even at max-height 0;
-     zero it so the bar fully closes. Gated by the taller trigger during the
-     animation, so collapsing it doesn't cause a visible jump. */
-  .sticky-header.nav-condensed .backup-menu { line-height: 0; }
-  /* On a city page the topbar is only the brand row (the funnel is already
-     collapsed), so its padding collapses too — the children above are already
-     animating to 0, so the whole bar eases shut and the city-context menu stays
-     pinned. */
+  /* Fully collapse the ⋯ wrapper so the brand row closes to nothing — it can't
+     be opened while condensed, so clipping its (closed) dropdown is moot. The
+     taller brand mark gates the row height through the animation, so this
+     doesn't cause a visible jump. */
+  .sticky-header.nav-condensed .backup-menu {
+    line-height: 0;
+    max-height: 0;
+    overflow: hidden;
+  }
+  /* Close the top padding + the inter-row gap so the menu row rises to the top
+     instead of leaving dead space where the brand row was. (This is the
+     "daylight above the nav" — it was only being closed on city pages.) */
+  .sticky-header.nav-condensed .topbar-v2 {
+    padding-top: 0.1rem;
+    row-gap: 0;
+  }
+  /* City pages: the topbar is ONLY the (now-collapsed) brand row, so close it
+     entirely — the city-context menu below stays pinned. */
   .sticky-header.nav-condensed.has-city .topbar-v2 {
     padding-top: 0;
     padding-bottom: 0;

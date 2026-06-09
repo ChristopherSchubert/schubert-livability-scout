@@ -231,6 +231,12 @@ switcher is desktop-`display:none`). Verified rest states + dropdown on a clean
 server (the hidden preview tab freezes CSS transitions, so the easing itself is
 device-verified, like the scroll trigger).
 
+Follow-up fix: the topbar's top padding + inter-row gap (and the ⋯ wrapper) only
+collapsed on city pages, so on list pages (Board etc.) the funnel nav kept ~19px
+of dead space above it when condensed. Now the padding/gap close + the ⋯ wrapper
+fully collapses on *all* condensed pages, so the menu row rises to the top
+(daylight ~19px → ~2px). Board condensed header ≈ 53px (just the nav); city ≈ 56px.
+
 ## Simplified mobile planning view (2026-06-09, owner request)
 
 The desktop planning surface is a pan/zoom swim-lane timeline
