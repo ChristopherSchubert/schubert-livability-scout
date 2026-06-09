@@ -110,13 +110,15 @@ function tidyStreet(name) {
 
 async function loadCity(client, slug) {
   const { rows } = await client.query(
-    `select slug, name, lat, lon, blocks, block_geometries
+    `select slug, name, lat, lon, blocks, blocks_authored, block_geometries
        from cities where slug = $1`, [slug]);
   return rows[0] || null;
 }
 async function allSlugs(client) {
+  // n = how many human-authored blocks the city has (the regeneration baseline),
+  // NOT how many it currently renders — so a re-run tops up from the baseline.
   const { rows } = await client.query(
-    `select slug, coalesce(jsonb_array_length(blocks), 0) as n
+    `select slug, coalesce(jsonb_array_length(blocks_authored), 0) as n
        from cities order by name`);
   return rows;
 }
@@ -131,12 +133,18 @@ async function allSlugs(client) {
 async function socialPois(client, lat, lon) {
   const d = 0.013; // ~1.4 km bbox prefilter; haversine refine below
   const { rows } = await client.query(
-    `select lat, lon, name, street, user_rating_count
+    `select lat, lon, name, street, user_rating_count, business_status
        from pois
-      where lat between $1 and $2 and lon between $3 and $4
-        and (business_status is null or business_status = 'OPERATIONAL')`,
+      where lat between $1 and $2 and lon between $3 and $4`,
     [lat - d, lat + d, lon - d, lon + d]);
+  // Cache-miss guard: zero rows in the bbox means this city was never fetched
+  // (not that it's genuinely empty — even sparse places have a few). Fail LOUD
+  // instead of silently returning 0 blocks. CLAUDE.md: zero is not null.
+  if (rows.length === 0) {
+    throw new Error("no cached POIs in range — run `node scripts/.fetch-pois.mjs --slug <slug>` first");
+  }
   return rows
+    .filter((r) => !r.business_status || r.business_status === "OPERATIONAL")
     .filter((r) => haversine(lat, lon, r.lat, r.lon) <= RADIUS_M)
     .map((r) => ({ lat: r.lat, lon: r.lon, name: r.name, street: r.street, reviews: r.user_rating_count ?? 0 }));
 }
@@ -418,25 +426,24 @@ const slugArg = argv.includes("--slug") ? argv[argv.indexOf("--slug") + 1] : nul
 const wantAll = argv.includes("--all");
 const asJson = argv.includes("--json");
 
-// True pre-session blocks, captured before the old-style save was applied, so
-// generation ignores whatever auto-blocks currently sit in the DB.
-const ORIGINALS = existsSync("/tmp/original-blocks.json")
-  ? JSON.parse(readFileSync("/tmp/original-blocks.json", "utf8")) : {};
-
 const client = await connect();
 let targets = [];
 if (slugArg) targets = slugArg.split(",").map((s) => s.trim());
 else if (wantAll) {
-  // base the "needs blocks" filter on ORIGINAL counts, not current DB state
+  // base the "needs blocks" filter on the human-authored baseline count
   const rows = await allSlugs(client);
-  targets = rows.filter((r) => (ORIGINALS[r.slug]?.length ?? r.n) < TARGET).map((r) => r.slug);
+  targets = rows.filter((r) => r.n < TARGET).map((r) => r.slug);
 } else { console.error("pass --slug <slug[,slug]> or --all"); await client.end(); process.exit(2); }
 
 const out = {};
 for (const slug of targets) {
   const city = await loadCity(client, slug);
   if (!city) { console.error(`! no city ${slug}`); continue; }
-  const original = ORIGINALS[slug] ?? city.blocks ?? [];
+  // The regeneration baseline is the human-authored blocks (durable column),
+  // never the current merged `blocks` — so a re-run tops up from the baseline
+  // and can't compound. Falls back to current blocks only if the column is
+  // unset (a city onboarded before migration 0009).
+  const original = (Array.isArray(city.blocks_authored) ? city.blocks_authored : null) ?? city.blocks ?? [];
   try {
     const res = await generate(client, city, original);
     out[slug] = { name: city.name, existing: original, ...res };

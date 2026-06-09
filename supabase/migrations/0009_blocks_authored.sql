@@ -1,0 +1,14 @@
+-- 0009 — blocks_authored: the human-curated block baseline.
+--
+-- The "six blocks" generator ADDS auto-derived blocks to whatever a human
+-- authored; `blocks` is the merged, rendered set. To regenerate idempotently it
+-- needs to know which blocks were the human baseline vs which it added — earlier
+-- that lived in an ephemeral /tmp file, so a re-run without it could treat
+-- already-augmented blocks as the baseline and pile more on top.
+--
+-- blocks_authored is that baseline, in the DB: set by humans (onboarding /
+-- manual edit), NEVER written by the generator. The pipeline computes
+--   blocks = blocks_authored + generated_picks
+-- so regeneration always starts clean and can't compound. Backfilled from the
+-- captured originals snapshot for the 2026-06 corpus.
+alter table cities add column if not exists blocks_authored jsonb default '[]';

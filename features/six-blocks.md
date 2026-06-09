@@ -69,6 +69,18 @@ less location string.
   **NOTE:** the measured Aliveness metrics (`cafe_n`/`bar_n`/`rest_n` in
   `lib/measure.js`) still come from OSM and carry the same coverage gap —
   a known follow-up, not yet migrated to Google.
+- **Durable baseline + idempotency** (migration 0009). The generator ADDS
+  to a human baseline; that baseline lives in `cities.blocks_authored`
+  (never written by the pipeline), so `blocks = blocks_authored + picks`
+  and a re-run always rebuilds from the baseline — it can't compound, and
+  doesn't depend on any temp file. The save skips the write when the result
+  is unchanged (so it won't needlessly clear `block_geometries` and wipe
+  resolved pins). The generator **fails loudly** ("no cached POIs in
+  range") if a city was never fetched into the `pois` cache, instead of
+  silently producing 0 blocks. *Residual:* cross-street names still come
+  from live Overpass, so they drift slightly run-to-run — a re-save would
+  rewrite a few cities' block strings (churn, not compounding); caching the
+  OSM road data would make naming deterministic too.
 - **Data (block coordinates)**: `cities.block_geometries` jsonb — an
   array parallel to `blocks`, each entry shaped like
   `{ name, lat, lon, accuracy, source, meta, asOf }` with `accuracy`
