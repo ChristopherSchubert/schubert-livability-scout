@@ -224,6 +224,15 @@ from sliding 1 km onto a commercial strip. Both are why recentering stays a
 reviewed step, never an auto-apply. Boundary cleanup for the recentered cities
 is tracked in #6.
 
+The `walkscore` measurer was re-run for the same 8 (it's also pin-keyed but
+lives in a separate measurer). Most moved a few points, but the two worst-placed
+pins jumped hard — Jim Thorpe 29→59, Deep Creek 29→43 — confirming the old pins
+were stranded off the walkable grid (Walk Score ~29 = car-dependent), not that
+the towns are. The other walking-core metrics (cafe/bar/rest/daily-needs scores)
+feed Aliveness + Fabric via absolute saturating bands (`metricScore`), so the
+recenter raised those two axes for these 8 cities only — no cohort ripple, no
+change to the other three axes or any subjective/felt score.
+
 ## Follow-ups (tracked as GitHub issues)
 
 Per the project's TODO convention — concrete shippable work that's
