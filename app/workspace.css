@@ -1350,12 +1350,15 @@
 
 /* ── Lighter mobile masthead + tappable settings menu (features/mobile.md) ──── */
 @media (max-width: 640px) {
-  /* The brand row sits in the always-sticky header; trim its weight and height
-     so it stops eating screen real estate on every scroll. */
-  .topbar-v2 { padding: 0.4rem 0.9rem; gap: 0.4rem 0.75rem; }
+  /* The brand row sits in the always-sticky header; keep it tight even when
+     expanded. The ⋯ button (a secondary action) was the tallest thing in the
+     row at 40px and forced the whole brand row taller than the wordmark needs,
+     so it's trimmed too. Small top padding + gap; the bottom padding carries
+     the visual separation from the nav row. */
+  .topbar-v2 { padding: 0.22rem 0.85rem 0.4rem; gap: 0.15rem 0.75rem; }
   .brand-mark { font-size: 0.95rem; }
   .brand-dot { width: 8px; height: 8px; box-shadow: 0 0 0 3px var(--accent-soft); }
-  .backup-trigger { width: 40px; height: 40px; }
+  .backup-trigger { width: 32px; height: 32px; font-size: 1rem; }
 
   /* Make the dropdown's actions proper full-width tap rows. */
   .backup-pop { width: 232px; padding: 0.4rem; }
