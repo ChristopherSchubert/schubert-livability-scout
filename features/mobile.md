@@ -147,6 +147,23 @@ Re-swept the other un-audited workspace pages (`/visited`, `/assessed`,
 `/decided`, `/planning`) — empty states are clean, trip planner functional,
 zero horizontal overflow.
 
+## Stats as a swipe carousel (2026-06-09, owner request)
+
+The owner didn't want the city-detail "By the numbers" stats as an endless
+scroll (5 axes × ~4 metrics = ~20 stacked rows on a phone). Their idea — swipe
+left/right across the axes — is now the mobile treatment:
+
+- `components/city-detail/ChapterData.jsx` is now a client component. Desktop
+  still renders all five axes in a CSS grid; at ≤640px the same `.axes` grid
+  becomes a horizontal **scroll-snap carousel** — one axis per full-width panel.
+- A chip row above the carousel doubles as (a) an at-a-glance overview of all
+  five axis scores and (b) the navigator: tap a chip to jump, and the active
+  chip + a dot row track the swipe position (scroll handler → `active` state).
+- Switcher + dots are `display:none` on desktop; the carousel CSS is all under
+  `@media (max-width: 640px)` in `app/city-detail.css`. Verified: swipe updates
+  the active chip/dot, tap-to-jump scrolls, desktop grid unchanged at 1200px,
+  zero horizontal page overflow.
+
 ## Follow-ups (tracked as GitHub issues)
 
 - ~~**Climate-heatmap legibility on phones.**~~ ✅ Fixed 2026-06-09 (from owner

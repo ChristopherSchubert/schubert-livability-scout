@@ -1405,3 +1405,90 @@
   .cd-root .climate .annot-label,
   .cd-root .climate .annot-sub { display: none; }
 }
+
+/* ── Stats swipe carousel (mobile, features/mobile.md) ────────────────────────
+   Desktop shows all five axes in a grid (the switcher + dots are hidden there).
+   At phone width the same markup becomes a horizontal scroll-snap carousel —
+   one axis per full-width panel, swiped left/right — instead of ~20 metric rows
+   in an endless vertical scroll. The chip row up top is both an at-a-glance
+   overview of all five scores and the tap-to-jump navigator. */
+.cd-root .axis-switcher,
+.cd-root .axis-dots { display: none; }
+
+@media (max-width: 640px) {
+  .cd-root .axis-switcher {
+    display: flex;
+    gap: 0.2rem;
+    margin: 0.2rem 0 0.6rem;
+    border-bottom: 1px solid var(--hair);
+  }
+  .cd-root .axis-chip {
+    flex: 1 1 0;
+    min-width: 0;
+    min-height: 44px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1px;
+    padding: 0.3rem 0.15rem;
+    background: none;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    cursor: pointer;
+    color: var(--ink-mute);
+    font-family: inherit;
+  }
+  .cd-root .axis-chip-label {
+    font-family: 'Inter Tight', sans-serif;
+    font-size: 0.53rem;
+    text-transform: uppercase;
+    letter-spacing: 0.01em;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
+  .cd-root .axis-chip-score {
+    font-family: 'Fraunces', serif;
+    font-variation-settings: "opsz" 40, "wght" 700;
+    font-size: 1.05rem;
+    line-height: 1;
+  }
+  .cd-root .axis-chip.active { color: var(--ink); border-bottom-color: var(--accent); }
+  .cd-root .axis-chip.active .axis-chip-score { color: var(--accent); }
+
+  /* The carousel track: cancel the grid, lay panels in a swipeable row. */
+  .cd-root .axes {
+    display: flex;
+    grid-template-columns: none;
+    gap: 0;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    /* bleed to the screen edges; each panel restores the inset so a swipe feels
+       full-width. The chapter's side padding is ~1.25rem at this breakpoint. */
+    margin-inline: -1.25rem;
+  }
+  .cd-root .axes::-webkit-scrollbar { display: none; }
+  .cd-root .axis-col {
+    flex: 0 0 100%;
+    width: 100%;
+    box-sizing: border-box;
+    scroll-snap-align: center;
+    padding-inline: 1.25rem;
+  }
+
+  .cd-root .axis-dots {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 0.9rem;
+  }
+  .cd-root .axis-dot { width: 6px; height: 6px; border-radius: 999px; background: var(--hair); transition: background 0.2s ease; }
+  .cd-root .axis-dot.active { background: var(--accent); }
+}
