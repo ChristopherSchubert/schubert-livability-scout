@@ -324,6 +324,38 @@ Planner-specific tokens:
 - All three verified in-browser (Chromium): reorder moves the dragged lane;
   ghost tracks + cancels cleanly on an off-target drop.
 
+### Backlog sort + filter (2026-06-09)
+The Backlog grew to 100+ cities, so the pane below Planning gained a control
+bar (`.bl-ctl`) above the card grid. All controls are **session-local** (no
+persistence) and operate on real measurements — an unmeasured value is `null`,
+never a fake 0, so it always sorts last (per the no-invented-data rule).
+
+- **Name filter** — `.bl-search` substring match (case-insensitive) on the
+  full city name. Backed by `blQuery`.
+- **Sort** — a `<select>` (`blSort`, options in module-level `BACKLOG_SORTS`):
+  **Best week** (default — peak of `weeklyVisitScore` across the 53-week
+  window, the yearly high, distinct from the lanes' "Best now"), **Overall**
+  (`weightedAxisScore(c, EQUAL_WEIGHTS)`, 0–10), the **5 axes** (Setting /
+  Aliveness / Fabric / Realness / Year-round, off `axisRollup`), **Gut score**
+  (`feltScore(c.survey)`), and **Name A–Z**. Score sorts are descending with
+  nulls last and ties broken by name; name sorts A–Z.
+- **State** — a `<select>` (`blState`) populated from the states actually
+  present in the backlog (`backlogStates`), plus "All".
+- **Measured** / **Surveyed** toggles — keep only cities with an overall
+  measured score / a completed gut score, respectively (`blMeasuredOnly`,
+  `blSurveyedOnly`).
+- Each card shows a **score chip** (`.bkbadge`) in the thumbnail corner
+  reflecting the active sort's value (the 0–100 best-week score, or the 0–10
+  axis/overall/gut value), so the ranking is legible. Hidden for the Name
+  sort and for unmeasured cities. Built by the `backlogBadge()` helper.
+- The header `.sub` shows `N cities` or `M of N` when filtered; a `.bl-none`
+  message renders when filters exclude everything.
+
+Derived in `shownBacklog` (filter → sort) off `backlogRows` (per-city peak /
+rollup / overall / gut, memoized on `backlog` + `viewStart`). Verified
+in-browser: best-week sort 94→49, overall 7.6→3.1, CA state filter 10/112,
+no-match empty state.
+
 ### Audit vs the mockup (2026-06-07)
 Fixed after a side-by-side audit with real data populated in Planning:
 - **Planning-box hover hero** was querying `.trip-pl-thumb` (committed-bar

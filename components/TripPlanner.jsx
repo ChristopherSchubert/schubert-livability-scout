@@ -3,9 +3,12 @@
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
+  axisRollup,
   cityImageQuery,
   cityStage,
+  feltScore,
   weeklyVisitScore,
+  weightedAxisScore,
 } from "../lib/planner-data";
 import AppShell from "./AppShell";
 import { resolveImage, usePlanner } from "./PlannerProvider";
@@ -27,6 +30,22 @@ const MONTHS_SHORT = [
   "Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec",
 ];
 const CROWD_WORD = { 0: "empty", 1: "empty", 2: "quiet", 3: "steady", 4: "busy", 5: "packed" };
+
+// ── backlog sort/filter ─────────────────────────────────────────────────
+const EQUAL_WEIGHTS = { setting: 1, aliveness: 1, fabric: 1, realness: 1, january: 1 };
+// Each option carries its natural direction; score sorts are descending with
+// unmeasured cities pushed last, name is A–Z. `axis` keys read off axisRollup.
+const BACKLOG_SORTS = [
+  { id: "best",      label: "Best week",  kind: "peak" },
+  { id: "overall",   label: "Overall",    kind: "overall" },
+  { id: "setting",   label: "Setting",    kind: "axis", axis: "setting" },
+  { id: "aliveness", label: "Aliveness",  kind: "axis", axis: "aliveness" },
+  { id: "fabric",    label: "Fabric",     kind: "axis", axis: "fabric" },
+  { id: "realness",  label: "Realness",   kind: "axis", axis: "realness" },
+  { id: "january",   label: "Year-round", kind: "axis", axis: "january" },
+  { id: "gut",       label: "Gut score",  kind: "gut" },
+  { id: "name",      label: "Name A–Z",   kind: "name" },
+];
 
 // ── date helpers ────────────────────────────────────────────────────────
 function startOfDay(d) { return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
@@ -195,6 +214,12 @@ export default function TripPlanner() {
   // sortMode: "next" (by scheduled trip), "best" (peak score first), "none"
   // (manual — set by dragging a lane's grip; persists in `order`).
   const [sortMode, setSortMode] = useState("next");
+  // ── backlog sort + filter ─────────────────────────────────────────────
+  const [blSort, setBlSort] = useState("best");
+  const [blState, setBlState] = useState("all"); // "all" or a state abbrev
+  const [blMeasuredOnly, setBlMeasuredOnly] = useState(false);
+  const [blSurveyedOnly, setBlSurveyedOnly] = useState(false);
+  const [blQuery, setBlQuery] = useState("");
   const [confirmId, setConfirmId] = useState(null); // lane pending remove-confirm
   useEffect(() => {
     if (!confirmId) return;
@@ -251,6 +276,66 @@ export default function TripPlanner() {
     }
     return lanes;
   }, [planLanes, sortMode, order]);
+
+  // ── backlog: derive sortable values, then filter + sort for display ─────
+  // Each row carries its peak visit week, per-axis rollup, weighted overall,
+  // and gut score so the sort/filter controls operate on real measurements
+  // (null = unmeasured, which always sorts last — never a fake zero).
+  const backlogRows = useMemo(() => {
+    return backlog.map((c) => {
+      const scores = weeklyVisitScore(c, viewStart, WEEKS);
+      const peak = scores && scores.length ? Math.max(...scores) : null;
+      const lastComma = c.name.lastIndexOf(", ");
+      const base = lastComma > 0 ? c.name.slice(0, lastComma) : c.name;
+      const st = lastComma > 0 ? c.name.slice(lastComma + 2) : "";
+      return {
+        city: c, base, st, peak,
+        roll: axisRollup(c),
+        overall: weightedAxisScore(c, EQUAL_WEIGHTS),
+        gut: feltScore(c.survey),
+      };
+    });
+  }, [backlog, viewStart]);
+
+  // States present in the backlog, for the state filter dropdown.
+  const backlogStates = useMemo(() => {
+    const set = new Set();
+    for (const r of backlogRows) if (r.st) set.add(r.st);
+    return [...set].sort();
+  }, [backlogRows]);
+
+  const shownBacklog = useMemo(() => {
+    const q = blQuery.trim().toLowerCase();
+    let rows = backlogRows.filter((r) => {
+      if (blState !== "all" && r.st !== blState) return false;
+      if (blMeasuredOnly && r.overall == null) return false;
+      if (blSurveyedOnly && r.gut == null) return false;
+      if (q && !r.city.name.toLowerCase().includes(q)) return false;
+      return true;
+    });
+    const opt = BACKLOG_SORTS.find((s) => s.id === blSort) || BACKLOG_SORTS[0];
+    const valueOf = (r) => {
+      if (opt.kind === "peak") return r.peak;
+      if (opt.kind === "overall") return r.overall;
+      if (opt.kind === "gut") return r.gut;
+      if (opt.kind === "axis") return r.roll?.[opt.axis] ?? null;
+      return null; // name sort handled below
+    };
+    rows = [...rows];
+    if (opt.kind === "name") {
+      rows.sort((a, b) => a.base.localeCompare(b.base));
+    } else {
+      // descending by score; nulls (unmeasured) last; ties broken by name
+      rows.sort((a, b) => {
+        const av = valueOf(a), bv = valueOf(b);
+        if (av == null && bv == null) return a.base.localeCompare(b.base);
+        if (av == null) return 1;
+        if (bv == null) return -1;
+        return bv - av || a.base.localeCompare(b.base);
+      });
+    }
+    return rows;
+  }, [backlogRows, blSort, blState, blMeasuredOnly, blSurveyedOnly, blQuery]);
 
   const [dragLaneId, setDragLaneId] = useState(null);
   function startLaneReorder(e, id) {
@@ -1101,13 +1186,42 @@ export default function TripPlanner() {
 
         {/* Backlog */}
         <section className="trip-pl-backlog">
-          <div className="bh"><span className="eyebrow">Backlog</span><h2>Not yet in planning</h2><span className="sub">{!hydrated ? "Loading…" : backlog.length ? "Promote to add a lane." : "Empty."}</span></div>
+          <div className="bh">
+            <span className="eyebrow">Backlog</span><h2>Not yet in planning</h2>
+            <span className="sub">{!hydrated ? "Loading…" : !backlog.length ? "Empty." : shownBacklog.length === backlog.length ? `${backlog.length} cities` : `${shownBacklog.length} of ${backlog.length}`}</span>
+          </div>
+          {backlog.length ? (
+            <div className="bl-ctl">
+              <input
+                type="search"
+                className="bl-search"
+                placeholder="Filter by name…"
+                value={blQuery}
+                onChange={(e) => setBlQuery(e.target.value)}
+                aria-label="Filter backlog by name"
+              />
+              <label className="bl-field">
+                <span>Sort</span>
+                <select value={blSort} onChange={(e) => setBlSort(e.target.value)}>
+                  {BACKLOG_SORTS.map((s) => <option key={s.id} value={s.id}>{s.label}</option>)}
+                </select>
+              </label>
+              <label className="bl-field">
+                <span>State</span>
+                <select value={blState} onChange={(e) => setBlState(e.target.value)}>
+                  <option value="all">All</option>
+                  {backlogStates.map((s) => <option key={s} value={s}>{s}</option>)}
+                </select>
+              </label>
+              <label className="bl-tog"><input type="checkbox" checked={blMeasuredOnly} onChange={(e) => setBlMeasuredOnly(e.target.checked)} /> Measured</label>
+              <label className="bl-tog"><input type="checkbox" checked={blSurveyedOnly} onChange={(e) => setBlSurveyedOnly(e.target.checked)} /> Surveyed</label>
+            </div>
+          ) : null}
           <div className="bl">
-            {backlog.map((c) => {
+            {shownBacklog.map((r) => {
+              const c = r.city;
               const hero = heroFor(c);
-              const lastComma = c.name.lastIndexOf(", ");
-              const base = lastComma > 0 ? c.name.slice(0, lastComma) : c.name;
-              const st = lastComma > 0 ? c.name.slice(lastComma + 2) : "";
+              const badge = backlogBadge(r, blSort);
               return (
                 <div
                   key={c.id}
@@ -1118,15 +1232,21 @@ export default function TripPlanner() {
                   onPointerDown={(e) => startCardDrag(e, c)}
                   onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); updateCity(c.id, { status: "Shortlist" }); } }}
                 >
-                  <span className="bkt" style={hero ? { backgroundImage: `url(${hero})` } : undefined}>{hero ? "" : base.slice(0, 1)}</span>
+                  <span className="bkt" style={hero ? { backgroundImage: `url(${hero})` } : undefined}>
+                    {hero ? "" : r.base.slice(0, 1)}
+                    {badge ? <span className="bkbadge" title={badge.title}>{badge.text}</span> : null}
+                  </span>
                   <span className="bkb">
-                    <span className="bkc">{base}</span>
-                    <span className="bks">{st ? `${st} · ` : ""}click to plan</span>
+                    <span className="bkc">{r.base}</span>
+                    <span className="bks">{r.st ? `${r.st} · ` : ""}click to plan</span>
                   </span>
                 </div>
               );
             })}
           </div>
+          {hydrated && backlog.length && !shownBacklog.length ? (
+            <p className="bl-none">No backlog cities match these filters.</p>
+          ) : null}
         </section>
 
         {ghost ? (
@@ -1135,6 +1255,22 @@ export default function TripPlanner() {
       </div>
     </AppShell>
   );
+}
+
+// The small score chip on a backlog card, reflecting whatever the active sort
+// ranks on. Peak is the 0–100 visit score; the rest are 0–10 axis/overall/gut.
+// Returns null for the name sort or when the value is unmeasured.
+function backlogBadge(r, sortId) {
+  const opt = BACKLOG_SORTS.find((s) => s.id === sortId);
+  if (!opt || opt.kind === "name") return null;
+  let v, label;
+  if (opt.kind === "peak") { v = r.peak; label = "Best visit week"; }
+  else if (opt.kind === "overall") { v = r.overall; label = "Overall measured score (0–10)"; }
+  else if (opt.kind === "gut") { v = r.gut; label = "Gut score (0–10)"; }
+  else { v = r.roll?.[opt.axis] ?? null; label = `${opt.label} (0–10)`; }
+  if (v == null) return null;
+  const text = opt.kind === "peak" ? String(Math.round(v)) : (Math.round(v * 10) / 10).toFixed(1);
+  return { text, title: `${label}: ${text}` };
 }
 
 function fmtRange(viewStart, off, len) {

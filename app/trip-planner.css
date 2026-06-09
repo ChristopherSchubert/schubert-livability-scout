@@ -280,7 +280,29 @@
 /* backlog */
 .trip-pl-backlog { margin-top: 24px; border-top: 1px solid var(--text); padding-top: 16px; }
 .trip-pl-backlog .bh { display: flex; align-items: baseline; gap: 16px; margin-bottom: 12px; }
+.bl-ctl { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 14px; padding: 0 4px; }
+.bl-search {
+  flex: 0 1 220px; min-width: 140px; font-family: inherit; font-size: 0.82rem;
+  padding: 6px 9px; border: 1px solid var(--border); border-radius: 2px;
+  background: var(--panel); color: var(--text);
+}
+.bl-search:focus { outline: none; border-color: var(--accent); }
+.bl-field { display: inline-flex; align-items: center; gap: 7px; font-size: 0.7rem; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.bl-field select {
+  font-family: inherit; font-size: 0.8rem; text-transform: none; letter-spacing: 0; font-weight: 400;
+  padding: 5px 8px; border: 1px solid var(--border); border-radius: 2px;
+  background: var(--panel); color: var(--text); cursor: pointer;
+}
+.bl-field select:focus { outline: none; border-color: var(--accent); }
+.bl-tog { display: inline-flex; align-items: center; gap: 6px; font-size: 0.72rem; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); font-weight: 600; cursor: pointer; }
+.bl-none { color: var(--muted); font-size: 0.85rem; padding: 4px; }
 .trip-pl-backlog .bl { display: grid; grid-template-columns: repeat(auto-fill, minmax(168px, 1fr)); gap: 14px; padding: 4px 4px 12px; }
+.bkbadge {
+  position: absolute; top: 6px; right: 6px; min-width: 22px; padding: 1px 6px;
+  font-family: var(--font-display); font-size: 0.74rem; font-variation-settings: "wght" 560;
+  color: var(--panel); background: rgba(13,76,68,.82); border-radius: 10px; text-align: center;
+  backdrop-filter: saturate(1.2);
+}
 .bk {
   flex: 0 0 184px; background: var(--panel); border: 1px solid var(--border); border-radius: 2px;
   cursor: pointer; text-align: left; padding: 0; overflow: hidden;
@@ -289,6 +311,7 @@
 }
 .bk:hover { transform: translateY(-3px) rotate(-0.5deg); border-color: var(--accent); box-shadow: 0 2px 0 rgba(13,76,68,.2), 0 14px 26px -16px rgba(13,76,68,.4); }
 .bkt {
+  position: relative;
   display: block; width: 100%; height: 104px; background-size: cover; background-position: center;
   filter: saturate(0.88) contrast(1.05); border-bottom: 1px solid var(--border);
   display: flex; align-items: center; justify-content: center;
