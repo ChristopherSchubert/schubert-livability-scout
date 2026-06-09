@@ -164,6 +164,21 @@ left/right across the axes — is now the mobile treatment:
   the active chip/dot, tap-to-jump scrolls, desktop grid unchanged at 1200px,
   zero horizontal page overflow.
 
+## Mobile masthead + settings menu (2026-06-09, owner feedback)
+
+- **Lighter brand row.** The "Livability Scout" masthead sits in the
+  always-sticky header and was eating ~55px on every scroll. At ≤640px the
+  wordmark drops 18px → 15px, the topbar padding tightens, the brand dot
+  shrinks, and the ⋯ trigger goes 44px → 40px — brand row now ~46px.
+  (The ⋯ at 40px is a deliberate trade against the 44px touch floor for a
+  secondary, rarely-used control, to reclaim header space the owner flagged.)
+- **Settings dropdown.** The ⋯ menu's "Restore from file" row rendered the
+  browser's raw, unstyled `Choose File / No file chosen` control, which broke
+  the editorial look. An invisible file input is now overlaid across the row so
+  the styled "Restore from file" label is the button (fix applies at all
+  widths); menu actions are full-width 44px tap rows on phones.
+  `app/workspace.css`.
+
 ## Follow-ups (tracked as GitHub issues)
 
 - ~~**Climate-heatmap legibility on phones.**~~ ✅ Fixed 2026-06-09 (from owner

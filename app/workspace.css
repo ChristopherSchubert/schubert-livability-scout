@@ -1287,3 +1287,44 @@
   .trip-facts { grid-template-columns: 1fr; }
   .trip-fact dd { white-space: normal; }   /* show full stay-zone / heart, no ellipsis clip */
 }
+
+/* ── Settings (⋯) menu: replace the raw native file picker ────────────────────
+   The "Restore from file" row rendered the browser's unstyled
+   "Choose File / No file chosen" control, which broke the editorial look (worst
+   on mobile). Overlay an invisible file input across the whole row so the
+   styled "Restore from file" label IS the button — applies at every width. */
+.backup-import {
+  display: flex;
+  align-items: center;
+  position: relative;
+  gap: 0;
+}
+.backup-import input[type="file"] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  font-size: 0;
+}
+
+/* ── Lighter mobile masthead + tappable settings menu (features/mobile.md) ──── */
+@media (max-width: 640px) {
+  /* The brand row sits in the always-sticky header; trim its weight and height
+     so it stops eating screen real estate on every scroll. */
+  .topbar-v2 { padding: 0.4rem 0.9rem; gap: 0.4rem 0.75rem; }
+  .brand-mark { font-size: 0.95rem; }
+  .brand-dot { width: 8px; height: 8px; box-shadow: 0 0 0 3px var(--accent-soft); }
+  .backup-trigger { width: 40px; height: 40px; }
+
+  /* Make the dropdown's actions proper full-width tap rows. */
+  .backup-pop { width: 232px; padding: 0.4rem; }
+  .backup-pop button,
+  .backup-pop .backup-import {
+    min-height: 44px;
+    width: 100%;
+    padding: 0.5rem 0.7rem;
+    font-size: 0.95rem;
+  }
+}
