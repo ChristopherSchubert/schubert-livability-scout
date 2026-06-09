@@ -101,7 +101,7 @@ The `climate` measurer writes `visit_climate` (12 months of NASA-POWER-derived
 normals) as part of step 3. If a city is somewhere POWER can't reach (very
 small islands, etc.) the column stays null and you write the months directly
 into the row. `crowd_season` is now measured by the crowd pipeline above (not
-qualitative); only `season_notes` (`{ charm, truth }`) is hand-authored prose.
+qualitative); only `season_notes` (`{ prime, offSeason }`) is hand-authored prose.
 
 ### 5. Set `drive_hrs_from_pit`
 

@@ -87,7 +87,7 @@ safe. Risk: low-medium; do it module-by-module.
 
 ### P5 — Tests (there are none)
 - Unit: `lib/domain/scoring.js` (`metricScore` threshold/ceiling math,
-  `axisRollup`, `weightedAxisScore`) and `visit-window.js` (charm/truth pick).
+  `axisRollup`, `weightedAxisScore`) and `visit-window.js` (prime/off-season pick).
   Pure functions — cheap, high-value. Vitest.
 - Snapshot: freeze one city's measurer output against a recorded Overpass dump.
 - Playwright visual snapshots of each route via the dev-login bypass (3 cities ×

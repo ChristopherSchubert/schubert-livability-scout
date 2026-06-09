@@ -33,7 +33,7 @@ async function postSaveHero(section, candidate) {
   return data;
 }
 
-// VisitWindowPanel — the two diagnostic visit windows (Charm + Truth) over a
+// VisitWindowPanel — the two diagnostic visit windows (Prime + Off-season) over a
 // 12-month comfort strip. Quantitative climate drives the bars; qualitative
 // season notes explain each recommended window. Shows "awaiting climate data"
 // rather than faking when a city hasn't been measured.
@@ -42,7 +42,7 @@ function VisitWindowPanel({ cityItem }) {
   if (!win) {
     return (
       <section className="panel visit-window">
-        <div className="section-head"><div><h2>When to visit</h2><p>Awaiting climate data for {cityItem.name}. Once measured, the charm and truth windows compute here.</p></div></div>
+        <div className="section-head"><div><h2>When to visit</h2><p>Awaiting climate data for {cityItem.name}. Once measured, the prime and off-season windows compute here.</p></div></div>
       </section>
     );
   }
@@ -58,7 +58,7 @@ function VisitWindowPanel({ cityItem }) {
       <div className="section-head">
         <div>
           <h2>When to visit</h2>
-          <p>Two diagnostic trips. A candidate should pass both before it advances.</p>
+          <p>Two windows on the year — the comfortable stretch and the quiet off-season.</p>
         </div>
         {now != null ? (
           <div className={`visit-now-badge${dontMiss ? " urgent" : ""}`}>
@@ -72,26 +72,26 @@ function VisitWindowPanel({ cityItem }) {
       </div>
 
       <div className="vw-windows">
-        <article className="vw-card vw-charm">
-          <p className="vw-tag">Charm visit</p>
-          <strong>{win.charm ? win.charm.name : "—"}</strong>
-          <p>{win.notes.charm || "Comfortable weather, after the crowds thin."}</p>
+        <article className="vw-card vw-prime">
+          <p className="vw-tag">Prime visit</p>
+          <strong>{win.prime ? win.prime.name : "—"}</strong>
+          <p>{win.notes.prime || "Comfortable weather, after the crowds thin."}</p>
         </article>
-        <article className="vw-card vw-truth">
-          <p className="vw-tag">Truth visit · the January test</p>
-          <strong>{win.truth ? win.truth.name : "—"}</strong>
-          <p>{win.notes.truth || "Deliberately off-season — does real life persist when tourists are gone?"}</p>
+        <article className="vw-card vw-offseason">
+          <p className="vw-tag">Off-season visit</p>
+          <strong>{win.offSeason ? win.offSeason.name : "—"}</strong>
+          <p>{win.notes.offSeason || "The coldest, quietest stretch — the town with the crowds gone."}</p>
         </article>
       </div>
 
       <div className="vw-strip" role="img" aria-label="Monthly comfort and crowd">
         {win.months.map((mo) => {
-          const isCharm = win.charm && mo.idx === win.charm.idx;
-          const isTruth = win.truth && mo.idx === win.truth.idx;
+          const isPrime = win.prime && mo.idx === win.prime.idx;
+          const isOffSeason = win.offSeason && mo.idx === win.offSeason.idx;
           const isNow = mo.idx === nowIdx;
           const h = mo.comfort == null ? 0 : (mo.comfort / maxComfort) * 100;
           return (
-            <div key={mo.idx} className={`vw-month${isCharm ? " charm" : ""}${isTruth ? " truth" : ""}${isNow ? " now" : ""}`}>
+            <div key={mo.idx} className={`vw-month${isPrime ? " prime" : ""}${isOffSeason ? " offseason" : ""}${isNow ? " now" : ""}`}>
               <div className="vw-bar-track">
                 <span className="vw-bar" style={{ height: `${h}%` }} />
                 {mo.crowd != null ? <span className="vw-crowd" style={{ height: `${(mo.crowd / 5) * 100}%` }} title={`Crowd ${mo.crowd}/5`} /> : null}

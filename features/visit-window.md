@@ -1,8 +1,8 @@
-# Visit window (Charm + Truth)
+# Visit window (Prime + Off-season)
 
 Two diagnostic trips computed per city from climate normals + crowd
-season: **Charm** (the month that's comfortable *after* crowds thin) and
-**Truth** (the coldest month — the January test made literal). A
+season: **Prime** (the month that's comfortable *after* crowds thin) and
+**Off-season** (the coldest month — the January test made literal). A
 candidate should pass both before it advances.
 
 ## Crowd-season source cascade (current)
@@ -62,15 +62,16 @@ Trends uses hotel-search per-capita). Documented as tier-specific.
     baked in (`gtrends_hotels_pop_norm_v2_…_floor=100_ceil=10000_anchor=mackinac_island`).
   - `cities.population_total` / `population_source` — city-wide
     population from Census ACS Place, the denominator for per-capita.
-  - `cities.season_notes` — `{ charm, truth }` user-authored prose.
+  - `cities.season_notes` — `{ prime, offSeason }` user-authored prose
+    (legacy rows store `{ charm, truth }`, mapped on read in `lib/city-row.js`).
 
 - **Logic**: `cityVisitWindow(cityItem)` in
   [lib/planner-data.js](../lib/planner-data.js) returns
-  `{ charm: {idx, name}, truth: {idx, name}, notes, comfort[], crowd[] }`.
+  `{ prime: {idx, name}, offSeason: {idx, name}, notes, comfort[], crowd[] }`.
 
 - **Render (live)**: `ChapterWhen` in
   [components/city-detail/ChapterWhen.jsx](../components/city-detail/ChapterWhen.jsx) — comfort + crowd ribbons,
-  a visit-score line, charm + off-season annotations, climatology rows
+  a visit-score line, prime + off-season annotations, climatology rows
   with home-base deltas, and extremes cards. The crowd line's prominence
   scales with `crowdIntensity`: low intensity (0–1) renders dashed and
   muted, high intensity (4–5) renders bolder. The legend names the
@@ -209,7 +210,7 @@ and a label.
 
 ## Status
 
-- Charm + Truth selection logic works against POWER-derived `visit_climate`.
+- Prime + Off-season selection logic works against POWER-derived `visit_climate`.
 - Notes: still qualitative; user-authored on the row.
 - Crowd: measured for all 78 cities via the Google Trends pipeline.
 - Chart honors `crowd_intensity` to render low-intensity lines muted.
@@ -232,7 +233,7 @@ and a label.
 - **Refresh cadence.** Google Trends data drifts (especially post-2020
   travel patterns). Quarterly or annual re-measure is probably right;
   the method is idempotent so the script can run cold.
-- **Charm/Off-season annotations on the chart.** Now drawn; verify they
+- **Prime/Off-season annotations on the chart.** Now drawn; verify they
   still read correctly under the new intensity-muted rendering.
 - **POWER-derived snowfall is null.** January chapter loses a signal until
   the NOAA NCEI snowfall measurer fills `snowfall_in_yr` for the rest of

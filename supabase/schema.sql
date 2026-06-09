@@ -69,7 +69,7 @@ create table if not exists cities (
   geocoded_at        date,
   visit_climate      jsonb,                     -- [12] monthly normals
   crowd_season       jsonb,                     -- [12] 0-5
-  season_notes       jsonb,                     -- { charm, truth }
+  season_notes       jsonb,                     -- { prime, offSeason } (legacy rows: { charm, truth }, mapped on read)
   drive_hrs_from_pit text,                      -- '4.5' (hours, string) | 'FLY' | null
   created_at         timestamptz not null default now(),
   updated_at         timestamptz not null default now()

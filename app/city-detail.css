@@ -740,8 +740,8 @@
       letter-spacing: 0.18em;
       text-transform: uppercase;
     }
-.cd-root .climate .annot-label.charm { fill: var(--accent); }
-.cd-root .climate .annot-label.truth { fill: var(--warn); }
+.cd-root .climate .annot-label.prime { fill: var(--accent); }
+.cd-root .climate .annot-label.offseason { fill: var(--warn); }
 .cd-root .climate .annot-sub {
       font-family: 'Fraunces', serif;
       font-style: italic;
@@ -1378,7 +1378,7 @@
      let it wrap on a phone so it stops running off the right edge. */
   .cd-root .hero-bottom .meta > span:not(.sep) { white-space: normal; min-width: 0; }
   /* Clip the chart's horizontal paint bleed only; overflow-y stays visible so
-     vertical annotations (now-pill, charm/truth labels) are unaffected. */
+     vertical annotations (now-pill, prime/off-season labels) are unaffected. */
   .cd-root .climate { overflow-x: clip; }
 
   /* The 4-up "extremes" row (cold/hot/wet/dark) is far too tight at phone
@@ -1398,7 +1398,7 @@
      one run ("0.80.90.1"). Smaller gives each number breathing room. */
   .cd-root .climate-heatmap .ch-cell { font-size: 11px; }
 
-  /* The in-chart Charm / Off-season annotations (SVG text on the comfort
+  /* The in-chart Prime / Off-season annotations (SVG text on the comfort
      curve) are cramped and clip on a narrow chart — and they're repeated
      verbatim in the legend text right below the chart. Keep the marker lines,
      hide the duplicated text on phones. */

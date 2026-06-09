@@ -18,7 +18,7 @@ export default function ChapterWhen({ view, homebase }) {
         <div className="when-inner">
           <div className="when-head">
             <h2>When to go</h2>
-            <p className="sub">Awaiting climate normals for {view.name}. Once the pipeline measures them, the comfort ribbon, the year-shape, and the charm / off-season windows compute here.</p>
+            <p className="sub">Awaiting climate normals for {view.name}. Once the pipeline measures them, the comfort ribbon, the year-shape, and the prime / off-season windows compute here.</p>
           </div>
         </div>
       </section>
@@ -96,8 +96,8 @@ export default function ChapterWhen({ view, homebase }) {
               <text className="now-pill" textAnchor="middle">Now</text>
             </g>
 
-            {vw?.charm ? <Annotation idx={vw.charm.idx} y={yC(comfort[vw.charm.idx] ?? 0)} cls="charm" label="Charm visit" sub={`${MONTHS[vw.charm.idx]} — comfortable, crowds thinned`} /> : null}
-            {vw?.truth ? <Annotation idx={vw.truth.idx} y={yC(comfort[vw.truth.idx] ?? 0)} cls="truth" label="Off-season visit" sub={`${MONTHS[vw.truth.idx]} — coldest, quietest test`} /> : null}
+            {vw?.prime ? <Annotation idx={vw.prime.idx} y={yC(comfort[vw.prime.idx] ?? 0)} cls="prime" label="Prime visit" sub={`${MONTHS[vw.prime.idx]} — comfortable, crowds thinned`} /> : null}
+            {vw?.offSeason ? <Annotation idx={vw.offSeason.idx} y={yC(comfort[vw.offSeason.idx] ?? 0)} cls="offseason" label="Off-season visit" sub={`${MONTHS[vw.offSeason.idx]} — coldest, quietest stretch`} /> : null}
 
             <g>{dots(comfort, yC, "comfort", nowIdx)}</g>
             {crowd ? <g>{dots(crowd, yCrowd, "crowd", nowIdx)}</g> : null}
@@ -122,8 +122,8 @@ export default function ChapterWhen({ view, homebase }) {
         <Extremes extremes={view.extremes} homebase={homebase} />
 
         <div className="climate-foot">
-          {vw?.charm ? <span><strong>Charm visit</strong> · {MONTH_LONG[vw.charm.idx]} — comfortable weather, after the crowds thin.</span> : null}
-          {vw?.truth ? <span><strong>Off-season visit</strong> · {MONTH_LONG[vw.truth.idx]} — coldest and quietest month; the test of whether public life persists off-season.</span> : null}
+          {vw?.prime ? <span><strong>Prime visit</strong> · {MONTH_LONG[vw.prime.idx]} — comfortable weather, after the crowds thin.</span> : null}
+          {vw?.offSeason ? <span><strong>Off-season visit</strong> · {MONTH_LONG[vw.offSeason.idx]} — the coldest, quietest month; the town with the crowds gone.</span> : null}
         </div>
       </div>
     </section>
@@ -177,7 +177,7 @@ function Annotation({ idx, y, cls, label, sub }) {
 //
 // Temperature uses a diverging ramp centered on 74°F — the same outdoor-ideal
 // pivot monthComfort() penalizes around — so the legend matches the math
-// driving Charm/Truth window selection. Precipitation is sequential: 0″ pale
+// driving Prime/Off-season window selection. Precipitation is sequential: 0″ pale
 // paper → 8″+ deep blue. City reference anchors on each legend (Minneapolis
 // Jan, Phoenix Jul, Miami Sep) let the user calibrate without reading numbers.
 const TEMP_STOPS = [

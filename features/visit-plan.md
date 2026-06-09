@@ -27,7 +27,7 @@ trips across cities. This page is one city, edited in depth.
   (`[{title, plan}]`), `checklists` (`{before|during|after: [{text, done}]}`).
 
 ### Sections (top → bottom)
-1. **When to visit** — `VisitWindowPanel`. The Charm + Truth windows over a
+1. **When to visit** — `VisitWindowPanel`. The Prime + Off-season windows over a
    12-month comfort/crowd strip, plus the "visit now" urgency badge. Driven by
    `cityVisitWindow()` / `monthlyComfortScores()` / `visitNowScore()`; shows
    "awaiting climate data" rather than faking when unmeasured. See

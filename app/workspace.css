@@ -724,7 +724,7 @@
 /* One row per scheduled trip */
 .trip-cal-row { position: absolute; left: 0; right: 0; }
 
-/* Charm / Truth seasonal washes painted under the bar */
+/* Prime / Off-season seasonal washes painted under the bar */
 .trip-cal-band {
   position: absolute;
   top: 4px;
@@ -733,12 +733,12 @@
   border-radius: 0;
   z-index: 1;
 }
-.trip-cal-band-charm {
+.trip-cal-band-prime {
   background:
     linear-gradient(180deg, rgba(212, 142, 56, 0.0) 0%, rgba(212, 142, 56, 0.18) 100%);
   border-top: 1px dashed rgba(160, 96, 28, 0.45);
 }
-.trip-cal-band-truth {
+.trip-cal-band-offseason {
   background:
     linear-gradient(180deg, rgba(46, 84, 130, 0.0) 0%, rgba(46, 84, 130, 0.16) 100%);
   border-top: 1px dashed rgba(46, 84, 130, 0.5);
@@ -918,7 +918,7 @@
 /* ─────────────────────────────────────────────────────────────────────
    Card — TWO LAYOUTS sharing the same DOM.
    Default (sidebar, ≥1101px wide): compact horizontal row — 56-px thumb,
-   name + small caps meta, inline amber Charm chip on the right.
+   name + small caps meta, inline amber Prime chip on the right.
    Below 1100px the cards collapse to wide postcards with the chip-as-stamp
    on the hero corner.
 ───────────────────────────────────────────────────────────────────── */
@@ -1035,8 +1035,8 @@
   min-height: 0.8rem;
 }
 .trip-cal-card-state { font-weight: 500; color: var(--muted); }
-.trip-cal-card-truth { color: rgb(46, 84, 130); font-style: normal; }
-.trip-cal-card-truth::before {
+.trip-cal-card-offseason { color: rgb(46, 84, 130); font-style: normal; }
+.trip-cal-card-offseason::before {
   content: "·";
   margin-right: 6px;
   color: var(--border);

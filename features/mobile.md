@@ -26,7 +26,7 @@ semantics), not eyeballed.
 - **Assess / felt-score survey** — one question per screen, answer cards
   284×62–95px (well above the 44px touch floor), progress dots. Needs nothing.
 - **Baseline** ("rate from memory") — clean, large buttons.
-- **Plan / visit-window** (Charm/Truth + 12-month comfort-crowd chart) — reflows.
+- **Plan / visit-window** (Prime/Off-season + 12-month comfort-crowd chart) — reflows.
 - **City-detail hero** — magazine layout holds up on a phone.
 - **Board status moves** — `Planning →` / `← Backlog` buttons = non-drag status
   changes already work.
@@ -286,7 +286,7 @@ scannable list instead:
   (Atlanta Jul, marked `secondary`) on phones and shrinks tick labels to 8px so
   the three remaining anchors (Minneapolis / Outdoor ideal / Phoenix) no longer
   collide; the 12-month cell value font drops 14px → 11px so adjacent precip
-  numbers stop merging ("0.80.90.1"); and the in-chart Charm/Off-season SVG
+  numbers stop merging ("0.80.90.1"); and the in-chart Prime/Off-season SVG
   annotations (duplicated in the legend text below) hide on phones to declutter
   the curve. `components/city-detail/ChapterWhen.jsx`, `app/city-detail.css`.
 - **Mobile sort control for Ranking.** On a phone the table's tap-to-sort

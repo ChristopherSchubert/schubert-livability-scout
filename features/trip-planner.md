@@ -60,7 +60,7 @@ re-walk the path.
 
 | # | What we tried | Why it failed | Rule learned |
 |---|---|---|---|
-| 1 | Collapse the year to a single **Charm** + **Truth** month | Threw away 10 months of real signal; owner disliked the framing | Don't reduce rich monthly data to named anchors. Show the shape. |
+| 1 | Collapse the year to a single **Prime** + **Off-season** month | Threw away 10 months of real signal; owner disliked the framing | Don't reduce rich monthly data to named anchors. Show the shape. |
 | 2 | **Two-row heatmap** (weather row + crowd row, 12 cells each) | "Hard to read and distracting" | Two dense grids per lane overwhelm. One synthesized signal beats two raw grids for the glance. |
 | 3 | Single **silhouette/area curve**, "aim for the top" | "Too imprecise… not a scientific planning process," and the scale was wrong (a 6-day trip stretched across ~1.5 months) | A vibe-curve with no numbers and dishonest scale fails. Precision must be reachable; the time axis must be honest. |
 | 4 | **Numbers in every cell** (avg high per week) | "I have no intuitive understanding when I look at this" | Raw numbers give precision but no gestalt. Need a visual carrier too. |
@@ -118,7 +118,7 @@ Per city, via `rowToCity` / `cityItem`:
    between month centers to the week** (the mockup's `wscore`). Document the
    weighting + interpolation as the method string (project rule: every
    derived value carries its method). Reconcile with the existing
-   `cityVisitWindow()` so Charm/Truth and this share one comfort source.
+   `cityVisitWindow()` so Prime/Off-season and this share one comfort source.
 2. Helpers: `weeklyTemp/Crowd/etc.` from `visitClimate`/`crowdSeason`.
 
 ### Component shape
