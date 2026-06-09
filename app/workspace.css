@@ -1158,9 +1158,16 @@
   .stage-tab,
   .city-context-tab { scroll-snap-align: center; }
 
-  /* 44px touch floor. Tabs are caps text; pad vertically to reach the target. */
+  /* The top nav rows (funnel + city sub-nav) are kept deliberately compact at
+     the owner's request — below the 44px touch floor, an accepted trade for
+     these always-visible, frequently-glanced navigation rows. The in-page view
+     toggle (Board/Ranking) keeps the 44px target. */
   .stage-tab,
-  .city-context-tab,
+  .city-context-tab {
+    min-height: 32px;
+    display: inline-flex;
+    align-items: center;
+  }
   .view-toggle-tab {
     min-height: 44px;
     display: inline-flex;

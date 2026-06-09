@@ -235,7 +235,14 @@ Follow-up fix: the topbar's top padding + inter-row gap (and the ⋯ wrapper) on
 collapsed on city pages, so on list pages (Board etc.) the funnel nav kept ~19px
 of dead space above it when condensed. Now the padding/gap close + the ⋯ wrapper
 fully collapses on *all* condensed pages, so the menu row rises to the top
-(daylight ~19px → ~2px). Board condensed header ≈ 53px (just the nav); city ≈ 56px.
+(daylight ~19px → ~2px).
+
+Further tightening (owner asked specifically for the top nav row): the ⋯
+settings button → 32px and the topbar padding/gap trimmed (expanded header
+~104px → ~90px), then the funnel + city sub-nav **tabs dropped to 32px**
+(below the 44px touch floor — an accepted trade for these always-visible nav
+rows; the in-page Board/Ranking toggle keeps 44px). Expanded list header now
+~77px, scrolled/condensed ~40px (just the 32px nav row).
 
 ## Simplified mobile planning view (2026-06-09, owner request)
 
