@@ -399,6 +399,14 @@ Year-round 9.0, chips Coastal·Walkable·Historic·Compact, "Best in Summer ·
 visit score 85", trimmed why) at a clamped viewport position; no console
 errors.
 
+**Open-in-new-tab affordance.** Each card carries a `.bk-open` ↗ link
+(`/cities/${citySlug}`, `target="_blank"`) in the top-left of the thumbnail,
+revealed on card hover/focus. It `stopPropagation()`s on `pointerdown`/`click`
+so it never trips the card's click-to-plan or drag (the pointer-up handler
+otherwise promotes on *any* release). Lets you open the full detail page
+without leaving Planning. Verified: route 200s; a pointerdown on the link
+produces no ghost and no promotion.
+
 ### Audit vs the mockup (2026-06-07)
 Fixed after a side-by-side audit with real data populated in Planning:
 - **Planning-box hover hero** was querying `.trip-pl-thumb` (committed-bar

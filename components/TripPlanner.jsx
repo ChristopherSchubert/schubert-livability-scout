@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   calibrateAxes,
   cityImageQuery,
+  citySlug,
   cityStage,
   feltScore,
   visitNowScore,
@@ -1272,6 +1273,16 @@ export default function TripPlanner() {
                   <span className="bkt" style={hero ? { backgroundImage: `url(${hero})` } : undefined}>
                     {hero ? "" : r.base.slice(0, 1)}
                     {badge ? <span className="bkbadge" title={badge.title}>{badge.text}</span> : null}
+                    <a
+                      className="bk-open"
+                      href={`/cities/${citySlug(c)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      title="Open detail in a new tab"
+                      aria-label={`Open ${r.base} detail in a new tab`}
+                      onPointerDown={(e) => e.stopPropagation()}
+                      onClick={(e) => { e.stopPropagation(); closeHover(); }}
+                    >↗</a>
                   </span>
                   <span className="bkb">
                     <span className="bkc">{r.base}</span>

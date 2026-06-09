@@ -284,6 +284,18 @@
 .trip-pl-backlog .rank-controls { margin-bottom: 14px; }
 .bl-none { color: var(--muted); font-size: 0.85rem; padding: 4px; }
 
+/* Open-in-new-tab affordance on a backlog card — reveals on hover/focus */
+.bk-open {
+  position: absolute; top: 6px; left: 6px; z-index: 2;
+  display: inline-grid; place-items: center; width: 24px; height: 24px;
+  border-radius: 6px; border: 1px solid var(--border); text-decoration: none;
+  background: rgba(255,253,246,.86); color: #2f4a23; font-size: 0.92rem; line-height: 1;
+  box-shadow: 0 1px 3px rgba(28,24,20,.2); backdrop-filter: saturate(1.2);
+  opacity: 0; transform: translateY(-2px); transition: opacity .14s, background .14s, color .14s, transform .14s;
+}
+.bk:hover .bk-open, .bk:focus-within .bk-open, .bk-open:focus-visible { opacity: 1; transform: none; }
+.bk-open:hover { background: var(--accent); color: var(--panel); border-color: var(--accent); }
+
 /* Backlog hover preview — pointer-events:none so it never steals click/drag */
 .bk-pop {
   position: fixed; z-index: 1300; pointer-events: none;
