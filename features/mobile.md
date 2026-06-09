@@ -179,6 +179,28 @@ left/right across the axes — is now the mobile treatment:
   widths); menu actions are full-width 44px tap rows on phones.
   `app/workspace.css`.
 
+## Compact city-context bar (2026-06-09, owner feedback)
+
+The city-context strip (back-arrow + "BACKLOG / City Name" + the
+Detail/Plan/Images/Assess sub-nav) was eating the always-sticky header — ~107px
+because Phase 1 had stacked the name above the sub-nav on two rows. The owner
+flagged that static identification shouldn't cost that much. Collapsed it back
+to **one short row** (`app/workspace.css`, ≤640px):
+
+- Back-arrow + a truncating city name on the left; sub-nav on the right, all on
+  one line. The "BACKLOG" stage eyebrow (pure static text) is dropped on phones.
+- Tuned the name max-width + sub-nav font so the full name *and* all four tabs
+  fit at 393px ("Santa Cruz, CA" + Detail/Plan/Images/Assess); long names
+  truncate with an ellipsis (the hero shows the full name).
+- Fixed a latent bug in the sub-nav active-tab centering helper
+  (`components/AppShell.jsx`): when the row now fits without overflow it resets
+  `scrollLeft` to 0, so a leftover scroll from an earlier (narrower) render no
+  longer clips the active first tab.
+
+Result: city-context 107px → **55px**; the city-page sticky header 161px →
+**108px** (a third less chrome on every scroll). Desktop keeps the full
+two-line context with the stage eyebrow.
+
 ## Follow-ups (tracked as GitHub issues)
 
 - ~~**Climate-heatmap legibility on phones.**~~ ✅ Fixed 2026-06-09 (from owner

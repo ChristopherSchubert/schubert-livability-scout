@@ -1177,11 +1177,41 @@
      the second row and we reclaim the vertical space. */
   .sticky-header.has-city .stage-nav { display: none; }
 
-  /* Give the city sub-nav (Detail/Plan/Images/Assess) its own full-width row
-     below the name instead of fighting it for space on one cramped line —
-     all four tabs then fit at phone width with no clipping or scroll. */
-  .city-context { flex-direction: column; align-items: stretch; gap: 0.5rem; }
-  .city-context-nav { width: 100%; }
+  /* Keep the city context to ONE short row — it's mostly static identification
+     and shouldn't eat the always-sticky header. Back-arrow + a small,
+     truncating city name on the left; the sub-nav on the right. The name yields
+     width to the nav, and the active sub-tab is scrolled into view (JS) when
+     the four tabs don't all fit. The "BACKLOG" stage eyebrow is dropped on
+     phones — pure static text not worth a line. */
+  .city-context {
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.3rem 0.85rem;
+  }
+  .city-context-left { gap: 0.5rem; min-width: 0; flex: 0 1 auto; }
+  .city-context-back { width: 30px; height: 30px; flex: none; }
+  .city-context-stage { display: none; }
+  .city-context-name {
+    font-size: 0.9rem;
+    width: auto;
+    max-width: 30vw;
+    padding-left: 0;
+    padding-right: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .city-context-nav {
+    width: auto;
+    flex: 0 1 auto;             /* size to the tabs, pushed right by space-between */
+    min-width: 0;
+    justify-content: flex-start; /* anchor the active first tab so it's never clipped */
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .city-context-nav::-webkit-scrollbar { display: none; }
+  .city-context-tab { font-size: 0.6rem; padding-left: 0.4rem; padding-right: 0.4rem; }
 
 /* ── Ranking table → card list (Phase 2, features/mobile.md) ──────────────────
    The 9-column table is 843px wide; on a phone all 6 score columns are clipped

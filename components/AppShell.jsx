@@ -37,7 +37,9 @@ const MODE_HREF = Object.fromEntries(NAV_MODES.map((mode) => [mode.id, mode.href
 function scrollActiveTabIntoView(nav, activeSelector) {
   const active = nav?.querySelector(activeSelector);
   if (!nav || !active) return;
-  if (nav.scrollWidth <= nav.clientWidth + 1) return;
+  // If everything fits, make sure we're parked at the start — otherwise a
+  // scrollLeft left over from an earlier (narrower) render clips the first tab.
+  if (nav.scrollWidth <= nav.clientWidth + 1) { nav.scrollLeft = 0; return; }
   const navRect = nav.getBoundingClientRect();
   const tabRect = active.getBoundingClientRect();
   const delta = (tabRect.left - navRect.left) - (nav.clientWidth - tabRect.width) / 2;
