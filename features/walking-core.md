@@ -186,6 +186,44 @@ POIs within the bbox, almost always because its pin is in suburbia or off
 the main grid. Allison Park sits in this state legitimately; for any other
 city it usually means the pin is in the wrong place.
 
+## Pin-placement audit (recenter)
+
+Because walking-core measures around the **saved pin** with no cluster-snapping
+(see follow-up #1), a pin dropped off the walkable core reads as dead even
+when the town isn't — the dishonest-low this project exists to avoid. Most
+pins came from approximate sources (`nominatim:heart` geocoder centroids,
+`candidate_cities.csv (approx pin — verify)`, manual placements), so this is
+a real failure mode, not a hypothetical.
+
+`scripts/recenter-audit.mjs` (review-only, writes nothing) ranks every city by
+how much its pin misses its own POI cluster: for each city it grid-searches
+the cached `poi_positions` for the center that maximizes plateau-decay capture
+and reports the gain. The honest tell of a misplaced pin is a **jump in
+in-plateau POI count** (POIs inside the 500 m plateau), not just total weight —
+in dense cities the weight optimum can slide toward a denser node at the cache
+edge without the pin being wrong. Gains are a lower bound: `poi_positions` is
+truncated at 1500 m of the *current* pin, so a recentered refetch finds more.
+
+`scripts/recenter-apply.mjs` applies a confirmed fix per city: record the old
+pin (`scripts/.recenter-rollback.json`, local-only) → move `cities.lat/lon` to
+the optimum → refetch Google POIs at the new pin → re-run **only** walking-core
+(a sub-1 km move is negligible for NOAA/census/terrain). It prints before→after
+in-plateau capture on the freshly refetched data, which removes the lower-bound
+caveat.
+
+**2026-06-08 pass.** Eight cities recentered, all confirmed on fresh data
+(in-plateau before→after): Jim Thorpe 3→23, Sewickley 3→15, Berea 2→10, Deep
+Creek Lake 3→10, Litchfield 12→16, Abingdon 11→14, Floyd 10→13, Newport VT 5→9.
+San Francisco (Noe Valley) was **excluded** despite ranking in the top tier:
+its pin is already on the named heart (24th & Diamond); the audit's +54%
+"gain" pulled it 700 m toward the Mission edge — dense-city weight-chasing, not
+a misplaced pin. Allison Park ranked #1 in the audit and is **permanently
+excluded** — its ~0 walkable POIs is the honest reading of the owner's
+residential pin (see [CLAUDE.md](../CLAUDE.md)), and the audit's "gain" comes
+from sliding 1 km onto a commercial strip. Both are why recentering stays a
+reviewed step, never an auto-apply. Boundary cleanup for the recentered cities
+is tracked in #6.
+
 ## Follow-ups (tracked as GitHub issues)
 
 Per the project's TODO convention — concrete shippable work that's
@@ -211,3 +249,9 @@ explanation that makes them legible stays here. See
   categorize Piran's old-town grocers under our `daily` bucket. Audit
   + decide whether to broaden the bucket or cross-reference OSM where
   Places returns 0.
+- **#6 — Refresh off-center boundaries after recenter**: the 2026-06-08
+  recenter pass moved `jim-thorpe-pa`, `litchfield-ct`, and `sewickley-pa`,
+  whose approximate `stay_zone_boundary` polygons no longer center on the
+  corrected pin. Cosmetic/legacy only (boundary drives superseded osm-core
+  + the map outline, not Aliveness). Clear + refetch via the cascade in
+  [lib/measure.js](../lib/measure.js). See "Pin-placement audit" above.
