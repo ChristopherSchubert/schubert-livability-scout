@@ -303,25 +303,24 @@ export default function TripPlanner() {
       window.removeEventListener("pointermove", move);
       window.removeEventListener("pointerup", up);
       setGhost(null);
-      const lanesWrap = document.querySelector(".trip-pl-lanes");
-      const z = lanesWrap ? lanesWrap.getBoundingClientRect() : null;
-      const overLanes = z && ev.clientY >= z.top - 8 && ev.clientY <= z.bottom + 40;
-      if (!moved || overLanes) {
-        const patch = { status: "Shortlist" };
-        const lbody = moved ? document.elementFromPoint(ev.clientX, ev.clientY)?.closest(".lbody") : null;
-        if (lbody) {
-          const r = lbody.getBoundingClientRect();
-          const root = rootRef.current;
-          const dayW = parseFloat(getComputedStyle(root).getPropertyValue("--day-w")) || DEFAULT_DAY_W;
-          const panX = parseFloat(getComputedStyle(root).getPropertyValue("--pan-x")) || 0;
-          let d = Math.round((ev.clientX - r.left - panX) / dayW);
-          if (d < todayDay) d = todayDay;
-          if (d + DEFAULT_TRIP_LEN > N) d = N - DEFAULT_TRIP_LEN;
-          patch.arriveDate = toYmd(addDays(viewStart, d));
-          patch.departDate = toYmd(addDays(viewStart, d + DEFAULT_TRIP_LEN - 1));
-        }
-        updateCity(c.id, patch);
+      // Any release promotes the card into Planning. If it happened to land on a
+      // lane's timeline, use that week; otherwise the planner picks the best
+      // future week. (The backlog is now a big wrapped grid, so requiring a drag
+      // all the way up to the lanes was unworkable — a click/drag anywhere works.)
+      const patch = { status: "Shortlist" };
+      const lbody = moved ? document.elementFromPoint(ev.clientX, ev.clientY)?.closest(".lbody") : null;
+      if (lbody) {
+        const r = lbody.getBoundingClientRect();
+        const root = rootRef.current;
+        const dayW = parseFloat(getComputedStyle(root).getPropertyValue("--day-w")) || DEFAULT_DAY_W;
+        const panX = parseFloat(getComputedStyle(root).getPropertyValue("--pan-x")) || 0;
+        let d = Math.round((ev.clientX - r.left - panX) / dayW);
+        if (d < todayDay) d = todayDay;
+        if (d + DEFAULT_TRIP_LEN > N) d = N - DEFAULT_TRIP_LEN;
+        patch.arriveDate = toYmd(addDays(viewStart, d));
+        patch.departDate = toYmd(addDays(viewStart, d + DEFAULT_TRIP_LEN - 1));
       }
+      updateCity(c.id, patch);
     };
     window.addEventListener("pointermove", move);
     window.addEventListener("pointerup", up);
@@ -1112,14 +1111,14 @@ export default function TripPlanner() {
                   role="button"
                   tabIndex={0}
                   className="bk"
-                  title="Drag onto a lane, or click, to promote"
+                  title="Click to plan (or drag onto a week)"
                   onPointerDown={(e) => startCardDrag(e, c)}
                   onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); updateCity(c.id, { status: "Shortlist" }); } }}
                 >
                   <span className="bkt" style={hero ? { backgroundImage: `url(${hero})` } : undefined}>{hero ? "" : base.slice(0, 1)}</span>
                   <span className="bkb">
                     <span className="bkc">{base}</span>
-                    <span className="bks">{st ? `${st} · ` : ""}drag up ↑</span>
+                    <span className="bks">{st ? `${st} · ` : ""}click to plan</span>
                   </span>
                 </div>
               );
