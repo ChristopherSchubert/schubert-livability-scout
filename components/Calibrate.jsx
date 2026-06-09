@@ -169,11 +169,11 @@ export default function Calibrate() {
                       </div>
                     </div>
                   </td>
-                  {calibrateAxes.map(([key]) => (
-                    <td key={key} className="rt-axis"><ScoreCell value={row.roll[key]} /></td>
+                  {calibrateAxes.map(([key, label]) => (
+                    <td key={key} className="rt-axis" data-label={shortAxisLabel(label)}><ScoreCell value={row.roll[key]} /></td>
                   ))}
-                  <td className="rt-overall">{row.overall != null ? row.overall.toFixed(2) : "—"}</td>
-                  <td className="rt-visitnow"><ScoreCell value={row.visitNow} /></td>
+                  <td className="rt-overall" data-label="Overall">{row.overall != null ? row.overall.toFixed(2) : "—"}</td>
+                  <td className="rt-visitnow" data-label="Visit now"><ScoreCell value={row.visitNow} /></td>
                 </tr>
               );
             })}

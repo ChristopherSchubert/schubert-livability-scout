@@ -1164,3 +1164,76 @@
      the second row and we reclaim the vertical space. */
   .sticky-header.has-city .stage-nav { display: none; }
 }
+
+/* ── Ranking table → card list (Phase 2, features/mobile.md) ──────────────────
+   The 9-column table is 843px wide; on a phone all 6 score columns are clipped
+   off-screen, so the ranking shows names with no scores — the whole point of
+   the view is invisible. At phone width the table reflows to self-contained
+   cards: rank + city on line 1, then the axis/Overall/Visit-now scores as a
+   wrapping row of labeled chips (the hidden <thead> labels are restored per
+   chip via data-label). No JS, no markup change beyond data-label; sort logic
+   is intact (default Overall-desc IS the ranking). A mobile sort control is a
+   tracked follow-up. */
+@media (max-width: 640px) {
+  .rank-table-wrap { overflow-x: visible; }
+  .rank-table,
+  .rank-table tbody { display: block; }
+  .rank-table thead { display: none; }              /* headers move to chip labels */
+
+  .rank-table tr.rt-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 0.7rem;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 0.75rem 0.85rem;
+    margin-bottom: 0.6rem;
+    background: var(--panel);
+  }
+  .rank-table tr.rt-row:hover td { background: transparent; }   /* no hover tint on a card */
+  /* `tbody td` to outrank the desktop `.rank-table tbody td` border/padding. */
+  .rank-table tbody td { display: block; padding: 0; border: none; }
+
+  /* Line 1: rank numeral + city (thumb/name/zone). rt-city basis ~100% forces
+     the score chips to wrap onto the next line. */
+  .rank-table td.rt-rank {
+    flex: 0 0 auto;
+    width: 1.9rem;
+    font-size: 1.4rem;
+    text-align: center;
+    line-height: 1;
+  }
+  .rank-table tbody td.rt-city {
+    flex: 1 1 calc(100% - 2.8rem);
+    min-width: 0;          /* override the desktop min-width:260px so it shrinks */
+  }
+
+  /* Line 2+: labeled score chips, ~3–4 per row, wrapping. */
+  .rank-table td.rt-axis,
+  .rank-table td.rt-visitnow,
+  .rank-table td.rt-overall {
+    flex: 1 0 auto;
+    min-width: 3.4rem;
+  }
+  .rank-table td.rt-axis::before,
+  .rank-table td.rt-visitnow::before,
+  .rank-table td.rt-overall::before {
+    content: attr(data-label);
+    display: block;
+    font-size: 0.56rem;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--muted);
+    margin-bottom: 3px;
+    white-space: nowrap;
+  }
+  /* Overall is the sort key — give it weight, not just another faint chip. */
+  .rank-table td.rt-overall {
+    font-size: 1.15rem;
+    color: var(--accent);
+  }
+  /* Drop the desktop visit-now separator stub; the chip label already sets it
+     apart, and a short floating vertical rule reads as an accident on a card. */
+  .rank-table tbody td.rt-visitnow { border-left: none; }
+}

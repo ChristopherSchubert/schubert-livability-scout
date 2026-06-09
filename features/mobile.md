@@ -74,7 +74,15 @@ semantics), not eyeballed.
   `components/AppShell.jsx`, `app/workspace.css`. Remaining #6 targets (Board
   `.advance` buttons 22px, the calibration checkbox 13×13, Filters 31px) move
   to Phase 4.
-- **Phase 2 — Ranking** (#2): card-list at phone width with inline score + chips.
+- **Phase 2 — Ranking** ✅ (#2): at ≤640px the 9-column table reflows (pure CSS,
+  `display` swap + `data-label` chip labels) to self-contained cards — rank +
+  thumbnail + name on line 1, then axis/Overall/Visit-now scores as a wrapping
+  row of labeled chips with Overall emphasized. All 9 scores now visible (was 2
+  of 9); table width 843px → 342px, no overflow. Desktop keeps the sortable
+  table. Files: `components/Calibrate.jsx`, `app/workspace.css`.
+  **Follow-up:** the column-header sort is `display:none` on mobile, so the only
+  mobile sort is the default Overall-desc (which IS the ranking) + the
+  search/filters. A mobile sort control (dropdown) is deferred — see follow-ups.
 - **Phase 3 — City-detail polish + Board** (#4, #5): kill overflow culprits;
   decide whether Board columns stack on phone.
 - **Phase 4 — a11y cleanup** (#8, #9, #10): input labels, meaningful image alt,
@@ -84,5 +92,10 @@ semantics), not eyeballed.
 
 ## Follow-ups (tracked as GitHub issues)
 
-_None opened yet — phases above are the live worklist. Promote any phase that
-slips to an issue and link it here._
+- **Mobile sort control for Ranking.** On a phone the table's tap-to-sort
+  column headers are hidden (the table is now cards), so the only sort is the
+  default Overall-desc. Add a compact sort dropdown to `.rank-controls` (sort by
+  any axis / Overall / Visit-now) so phone users get the full sort surface.
+  Code: `components/Calibrate.jsx` (`clickSort`/`sort` state already exist —
+  just needs a `<select>` bound to them at mobile width). Low priority; the
+  default ranking is the most useful sort. _(promote to a GitHub issue when picked up)_
