@@ -7,7 +7,7 @@ import { PlannerProvider } from "../components/PlannerProvider";
 import { readImageManifest } from "../lib/image-manifest";
 
 export const metadata = {
-  title: "Sojourn",
+  title: "J&C",
   description: "Find wonderful places to go, and enjoy them.",
 };
 

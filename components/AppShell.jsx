@@ -178,7 +178,7 @@ function TopBar({ activeMode }) {
       <div className="topbar-brand">
         <Link href="/board" className="brand-mark">
           <span className="brand-dot" aria-hidden="true" />
-          <span>Sojourn</span>
+          <span>J&C</span>
         </Link>
         <SavePill saveState={saveState} hydrated={hydrated} />
       </div>
