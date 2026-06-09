@@ -1419,8 +1419,20 @@
   .cd-root .axis-switcher {
     display: flex;
     gap: 0.2rem;
-    margin: 0.2rem 0 0.6rem;
+    margin: 0 0 0.6rem;
     border-bottom: 1px solid var(--hair);
+    /* Freeze the axis menu while reading within the stats section: pin it just
+       below the app header (whose live height AppShell publishes as
+       --app-header-h, updating as the brand row condenses). Sticky is bounded by
+       the .data section, so it releases when you scroll past the stats. */
+    position: sticky;
+    top: var(--app-header-h, 108px);
+    z-index: 6;
+    background: var(--paper);
+    /* full-bleed so the bar's background covers the full-width carousel that
+       scrolls beneath it; padding restores the chip inset. */
+    margin-inline: -1.25rem;
+    padding: 0.35rem 1.25rem 0;
   }
   .cd-root .axis-chip {
     flex: 1 1 0;

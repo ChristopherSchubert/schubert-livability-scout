@@ -1357,4 +1357,14 @@
     padding: 0.5rem 0.7rem;
     font-size: 0.95rem;
   }
+
+  /* Hide-on-scroll-down: when the page is scrolled down (AppShell toggles
+     `nav-condensed`), drop the brand identity + settings so only the menu rows
+     stay pinned. Scrolling up restores them. */
+  .sticky-header.nav-condensed .topbar-brand,
+  .sticky-header.nav-condensed .backup-menu { display: none; }
+  /* On a city page the topbar is only the brand row (the funnel is already
+     collapsed), so hide the whole bar when condensed — the city-context menu
+     stays pinned at the top of the header. */
+  .sticky-header.nav-condensed.has-city .topbar-v2 { display: none; }
 }

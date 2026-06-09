@@ -68,11 +68,50 @@ export function modeForCity(cityItem) {
 // `activeStage` name from existing callers and treat it the same way.
 export default function AppShell({ activeMode, activeStage, cityItem, cityNav, children }) {
   const mode = activeMode || activeStage;
+  const headerRef = useRef(null);
+  const [condensed, setCondensed] = useState(false);
+
+  // Hide-on-scroll-down / show-on-scroll-up for the brand row (mobile): scrolling
+  // down past the masthead collapses it so the menu rows stay pinned without the
+  // brand eating space; scrolling up brings it back. (features/mobile.md)
+  useEffect(() => {
+    let lastY = window.scrollY;
+    // Direct (no rAF) so it doesn't depend on animation-frame scheduling; the
+    // work is a cheap scrollY read + a boolean setState that no-ops when
+    // unchanged, and browsers already coalesce scroll events.
+    const onScroll = () => {
+      const y = window.scrollY;
+      if (y < 64) setCondensed(false);
+      else if (y > lastY + 4) setCondensed(true);
+      else if (y < lastY - 4) setCondensed(false);
+      lastY = y;
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // Publish the sticky header's live height so in-page sticky elements (the
+  // stats axis switcher) can pin flush below it — even as it condenses. Tied to
+  // the state that changes the height (condense + city vs not) plus viewport
+  // resize, so it stays correct without depending on ResizeObserver timing.
+  useEffect(() => {
+    const el = headerRef.current;
+    if (!el) return;
+    const setVar = () =>
+      document.documentElement.style.setProperty("--app-header-h", `${el.offsetHeight}px`);
+    setVar();
+    window.addEventListener("resize", setVar);
+    return () => window.removeEventListener("resize", setVar);
+  }, [condensed, cityItem]);
+
   return (
     <div className="shell">
       {/* `has-city` lets the mobile CSS collapse the redundant global funnel on
-          city pages (the context strip's back-arrow handles upward nav). */}
-      <div className={`sticky-header${cityItem ? " has-city" : ""}`}>
+          city pages; `nav-condensed` hides the brand row on scroll-down. */}
+      <div
+        ref={headerRef}
+        className={`sticky-header${cityItem ? " has-city" : ""}${condensed ? " nav-condensed" : ""}`}
+      >
         <TopBar activeMode={mode} />
         {cityItem ? <CityContextStrip cityItem={cityItem} cityNav={cityNav} /> : null}
       </div>

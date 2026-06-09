@@ -201,6 +201,29 @@ Result: city-context 107px → **55px**; the city-page sticky header 161px →
 **108px** (a third less chrome on every scroll). Desktop keeps the full
 two-line context with the stage eyebrow.
 
+## Collapsing brand row + frozen stats menu (2026-06-09, owner request)
+
+Two interlocking scroll behaviors on phones, both driven from `AppShell.jsx`:
+
+- **Brand row hides on scroll-down, returns on scroll-up.** A scroll listener
+  toggles `nav-condensed` on `.sticky-header`; the CSS (`app/workspace.css`,
+  ≤640px) then hides `.topbar-brand` + the ⋯ menu (and the whole `.topbar-v2`
+  on city pages, where it's only the brand row) so just the menu rows stay
+  pinned. The city-page sticky header shrinks 108px → 55px while reading.
+- **The stats axis menu freezes while in the section.** The Setting/Aliveness/
+  Fabric/Realness/Year-round chip row is `position: sticky` (`city-detail.css`)
+  pinned at `top: var(--app-header-h)`, so it stays put while you read an axis's
+  metrics and releases when you scroll past the stats section. AppShell
+  publishes the header's live height as `--app-header-h` (re-measured on
+  condense / city change / resize) so the chips pin flush even as the brand
+  collapses.
+
+Implementation notes: the scroll handler updates state directly (no rAF) so it
+doesn't depend on animation-frame scheduling; `--app-header-h` is tied to state
+changes rather than a ResizeObserver. Desktop is unaffected (all the collapse /
+sticky CSS is ≤640px; the chip switcher is desktop-`display:none`). Verified the
+full down/up cycle on a clean server, no console errors.
+
 ## Follow-ups (tracked as GitHub issues)
 
 - ~~**Climate-heatmap legibility on phones.**~~ ✅ Fixed 2026-06-09 (from owner
