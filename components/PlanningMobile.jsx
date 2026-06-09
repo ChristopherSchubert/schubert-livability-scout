@@ -27,19 +27,19 @@ const MONTHS_SHORT = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "S
 const EQUAL_WEIGHTS = { setting: 1, aliveness: 1, fabric: 1, realness: 1, january: 1 };
 
 // Backlog sort options. Both "window" and "soonest" use the best week from
-// today forward, but "window" orders by that window's QUALITY (0–100) while
-// "soonest" orders by its DATE (earliest first). Season options take the best
-// week whose midpoint falls in those months (mirrors the desktop per-season
-// best-week sort); "overall" = fit score. A season sort also re-windows each
-// card to that season's best week, so the card reflects the lens you picked.
+// Sorting a backlog by each city's single best week is useless — every city
+// has *some* good week, so it just ranks by an undifferentiated peak. The
+// actionable lenses are: when can I next go (soonest), how good is the place
+// (overall fit), and which cities suit a given season (best week in those
+// months — the card re-windows to that season). The shown date is the visit
+// window under the active lens.
 const SORTS = [
-  { id: "window", label: "Best window", chip: "Best window" },
-  { id: "soonest", label: "Soonest first", chip: "Best window" },
+  { id: "soonest", label: "Soonest first", chip: "Next window" },
+  { id: "overall", label: "Overall fit", chip: "Next window" },
   { id: "spring", label: "Best in spring", chip: "Spring", months: [2, 3, 4] },
   { id: "summer", label: "Best in summer", chip: "Summer", months: [5, 6, 7] },
   { id: "fall", label: "Best in fall", chip: "Fall", months: [8, 9, 10] },
   { id: "winter", label: "Best in winter", chip: "Winter", months: [11, 0, 1] },
-  { id: "overall", label: "Overall fit", chip: "Best window" },
 ];
 const SORT_BY_ID = Object.fromEntries(SORTS.map((s) => [s.id, s]));
 
@@ -97,7 +97,7 @@ export default function PlanningMobile() {
     return learned.weights || EQUAL_WEIGHTS;
   }, [planner.cities]);
 
-  const [sort, setSort] = useState("window");
+  const [sort, setSort] = useState("soonest");
 
   const frame = useMemo(() => {
     const today = startOfDay(new Date());
@@ -140,12 +140,14 @@ export default function PlanningMobile() {
       rows.push({ city: c, overall: weightedAxisScore(c, weights), bestDate: w.date, bestScore: w.score });
     }
     const time = (r) => (r.bestDate ? r.bestDate.getTime() : Infinity);
+    const byOverall = (a, b) => (b.overall ?? -1) - (a.overall ?? -1);
     rows.sort(
       sort === "overall"
-        ? (a, b) => (b.overall ?? -1) - (a.overall ?? -1)
+        ? byOverall
         : sort === "soonest"
-          // earliest upcoming window first; ties broken by quality
-          ? (a, b) => time(a) - time(b) || (b.bestScore ?? -1) - (a.bestScore ?? -1)
+          // earliest visit window first; ties broken by the place's fit
+          ? (a, b) => time(a) - time(b) || byOverall(a, b)
+          // season lens: best week in that season, ranked by its quality
           : (a, b) => (b.bestScore ?? -1) - (a.bestScore ?? -1));
     return rows;
   }, [planner.cities, weights, frame, sort]);
@@ -197,8 +199,7 @@ export default function PlanningMobile() {
                     overall={overall}
                     src={thumb(city)}
                     primary={bestDate ? fmtDate(bestDate) : "No window yet"}
-                    primaryLabel="Best window"
-                    badge={bestScore != null ? `${Math.round(bestScore)}/100` : null}
+                    primaryLabel="Next window"
                   />
                 ))}
               </ol>
@@ -233,8 +234,7 @@ export default function PlanningMobile() {
                     overall={overall}
                     src={thumb(city)}
                     primary={bestDate ? fmtDate(bestDate) : "No window yet"}
-                    primaryLabel={SORT_BY_ID[sort]?.chip || "Best window"}
-                    badge={bestScore != null ? `${Math.round(bestScore)}/100` : null}
+                    primaryLabel={SORT_BY_ID[sort]?.chip || "Next window"}
                   />
                 ))}
               </ol>

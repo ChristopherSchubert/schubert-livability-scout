@@ -257,12 +257,17 @@ scannable list instead:
   lists candidates not yet in planning, ranked by their best upcoming window —
   the same triage lens the desktop backlog provides (calibration/reference
   places are excluded). The backlog carries a compact **sort** (native
-  `<select>`): **Best window** (by the upcoming window's 0–100 quality),
-  **Soonest first** (by the upcoming window's date — earliest first, quality
-  as the tiebreaker), best in spring/summer/fall/winter, or overall fit. A
-  season sort both reorders the list *and* re-windows each card to that season's
-  best week (e.g. "Best in winter" surfaces warm-winter destinations with their
-  Dec/Jan dates) — mirroring the desktop's per-season best-week sort.
+  `<select>`): **Soonest first** (default — by the upcoming window's date,
+  earliest first, fit as tiebreaker), **Overall fit**, or best in
+  spring/summer/fall/winter. A season sort both reorders the list *and*
+  re-windows each card to that season's best week (e.g. "Best in winter"
+  surfaces warm-winter destinations with their Dec/Jan dates).
+
+  Cards show *when* to visit (the window date) + the city's **overall fit** —
+  not a per-window quality score. (An earlier "best window" sort/score was
+  removed: ranking by each city's single peak week is undifferentiated noise —
+  every city has *some* best week — and showing the score made the list look
+  out of order under any other sort.)
 - `/planning/calendar` still renders the full timeline (a deliberate
   power-user/desktop destination); the mobile list links to it as "Calendar
   view →".
