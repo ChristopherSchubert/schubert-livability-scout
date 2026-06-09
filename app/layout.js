@@ -11,6 +11,16 @@ export const metadata = {
   description: "A city-by-city planner for testing walkable, vivid places.",
 };
 
+// Explicit viewport (was relying on Next's implicit default). The app is used
+// on a phone in the field for the felt-score survey, so device-width + a
+// user-scalable zoom (accessibility: never disable pinch-zoom) are deliberate.
+// See features/mobile.md.
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+};
+
 export default async function RootLayout({ children }) {
   const initialManifest = await readImageManifest();
 

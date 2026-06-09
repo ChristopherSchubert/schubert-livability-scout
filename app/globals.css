@@ -8,7 +8,7 @@
   --panel-strong: #f4eddc;  /* paper-deep */
   --border: #d8ccb8;        /* hair */
   --text: #1b1814;          /* ink */
-  --muted: #7a7268;         /* ink-mute */
+  --muted: #6b6358;         /* ink-mute — darkened 2026-06-09 so muted text clears WCAG AA 4.5:1 on all three paper tones (was #7a7268 = 4.39:1 on cream, a fail). See features/mobile.md. */
   --accent: #0d4c44;        /* deep green */
   --accent-soft: #d2e6e1;
   --shadow: 0 10px 30px rgba(41, 33, 19, 0.06);
@@ -17,6 +17,16 @@
   --font-display: 'Fraunces', Georgia, "Times New Roman", serif;
   --font-ui: 'Inter Tight', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
+
+/* ── Canonical responsive breakpoints (mobile work, 2026-06-09) ───────────────
+   The CSS predates mobile and accumulated ~14 ad-hoc max-width values. New
+   responsive rules should snap to these three edges (CSS custom props can't be
+   used inside @media, so this is a convention, enforced by review not by code):
+     • phone   →  @media (max-width: 640px)
+     • tablet  →  @media (max-width: 1024px)
+     • desktop →  default (no query)
+   Mobile-first min-width is preferred for NEW components; the legacy max-width
+   rules are migrated opportunistically, not all at once. See features/mobile.md. */
 
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; }
