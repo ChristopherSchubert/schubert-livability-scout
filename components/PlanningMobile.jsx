@@ -26,12 +26,15 @@ const WEEKS = 53;
 const MONTHS_SHORT = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const EQUAL_WEIGHTS = { setting: 1, aliveness: 1, fabric: 1, realness: 1, january: 1 };
 
-// Backlog sort options. "window" = best week from today forward; the season
-// options = best week whose midpoint falls in those months (mirrors the desktop
-// per-season best-week sort); "overall" = fit score. A season sort also changes
-// which window each card shows, so the card reflects the lens you picked.
+// Backlog sort options. Both "window" and "soonest" use the best week from
+// today forward, but "window" orders by that window's QUALITY (0–100) while
+// "soonest" orders by its DATE (earliest first). Season options take the best
+// week whose midpoint falls in those months (mirrors the desktop per-season
+// best-week sort); "overall" = fit score. A season sort also re-windows each
+// card to that season's best week, so the card reflects the lens you picked.
 const SORTS = [
-  { id: "window", label: "Soonest window", chip: "Best window" },
+  { id: "window", label: "Best window", chip: "Best window" },
+  { id: "soonest", label: "Soonest first", chip: "Best window" },
   { id: "spring", label: "Best in spring", chip: "Spring", months: [2, 3, 4] },
   { id: "summer", label: "Best in summer", chip: "Summer", months: [5, 6, 7] },
   { id: "fall", label: "Best in fall", chip: "Fall", months: [8, 9, 10] },
@@ -136,9 +139,14 @@ export default function PlanningMobile() {
       const w = windowFor(c, viewStart, todayDay, months);
       rows.push({ city: c, overall: weightedAxisScore(c, weights), bestDate: w.date, bestScore: w.score });
     }
-    rows.sort(sort === "overall"
-      ? (a, b) => (b.overall ?? -1) - (a.overall ?? -1)
-      : (a, b) => (b.bestScore ?? -1) - (a.bestScore ?? -1));
+    const time = (r) => (r.bestDate ? r.bestDate.getTime() : Infinity);
+    rows.sort(
+      sort === "overall"
+        ? (a, b) => (b.overall ?? -1) - (a.overall ?? -1)
+        : sort === "soonest"
+          // earliest upcoming window first; ties broken by quality
+          ? (a, b) => time(a) - time(b) || (b.bestScore ?? -1) - (a.bestScore ?? -1)
+          : (a, b) => (b.bestScore ?? -1) - (a.bestScore ?? -1));
     return rows;
   }, [planner.cities, weights, frame, sort]);
 
