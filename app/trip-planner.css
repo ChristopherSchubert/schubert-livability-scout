@@ -280,7 +280,7 @@
 /* backlog */
 .trip-pl-backlog { margin-top: 24px; border-top: 1px solid var(--text); padding-top: 16px; }
 .trip-pl-backlog .bh { display: flex; align-items: baseline; gap: 16px; margin-bottom: 12px; }
-.trip-pl-backlog .bl { display: flex; gap: 14px; overflow-x: auto; padding: 4px 4px 12px; }
+.trip-pl-backlog .bl { display: grid; grid-template-columns: repeat(auto-fill, minmax(168px, 1fr)); gap: 14px; padding: 4px 4px 12px; }
 .bk {
   flex: 0 0 184px; background: var(--panel); border: 1px solid var(--border); border-radius: 2px;
   cursor: pointer; text-align: left; padding: 0; overflow: hidden;
