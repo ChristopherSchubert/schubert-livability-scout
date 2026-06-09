@@ -169,6 +169,31 @@ the corpus from 629→670 of 675 pins; the 5 holdouts are genuinely-distant
 drive-to features — Blue Ridge Parkway overlook, Canaan Valley Resort —
 left as honest placeholders.)
 
+## The 1.5 km audit (2026-06-09)
+
+A pin being "resolved" doesn't mean it's in the right place — the
+measurer's 5 km integrity gate had accepted same-named streets/features
+up to 5 km from the center (Salem's downtown "Washington St" pinned 4 km
+out). Audited every pin against the ~1.5 km walkable circle:
+- **[.reresolve-far.mjs](../scripts/.reresolve-far.mjs)** — for each pin
+  outside 1.5 km, re-geocode with a *tight* bias around the center and
+  accept only a result inside the zone / closer; snapped **50 misplaced
+  pins** back to the correct downtown spot.
+- **[.cleanup-blocks.mjs](../scripts/.cleanup-blocks.mjs)** — drop blocks
+  that point to drive-to features (Blue Ridge Parkway overlook, a ski
+  base, a state-park beach — not walkable) from `blocks` /
+  `blocks_authored` / `block_geometries`; re-pin the rest (a "between Y
+  and Z" block → midpoint of its neighbour blocks; a bare street → nearest
+  OSM intersection of that street to the pin).
+- **[.snap-intersections.mjs](../scripts/.snap-intersections.mjs)** — lock
+  a block to the nearest real intersection rather than a random business.
+
+Result: **118/118 cities fully resolved, 0 unresolved.** ~12 pins sit
+1.5–3.8 km out and are *kept on purpose* — genuine destination walks in
+spread-out towns (West Cliff/Lighthouse Point, the Pacific Grove
+waterfront, Kailua beach). Lesson: judge pins by *correctness*, not just
+resolved-vs-unresolved counts.
+
 ## TODOs / future direction
 
 - **Finish the backfill.** Run `node scripts/onboard.mjs --measurer
