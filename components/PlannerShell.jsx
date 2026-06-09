@@ -7,6 +7,7 @@ import {
   cityVisitWindow,
   monthlyComfortScores,
   visitNowScore,
+  tripNights,
   citySlug,
   imageResearchBrief,
 } from "../lib/planner-data";
@@ -288,17 +289,6 @@ export function VisitPlan({ cityItem, onPatch, onChangeDay, onChangeChecklist })
       </section>
     </>
   );
-}
-
-// Whole nights between two YYYY-MM-DD dates, or null when either is missing
-// or the range is degenerate. Pure date math — no invented values.
-function tripNights(arrive, depart) {
-  if (!arrive || !depart) return null;
-  const a = new Date(`${arrive}T00:00:00`);
-  const d = new Date(`${depart}T00:00:00`);
-  if (Number.isNaN(a.getTime()) || Number.isNaN(d.getTime())) return null;
-  const nights = Math.round((d - a) / 86400000);
-  return nights > 0 ? nights : null;
 }
 
 export function ImagesPage({ cityItem, imageState, searchState, setSearchState, onPatch, onSaved }) {

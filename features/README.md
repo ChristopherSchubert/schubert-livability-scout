@@ -30,7 +30,7 @@ docs are worse than no feature docs.
 | Candidate funnel (Board ⇄ Ranking + shared filters + ViewToggle) | [candidate-funnel.md](candidate-funnel.md) | stub — created 2026-06-09 |
 | Funnel board (5-stage kanban) | [candidate-funnel.md](candidate-funnel.md) | stub |
 | Calibrate (weighted ranking + learned weights) | [candidate-funnel.md](candidate-funnel.md) | stub |
-| Visit plan (logistics, days, checklists) | _todo_ | undocumented |
+| Visit plan (per-city trip setup, days, checklists) | [visit-plan.md](visit-plan.md) | documented; redesign 2026-06-09 |
 | Decide questionnaire (post-visit survey) | _todo_ | undocumented |
 | Baseline ratings (reference places) | _todo_ | undocumented |
 | Image management (hero, search, Supabase Storage) | _todo_ | undocumented |

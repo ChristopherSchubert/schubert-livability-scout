@@ -704,7 +704,7 @@ button:hover, .button-link:hover {
 }
 
 .field input:hover, .field textarea:hover, .field select:hover {
-  border-color: #c2b298;
+  border-color: #bfae96;
 }
 
 .field input:focus, .field textarea:focus, .field select:focus,
@@ -751,7 +751,7 @@ button:hover, .button-link:hover {
   display: grid;
   gap: 0.7rem;
 }
-.day-card:focus-within { border-color: #c2b298; }
+.day-card:focus-within { border-color: #bfae96; }
 .day-card-head {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
