@@ -1388,4 +1388,20 @@
   .cd-root .extremes { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .cd-root .extreme:nth-child(odd) { border-left: 0; }
   .cd-root .extreme:nth-child(n + 3) { border-top: 1px solid var(--hair-soft); }
+
+  /* The temperature ramp's three warm-end reference labels (Outdoor ideal /
+     Atlanta Jul / Phoenix Jul) collide at phone width. Drop the redundant
+     middle one; the cold/comfort/hot anchors still bracket the scale. */
+  .cd-root .climate-heatmap .ch-ref-secondary { display: none; }
+  .cd-root .climate-heatmap .ch-tick { font-size: 8px; gap: 2px; }
+  /* 14px Fraunces nearly fills a ~23px month column, so adjacent values read as
+     one run ("0.80.90.1"). Smaller gives each number breathing room. */
+  .cd-root .climate-heatmap .ch-cell { font-size: 11px; }
+
+  /* The in-chart Charm / Off-season annotations (SVG text on the comfort
+     curve) are cramped and clip on a narrow chart — and they're repeated
+     verbatim in the legend text right below the chart. Keep the marker lines,
+     hide the duplicated text on phones. */
+  .cd-root .climate .annot-label,
+  .cd-root .climate .annot-sub { display: none; }
 }

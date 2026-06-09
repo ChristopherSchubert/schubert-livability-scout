@@ -149,13 +149,14 @@ zero horizontal overflow.
 
 ## Follow-ups (tracked as GitHub issues)
 
-- **Climate-heatmap legibility on phones.** Horizontal overflow is fixed, but
-  in the city-detail "When to go" heatmap the temp/precip **reference-tick
-  labels collide** at 390px (e.g. "Outdoor ideal" overlaps "Atlanta Jul · 89°")
-  and the 12-month cell row is tight. Needs responsive tick handling (thin out
-  or stagger reference ticks, shrink/scroll the month row) in
-  `components/city-detail/ChapterWhen.jsx` + `.climate-heatmap` CSS. Legibility
-  polish, not breakage. _(promote to a GitHub issue when picked up)_
+- ~~**Climate-heatmap legibility on phones.**~~ ✅ Fixed 2026-06-09 (from owner
+  iPhone screenshots): the temp ramp drops its redundant middle warm anchor
+  (Atlanta Jul, marked `secondary`) on phones and shrinks tick labels to 8px so
+  the three remaining anchors (Minneapolis / Outdoor ideal / Phoenix) no longer
+  collide; the 12-month cell value font drops 14px → 11px so adjacent precip
+  numbers stop merging ("0.80.90.1"); and the in-chart Charm/Off-season SVG
+  annotations (duplicated in the legend text below) hide on phones to declutter
+  the curve. `components/city-detail/ChapterWhen.jsx`, `app/city-detail.css`.
 - **Mobile sort control for Ranking.** On a phone the table's tap-to-sort
   column headers are hidden (the table is now cards), so the only sort is the
   default Overall-desc. Add a compact sort dropdown to `.rank-controls` (sort by

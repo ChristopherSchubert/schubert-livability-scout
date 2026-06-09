@@ -202,7 +202,9 @@ const PRECIP_STOPS = [
 const TEMP_REFS = [
   { v: 22,  name: "Minneapolis Jan" },
   { v: 74,  name: "Outdoor ideal", cls: "now" },
-  { v: 89,  name: "Atlanta Jul" },
+  // `secondary` refs hide on phones, where the three warm-end anchors collide;
+  // Minneapolis (cold) / Outdoor ideal / Phoenix (hot) still bracket the scale.
+  { v: 89,  name: "Atlanta Jul", secondary: true },
   { v: 106, name: "Phoenix Jul" },
 ];
 const PRECIP_REFS = [
@@ -332,7 +334,7 @@ function Legend({ kind, label, extremes, refs, pct, fmtVal }) {
         {refs.map((r) => (
           <span
             key={r.v}
-            className={`ch-tick ${r.cls === "now" ? "ch-now" : "ch-ref"}`}
+            className={`ch-tick ${r.cls === "now" ? "ch-now" : "ch-ref"}${r.secondary ? " ch-ref-secondary" : ""}`}
             style={{ left: `${pct(r.v)}%` }}
           >
             <span className="ch-tick-name">{r.name}</span>
