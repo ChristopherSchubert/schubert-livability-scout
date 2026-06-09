@@ -153,6 +153,22 @@ less location string.
   mini-maps render wherever `block_geometries[i].accuracy !==
   "unresolved"`.
 
+## Fallback pins for un-geocodable editorial blocks
+
+Hand-authored blocks often name landmarks OSM under-maps ("Bowens Wharf",
+"Cap Sante marina", "Wisp Resort base village") — Overpass + Nominatim
+can't place them, but Google text-search can.
+[scripts/.fallback-pins.mjs](../scripts/.fallback-pins.mjs) Google-resolves
+every still-`unresolved` block, gates it tightly (inside the stay-zone
+polygon OR within 2.5 km of the pin — a wrong pin is worse than a
+placeholder), and writes the hit as a `block_geometries` entry with
+`accuracy: "manual"`. The measurer's Layer 0 **preserves `manual` entries
+verbatim across `--force`**, so these are permanent fallbacks the pipeline
+never recomputes. Source recorded as `google-fallback`. (2026-06-09: took
+the corpus from 629→670 of 675 pins; the 5 holdouts are genuinely-distant
+drive-to features — Blue Ridge Parkway overlook, Canaan Valley Resort —
+left as honest placeholders.)
+
 ## TODOs / future direction
 
 - **Finish the backfill.** Run `node scripts/onboard.mjs --measurer
