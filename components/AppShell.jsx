@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { STAGES, citySlug, cityStage } from "../lib/planner-data";
 import { usePlanner } from "./PlannerProvider";
 
@@ -54,7 +54,9 @@ export default function AppShell({ activeMode, activeStage, cityItem, cityNav, c
   const mode = activeMode || activeStage;
   return (
     <div className="shell">
-      <div className="sticky-header">
+      {/* `has-city` lets the mobile CSS collapse the redundant global funnel on
+          city pages (the context strip's back-arrow handles upward nav). */}
+      <div className={`sticky-header${cityItem ? " has-city" : ""}`}>
         <TopBar activeMode={mode} />
         {cityItem ? <CityContextStrip cityItem={cityItem} cityNav={cityNav} /> : null}
       </div>
@@ -65,6 +67,18 @@ export default function AppShell({ activeMode, activeStage, cityItem, cityNav, c
 
 function TopBar({ activeMode }) {
   const { exportPlanner, replacePlanner, saveState, hydrated } = usePlanner();
+  const navRef = useRef(null);
+
+  // On a phone the tab row scrolls horizontally; keep the active stage centered
+  // and in view rather than clipped off the right edge. Sets the container's
+  // scrollLeft directly so the window never moves. (Phase 1, features/mobile.md)
+  useEffect(() => {
+    const nav = navRef.current;
+    const active = nav?.querySelector(".stage-tab.active");
+    if (nav && active) {
+      nav.scrollLeft = active.offsetLeft - (nav.clientWidth - active.clientWidth) / 2;
+    }
+  }, [activeMode]);
 
   return (
     <header className="topbar-v2">
@@ -76,7 +90,7 @@ function TopBar({ activeMode }) {
         <SavePill saveState={saveState} hydrated={hydrated} />
       </div>
 
-      <nav className="stage-nav" aria-label="Workflow modes">
+      <nav className="stage-nav" aria-label="Workflow modes" ref={navRef}>
         {NAV_MODES.map((mode) => {
           const active = mode.id === activeMode;
           const stageClass = mode.stageId ? `stage-${mode.stageId}` : "stage-board";
@@ -86,6 +100,7 @@ function TopBar({ activeMode }) {
               href={mode.href}
               className={`stage-tab ${stageClass}${active ? " active" : ""}`}
               title={mode.help}
+              aria-current={active ? "page" : undefined}
             >
               <span className="stage-tab-label">{mode.label}</span>
             </Link>
@@ -160,6 +175,18 @@ function CityContextStrip({ cityItem, cityNav }) {
   const { updateCity } = usePlanner();
   const stage = cityStage(cityItem);
   const stageLabel = STAGES.find((entry) => entry.id === stage)?.label || stage;
+  const navRef = useRef(null);
+
+  // Keep the active sub-tab (Detail/Plan/Images/Assess) centered when the row
+  // scrolls horizontally on a phone. (Phase 1, features/mobile.md)
+  useEffect(() => {
+    const nav = navRef.current;
+    const active = nav?.querySelector(".city-context-tab.active");
+    if (nav && active) {
+      nav.scrollLeft = active.offsetLeft - (nav.clientWidth - active.clientWidth) / 2;
+    }
+  }, [cityNav]);
+
   return (
     <div className={`city-context stage-${stage}`}>
       <div className="city-context-left">
@@ -175,9 +202,14 @@ function CityContextStrip({ cityItem, cityNav }) {
         </div>
       </div>
       {cityNav?.length ? (
-        <nav className="city-context-nav">
+        <nav className="city-context-nav" ref={navRef}>
           {cityNav.map((item) => (
-            <Link key={item.href} href={item.href} className={`city-context-tab${item.active ? " active" : ""}`}>
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`city-context-tab${item.active ? " active" : ""}`}
+              aria-current={item.active ? "page" : undefined}
+            >
               {item.label}
             </Link>
           ))}

@@ -1125,3 +1125,42 @@
   box-shadow: 0 6px 18px -6px rgba(13, 76, 68, 0.4);
   letter-spacing: -0.005em;
 }
+
+/* ── Mobile navigation (Phase 1, features/mobile.md) ──────────────────────────
+   Loaded last so these win the cascade over globals.css. The two tab rows
+   (global funnel + per-city sub-nav) used to clip stages off the right edge and
+   stack ~190px of chrome on city pages. At phone width they become single-row
+   horizontal scrollers with the active tab scrolled into view (JS), 44px touch
+   targets (WCAG 2.5.5), and the redundant funnel collapses on city pages. */
+@media (max-width: 640px) {
+  .stage-nav,
+  .city-context-nav {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;            /* Firefox — hide the scrollbar */
+    scroll-snap-type: x proximity;
+    /* Edge-fade hint that there's more to scroll, without a visible scrollbar. */
+    -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 12px, #000 calc(100% - 12px), transparent 100%);
+    mask-image: linear-gradient(90deg, transparent 0, #000 12px, #000 calc(100% - 12px), transparent 100%);
+  }
+  .stage-nav::-webkit-scrollbar,
+  .city-context-nav::-webkit-scrollbar { display: none; }  /* WebKit — hide */
+  .stage-tab,
+  .city-context-tab { scroll-snap-align: center; }
+
+  /* 44px touch floor. Tabs are caps text; pad vertically to reach the target. */
+  .stage-tab,
+  .city-context-tab,
+  .view-toggle-tab {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+  .backup-trigger { width: 44px; height: 44px; }
+
+  /* On a city page the global funnel is redundant — the context strip's
+     back-arrow returns to the stage workspace. Collapse it so the sub-nav owns
+     the second row and we reclaim the vertical space. */
+  .sticky-header.has-city .stage-nav { display: none; }
+}

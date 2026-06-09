@@ -66,8 +66,14 @@ semantics), not eyeballed.
   - Darken `--muted` `#7a7268` → `#6b6358` (clears AA 4.5:1 on all three paper
     tones: cream 5.48, panel 5.81, deepest 5.07). Fixes #3.
   - Documented canonical breakpoints (640 / 1024 / default) in `globals.css`.
-- **Phase 1 — Global nav** (#1, #6, #7): scroll-aware tab bars + active-in-view,
-  collapse funnel on city pages at phone width, 44px touch floor, `aria-current`.
+- **Phase 1 — Global nav** ✅ (#1, #7; #6 partial): both tab rows are single-row
+  horizontal scrollers at ≤640px with the active tab auto-scrolled into view
+  (JS sets `scrollLeft`), an edge-fade mask hinting more, `aria-current="page"`
+  on active tabs, 44px touch floor on tabs + backup trigger, and the global
+  funnel collapses on city pages (`.sticky-header.has-city`). Files:
+  `components/AppShell.jsx`, `app/workspace.css`. Remaining #6 targets (Board
+  `.advance` buttons 22px, the calibration checkbox 13×13, Filters 31px) move
+  to Phase 4.
 - **Phase 2 — Ranking** (#2): card-list at phone width with inline score + chips.
 - **Phase 3 — City-detail polish + Board** (#4, #5): kill overflow culprits;
   decide whether Board columns stack on phone.
