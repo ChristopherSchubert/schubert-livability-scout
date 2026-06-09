@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
+  calibrateAxes,
   cityImageQuery,
   cityStage,
   feltScore,
@@ -18,6 +19,7 @@ import {
   applyCityFilters,
   augmentCityForFilters,
   availableFilterOptions,
+  shortAxisLabel,
   useCityFilters,
 } from "./city-filters";
 import { resolveImage, usePlanner } from "./PlannerProvider";
@@ -244,6 +246,26 @@ export default function TripPlanner() {
   // most relevant window rather than a far-future peak.
   const backlogFilters = useCityFilters();
   const [blSort, setBlSort] = useState(() => `best-${MONTH_SEASON[today.getMonth()]}`);
+
+  // ── backlog hover preview ─────────────────────────────────────────────
+  // A pointer-events:none popover (so it never steals the card's click/drag)
+  // showing the meaningful signal — axes, chips, best season, why — to spare a
+  // trip to the detail page. Opens on hover (small delay to avoid flicker) or
+  // keyboard focus; closes on leave, scroll, or drag start.
+  const [hoverCard, setHoverCard] = useState(null); // { row, rect }
+  const hoverTimerRef = useRef(null);
+  const openHover = useCallback((el, row) => {
+    clearTimeout(hoverTimerRef.current);
+    hoverTimerRef.current = setTimeout(() => setHoverCard({ row, rect: el.getBoundingClientRect() }), 130);
+  }, []);
+  const closeHover = useCallback(() => { clearTimeout(hoverTimerRef.current); setHoverCard(null); }, []);
+  useEffect(() => {
+    if (!hoverCard) return;
+    const onScroll = () => closeHover();
+    window.addEventListener("scroll", onScroll, true);
+    window.addEventListener("wheel", onScroll, { passive: true });
+    return () => { window.removeEventListener("scroll", onScroll, true); window.removeEventListener("wheel", onScroll); };
+  }, [hoverCard, closeHover]);
   const [confirmId, setConfirmId] = useState(null); // lane pending remove-confirm
   useEffect(() => {
     if (!confirmId) return;
@@ -1240,7 +1262,11 @@ export default function TripPlanner() {
                   tabIndex={0}
                   className="bk"
                   title="Click to plan (or drag onto a week)"
-                  onPointerDown={(e) => startCardDrag(e, c)}
+                  onPointerDown={(e) => { closeHover(); startCardDrag(e, c); }}
+                  onMouseEnter={(e) => openHover(e.currentTarget, r)}
+                  onMouseLeave={closeHover}
+                  onFocus={(e) => openHover(e.currentTarget, r)}
+                  onBlur={closeHover}
                   onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); updateCity(c.id, { status: "Shortlist" }); } }}
                 >
                   <span className="bkt" style={hero ? { backgroundImage: `url(${hero})` } : undefined}>
@@ -1263,9 +1289,82 @@ export default function TripPlanner() {
         {ghost ? (
           <div className="trip-pl-ghost" style={{ left: ghost.x + 14, top: ghost.y + 14 }}>{ghost.name}</div>
         ) : null}
+        {hoverCard && !ghost ? (
+          <BacklogHoverCard row={hoverCard.row} rect={hoverCard.rect} hero={heroFor(hoverCard.row.cityItem)} />
+        ) : null}
       </div>
       <CityFilterDrawer filters={backlogFilters} options={backlogOptions} />
     </AppShell>
+  );
+}
+
+// Hover/focus preview for a backlog card: the meaningful signal at a glance —
+// overall score, the 5 measured axes as mini-bars, chips, best season, and a
+// trimmed why — so you can triage without opening the detail page. Fixed-
+// position and pointer-events:none (set in CSS) so it never intercepts the
+// card's click/drag; flips left near the right edge and clamps to the viewport.
+const HOVER_W = 300;
+function backlogHoverStyle(rect) {
+  const margin = 12, pad = 8, estH = 360;
+  const vw = window.innerWidth, vh = window.innerHeight;
+  let left = rect.right + margin;
+  if (left + HOVER_W > vw - pad) left = rect.left - HOVER_W - margin; // flip left
+  if (left < pad) left = Math.max(pad, Math.min(rect.left, vw - HOVER_W - pad));
+  let top = rect.top;
+  if (top + estH > vh - pad) top = Math.max(pad, vh - estH - pad);
+  return { left, top, width: HOVER_W };
+}
+function bestSeasonOf(seasonPeak) {
+  let best = null;
+  for (const [id, v] of Object.entries(seasonPeak || {})) {
+    if (v == null) continue;
+    if (!best || v > best.score) best = { id, score: v };
+  }
+  return best ? { label: SEASON_LABEL[best.id], score: best.score } : null;
+}
+function trimWhy(why) {
+  const first = (why || "").split(/\n\n+/)[0]?.trim();
+  if (!first) return null;
+  if (first.length <= 180) return first;
+  const cut = first.slice(0, 180);
+  return cut.slice(0, cut.lastIndexOf(" ")) + "…";
+}
+function BacklogHoverCard({ row, rect, hero }) {
+  const c = row.cityItem;
+  const best = bestSeasonOf(row.seasonPeak);
+  const why = trimWhy(c.why);
+  const loc = [row.st, c.stayZone].filter(Boolean).join(" · ");
+  return (
+    <div className="bk-pop" style={backlogHoverStyle(rect)} role="tooltip" aria-hidden="true">
+      <div className="bk-pop-hero" style={hero ? { backgroundImage: `url(${hero})` } : undefined}>
+        {row.overall != null ? <span className="bk-pop-score" title="Overall measured score (equal weights)">{row.overall.toFixed(1)}</span> : null}
+      </div>
+      <div className="bk-pop-body">
+        <div className="bk-pop-head">
+          <h4>{row.base}</h4>
+          {loc ? <span className="bk-pop-loc">{loc}</span> : null}
+        </div>
+        {row.chipLabels?.length ? (
+          <div className="bk-pop-chips">
+            {row.chipLabels.slice(0, 4).map((ch) => <span key={ch} className="bk-pop-chip">{ch}</span>)}
+          </div>
+        ) : null}
+        <div className="bk-pop-axes">
+          {calibrateAxes.map(([key, label]) => {
+            const v = row.roll?.[key];
+            return (
+              <div key={key} className="bk-pop-axis">
+                <span className="bk-pop-axis-l">{shortAxisLabel(label)}</span>
+                <span className="bk-pop-axis-bar"><i style={{ width: v != null ? `${Math.max(2, v * 10)}%` : 0 }} /></span>
+                <span className="bk-pop-axis-v">{v != null ? v.toFixed(1) : "—"}</span>
+              </div>
+            );
+          })}
+        </div>
+        {best ? <p className="bk-pop-when">Best in <strong>{best.label}</strong> · visit score {Math.round(best.score)}</p> : null}
+        {why ? <p className="bk-pop-why">{why}</p> : null}
+      </div>
+    </div>
   );
 }
 

@@ -374,6 +374,31 @@ filter yields 21 cities (CA/OR/WA/HI) with an active "Pacific" chip and a
 "21 of 111" count; switching sort re-orders within the filter; clicking the
 chip clears it.
 
+### Backlog hover preview (2026-06-09)
+Hovering (or keyboard-focusing) a backlog card opens a `BacklogHoverCard`
+popover so you can triage without opening the detail page: hero, overall
+score, the **5 measured axes as mini-bars** (the meatiest signal), up to 4
+chips, the best season + its visit score, and a trimmed first paragraph of
+`why`. It reuses the row data already computed for sort/filter (`roll`,
+`chipLabels`, `overall`, `seasonPeak`) plus `cityItem.why`.
+
+Design rules that matter:
+- **`position: fixed; pointer-events: none`** — the popover never intercepts
+  the card's click-to-plan or pointer-drag, and never needs to be hovered
+  itself (so there's no card→popover "hover gap" to manage). It sits *beside*
+  the card, never over it.
+- Opens on `onMouseEnter`/`onFocus` after a 130 ms delay (anti-flicker);
+  closes on leave, blur, `pointerdown` (drag start), and **scroll/wheel** (the
+  anchor rect would go stale). `backlogHoverStyle()` places it to the card's
+  right, **flips left near the right viewport edge**, and clamps vertically.
+- Suppressed while a drag `ghost` is active.
+
+Verified in-browser: popover renders the full payload (e.g. San Francisco
+(Noe Valley) → Setting 3.5 / Aliveness 6.4 / Fabric 7.1 / Realness 5.8 /
+Year-round 9.0, chips Coastal·Walkable·Historic·Compact, "Best in Summer ·
+visit score 85", trimmed why) at a clamped viewport position; no console
+errors.
+
 ### Audit vs the mockup (2026-06-07)
 Fixed after a side-by-side audit with real data populated in Planning:
 - **Planning-box hover hero** was querying `.trip-pl-thumb` (committed-bar

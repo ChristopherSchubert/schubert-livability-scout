@@ -283,6 +283,39 @@
 /* Backlog sort + filter use the app-wide .rank-controls bar (globals.css). */
 .trip-pl-backlog .rank-controls { margin-bottom: 14px; }
 .bl-none { color: var(--muted); font-size: 0.85rem; padding: 4px; }
+
+/* Backlog hover preview — pointer-events:none so it never steals click/drag */
+.bk-pop {
+  position: fixed; z-index: 1300; pointer-events: none;
+  background: var(--panel); border: 1px solid var(--border); border-radius: 8px;
+  overflow: hidden; box-shadow: 0 12px 34px -12px rgba(13,76,68,.42), 0 2px 0 rgba(13,76,68,.06);
+  animation: bk-pop-in 0.12s ease-out;
+}
+@keyframes bk-pop-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+.bk-pop-hero {
+  position: relative; height: 118px; background-size: cover; background-position: center;
+  background-color: #efe7d6; filter: saturate(0.9) contrast(1.04); border-bottom: 1px solid var(--border);
+}
+.bk-pop-score {
+  position: absolute; top: 8px; right: 8px; min-width: 30px; padding: 2px 8px;
+  font-family: var(--font-display); font-variation-settings: "wght" 560; font-size: 0.92rem;
+  color: var(--panel); background: rgba(13,76,68,.85); border-radius: 10px; text-align: center;
+}
+.bk-pop-body { padding: 10px 12px 12px; }
+.bk-pop-head { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.bk-pop-head h4 { margin: 0; font-family: var(--font-display); font-variation-settings: "opsz" 32, "wght" 560; font-size: 1.05rem; line-height: 1.1; }
+.bk-pop-loc { font-size: 0.62rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); }
+.bk-pop-chips { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
+.bk-pop-chip { font-size: 0.66rem; padding: 2px 7px; border-radius: 999px; background: #f1f7f2; border: 1px solid #cfe3d5; color: #2c6a3f; font-weight: 600; }
+.bk-pop-axes { margin-top: 10px; display: grid; gap: 4px; }
+.bk-pop-axis { display: grid; grid-template-columns: 64px 1fr 26px; align-items: center; gap: 8px; }
+.bk-pop-axis-l { font-size: 0.7rem; color: var(--muted); }
+.bk-pop-axis-bar { height: 5px; background: #ece4d3; border-radius: 3px; overflow: hidden; }
+.bk-pop-axis-bar i { display: block; height: 100%; background: linear-gradient(90deg, #6f9e57, #3f6a30); border-radius: 3px; }
+.bk-pop-axis-v { font-size: 0.72rem; text-align: right; color: var(--text); font-variation-settings: "wght" 540; }
+.bk-pop-when { margin: 10px 0 0; font-size: 0.74rem; color: var(--text); }
+.bk-pop-when strong { color: #3f6a30; }
+.bk-pop-why { margin: 8px 0 0; font-size: 0.78rem; line-height: 1.4; color: var(--muted); }
 .trip-pl-backlog .bl { display: grid; grid-template-columns: repeat(auto-fill, minmax(168px, 1fr)); gap: 14px; padding: 4px 4px 12px; }
 .bkbadge {
   position: absolute; top: 6px; right: 6px; min-width: 22px; padding: 1px 6px;
