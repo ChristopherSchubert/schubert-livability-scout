@@ -353,7 +353,7 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
 <p>＋ add transport opens the <b>transport editor</b>: route, each end's local clock, ticket fields that wait honestly empty until ticketed — and the consequence stated before it happens: <b>booking this locks the trip's end date.</b></p>
 <p>The flights get booked and the window's outer edges <b>lock</b>. The trip can't stretch anymore without real money moving. Inside, still clay.</p>
 <p>Locked is <b>not frozen</b>: the lock holds only the outer edges. Inside, she drops Kranj in and trades nights freely. The lock's tooltip names its cause and its exit — <b>change the return flight and the edge softens</b>. Hardening is always reversible at the price of the thing that caused it.</p>
-<p>Transport done, she <b>folds it closed (▸)</b> and opens Stays below. 🔍 search hotels runs a place search scoped to the leg; she <b>shortlists all five results</b> — the candidate strip on the next page is exactly these five. Add-your-own covers places no cache knows.</p>
+<p>Transport done, she <b>folds it closed (▸)</b>. Every empty stay slot has carried its <b>🔍 search</b> since the cities landed — pressing Ljubljana's runs a place search scoped to that leg, and she <b>shortlists all five results</b>: the candidate strip on the next page is exactly these five. Add-your-own covers places no cache knows.</p>
 <p>The shortlist from the search now sits under Ljubljana as the <b>candidate strip</b> (each card: ✎ · ✕). She drags Union onto the city — it becomes a bar spanning the leg's nights.</p>
 <p>The same search-and-drop, twice more: <b>Toplice</b> for Bled, <b>Hotel Piran</b> for Piran. Three cities, three bars — every night housed, nothing split yet.</p>
 <p>✂ split a stay asks one question — <b>after which night?</b> — and the split leaves an honest open slot (“night of May 20 — drop a stay”) rather than silently stretching a neighbor. Hiša Franko lands in that slot next.</p>
@@ -469,7 +469,7 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
 <!-- ═ 2 · empty skeleton ═ -->
 <section data-phase="Where · the skeleton" data-did="drags the window's right edge to test it — it slides freely; nothing booked yet.">
   <nav class="topbar"><span class="brand">Schubert Atlas</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
-  <div class="tripbar"><span class="crumb"><b>Trips</b> ›</span><span class="tname">Slovenia</span><span class="tmeta">May 15–25 · provisional</span>
+  <div class="tripbar"><span class="crumb"><b>Trips</b> ›</span><span class="tname">Slovenia</span><span class="tmeta">May 15–25 · 10 nights</span>
     <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
     <span class="spacer"></span><span class="chipbtn">Book</span><span class="chipbtn">Grid →</span></div>
   <div class="pagebody">
@@ -493,7 +493,7 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
 
 <section data-phase="Where · adjusting the dates" data-did="opens ✎ adjust dates — the same values the edges drag, as fields.">
   <nav class="topbar"><span class="brand">Schubert Atlas</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
-  <div class="tripbar"><span class="crumb"><b>Trips</b> ›</span><span class="tname">Slovenia</span><span class="tmeta">May 15–25 · provisional</span>
+  <div class="tripbar"><span class="crumb"><b>Trips</b> ›</span><span class="tname">Slovenia</span><span class="tmeta">May 15–25 · 10 nights</span>
     <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
     <span class="spacer"></span><span class="chipbtn">Book</span><span class="chipbtn">Grid →</span></div>
   <div class="pagebody" style="position:relative;">
@@ -526,7 +526,7 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
 <!-- ═ 3 · cities land ═ -->
 <section data-phase="Where · cities land" data-did="drags Ljubljana, then Bled, then Piran from the tray into the window.">
   <nav class="topbar"><span class="brand">Schubert Atlas</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
-  <div class="tripbar"><span class="crumb"><b>Trips</b> ›</span><span class="tname">Slovenia</span><span class="tmeta">May 15–25 · provisional</span>
+  <div class="tripbar"><span class="crumb"><b>Trips</b> ›</span><span class="tname">Slovenia</span><span class="tmeta">May 15–25 · 10 nights</span>
     <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
     <span class="spacer"></span><span class="chipbtn">Book</span><span class="chipbtn">Grid →</span></div>
   <div class="pagebody">
@@ -543,13 +543,17 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
     <div class="sect" style="margin-top:1.3rem;">▾ Transport <button class="ctrl inlinectl">＋ add transport…</button></div>
     <p class="srcline">✈ nothing yet</p>
     <div class="sect" style="margin-top:1.1rem;">▾ Stays</div>
-    <p class="srcline">stays live under each city — add cities, then drop hotels</p>
+    <div class="staysrow">
+      <span class="staybar" style="flex:2;border-style:dashed;border-left:1px dashed var(--border);justify-content:center;"><span class="dropz">drop a hotel on Ljubljana · 🔍 search</span></span>
+      <span class="staybar" style="flex:4;border-style:dashed;border-left:1px dashed var(--border);justify-content:center;"><span class="dropz">drop a hotel on Bled · 🔍 search</span></span>
+      <span class="staybar" style="flex:4;border-style:dashed;border-left:1px dashed var(--border);justify-content:center;"><span class="dropz">drop a hotel on Piran · 🔍 search</span></span>
+    </div>
   </div>
 </section>
 
 <section data-phase="Where · ＋ other city" data-did="presses ＋ other city and types — any place works, not just the scout's list.">
   <nav class="topbar"><span class="brand">Schubert Atlas</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
-  <div class="tripbar"><span class="crumb"><b>Trips</b> ›</span><span class="tname">Slovenia</span><span class="tmeta">May 15–25 · provisional</span>
+  <div class="tripbar"><span class="crumb"><b>Trips</b> ›</span><span class="tname">Slovenia</span><span class="tmeta">May 15–25 · 10 nights</span>
     <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
     <span class="spacer"></span><span class="chipbtn">Book</span><span class="chipbtn">Grid →</span></div>
   <div class="pagebody" style="position:relative;">
@@ -571,14 +575,18 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
     <div class="sect" style="margin-top:1.3rem;">▾ Transport <button class="ctrl inlinectl">＋ add transport…</button></div>
     <p class="srcline">✈ nothing yet</p>
     <div class="sect" style="margin-top:1.1rem;">▾ Stays</div>
-    <p class="srcline">stays live under each city — add cities, then drop hotels</p>
+    <div class="staysrow">
+      <span class="staybar" style="flex:2;border-style:dashed;border-left:1px dashed var(--border);justify-content:center;"><span class="dropz">drop a hotel on Ljubljana · 🔍 search</span></span>
+      <span class="staybar" style="flex:4;border-style:dashed;border-left:1px dashed var(--border);justify-content:center;"><span class="dropz">drop a hotel on Bled · 🔍 search</span></span>
+      <span class="staybar" style="flex:4;border-style:dashed;border-left:1px dashed var(--border);justify-content:center;"><span class="dropz">drop a hotel on Piran · 🔍 search</span></span>
+    </div>
   </div>
 </section>
 
 <!-- ═ 4 · trading nights ═ -->
 <section data-phase="Where · trading nights" data-did="grabs the Bled | Piran ↔ handle and slides it a day to feel it — then releases back; the split stays 2·4·4.">
   <nav class="topbar"><span class="brand">Schubert Atlas</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
-  <div class="tripbar"><span class="crumb"><b>Trips</b> ›</span><span class="tname">Slovenia</span><span class="tmeta">May 15–25 · provisional</span>
+  <div class="tripbar"><span class="crumb"><b>Trips</b> ›</span><span class="tname">Slovenia</span><span class="tmeta">May 15–25 · 10 nights</span>
     <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
     <span class="spacer"></span><span class="chipbtn">Book</span><span class="chipbtn">Grid →</span></div>
   <div class="pagebody">
@@ -596,14 +604,18 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
     <div class="sect" style="margin-top:1.3rem;">▾ Transport <button class="ctrl inlinectl">＋ add transport…</button></div>
     <p class="srcline">✈ nothing yet</p>
     <div class="sect" style="margin-top:1.1rem;">▾ Stays</div>
-    <p class="srcline">stays live under each city — add cities, then drop hotels</p>
+    <div class="staysrow">
+      <span class="staybar" style="flex:2;border-style:dashed;border-left:1px dashed var(--border);justify-content:center;"><span class="dropz">drop a hotel on Ljubljana · 🔍 search</span></span>
+      <span class="staybar" style="flex:4;border-style:dashed;border-left:1px dashed var(--border);justify-content:center;"><span class="dropz">drop a hotel on Bled · 🔍 search</span></span>
+      <span class="staybar" style="flex:4;border-style:dashed;border-left:1px dashed var(--border);justify-content:center;"><span class="dropz">drop a hotel on Piran · 🔍 search</span></span>
+    </div>
   </div>
 </section>
 
 <!-- ═ 5 · flights lock the edges ═ -->
 <section data-phase="Where · the transport editor" data-did="presses ＋ add transport on the empty Transport section, fills the outbound with each end's local time, sets status booked — then repeats for the return.">
   <nav class="topbar"><span class="brand">Schubert Atlas</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
-  <div class="tripbar"><span class="crumb"><b>Trips</b> ›</span><span class="tname">Slovenia</span><span class="tmeta">May 15–25 · provisional</span>
+  <div class="tripbar"><span class="crumb"><b>Trips</b> ›</span><span class="tname">Slovenia</span><span class="tmeta">May 15–25 · 10 nights</span>
     <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
     <span class="spacer"></span><span class="chipbtn">Book</span><span class="chipbtn">Grid →</span></div>
   <div class="pagebody" style="min-height:430px;">
@@ -621,7 +633,11 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
       <div class="mini ghost" style="--k:var(--k-trav);border-color:var(--accent);"><b>✈ FRA → LJU</b> · Fri May 15<small>editing…</small></div>
     </div>
     <div class="sect" style="margin-top:1.1rem;">▾ Stays</div>
-    <p class="srcline">stays live under each city — search or add your own, then drop one on a city</p>
+    <div class="staysrow">
+      <span class="staybar" style="flex:2;border-style:dashed;border-left:1px dashed var(--border);justify-content:center;"><span class="dropz">drop a hotel on Ljubljana · 🔍 search</span></span>
+      <span class="staybar" style="flex:4;border-style:dashed;border-left:1px dashed var(--border);justify-content:center;"><span class="dropz">drop a hotel on Bled · 🔍 search</span></span>
+      <span class="staybar" style="flex:4;border-style:dashed;border-left:1px dashed var(--border);justify-content:center;"><span class="dropz">drop a hotel on Piran · 🔍 search</span></span>
+    </div>
   </div>
   <div class="overlay"><div class="scrim2"></div>
     <aside class="sheet"><span class="x2">×</span>
@@ -661,7 +677,11 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
       <div class="mini" style="--k:var(--k-trav)"><b>✈ LJU →</b> · Mon May 25<small>takeoff 9:30 AM · booked 🔒</small></div>
     </div>
     <div class="sect" style="margin-top:1.1rem;">▾ Stays</div>
-    <p class="srcline">stays live under each city — search or add your own, then drop one on a city</p>
+    <div class="staysrow">
+      <span class="staybar" style="flex:2;border-style:dashed;border-left:1px dashed var(--border);justify-content:center;"><span class="dropz">drop a hotel on Ljubljana · 🔍 search</span></span>
+      <span class="staybar" style="flex:4;border-style:dashed;border-left:1px dashed var(--border);justify-content:center;"><span class="dropz">drop a hotel on Bled · 🔍 search</span></span>
+      <span class="staybar" style="flex:4;border-style:dashed;border-left:1px dashed var(--border);justify-content:center;"><span class="dropz">drop a hotel on Piran · 🔍 search</span></span>
+    </div>
   </div>
 </section>
 
@@ -691,12 +711,16 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
       <div class="mini" style="--k:var(--k-trav)"><b>✈ LJU →</b> · Mon May 25<small>booked 🔒</small></div>
     </div>
     <div class="sect" style="margin-top:1.1rem;">▾ Stays</div>
-    <p class="srcline">stays live under each city — search or add your own, then drop one on a city</p>
+    <div class="staysrow">
+      <span class="staybar" style="flex:2;border-style:dashed;border-left:1px dashed var(--border);justify-content:center;"><span class="dropz">drop a hotel on Ljubljana · 🔍 search</span></span>
+      <span class="staybar" style="flex:4;border-style:dashed;border-left:1px dashed var(--border);justify-content:center;"><span class="dropz">drop a hotel on Bled · 🔍 search</span></span>
+      <span class="staybar" style="flex:4;border-style:dashed;border-left:1px dashed var(--border);justify-content:center;"><span class="dropz">drop a hotel on Piran · 🔍 search</span></span>
+    </div>
   </div>
 </section>
 
 <!-- ═ 6 · stay strip + shelf ═ -->
-<section data-phase="Stays · 🔍 search hotels" data-did="folds ▸ Transport closed, opens Stays below it, presses 🔍 search hotels on Ljubljana — and shortlists all five results.">
+<section data-phase="Stays · 🔍 search hotels" data-did="folds ▸ Transport closed, presses 🔍 search on Ljubljana's empty stay slot — and shortlists all five results.">
   <nav class="topbar"><span class="brand">Schubert Atlas</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
   <div class="tripbar"><span class="crumb"><b>Trips</b> ›</span><span class="tname">Slovenia</span><span class="tmeta">May 15–25 · 10 nights</span>
     <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
@@ -712,9 +736,9 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
     <div class="collapsec">▸ <b>Transport</b> · 2 booked ✈</div>
     <div class="sect">▾ Stays</div>
     <div class="staysrow">
-      <span class="staybar" style="flex:2;border-style:dashed;border-left:1px dashed var(--border);justify-content:center;"><span class="dropz">drop a hotel on Ljubljana</span></span>
-      <span class="staybar" style="flex:4;border-style:dashed;border-left:1px dashed var(--border);justify-content:center;"><span class="dropz">drop a hotel on Bled</span></span>
-      <span class="staybar" style="flex:4;border-style:dashed;border-left:1px dashed var(--border);justify-content:center;"><span class="dropz">drop a hotel on Piran</span></span>
+      <span class="staybar" style="flex:2;border-style:dashed;border-color:var(--accent);justify-content:center;"><span class="dropz">drop a hotel on Ljubljana · 🔍 search</span></span>
+      <span class="staybar" style="flex:4;border-style:dashed;border-left:1px dashed var(--border);justify-content:center;"><span class="dropz">drop a hotel on Bled · 🔍 search</span></span>
+      <span class="staybar" style="flex:4;border-style:dashed;border-left:1px dashed var(--border);justify-content:center;"><span class="dropz">drop a hotel on Piran · 🔍 search</span></span>
     </div>
   </div>
   <div class="overlay"><div class="scrim2"></div>
@@ -749,8 +773,8 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
     <div class="sect" style="margin-top:.9rem;">▾ Stays <button class="ctrl inlinectl">✂ split a stay…</button></div>
     <div class="staysrow">
       <span class="staybar" style="flex:2"><span class="grip2">⠿</span><b>Union Eurostars</b><small>2 nights</small><span class="hndl">↔</span></span>
-      <span class="staybar" style="flex:4;border-style:dashed;border-left:1px dashed var(--border);justify-content:center;"><span class="dropz">drop a hotel on Bled</span></span>
-      <span class="staybar" style="flex:4;border-style:dashed;border-left:1px dashed var(--border);justify-content:center;"><span class="dropz">drop a hotel on Piran</span></span>
+      <span class="staybar" style="flex:4;border-style:dashed;border-left:1px dashed var(--border);justify-content:center;"><span class="dropz">drop a hotel on Bled · 🔍 search</span></span>
+      <span class="staybar" style="flex:4;border-style:dashed;border-left:1px dashed var(--border);justify-content:center;"><span class="dropz">drop a hotel on Piran · 🔍 search</span></span>
     </div>
     <div class="sect" style="margin-top:1.2rem;">Stay candidates · Ljubljana <button class="ctrl inlinectl">🔍 search hotels…</button><button class="ctrl inlinectl" style="margin-left:.4rem;">＋ add your own…</button></div>
     <div class="cardrow">

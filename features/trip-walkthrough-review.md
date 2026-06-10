@@ -134,6 +134,17 @@ booking replaces them with terms (19). Also fixed under this rule: slide
 15 had leaked the post-split five-bar state ("nothing split yet" caption
 over a split page) — restored to three bars, 2/4/4.
 
+### Addendum (same day): the trip bar is now ONE string
+
+The "provisional" qualifier wasn't earning its place (the soft-dates story
+already lives in the unlocked edges, the ✎ popover's "slide it anytime",
+and the captions) — trip-meta is now the single constant
+"May 15–25 · 10 nights" on every slide. And the slide-13 search sheet got
+its missing click-path origin: from the moment cities land (slide 7),
+every empty stay slot reads "drop a hotel on <city> · 🔍 search" — slide
+13 is just Ljubljana's slot pressed, sheet scoped to that leg. Stays
+never "opens" (it was never closed); did-line and caption rewritten.
+
 ## Mechanical checks (run before any review handoff)
 
 Per-slide matrix script (in git history, commit 771384e): topbar/tripbar
