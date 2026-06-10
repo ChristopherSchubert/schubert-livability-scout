@@ -85,7 +85,7 @@ display:flex;align-items:center;gap:.35rem;padding:0 .55rem;font-size:.73rem;mar
 
 /* cards, buckets, day strips */
 .cardrow{display:flex;gap:.55rem;flex-wrap:wrap;margin:.5rem 0 0;}
-.mini{background:var(--panel);border:1px solid var(--border);border-left:4px solid var(--k,var(--border));border-radius:7px;
+.mini{position:relative;background:var(--panel);border:1px solid var(--border);border-left:4px solid var(--k,var(--border));border-radius:7px;
 padding:.4rem .65rem;font-size:.78rem;box-shadow:0 2px 6px rgba(41,33,19,.05);}
 .mini b{font-weight:600;}
 .mini small{display:block;color:var(--muted);font-size:.68rem;}
@@ -148,7 +148,7 @@ padding:.4rem .65rem;font-size:.78rem;box-shadow:0 2px 6px rgba(41,33,19,.05);}
 .tray header{background:var(--panel-strong);padding:.55rem .8rem;}
 .tray header h3{font-family:var(--fd);font-weight:500;font-size:.92rem;margin:0;}
 .tray header .note{font-size:.66rem;color:var(--muted);margin:.1rem 0 0;}
-.tcard{margin:.5rem .6rem;background:var(--bg);border:1px solid var(--border);border-left:4px solid var(--k,var(--border));
+.tcard{position:relative;margin:.5rem .6rem;background:var(--bg);border:1px solid var(--border);border-left:4px solid var(--k,var(--border));
 border-radius:7px;padding:.42rem .55rem;font-size:.76rem;cursor:grab;}
 .tcard small{display:block;color:var(--muted);font-size:.66rem;}
 
@@ -212,6 +212,12 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
 .vartab{font-size:.76rem;font-weight:600;border:1px solid var(--border);border-radius:100px;padding:.26rem .8rem;color:var(--muted);cursor:pointer;}
 .vartab.on{background:#e7f1ee;color:var(--accent);border-color:#bcd8d0;}
 .decideby{font-size:.74rem;color:var(--warn);font-weight:600;margin-top:.45rem;}
+.iacts{position:absolute;top:2px;right:4px;display:flex;gap:5px;font-size:.6rem;color:var(--muted);background:rgba(255,253,246,.85);border-radius:5px;padding:0 2px;}
+.iacts i{font-style:normal;cursor:pointer;}
+.iacts i:hover{color:var(--accent);}
+.srcline{font-size:.66rem;color:var(--muted);font-style:italic;margin:.15rem 0 0;}
+.savebtn{font-size:.64rem;font-weight:700;border:1px solid var(--accent);color:var(--accent);background:none;border-radius:100px;padding:.06rem .5rem;cursor:pointer;margin-top:.25rem;}
+.savebtn.done{border-color:var(--border);color:var(--muted);}
 </style></head><body>
 <div class="deck">
   <div class="dhead">
@@ -236,16 +242,16 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
 <p>Three cities dropped in rough order — the split is a default, <b>2 · 4 · 4 nights</b>. Kranj stays on the tray. Every bar has its grip; every boundary its handle.</p>
 <p>Zhuzhing: grab the <b>boundary handle</b> and slide — Bled takes a night from Piran. Zero-sum between neighbors; the trip total doesn't move.</p>
 <p>The flights get booked and the window's outer edges <b>lock</b>. The trip can't stretch anymore without real money moving. Inside, still clay.</p>
-<p>The <b>stay strip</b> under each city: five Ljubljana candidates below, one dropped onto the city — it becomes a bar spanning the leg's nights. Bled and Piran still show their drop targets.</p>
+<p>The <b>stay strip</b> under each city. Candidates come from 🔍 search or ＋ add your own (each card: ✎ edit · ✕ remove). She drags Union onto the city — it becomes a bar spanning the leg's nights.</p>
 <p>Stays aren't 1:1 with cities. Each city has its own candidate strip — she drops <b>Hiša Franko</b> from Bled's and <b>Brdo</b> from Piran's, then drags Toplice's edge: the neighbor takes the night.</p>
 <p>Each stay bar opens its editor on click — confirmation pasted, status set to <b>booked</b>. Booked bars wear a 🔒 and <b>resist</b>: grabbing Union's handle surfaces its terms — free cancellation ends <b>May 12</b>.</p>
-<p>Under each city, a <b>bucket</b>. Activities pile in with durations. <b>The balloon arrived booked-for-May-19, so it placed itself</b> — dated things never sit in the bucket. The rest waits: <b>~16 h for ~3 open days — enough to lay out.</b></p>
+<p>How things get in: she browses the <b>Bled pool</b> (sourced from the places cache) and presses <b>+ Save</b>; the balloon was <b>added by hand</b> — no cache knows it. Every card carries <b>✎ edit · ✕ remove</b>. The balloon arrived booked-for-May-19 so it placed itself; the rest waits: <b>~16 h for ~3 open days.</b></p>
 <p>Janice already knows another answer: <b>lunch at Rustika on balloon day</b>. She drags it from the bucket straight onto Tue — manual placement works at any stage, and it lands <b>pinned</b>.</p>
 <p>Some days are for nothing: May 22 gets the <b>🪶 keep-it-light</b> toggle. The layout engine must leave it nearly empty. Recovery is a feature.</p>
 <p><b>“Lay out Bled.”</b> The machine deals all seven undated items around the two pins — closed-Mondays respected (Public &amp; Vegan lands Sunday), the drive day kept light. <b>The zipline doesn't fit and becomes an alternate, not a casualty.</b></p>
 <p>She drags the toboggan from Monday onto Wednesday — pair it with the drive day. The instant a human edits, <b>auto-layout pauses</b> — and waits for the explicit “re-lay out around my pins.”</p>
 <p>Tuesday looks right — <b>Solve</b>. The Days view: the machine sequenced by geography, inserted the drives, dropped lunch in its window, surfaced the free gap, assigned the clock.</p>
-<p>She nudges lunch to 12:30 — it <b>pins itself</b>, the day says “edited since solve,” and one button re-solves <b>around</b> her pins. The human always outranks.</p>
+<p>Time changes go through the editor: she opens Lunch with <b>✎</b> and sets <b>12:30</b>. It <b>pins itself</b>, the day says “edited since solve,” and one button re-solves <b>around</b> her pins. (Drag-to-retime belongs to the grid view — list rows don't pretend to support it.)</p>
 <p>She tries the zipline on Tuesday anyway. The machine reflows — and <b>refuses to lie</b>: it names what can't fit and offers the next day instead of silently cramming.</p>
 <p>The <b>Book</b> page kept itself: to-books with lead times, cancel-bys counting down, cash = on-site ∧ cash-only = <b>€927</b>, passes remembered. Nothing hand-kept.</p>
 <p>The payoff: <b>the grid prints itself.</b> Every block computed from the plan, logistics one click deep, one leg per page on paper. The artifact Janice used to type — now output.</p>
@@ -367,14 +373,15 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
       <span class="staybar" style="flex:4;border-style:dashed;border-left:1px dashed var(--border);justify-content:center;"><span class="dropz">drop a hotel on Bled</span></span>
       <span class="staybar" style="flex:4;border-style:dashed;border-left:1px dashed var(--border);justify-content:center;"><span class="dropz">drop a hotel on Piran</span></span>
     </div>
-    <div class="sect" style="margin-top:1.2rem;">Stay candidates · Ljubljana <button class="ctrl inlinectl">＋ add your own stay…</button></div>
+    <div class="sect" style="margin-top:1.2rem;">Stay candidates · Ljubljana <button class="ctrl inlinectl">🔍 search hotels…</button><button class="ctrl inlinectl" style="margin-left:.4rem;">＋ add your own…</button></div>
     <div class="cardrow">
-      <div class="mini" style="--k:var(--k-stay)"><span class="grip2">⠿</span><b>Union Eurostars</b><small>old town · garage</small><span class="mk ok">chosen</span></div>
-      <div class="mini" style="--k:var(--k-stay)"><span class="grip2">⠿</span><b>Hotel Lev</b><small>★4.4</small></div>
-      <div class="mini" style="--k:var(--k-stay)"><span class="grip2">⠿</span><b>City Hotel</b><small>★4.2</small></div>
-      <div class="mini" style="--k:var(--k-stay)"><span class="grip2">⠿</span><b>Vander Urbani</b><small>★4.3 · boutique</small></div>
-      <div class="mini" style="--k:var(--k-stay)"><span class="grip2">⠿</span><b>Antiq Palace</b><small>★4.4</small></div>
+      <div class="mini" style="--k:var(--k-stay)"><span class="iacts"><i title="edit">✎</i><i title="remove">✕</i></span><span class="grip2">⠿</span><b>Union Eurostars</b><small>old town · garage</small><span class="mk ok">chosen</span></div>
+      <div class="mini" style="--k:var(--k-stay)"><span class="iacts"><i title="edit">✎</i><i title="remove">✕</i></span><span class="grip2">⠿</span><b>Hotel Lev</b><small>★4.4</small></div>
+      <div class="mini" style="--k:var(--k-stay)"><span class="iacts"><i title="edit">✎</i><i title="remove">✕</i></span><span class="grip2">⠿</span><b>City Hotel</b><small>★4.2</small></div>
+      <div class="mini" style="--k:var(--k-stay)"><span class="iacts"><i title="edit">✎</i><i title="remove">✕</i></span><span class="grip2">⠿</span><b>Vander Urbani</b><small>★4.3 · boutique</small></div>
+      <div class="mini" style="--k:var(--k-stay)"><span class="iacts"><i title="edit">✎</i><i title="remove">✕</i></span><span class="grip2">⠿</span><b>Antiq Palace</b><small>★4.4</small></div>
     </div>
+    <p class="srcline">sourced from the places cache near Ljubljana · ranked by rating × reviews · ratings cited</p>
   </div>
 </section>
 
@@ -421,13 +428,21 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
 </section>
 
 <!-- ═ 9 · the Bled bucket ═ -->
-<section data-phase="Gather · the Bled bucket" data-did="presses ＋ from the pool and saves nine Bled items. The balloon arrives already booked for May 19 → it auto-places onto Tue.">
+<section data-phase="Gather · the Bled bucket" data-did="browses the Bled pool, presses + Save on eight items, adds the balloon by hand (＋ add your own) — it arrives booked → auto-places onto Tue.">
   <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
   <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
     <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
     <span class="spacer"></span><span class="chipbtn">Book <span class="badge">⏰ 1</span></span><span class="chipbtn">Grid →</span></div>
   <div class="pagebody">
-    <div class="sect">Bled · May 17–20 · Toplice + Hiša Franko</div>
+    <div class="sect">Shelf pool · Bled — sourced from the places cache near the stay <button class="ctrl inlinectl">＋ add your own…</button></div>
+    <div class="cardrow">
+      <div class="mini" style="--k:var(--k-meal)"><b>Oštarija Peglez'n</b><small>★4.5 (4,513) · 0.45 km</small><br><button class="savebtn">+ Save to bucket</button></div>
+      <div class="mini" style="--k:var(--k-act)"><b>Straža toboggan</b><small>★4.7 (1,752) · 1.1 km</small><br><button class="savebtn done">✓ saved</button></div>
+      <div class="mini" style="--k:var(--k-act)"><b>Blejsko jezero walk</b><small>★4.8 (414) · 0.7 km</small><br><button class="savebtn">+ Save to bucket</button></div>
+      <div class="mini ghost" style="--k:var(--k-act)"><b>Hot-air balloon</b><small>added by hand — not in any cache</small><br><button class="savebtn done">✓ added + booked</button></div>
+    </div>
+    <p class="srcline">candidates ranked by rating × review volume · markers cited from Google · “add your own” for things no cache knows</p>
+    <div class="sect" style="margin-top:1.1rem;">Bled · May 17–20 · Toplice + Hiša Franko</div>
     <div class="daycols">
       <div class="daycol"><div class="dh">Sun 17 <small>arrive</small></div><div class="cap"><i style="width:0%"></i></div></div>
       <div class="daycol"><div class="dh">Mon 18</div><div class="cap"><i style="width:0%"></i></div></div>
@@ -439,14 +454,14 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
     <div class="bucketbox">
       <div class="bh"><b>Bled bucket</b><span class="ready"><b>8 undated items · ~16 h</b> · ~3 open days · <b>enough to lay out</b></span><button class="layout-btn">Lay out Bled →</button></div>
       <div class="cardrow">
-        <div class="mini" style="--k:var(--k-act)"><span class="grip2">⠿</span><b>Vintgar Gorge</b><small>booked 🔒 · 2.5h</small></div>
-        <div class="mini" style="--k:var(--k-act)"><span class="grip2">⠿</span><b>Bled Castle</b><small>~2h · opens 8:00</small></div>
-        <div class="mini" style="--k:var(--k-act)"><span class="grip2">⠿</span><b>Via Ferrata</b><small>booked 🔒 · 1.5h</small></div>
-        <div class="mini" style="--k:var(--k-act)"><span class="grip2">⠿</span><b>Canyoning</b><small>booked 🔒 · 2h</small></div>
-        <div class="mini" style="--k:var(--k-meal)"><span class="grip2">⠿</span><b>Rustika</b><small>~1h</small><span class="mk ok">veg ✓</span></div>
-        <div class="mini" style="--k:var(--k-meal)"><span class="grip2">⠿</span><b>Public &amp; Vegan</b><small>closed Mon</small></div>
-        <div class="mini" style="--k:var(--k-act)"><span class="grip2">⠿</span><b>Toboggan</b><small>~1.5h</small></div>
-        <div class="mini" style="--k:var(--k-act)"><span class="grip2">⠿</span><b>Zipline</b><small>to book ⏰ · 3h</small></div>
+        <div class="mini" style="--k:var(--k-act)"><span class="iacts"><i title="edit">✎</i><i title="remove">✕</i></span><span class="grip2">⠿</span><b>Vintgar Gorge</b><small>booked 🔒 · 2.5h</small></div>
+        <div class="mini" style="--k:var(--k-act)"><span class="iacts"><i title="edit">✎</i><i title="remove">✕</i></span><span class="grip2">⠿</span><b>Bled Castle</b><small>~2h · opens 8:00</small></div>
+        <div class="mini" style="--k:var(--k-act)"><span class="iacts"><i title="edit">✎</i><i title="remove">✕</i></span><span class="grip2">⠿</span><b>Via Ferrata</b><small>booked 🔒 · 1.5h</small></div>
+        <div class="mini" style="--k:var(--k-act)"><span class="iacts"><i title="edit">✎</i><i title="remove">✕</i></span><span class="grip2">⠿</span><b>Canyoning</b><small>booked 🔒 · 2h</small></div>
+        <div class="mini" style="--k:var(--k-meal)"><span class="iacts"><i title="edit">✎</i><i title="remove">✕</i></span><span class="grip2">⠿</span><b>Rustika</b><small>~1h</small><span class="mk ok">veg ✓</span></div>
+        <div class="mini" style="--k:var(--k-meal)"><span class="iacts"><i title="edit">✎</i><i title="remove">✕</i></span><span class="grip2">⠿</span><b>Public &amp; Vegan</b><small>closed Mon</small></div>
+        <div class="mini" style="--k:var(--k-act)"><span class="iacts"><i title="edit">✎</i><i title="remove">✕</i></span><span class="grip2">⠿</span><b>Toboggan</b><small>~1.5h</small></div>
+        <div class="mini" style="--k:var(--k-act)"><span class="iacts"><i title="edit">✎</i><i title="remove">✕</i></span><span class="grip2">⠿</span><b>Zipline</b><small>to book ⏰ · 3h</small></div>
       </div>
       <div class="toolrow"><button class="ctrl">＋ from the pool…</button><button class="ctrl">＋ add your own…</button><span class="lbl2">⠿ or drag a card straight onto a day</span></div>
     </div>
@@ -466,19 +481,19 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
       <div class="daycol"><div class="dh">Mon 18</div><div class="dropz" style="width:100%;justify-content:center;">drop here</div><div class="cap"><i style="width:0%"></i></div></div>
       <div class="daycol hot"><div class="dh">Tue 19</div>
         <div class="mini" style="--k:var(--k-act)"><b>Balloon</b> <span class="tag pin">📌 auto</span></div>
-        <div class="mini" style="--k:var(--k-meal);box-shadow:0 8px 20px rgba(13,76,68,.25);"><span class="grip2">⠿</span><b>Rustika</b> <span class="tag pin">📌 pinned</span><small>lunch on balloon day · just dropped</small></div>
+        <div class="mini" style="--k:var(--k-meal);box-shadow:0 8px 20px rgba(13,76,68,.25);"><span class="iacts"><i title="edit">✎</i><i title="remove">✕</i></span><span class="grip2">⠿</span><b>Rustika</b> <span class="tag pin">📌 pinned</span><small>lunch on balloon day · just dropped</small></div>
         <div class="cap"><i style="width:38%"></i></div></div>
       <div class="daycol"><div class="dh">Wed 20 <small>→ Soča</small></div><div class="dropz" style="width:100%;justify-content:center;">drop here</div><div class="cap"><i style="width:0%"></i></div></div>
     </div>
     <div class="bucketbox"><div class="bh"><b>Bled bucket</b><span class="ready">7 left · ~15 h</span><button class="layout-btn">Lay out Bled →</button></div>
       <div class="cardrow">
-        <div class="mini" style="--k:var(--k-act)"><span class="grip2">⠿</span><b>Vintgar Gorge</b></div>
-        <div class="mini" style="--k:var(--k-act)"><span class="grip2">⠿</span><b>Bled Castle</b></div>
-        <div class="mini" style="--k:var(--k-act)"><span class="grip2">⠿</span><b>Via Ferrata</b></div>
-        <div class="mini" style="--k:var(--k-act)"><span class="grip2">⠿</span><b>Canyoning</b></div>
-        <div class="mini" style="--k:var(--k-meal)"><span class="grip2">⠿</span><b>Public &amp; Vegan</b></div>
-        <div class="mini" style="--k:var(--k-act)"><span class="grip2">⠿</span><b>Toboggan</b></div>
-        <div class="mini" style="--k:var(--k-act)"><span class="grip2">⠿</span><b>Zipline</b></div>
+        <div class="mini" style="--k:var(--k-act)"><span class="iacts"><i title="edit">✎</i><i title="remove">✕</i></span><span class="grip2">⠿</span><b>Vintgar Gorge</b></div>
+        <div class="mini" style="--k:var(--k-act)"><span class="iacts"><i title="edit">✎</i><i title="remove">✕</i></span><span class="grip2">⠿</span><b>Bled Castle</b></div>
+        <div class="mini" style="--k:var(--k-act)"><span class="iacts"><i title="edit">✎</i><i title="remove">✕</i></span><span class="grip2">⠿</span><b>Via Ferrata</b></div>
+        <div class="mini" style="--k:var(--k-act)"><span class="iacts"><i title="edit">✎</i><i title="remove">✕</i></span><span class="grip2">⠿</span><b>Canyoning</b></div>
+        <div class="mini" style="--k:var(--k-meal)"><span class="iacts"><i title="edit">✎</i><i title="remove">✕</i></span><span class="grip2">⠿</span><b>Public &amp; Vegan</b></div>
+        <div class="mini" style="--k:var(--k-act)"><span class="iacts"><i title="edit">✎</i><i title="remove">✕</i></span><span class="grip2">⠿</span><b>Toboggan</b></div>
+        <div class="mini" style="--k:var(--k-act)"><span class="iacts"><i title="edit">✎</i><i title="remove">✕</i></span><span class="grip2">⠿</span><b>Zipline</b></div>
       </div>
     </div>
   </div>
@@ -502,10 +517,10 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
     </div>
     <div class="bucketbox"><div class="bh"><b>Piran bucket</b><span class="ready">6 items · ~9 h</span><button class="layout-btn">Lay out Piran →</button></div>
       <div class="cardrow">
-        <div class="mini" style="--k:var(--k-act)"><span class="grip2">⠿</span><b>Vintage boat cruise</b><small>booked 🔒 · cash €511</small></div>
-        <div class="mini" style="--k:var(--k-trav)"><span class="grip2">⠿</span><b>Catamaran → Venice</b><small>booked 🔒 May 23</small></div>
-        <div class="mini" style="--k:var(--k-act)"><span class="grip2">⠿</span><b>Explore Piran walls</b></div>
-        <div class="mini" style="--k:var(--k-meal)"><span class="grip2">⠿</span><b>Heaven Terrace 99</b></div>
+        <div class="mini" style="--k:var(--k-act)"><span class="iacts"><i title="edit">✎</i><i title="remove">✕</i></span><span class="grip2">⠿</span><b>Vintage boat cruise</b><small>booked 🔒 · cash €511</small></div>
+        <div class="mini" style="--k:var(--k-trav)"><span class="iacts"><i title="edit">✎</i><i title="remove">✕</i></span><span class="grip2">⠿</span><b>Catamaran → Venice</b><small>booked 🔒 May 23</small></div>
+        <div class="mini" style="--k:var(--k-act)"><span class="iacts"><i title="edit">✎</i><i title="remove">✕</i></span><span class="grip2">⠿</span><b>Explore Piran walls</b></div>
+        <div class="mini" style="--k:var(--k-meal)"><span class="iacts"><i title="edit">✎</i><i title="remove">✕</i></span><span class="grip2">⠿</span><b>Heaven Terrace 99</b></div>
       </div>
     </div>
   </div>
@@ -521,25 +536,25 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
     <div class="sect">Bled · laid out — a proposal <span class="inlinectl" style="display:inline-flex;gap:.4rem;"><button class="ctrl solid">✓ keep this layout</button><button class="ctrl">↶ undo</button></span></div>
     <div class="daycols">
       <div class="daycol"><div class="dh">Sun 17</div>
-        <div class="mini" style="--k:var(--k-act)"><span class="grip2">⠿</span><b>Vintgar Gorge</b><small>arrive 10:30 🔒</small></div>
-        <div class="mini" style="--k:var(--k-meal)"><span class="grip2">⠿</span><b>Public &amp; Vegan</b><small>lunch · open Sun ✓</small></div>
+        <div class="mini" style="--k:var(--k-act)"><span class="iacts"><i title="edit">✎</i><i title="remove">✕</i></span><span class="grip2">⠿</span><b>Vintgar Gorge</b><small>arrive 10:30 🔒</small></div>
+        <div class="mini" style="--k:var(--k-meal)"><span class="iacts"><i title="edit">✎</i><i title="remove">✕</i></span><span class="grip2">⠿</span><b>Public &amp; Vegan</b><small>lunch · open Sun ✓</small></div>
         <div class="cap"><i style="width:55%"></i></div></div>
       <div class="daycol"><div class="dh">Mon 18</div>
-        <div class="mini" style="--k:var(--k-act)"><span class="grip2">⠿</span><b>Canyoning</b><small>🔒</small></div>
-        <div class="mini" style="--k:var(--k-act)"><span class="grip2">⠿</span><b>Toboggan</b></div>
+        <div class="mini" style="--k:var(--k-act)"><span class="iacts"><i title="edit">✎</i><i title="remove">✕</i></span><span class="grip2">⠿</span><b>Canyoning</b><small>🔒</small></div>
+        <div class="mini" style="--k:var(--k-act)"><span class="iacts"><i title="edit">✎</i><i title="remove">✕</i></span><span class="grip2">⠿</span><b>Toboggan</b></div>
         <div class="cap"><i style="width:60%"></i></div></div>
       <div class="daycol"><div class="dh">Tue 19</div>
         <div class="mini" style="--k:var(--k-act)"><b>Balloon</b> <span class="tag pin">📌</span></div>
-        <div class="mini" style="--k:var(--k-act)"><span class="grip2">⠿</span><b>Castle hike</b></div>
+        <div class="mini" style="--k:var(--k-act)"><span class="iacts"><i title="edit">✎</i><i title="remove">✕</i></span><span class="grip2">⠿</span><b>Castle hike</b></div>
         <div class="mini" style="--k:var(--k-meal)"><b>Rustika</b> <span class="tag pin">📌</span></div>
-        <div class="mini" style="--k:var(--k-act)"><span class="grip2">⠿</span><b>Via Ferrata</b><small>🔒 16:00</small></div>
+        <div class="mini" style="--k:var(--k-act)"><span class="iacts"><i title="edit">✎</i><i title="remove">✕</i></span><span class="grip2">⠿</span><b>Via Ferrata</b><small>🔒 16:00</small></div>
         <div class="cap"><i style="width:90%"></i></div></div>
       <div class="daycol"><div class="dh">Wed 20</div>
         <div class="mini" style="--k:var(--k-trav)"><b>→ Soča drive</b></div>
         <div class="cap"><i style="width:30%"></i></div></div>
     </div>
     <div class="bucketbox"><div class="bh"><b>Didn't fit — alternates</b><span class="ready">stays in the bucket, ready if a slot opens</span></div>
-      <div class="cardrow"><div class="mini ghost" style="--k:var(--k-act)"><span class="grip2">⠿</span><b>Zipline Dolinka</b><small>3h wouldn't fit · to book ⏰</small></div></div>
+      <div class="cardrow"><div class="mini ghost" style="--k:var(--k-act)"><span class="iacts"><i title="edit">✎</i><i title="remove">✕</i></span><span class="grip2">⠿</span><b>Zipline Dolinka</b><small>3h wouldn't fit · to book ⏰</small></div></div>
     </div>
   </div>
 </section>
@@ -561,7 +576,7 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
         <div class="mini" style="--k:var(--k-meal)"><b>Rustika</b> <span class="tag pin">📌</span></div>
         <div class="mini" style="--k:var(--k-act)"><b>Via Ferrata</b></div></div>
       <div class="daycol hot"><div class="dh">Wed 20</div>
-        <div class="mini" style="--k:var(--k-act);box-shadow:0 8px 20px rgba(13,76,68,.25);"><span class="grip2">⠿</span><b>Toboggan</b> <span class="tag pin">📌 just moved</span></div>
+        <div class="mini" style="--k:var(--k-act);box-shadow:0 8px 20px rgba(13,76,68,.25);"><span class="iacts"><i title="edit">✎</i><i title="remove">✕</i></span><span class="grip2">⠿</span><b>Toboggan</b> <span class="tag pin">📌 just moved</span></div>
         <div class="mini" style="--k:var(--k-trav)"><b>→ Soča drive</b></div></div>
     </div>
     <div class="toolrow">
@@ -596,8 +611,8 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
       <div class="tlr a" style="--k:var(--k-act)"><span class="t">4:00 – 5:30</span><span class="c"><b>Via Ferrata Hvadnik</b> 🔒 📌 <span class="edit-aff">✎</span></span></div>
     </div>
     <aside class="tray"><header><h3>Shelf · Bled</h3><p class="note">drag onto the day</p></header>
-      <div class="tcard" style="--k:var(--k-act)"><span class="grip2">⠿</span><b>Zipline Dolinka</b><small>★5.0 · ~3 h · to book ⏰</small></div>
-      <div class="tcard" style="--k:var(--k-meal)"><span class="grip2">⠿</span><b>Public &amp; Vegan Kitchen</b><small>veg ✓ patio ✓ · closed Mon</small></div>
+      <div class="tcard" style="--k:var(--k-act)"><span class="iacts"><i title="edit">✎</i><i title="remove">✕</i></span><span class="grip2">⠿</span><b>Zipline Dolinka</b><small>★5.0 · ~3 h · to book ⏰</small></div>
+      <div class="tcard" style="--k:var(--k-meal)"><span class="iacts"><i title="edit">✎</i><i title="remove">✕</i></span><span class="grip2">⠿</span><b>Public &amp; Vegan Kitchen</b><small>veg ✓ patio ✓ · closed Mon</small></div>
     </aside>
   </div>
 </section>
@@ -620,7 +635,7 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
       <div class="tlr a" style="--k:var(--k-act)"><span class="t">4:00 – 5:30</span><span class="c"><b>Via Ferrata</b> 🔒</span></div>
     </div>
     <aside class="tray"><header><h3>Shelf · Bled</h3><p class="note">drag onto the day</p></header>
-      <div class="tcard" style="--k:var(--k-act)"><span class="grip2">⠿</span><b>Zipline Dolinka</b><small>★5.0 · ~3 h</small></div>
+      <div class="tcard" style="--k:var(--k-act)"><span class="iacts"><i title="edit">✎</i><i title="remove">✕</i></span><span class="grip2">⠿</span><b>Zipline Dolinka</b><small>★5.0 · ~3 h</small></div>
     </aside>
   </div>
 </section>
@@ -637,7 +652,7 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
   <div class="work" style="grid-template-columns:1fr;">
     <div class="canvas">
       <div class="chead"><h2>Tuesday, May 19</h2><span class="spacer"></span><span class="verdict bad">over-packed</span></div>
-      <div style="padding:.6rem 1rem 0;"><div class="mini ghost" style="--k:var(--k-act);display:inline-block;box-shadow:0 8px 20px rgba(163,67,31,.25);"><span class="grip2">⠿</span><b>Zipline Dolinka</b><small>just dropped from the Shelf — 3 h</small></div></div>
+      <div style="padding:.6rem 1rem 0;"><div class="mini ghost" style="--k:var(--k-act);display:inline-block;box-shadow:0 8px 20px rgba(163,67,31,.25);"><span class="iacts"><i title="edit">✎</i><i title="remove">✕</i></span><span class="grip2">⠿</span><b>Zipline Dolinka</b><small>just dropped from the Shelf — 3 h</small></div></div>
       <div class="flagbar">⚠️ <b>Zipline Dolinka (3 h) couldn't fit.</b> Everything else reflowed — lunch slid +18 min, free time shrank.
         <button class="ctrl">→ move to Wed 20</button><button class="ctrl ghosted">↩ back to alternates</button></div>
       <div class="tlr a" style="--k:var(--k-act)"><span class="t">5:30</span><span class="c"><b>Balloon</b> 🔒 📌</span></div>

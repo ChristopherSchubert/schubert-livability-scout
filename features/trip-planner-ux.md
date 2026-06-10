@@ -225,6 +225,19 @@ Days → Hours. Key rules, all owner-confirmed:
 plays this entire model as a 20-step arrow-through deck on the real Slovenia
 trip — the Janice-review artifact.
 
+### Two standing rules (owner audit, 2026-06-10)
+
+- **The collection rule.** Every pool / bucket / candidate strip / tray must
+  show: (a) **its source** ("from the places cache near the stay", "added by
+  hand"); (b) **its entry path** as a visible control (＋ Save / 🔍 search /
+  ＋ add your own); (c) **per-item lifecycle** — ✎ edit and ✕ remove on every
+  card. Collections never just *have* contents.
+- **The gesture-honesty rule.** Never narrate a gesture the rendered controls
+  can't perform. Time changes in the **list** view go through the editor
+  (✎ → time fields); drag-to-retime exists only where a time axis is drawn
+  (the grid view). Drag is for *placement* (pool→day, day→day); the editor is
+  for *values*.
+
 ## 6. What this forces on the mockups (the fix list)
 
 1. **Re-frame mockup 2 as the workspace**: Trip bar + Day rail + one day
