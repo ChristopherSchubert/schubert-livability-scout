@@ -276,10 +276,11 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
 <p>＋ add transport opens the <b>transport editor</b>: route, each end's local clock, ticket fields that wait honestly empty until ticketed — and the consequence stated before it happens: <b>booking this locks the trip's end date.</b></p>
 <p>The flights get booked and the window's outer edges <b>lock</b>. The trip can't stretch anymore without real money moving. Inside, still clay.</p>
 <p>Locked is <b>not frozen</b>: the lock holds only the outer edges. Inside, she drops Kranj in and trades nights freely. The lock's tooltip names its cause and its exit — <b>change the return flight and the edge softens</b>. Hardening is always reversible at the price of the thing that caused it.</p>
-<p>The <b>stay strip</b> under each city. Candidates come from 🔍 search or ＋ add your own (each card: ✎ edit · ✕ remove). She drags Union onto the city — it becomes a bar spanning the leg's nights.</p>
-<p>🔍 search hotels is where candidates come from: a place search scoped to the leg, results <b>＋ shortlist</b>-able onto the strip — and an add-your-own escape hatch for places no cache knows. The strip in the previous step is this sheet's output.</p>
-<p>Stays aren't 1:1 with cities. Each city has its own candidate strip — she drops <b>Hiša Franko</b> from Bled's and <b>Brdo</b> from Piran's, then drags Toplice's edge: the neighbor takes the night.</p>
+<p>Transport done, she works down the same Plan page to <b>Stays</b> — empty so far. 🔍 search hotels opens a place search scoped to the leg; <b>＋ shortlist</b> collects candidates, with add-your-own for places no cache knows.</p>
+<p>The shortlist from the search now sits under Ljubljana as the <b>candidate strip</b> (each card: ✎ · ✕). She drags Union onto the city — it becomes a bar spanning the leg's nights.</p>
+<p>The same search-and-drop, twice more: <b>Toplice</b> for Bled, <b>Hotel Piran</b> for Piran. Three cities, three bars — every night housed, nothing split yet.</p>
 <p>✂ split a stay asks one question — <b>after which night?</b> — and the split leaves an honest open slot (“night of May 20 — drop a stay”) rather than silently stretching a neighbor. Hiša Franko lands in that slot next.</p>
+<p>Stays aren't 1:1 with cities: <b>Hiša Franko</b> — added by hand, the splurge — takes the open night. The same split-and-drop later hands the last night to <b>Brdo</b>, near the airport.</p>
 <p>Each stay bar opens its editor on click — confirmation pasted, status set to <b>booked</b>. Booked bars wear a 🔒 and <b>resist</b>: grabbing Union's handle surfaces its terms — free cancellation ends <b>May 12</b>.</p>
 <p>The stay bar's click opens the <b>stay editor</b> — this is where booking actually happens: status to <b>booked</b>, confirmation pasted, the free-cancellation date captured once and reused everywhere (the bar's resistance, the Book page's countdown, the ⏰ badge).</p>
 <p>How you reach a city's bucket: <b>the window is the navigation</b> — click the Bled segment and the page focuses Bled's section: its stays, its days, and an empty bucket stating its three ways in (browse suggestions · add your own · booked-and-dated places itself).</p>
@@ -537,6 +538,8 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
     <div class="cardrow">
       <div class="mini ghost" style="--k:var(--k-trav);border-color:var(--accent);"><b>✈ FRA → LJU</b> · Fri May 15<small>editing…</small></div>
     </div>
+    <div class="sect" style="margin-top:1.1rem;">Stays</div>
+    <p class="srcline">stays live under each city — search or add your own, then drop one on a city</p>
   </div>
   <div class="overlay"><div class="scrim2"></div>
     <aside class="sheet"><span class="x2">×</span>
@@ -574,6 +577,8 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
       <div class="mini" style="--k:var(--k-trav)"><b>✈ → FRA → LJU</b> · Fri May 15<small>arrive 9:30 PM local · booked 🔒</small></div>
       <div class="mini" style="--k:var(--k-trav)"><b>✈ LJU →</b> · Mon May 25<small>takeoff 9:30 AM · booked 🔒</small></div>
     </div>
+    <div class="sect" style="margin-top:1.1rem;">Stays</div>
+    <p class="srcline">stays live under each city — search or add your own, then drop one on a city</p>
   </div>
 </section>
 
@@ -596,11 +601,45 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
     </div>
     <p class="dragnote">Kranj +1 night · Piran −1</p>
     <div class="toolrow"><button class="ctrl">↶ undo</button><span class="lbl2">On the tray:</span><span class="citychip" style="opacity:.5;">⠿ Kranj</span></div>
+    <div class="sect" style="margin-top:1.3rem;">Transport</div>
+    <div class="cardrow">
+      <div class="mini" style="--k:var(--k-trav)"><b>✈ → FRA → LJU</b> · Fri May 15<small>booked 🔒</small></div>
+      <div class="mini" style="--k:var(--k-trav)"><b>✈ LJU →</b> · Mon May 25<small>booked 🔒</small></div>
+    </div>
+    <div class="sect" style="margin-top:1.1rem;">Stays</div>
+    <p class="srcline">stays live under each city — search or add your own, then drop one on a city</p>
   </div>
 </section>
 
 <!-- ═ 6 · stay strip + shelf ═ -->
-<section data-phase="Stays · drop a hotel on the city" data-did="drags the Union Eurostars card onto the Ljubljana segment.">
+<section data-phase="Stays · 🔍 search hotels" data-did="works down the same Plan page to Stays — empty so far — and presses 🔍 search hotels on Ljubljana; shortlists two.">
+  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
+    <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
+    <span class="spacer"></span><span class="chipbtn">Book</span><span class="chipbtn">Grid →</span></div>
+  <div class="pagebody" style="min-height:430px;">
+    <div class="sect">Stays</div>
+    <div class="staysrow">
+      <span class="staybar" style="flex:2;border-style:dashed;border-left:1px dashed var(--border);justify-content:center;"><span class="dropz">drop a hotel on Ljubljana</span></span>
+      <span class="staybar" style="flex:4;border-style:dashed;border-left:1px dashed var(--border);justify-content:center;"><span class="dropz">drop a hotel on Bled</span></span>
+      <span class="staybar" style="flex:4;border-style:dashed;border-left:1px dashed var(--border);justify-content:center;"><span class="dropz">drop a hotel on Piran</span></span>
+    </div>
+  </div>
+  <div class="overlay"><div class="scrim2"></div>
+    <aside class="sheet"><span class="x2">×</span>
+      <span class="kl">stays · Ljubljana · May 15–17</span><h3>Search hotels</h3>
+      <div class="frow"><span class="fld"><input value="old town ljubljana" placeholder="search near the leg…"></span></div>
+      <p class="hint2">from Google Places near Ljubljana old town · ranked by rating × reviews</p>
+      <div class="mini" style="--k:var(--k-stay);margin-bottom:.45rem;"><b>Grand Hotel Union Eurostars</b><small>★4.5 (3,932) · old town</small><br><button class="savebtn">＋ shortlist</button></div>
+      <div class="mini" style="--k:var(--k-stay);margin-bottom:.45rem;"><b>Vander Urbani Resort</b><small>★4.3 (612) · riverside · boutique</small><br><button class="savebtn done">✓ shortlisted</button></div>
+      <div class="mini" style="--k:var(--k-stay);margin-bottom:.45rem;"><b>Antiq Palace</b><small>★4.4 (388) · old town</small><br><button class="savebtn">＋ shortlist</button></div>
+      <p class="hint2" style="margin-top:.5rem;">not here? <u>＋ add your own stay</u> — a B&amp;B no cache knows</p>
+    </aside>
+  </div>
+</section>
+
+<!-- ═ 7 · splitting stays ═ -->
+<section data-phase="Stays · drop a hotel on the city" data-did="drags Union Eurostars from the shortlist onto the Ljubljana segment.">
   <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
   <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
     <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
@@ -625,38 +664,11 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
       <div class="mini" style="--k:var(--k-stay)"><span class="iacts"><i title="edit">✎</i><i title="remove">✕</i></span><span class="grip2">⠿</span><b>Vander Urbani</b><small>★4.3 · boutique</small></div>
       <div class="mini" style="--k:var(--k-stay)"><span class="iacts"><i title="edit">✎</i><i title="remove">✕</i></span><span class="grip2">⠿</span><b>Antiq Palace</b><small>★4.4</small></div>
     </div>
-    <p class="srcline">sourced from the places cache near Ljubljana · ranked by rating × reviews · ratings cited</p>
+    <p class="srcline">your shortlist from 🔍 search · ranked by rating × reviews</p>
   </div>
 </section>
 
-<section data-phase="Stays · 🔍 search hotels" data-did="presses 🔍 search hotels — results come from Google Places near the leg; ＋ shortlist puts one on the strip.">
-  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
-  <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
-    <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
-    <span class="spacer"></span><span class="chipbtn">Book</span><span class="chipbtn">Grid →</span></div>
-  <div class="pagebody" style="min-height:430px;">
-    <div class="sect">Stays</div>
-    <div class="staysrow">
-      <span class="staybar" style="flex:2"><span class="grip2">⠿</span><b>Union Eurostars</b><small>2 nights</small></span>
-      <span class="staybar" style="flex:4;border-style:dashed;border-left:1px dashed var(--border);justify-content:center;"><span class="dropz">drop a hotel on Bled</span></span>
-      <span class="staybar" style="flex:4;border-style:dashed;border-left:1px dashed var(--border);justify-content:center;"><span class="dropz">drop a hotel on Piran</span></span>
-    </div>
-  </div>
-  <div class="overlay"><div class="scrim2"></div>
-    <aside class="sheet"><span class="x2">×</span>
-      <span class="kl">stays · Ljubljana · May 15–17</span><h3>Search hotels</h3>
-      <div class="frow"><span class="fld"><input value="old town ljubljana" placeholder="search near the leg…"></span></div>
-      <p class="hint2">from Google Places near Ljubljana old town · ranked by rating × reviews</p>
-      <div class="mini" style="--k:var(--k-stay);margin-bottom:.45rem;"><b>Grand Hotel Union Eurostars</b><small>★4.5 (3,932) · old town</small><br><button class="savebtn">＋ shortlist</button></div>
-      <div class="mini" style="--k:var(--k-stay);margin-bottom:.45rem;"><b>Vander Urbani Resort</b><small>★4.3 (612) · riverside · boutique</small><br><button class="savebtn done">✓ shortlisted</button></div>
-      <div class="mini" style="--k:var(--k-stay);margin-bottom:.45rem;"><b>Antiq Palace</b><small>★4.4 (388) · old town</small><br><button class="savebtn">＋ shortlist</button></div>
-      <p class="hint2" style="margin-top:.5rem;">not here? <u>＋ add your own stay</u> — a B&amp;B no cache knows</p>
-    </aside>
-  </div>
-</section>
-
-<!-- ═ 7 · splitting stays ═ -->
-<section data-phase="Stays · splitting a leg" data-did="drops Hiša Franko and Brdo from their cities' candidate strips, then drags Toplice's ↔ edge one night left.">
+<section data-phase="Stays · the other cities" data-did="repeats the search-and-drop for Bled and Piran — Toplice and Hotel Piran land as four-night bars.">
   <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
   <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25 · 5 stays</span>
     <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
@@ -689,13 +701,34 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
       <span class="staybar" style="flex:2"><b>Union</b><small>2n</small></span>
       <span class="staybar" style="flex:3;border-color:var(--accent);"><b>Toplice</b><small>3n</small></span>
       <span class="staybar" style="flex:1;border-style:dashed;border-left:1px dashed var(--border);justify-content:center;"><span class="dropz">night of May 20 — drop a stay</span></span>
-      <span class="staybar" style="flex:4"><b>Hotel Piran</b><small>3n+1</small></span>
+      <span class="staybar" style="flex:4"><b>Hotel Piran</b><small>4n</small></span>
     </div>
     <div class="pop" style="left:300px;top:108px;width:240px;">
       <div style="font-size:.76rem;font-weight:600;margin-bottom:.35rem;">Split Toplice after…</div>
       <div class="pi">night 1 · May 17</div>
       <div class="pi">night 2 · May 18</div>
       <div class="pi" style="background:var(--panel-strong);font-weight:700;">night 3 · May 19 ✓</div>
+    </div>
+  </div>
+</section>
+
+<section data-phase="Stays · the splurge night" data-did="adds Hiša Franko (＋ add your own — the splurge) and drops it into the open slot; the same split-and-drop later hands Brdo the last night.">
+  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25 · 5 stays</span>
+    <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
+    <span class="spacer"></span><span class="chipbtn">Book</span><span class="chipbtn">Grid →</span></div>
+  <div class="pagebody">
+    <div class="sect">The window</div>
+    <div class="win" style="height:36px"><span class="edge l lock"></span>
+      <span class="legseg lj" style="flex:2">Ljubljana<span class="hndl">↔</span></span><span class="legseg bl" style="flex:4">Bled + Soča<span class="hndl">↔</span></span><span class="legseg pi" style="flex:4">Piran + Kranj</span>
+    <span class="edge r lock"></span></div>
+    <div class="sect" style="margin-top:.9rem;">Stays <button class="ctrl inlinectl">✂ split a stay…</button></div>
+    <div class="staysrow">
+      <span class="staybar" style="flex:2"><b>Union</b><small>2n</small></span>
+      <span class="staybar" style="flex:3"><b>Toplice</b><small>3n</small></span>
+      <span class="staybar" style="flex:1;border-color:var(--accent);box-shadow:0 6px 16px rgba(13,76,68,.2);"><b>H. Franko</b><small>1n</small></span>
+      <span class="staybar" style="flex:3"><b>Hotel Piran</b><small>3n</small></span>
+      <span class="staybar" style="flex:1"><b>Brdo</b><small>1n</small></span>
     </div>
   </div>
 </section>
