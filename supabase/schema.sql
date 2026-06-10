@@ -185,7 +185,9 @@ create table if not exists pois (
   street            text,
   formatted_address text,
   source            text not null default 'google_places',
-  fetched_at        timestamptz not null default now()
+  fetched_at        timestamptz not null default now(),
+  attributes            jsonb,        -- cited-marker fields from Place Details (allowsDogs, servesVegetarianFood, outdoorSeating, goodForChildren, accessibilityOptions, paymentOptions, opening hours) — see migration 0014; null = never fetched, {} = fetched but Google reports nothing
+  attributes_fetched_at timestamptz   -- when the attributes were fetched; cited on every derived marker
 );
 create index if not exists pois_lat_lon_idx on pois (lat, lon);
 create index if not exists pois_primary_type_idx on pois (primary_type);

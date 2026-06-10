@@ -70,6 +70,20 @@ it; unknown stays **null** ("not verified"), never a guessed ✅. Richer dog dat
 **Honest v1.** Cost/cash from `price_level` + booking; the Google marker fields
 behind a one-time re-fetch; everything else null-until-sourced.
 
+**Status (2026-06-10): BUILT + proven, trip-scoped.** `pois.attributes` +
+`attributes_fetched_at` (migration 0014, applied). Two fetchers:
+`scripts/enrich-trip-pois.mjs` (matches a Trip's entries → cached POIs inside
+the legs' boxes, fetches ONLY those — the default) and
+`scripts/fetch-poi-attributes.mjs` (leg-area batch, available but not the
+default; one Details call per place, so scope deliberately). `deriveMarkers()`
+in [lib/sourcing.js](../lib/sourcing.js) emits each marker cited
+`Google Places · <fetch date>`; `openingHours()` feeds Solve's soft constraint.
+Verified end-to-end on the Slovenia trip: Pizzeria Rustika dog+veg+kid+patio,
+Hotel Piran dog-friendly, and the bonus catch — Public & Vegan Kitchen Bled is
+**closed Mondays** (exactly what the open-hours constraint exists for).
+Explicit `false` yields no chip (chips assert presence); absent field = null =
+"not verified", never guessed.
+
 ---
 
 ## 3. Block (fuzzy placement)
