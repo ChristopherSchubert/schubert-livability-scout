@@ -115,6 +115,25 @@ variable-width trip meta text — it's now absolutely centered in the tripbar,
 same x on every slide. Feedback pipeline is LIVE: migration 0015 applied
 2026-06-10, prod POST → row verified end-to-end, test rows removed.
 
+## Rule 10 — stable chrome (no arbitrary slide-to-slide variation)
+
+Chrome changes ONLY when the story changes it, in one consistent format.
+Canonical forms: trip-meta = "May 15–25 · provisional" (slides 5-10, until
+the flights lock) then "May 15–25 · 10 nights" (11+, including the
+variation slides — status crumbs like "3 stays"/"all stays booked" belong
+to page sections, not the trip bar); window header = "The window" + ✎
+adjust dates on the full-window editor (5-12), plain "The window" label on
+every miniwin (13-27, 36-37); miniwin legs = identical plain
+Ljubljana/Bled/Piran (focus outline only when a city section is focused,
+20-27; selection/fork labels only on 36-37); the city tray exists only on
+the full-window editor (7-12, where Kranj waits); the Days rail is the
+identical full 11-day rail on all Days slides (28-31); the ✂ split-a-stay
+control persists on every stays-bearing slide (14-19, highlighted while
+its popover is open on 16); stay bars always carry night counts until
+booking replaces them with terms (19). Also fixed under this rule: slide
+15 had leaked the post-split five-bar state ("nothing split yet" caption
+over a split page) — restored to three bars, 2/4/4.
+
 ## Mechanical checks (run before any review handoff)
 
 Per-slide matrix script (in git history, commit 771384e): topbar/tripbar
