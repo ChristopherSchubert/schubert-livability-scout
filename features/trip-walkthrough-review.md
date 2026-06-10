@@ -145,6 +145,26 @@ every empty stay slot reads "drop a hotel on <city> · 🔍 search" — slide
 13 is just Ljubljana's slot pressed, sheet scoped to that leg. Stays
 never "opens" (it was never closed); did-line and caption rewritten.
 
+## Rule 11 — section continuity (the section auditor)
+
+Every page-level section on slide N is either present on slide N+1,
+disappears because of an explicit named action, or appears because of one.
+The auditor (`scripts/.audit-walkthrough-sections.py`) prints the
+section-level diff for every consecutive pair; match each ± line against
+the pair's did-lines/captions — an unmatched line is a violation. Run it
+after ANY deck edit. The 2026-06-10 run found and fixed: 22/23's sheet
+backdrops had collapsed to a stub page (so slide 24 looked like a whole
+new section appearing — the owner's catch); 29 and 33 backdrops dropped
+the Shelf tray / the Booked·Cash·Passes sections; slide 3's composer lost
+its nights field, ＋traveler/＋pet row, and Create-trip footer; ＋ New trip
+vanished behind the composer (2-4); slide 27 dropped the proposal's
+✓ keep/↶ undo controls; the bucket toolrow existed only on some bucket
+slides; city-section titles flapped; unnamed transitions got named (Done
+closes the dates popover and entry editor; the suggestions tray closes
+via ✕; the big calendar "compacts to a strip" at 13; ✂ split-a-stay is
+ghosted until stays exist). Header margin styles normalized so spacing
+stops shifting between slides.
+
 ## Mechanical checks (run before any review handoff)
 
 Per-slide matrix script (in git history, commit 771384e): topbar/tripbar
