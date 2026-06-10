@@ -189,6 +189,42 @@ delete, no pin (you can't shelve a travel leg; it's a consequence). Their one
 affordance: "adjust the anchors around this." Past days: fields editable
 (notes!), moves disabled.
 
+## 5.7 The zhuzh model (owner sessions, 2026-06-10)
+
+Planning is **one grammar at five altitudes** — *gather options → machine
+proposes → you zhuzh it → booking hardens it* — over Trip → Cities → Nights →
+Days → Hours. Key rules, all owner-confirmed:
+
+- **The skeleton is sculpted, not input.** A trip starts as WHERE + a soft
+  window ("Slovenia, ~10 days"). Cities are bars dragged within the window
+  (boundary drag = zero-sum night trade between neighbors; outer-edge drag =
+  trip grows/shrinks). Stays are bars *under* a leg — a leg holds a
+  **sequence** of stays (Toplice ×3 + Hiša Franko ×1), trimmable by edge-drag.
+- **Commitment hardens the clay.** `toBook` bars slide freely; `reserved`
+  tugs; `booked` resists and surfaces its cancellation terms when moved;
+  booked flights freeze the trip's outer edges.
+- **Buckets per city; Distribute ("lay out") per leg, human-triggered.**
+  The bucket shows a readiness signal (gathered hours vs. open days). "Lay
+  out Bled" deals the cards: booked dates pin, one heavy anchor/day,
+  closed-days respected, load balanced. **Leftovers stay in the bucket as
+  alternates** — the Gettysburg "Alternate Activities" list is exactly this
+  residue. Never silently dropped.
+- **Human ↔ auto handoff:** any manual edit pauses auto for that scope
+  ("edited — layout paused") until an explicit re-trigger ("re-lay out around
+  my pins"). Pinning is the cheapest gesture — dragging or editing IS
+  pinning. Manual day-assignment is allowed at any stage.
+- **Keep-it-light** is a day property Distribute must respect (≤ one light
+  item).
+- **Variations (step 2, designed not built):** a fork scoped to a date range;
+  each option holds its own skeleton/stays/buckets; exactly one active for
+  rollups; the fork's **decide-by date inherits from the cancellation
+  deadlines** of the bookings inside it (the Trieste/Piran lesson — both
+  futures stay alive while they're refundable).
+
+**The walkthrough** ([/mockups/trip-walkthrough.html](../public/mockups/trip-walkthrough.html))
+plays this entire model as a 20-step arrow-through deck on the real Slovenia
+trip — the Janice-review artifact.
+
 ## 6. What this forces on the mockups (the fix list)
 
 1. **Re-frame mockup 2 as the workspace**: Trip bar + Day rail + one day
