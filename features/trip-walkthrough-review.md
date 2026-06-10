@@ -50,8 +50,10 @@ GATHER 20 window-as-nav → empty bucket · 21 suggestions + saves ·
 pin (Rustika) · 25 keep-it-light + caves errand — LAY OUT 26 the deal
 (alternates residue) · 27 human takes the wheel (auto pauses) — CLOCK
 28 solve day · 29 entry editor · 30 pinned result · 31 over-pack honesty —
-GO 32 book page · 33 mark booked · 34 grid · 35 phone — WHAT IF (rewind)
-36 fork composer · 37 variations.
+GO 32 book page · 33 mark booked · 34 grid · 35 phone (full day-of screen:
+faded done rows, NEXT card, tab bar) — WHAT IF (rewind) 36 fork composer ·
+37 variations — 38 mobile gallery (aside): Plan / Book / Grid as phone
+frames, same data one column.
 
 ## Janice's feedback widget (deck chrome, not part of the app mockup)
 
@@ -164,6 +166,16 @@ closes the dates popover and entry editor; the suggestions tray closes
 via ✕; the big calendar "compacts to a strip" at 13; ✂ split-a-stay is
 ghosted until stays exist). Header margin styles normalized so spacing
 stops shifting between slides.
+
+## Tour cursor (deck chrome)
+
+Every slide with a named action shows a glowing pointer on its control —
+warm halo + repeating click-ring for presses, an oscillating ↔ cursor for
+edge/handle drags, and a traveling cursor along a dashed trail for
+drag-and-drops (tray→window, strip→bar, bucket→day, shelf→day). Spec
+lives in the TCUR array (one entry per slide; null = no action shown,
+e.g. result-only slides); targets resolve by text/selector against the
+rendered stage and fail silent. Honors prefers-reduced-motion.
 
 ## Mechanical checks (run before any review handoff)
 

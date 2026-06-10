@@ -196,6 +196,16 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
 .ph .phh b{font-family:var(--fd);font-weight:500;}
 .ph .bd{padding:.55rem;}
 .nextcard{border:1px solid var(--accent);border-left:4px solid var(--k-meal);border-radius:9px;padding:.45rem .55rem;box-shadow:0 6px 18px rgba(13,76,68,.15);font-size:.74rem;background:var(--panel);}
+.ph .prow{display:flex;gap:.5rem;align-items:baseline;font-size:.72rem;padding:.32rem .2rem;border-bottom:1px dashed var(--border);}
+.ph .prow.done{opacity:.42;}
+.ph .prow .t{color:var(--muted);font-variant-numeric:tabular-nums;flex:0 0 44px;}
+.ph .prow small{color:var(--muted);}
+.phtabs{display:flex;border-top:1px solid var(--border);background:var(--panel);}
+.phtabs span{flex:1;text-align:center;font-size:.62rem;font-weight:600;color:var(--muted);padding:.42rem 0;}
+.phtabs span.on{color:var(--accent);font-weight:700;}
+.phgal{display:flex;gap:1.6rem;justify-content:center;align-items:flex-start;padding:1.4rem 0;flex-wrap:wrap;}
+.phgal .ph{width:236px;}
+.phgal .gl{text-align:center;font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.5rem;}
 .bigbtns{display:flex;gap:.3rem;margin-top:.35rem;}
 .bigbtns span{flex:1;text-align:center;font-size:.66rem;font-weight:700;border-radius:7px;padding:.35rem .2rem;cursor:pointer;}
 .bigbtns .d{background:var(--accent);color:#fff;}
@@ -230,6 +240,21 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
 .savebtn{font-size:.64rem;font-weight:700;border:1px solid var(--accent);color:var(--accent);background:none;border-radius:100px;padding:.06rem .5rem;cursor:pointer;margin-top:.25rem;}
 .savebtn.done{border-color:var(--border);color:var(--muted);}
 .stage{position:relative;}
+
+/* ════ TOUR CURSOR (deck chrome — marks the slide's named action) ════ */
+#tcur{position:absolute;z-index:80;pointer-events:none;filter:drop-shadow(0 2px 6px rgba(27,24,20,.45));}
+#tcur .halo{position:absolute;left:-21px;top:-21px;width:48px;height:48px;border-radius:50%;
+background:radial-gradient(rgba(255,190,60,.5),rgba(255,190,60,.18) 55%,transparent 70%);}
+#tcur .ring{position:absolute;left:-15px;top:-15px;width:36px;height:36px;border-radius:50%;
+border:2.5px solid var(--accent);opacity:0;}
+#tcur.click .ring{animation:tcring 2.2s ease-out infinite;}
+#tcur.click svg{animation:tctap 2.2s ease-in-out infinite;transform-origin:3px 3px;}
+@keyframes tcring{0%,55%{transform:scale(.25);opacity:0}60%{opacity:.9}100%{transform:scale(1.5);opacity:0}}
+@keyframes tctap{0%,55%,75%,100%{transform:scale(1)}65%{transform:scale(.8)}}
+#tcur.wiggle{animation:tcwig 1.6s ease-in-out infinite alternate;}
+@keyframes tcwig{from{margin-left:-9px}to{margin-left:9px}}
+#tctrail{position:absolute;z-index:79;pointer-events:none;border-top:2px dashed rgba(13,76,68,.45);transform-origin:0 0;}
+@media (prefers-reduced-motion: reduce){#tcur .ring,#tcur svg,#tcur.wiggle{animation:none !important;}}
 .overlay{position:absolute;inset:0;display:flex;justify-content:flex-end;z-index:6;}
 .scrim2{position:absolute;inset:0;background:rgba(27,24,20,.22);}
 .sheet{position:relative;width:350px;max-width:86%;background:var(--panel);border-left:1px solid var(--border);box-shadow:-16px 0 44px rgba(41,33,19,.3);padding:1rem 1.1rem;overflow-y:auto;}
@@ -378,6 +403,7 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
 <p>Day-of, the phone lands on <b>today</b>: next-up leads with Directions and Call, the confirmation code one thumb away, finished things faded.</p>
 <p>＋ new variation opens the <b>fork composer</b>: name it, start blank or copy the current plan — and the decide-by rule is stated up front, derived from whatever cancellation deadlines end up inside.</p>
 <p>The real story: they cancelled Piran betting on Trieste — and regretted it. <b>Variations</b> keep both futures alive on the same 3 days, each holding refundable bookings, with a <b>decide-by inherited from the cancellation deadlines</b>.</p>
+<p>The same trip on her phone — no separate "mobile app." The Plan window stacks to one leg per row, Book keeps its countdowns and cash, and the grid deals one day per swipe. Everything stays one column of the same data.</p>
 </div>
 
 <div id="steps" style="display:none">
@@ -1513,21 +1539,22 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
 </section>
 
 <!-- ═ 19 · day-of phone ═ -->
-<section data-phase="On the trip" data-did="opens the trip on her phone on May 19 — it lands on today.">
+<section data-phase="On the trip" data-did="opens the trip on her phone on May 19 — it lands on today, half the day already behind her.">
   <nav class="topbar"><span class="brand">Schubert Atlas</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
-  <div class="phonewrap"><div class="ph">
-    <div class="phh"><span style="font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;">Slovenia · day 5 of 11</span><br><b>Tuesday, May 19</b></div>
+  <div class="phonewrap"><div class="ph" style="width:300px;">
+    <div class="phh"><span style="font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;">Slovenia · day 5 of 11 · Bled</span><br><b>Tuesday, May 19</b></div>
     <div class="bd">
-      <div style="font-size:.68rem;color:var(--muted);margin-bottom:.3rem;">✓ balloon · ✓ castle</div>
-      <div class="nextcard"><span style="font-size:.58rem;font-weight:700;color:var(--accent);text-transform:uppercase;">Next · in 20 min</span><br><b>Lunch · Pizzeria Rustika</b><br><span style="color:var(--muted);">0.8 km — an 11-min walk · veg ✓</span>
+      <div class="prow done"><span class="t">5:30</span><span>Hot-air balloon ✓</span></div>
+      <div class="prow done"><span class="t">7:35</span><span>Bled Castle — hike + tour ✓</span></div>
+      <div class="nextcard" style="margin:.4rem 0;"><span style="font-size:.58rem;font-weight:700;color:var(--accent);text-transform:uppercase;">Next · in 20 min</span><br><b>Lunch · Pizzeria Rustika</b><br><span style="color:var(--muted);">0.8 km — an 11-min walk · veg ✓</span>
         <div class="bigbtns"><span class="d">📍 Directions</span><span class="c">📞 Call</span></div></div>
-      <div style="font-size:.7rem;color:var(--muted);margin-top:.4rem;">4:00 Via Ferrata · <span class="conf">#138953</span> <span style="color:var(--accent);font-weight:700;">copy</span></div>
+      <div class="prow"><span class="t">1:00</span><span>Free time <small>auto</small></span></div>
+      <div class="prow"><span class="t">4:00</span><span>Via Ferrata Hvadnik 🔒 <small><span class="conf">#138953</span></small> <span style="color:var(--accent);font-weight:700;font-size:.64rem;">copy</span></span></div>
+      <p style="font-size:.6rem;color:var(--muted);margin:.45rem 0 0;font-style:italic;">finished things fade · next-up leads with the two buttons she needs</p>
     </div>
+    <div class="phtabs"><span>Plan</span><span>Days</span><span>Book</span><span class="on">Today</span></div>
   </div></div>
-</section>
-
-<!-- ═ 20 · variations ═ -->
-<section data-phase="What if (rewind · pre-trip) · creating the variation" data-did="selects May 21–24, presses ＋ new variation, names option B, starts from a blank skeleton.">
+</section><section data-phase="What if (rewind · pre-trip) · creating the variation" data-did="selects May 21–24, presses ＋ new variation, names option B, starts from a blank skeleton.">
   <nav class="topbar"><span class="brand">Schubert Atlas</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
   <div class="tripbar"><span class="crumb"><b>Trips</b> ›</span><span class="tname">Slovenia</span><span class="tmeta">May 15–25 · 10 nights</span>
     <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
@@ -1586,6 +1613,45 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
     </div>
     <div class="toolrow" style="opacity:.8;"><span class="tchip" style="background:var(--panel-strong);border-color:var(--border);color:var(--muted);">dormant · refundable</span><button class="ctrl">make B active</button><button class="ctrl ghosted">compare side by side</button></div>
     <p class="decideby">⏰ decide by May 19 · set by Hotel Piran's free-cancellation deadline</p>
+  </div>
+</section>
+
+<section data-phase="On the phone (aside) · the other pages" data-did="flips through Plan, Book, and the Grid on her phone — same trip, one column.">
+  <nav class="topbar"><span class="brand">Schubert Atlas</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="phgal">
+    <div><div class="gl">Plan</div><div class="ph">
+      <div class="phh"><b>Slovenia</b> <span style="font-size:.62rem;color:var(--muted);">May 15–25 · 10 nights</span></div>
+      <div class="bd">
+        <div class="collapsec" style="font-size:.66rem;">▸ <b>Transport</b> · 2 booked ✈</div>
+        <div class="prow"><span class="t">15–17</span><span><b>Ljubljana</b> <small>Union 🔒</small></span></div>
+        <div class="prow"><span class="t">17–20</span><span><b>Bled</b> <small>Toplice + H. Franko 🔒</small></span></div>
+        <div class="prow"><span class="t">21–25</span><span><b>Piran</b> <small>Hotel Piran + Brdo 🔒</small></span></div>
+        <p style="font-size:.6rem;color:var(--muted);margin:.4rem 0 0;font-style:italic;">the window stacks — one leg per row</p>
+      </div>
+      <div class="phtabs"><span class="on">Plan</span><span>Days</span><span>Book</span><span>Today</span></div>
+    </div></div>
+    <div><div class="gl">Book</div><div class="ph">
+      <div class="phh"><b>Book</b> <span style="font-size:.62rem;color:var(--muted);">2 need action</span></div>
+      <div class="bd">
+        <div class="prow"><span class="t">⏰</span><span><b>Hotel Union</b> <small>cancel by May 12</small></span></div>
+        <div class="prow"><span class="t">⏰</span><span><b>Postojna Cave</b> <small>to book · ~€49</small></span></div>
+        <div class="prow"><span class="t">💶</span><span><b>Cash to carry</b> <small>€927</small></span></div>
+        <div class="prow"><span class="t">🎫</span><span><b>Ljubljana Card</b> <small>buy May 16</small></span></div>
+        <p style="font-size:.6rem;color:var(--muted);margin:.4rem 0 0;font-style:italic;">countdowns and cash, pocket-size</p>
+      </div>
+      <div class="phtabs"><span>Plan</span><span>Days</span><span class="on">Book</span><span>Today</span></div>
+    </div></div>
+    <div><div class="gl">The grid</div><div class="ph">
+      <div class="phh"><b>Tue, May 19</b> <span style="font-size:.62rem;color:var(--muted);">Bled · solved</span></div>
+      <div class="bd">
+        <div class="prow"><span class="t">5:30</span><span>Balloon 🔒</span></div>
+        <div class="prow"><span class="t">7:35</span><span>Castle hike</span></div>
+        <div class="prow"><span class="t">12:00</span><span>Lunch · Rustika 📌</span></div>
+        <div class="prow"><span class="t">4:00</span><span>Via Ferrata 🔒</span></div>
+        <p style="font-size:.6rem;color:var(--muted);margin:.4rem 0 0;font-style:italic;">swipe → Wed 20 · one day per swipe</p>
+      </div>
+      <div class="phtabs"><span>Plan</span><span class="on">Days</span><span>Book</span><span>Today</span></div>
+    </div></div>
   </div>
 </section>
 
@@ -1714,7 +1780,103 @@ fbHead.addEventListener("pointerdown",(e)=>{
   const up=()=>{removeEventListener("pointermove",move);removeEventListener("pointerup",up);};
   addEventListener("pointermove",move);addEventListener("pointerup",up);
 });
-const _go=go;go=function(i){_go(i);fbSync();};
+/* ── tour cursor: marks the slide's named action on its control ── */
+const TCUR=[
+  {f:"＋ New trip"},                                            // 1
+  {f:"＋ chip"},                                                // 2
+  {f:"🥦 vegetarian"},                                          // 3
+  {f:"Create trip →"},                                         // 4
+  {sel:".edge2",nth:1,mode:"wiggle"},                           // 5 right edge
+  {f:"✎ adjust dates"},                                        // 6
+  {from:{sel:".citychip",nth:0},sel:".lseg",nth:2,mode:"drag"},  // 7 tray → window
+  {f:"＋ other city…"},                                         // 8
+  {sel:".hndl",nth:1,mode:"wiggle"},                            // 9 Bled|Piran handle
+  {sheet:true},                                                 // 10 transport editor
+  null,                                                         // 11 (save happened)
+  {from:{sel:".citychip",nth:0},sel:".lseg",nth:3,mode:"drag"},  // 12 Kranj test
+  {f:"✓ shortlisted"},                                          // 13
+  {from:{f:"Union Eurostars"},f:"Union",mode:"drag"},           // 14 strip → bar
+  null,                                                         // 15 (narrated repeats)
+  {f:"night 3 · May 19"},                                       // 16 split pick
+  {f:"H. Franko"},                                              // 17 splurge slot
+  {sheet:true},                                                 // 18 stay editor
+  {sel:".staysrow .hndl",nth:0,mode:"wiggle"},                  // 19 tests Union ↔
+  {sel:".legseg.bl",nth:0},                                     // 20 clicks Bled
+  {f:"+ Save to bucket"},                                       // 21
+  {sheet:true},                                                 // 22 balloon editor
+  {sheet:true},                                                 // 23 Done closes
+  {from:{sel:".bucketbox",nth:0},f:"Rustika",mode:"drag"},      // 24 bucket → Tue
+  {f:"🪶 light · on"},                                          // 25
+  {sel:".legseg.bl",nth:0},                                     // 26 click its segment
+  {from:{f:"Mon 18"},f:"Toboggan",mode:"drag"},                 // 27 pair with drive day
+  null,                                                         // 28 (Solve happened)
+  {input:"12:30"},                                              // 29 types the time
+  null,                                                         // 30 (Done happened)
+  {from:{sel:".tray",nth:0},f:"Zipline Dolinka",mode:"drag"},   // 31 over-pack
+  {sel:".chipbtn.onpage",nth:0},                                // 32 Book chip
+  {sheet:true},                                                 // 33 booking sheet
+  {sel:".chipbtn.onpage",nth:0},                                // 34 Grid chip
+  null,                                                         // 35 phone
+  {sheet:true},                                                 // 36 fork composer
+  {f:"Option B"},                                               // 37 hops tabs
+  null,                                                         // 38 mobile gallery (aside)
+];
+function tcFind(spec){
+  if(!spec)return null;
+  if(spec.sel){const els=stage.querySelectorAll(spec.sel);return els[spec.nth||0]||null;}
+  if(spec.input)return [...stage.querySelectorAll("input")].find(e=>(e.getAttribute("value")||"").includes(spec.input))||null;
+  if(spec.sheet){
+    const sh=stage.querySelector(".sheet");if(!sh)return null;
+    const b=[...sh.querySelectorAll("button,.ctrl")];
+    return b.reverse().find(x=>/done|save|create/i.test(x.textContent))||b[0]||null;
+  }
+  if(spec.f){
+    const cand=[...stage.querySelectorAll("button,.ctrl,.chipbtn,.savebtn,.addchip,.pi,.legseg,.citychip,.staybar,.mini,.lightbtn,.vartab,.layout-btn,.dropz,.hndl,.tlr,.dchip,.dh")];
+    const hits=cand.filter(e=>e.textContent.replace(/\s+/g," ").includes(spec.f));
+    if(!hits.length)return null;
+    hits.sort((a,b)=>a.textContent.length-b.textContent.length);
+    return hits[0];
+  }
+  return null;
+}
+function tcCenter(el,st){const r=el.getBoundingClientRect();return [r.left+r.width/2-st.left,r.top+r.height/2-st.top];}
+function tcPlace(){
+  document.getElementById("tcur")?.remove();document.getElementById("tctrail")?.remove();
+  const spec=TCUR[at];if(!spec)return;
+  const el=tcFind(spec);if(!el)return;
+  const st=stage.getBoundingClientRect();if(st.width<10)return;
+  const [cx,cy]=tcCenter(el,st);
+  const cur=document.createElement("div");cur.id="tcur";
+  cur.className=spec.mode==="wiggle"?"wiggle":"click";
+  const halo=document.createElement("span");halo.className="halo";
+  const ring=document.createElement("span");ring.className="ring";
+  const svg=document.createElementNS("http://www.w3.org/2000/svg","svg");
+  svg.setAttribute("width","17");svg.setAttribute("height","23");svg.setAttribute("viewBox","0 0 13 20");
+  const path=document.createElementNS("http://www.w3.org/2000/svg","path");
+  path.setAttribute("d","M0 0 L0 16 L4.2 12.8 L6.8 19 L9.6 17.7 L7 11.9 L12.4 11.2 Z");
+  path.setAttribute("fill","#fffdf6");path.setAttribute("stroke","#1b1814");path.setAttribute("stroke-width","1.3");
+  svg.append(path);cur.append(halo,ring,svg);
+  cur.style.left=cx+"px";cur.style.top=cy+"px";
+  stage.append(cur);
+  if(spec.mode==="drag"&&spec.from&&!noMotion.matches){
+    const fe=tcFind(spec.from);
+    if(fe){
+      const [fx,fy]=tcCenter(fe,st);
+      const len=Math.hypot(cx-fx,cy-fy),ang=Math.atan2(cy-fy,cx-fx);
+      const tr=document.createElement("div");tr.id="tctrail";
+      tr.style.left=fx+"px";tr.style.top=fy+"px";tr.style.width=len+"px";
+      tr.style.transform=`rotate(${ang}rad)`;
+      stage.append(tr);
+      cur.animate([
+        {transform:`translate(${fx-cx}px,${fy-cy}px)`},
+        {transform:"translate(0,0)",offset:.6},
+        {transform:"translate(0,0)"},
+      ],{duration:2600,iterations:Infinity,easing:"ease-in-out"});
+    }
+  }
+}
+addEventListener("resize",tcPlace);
+const _go=go;go=function(i){_go(i);fbSync();tcPlace();};
 go(0);
 if(fbLoad().length){fbNudge.remove();fbBtn.classList.add("quiet");fbPanel.classList.add("open");fbSync();}
 fbRetry();
