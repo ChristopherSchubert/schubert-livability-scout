@@ -192,7 +192,12 @@ all 79 real entries' notes for structure hiding in prose):
   "status":   "none | toBook | reserved | booked",
 
   "title": "…", "note": "…",                          // note = color only now
-  "place": { "lat", "lon", "address" },
+
+  // PLACE — a RESOLVED identity, not loose coordinates (owner, 2026-06-10:
+  // "each event should have a field for a POI resolving through Google, so
+  // we can actually build a map of the day"). placeId = the Google place_id,
+  // the same key as the pois cache, so one resolution feeds everything.
+  "place": { "placeId"?, "name", "lat", "lon", "address"? },
 
   // LOGISTICS (was buried in notes — the artifact's real payload)
   "meetingPoint": "parking behind Teja bar",          // where exactly
@@ -222,6 +227,16 @@ all 79 real entries' notes for structure hiding in prose):
   "markers": [ { "type", "value"?, "source"? } ]
 }
 ```
+
+**Place resolution (the map keystone).** Every entry that happens *somewhere*
+resolves to a Google `place_id` — the same key as the `pois` cache, so one
+identity feeds everything: pool candidates already carry it (they come from
+the cache); add-your-own entries resolve via one `searchText` call (the
+pattern in `scripts/.snap-intersections.mjs`); unresolvable → manual lat/lon
+or honestly null, never guessed. Payoffs: the **day map** (a pin per entry +
+the stay + the route, in time order), Solve's travel legs read real
+coordinates, the same restaurant on two days dedupes to one place, and a
+marker verified once benefits every entry referencing that `placeId`.
 
 **Transport sub-shape (flights, trains, ferries — owner, 2026-06-10: "flight
 should show, with all the relevant trip detail like when to arrive").** A
