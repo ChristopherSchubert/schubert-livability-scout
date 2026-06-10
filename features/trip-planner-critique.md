@@ -78,3 +78,29 @@ hatched texture (effective-contrast loss).
    rows, kind always in text, citations on a readable affordance.
 3. **One marker language** — lock icons, one null voice, labeled distance
    origin; freeze as the component spec.
+
+---
+
+## Round 2 — walkthrough action→control audit (2026-06-10, owner-prompted)
+
+Stepped the 20-step script against the pages: **6 of 20 transitions were broken
+or unsupported**, including a violation of our own booking-dates-it rule.
+
+Fixed in the deck:
+- "She does: …" action line in the context band — every transition names its
+  cause (the control used).
+- Dates from nowhere → ✎ set-dates control on the window (step 2).
+- Balloon contradiction → booked-for-May-19 auto-places itself (step 9); the
+  manual-pin demo now uses Rustika (step 10).
+- Conservation violation → the Lay-out deal accounts for all 9 items
+  (Public & Vegan lands Sunday — closed-Mondays shown working) (step 12).
+- 13→14 state mismatch → the solved day now solves exactly the laid-out day.
+- Step 16 → the zipline drag is shown (ghost card + tray origin named).
+- Captions name the off-stage actions (stay editors for booking; per-city
+  candidate strips for Hiša Franko/Brdo).
+
+**Deferred to the real build (controls that don't exist anywhere yet):**
+remove-a-city from the window · stay-candidate sourcing/search per city ·
+per-city section navigation on the Plan tab · editor doors (✎/click) on
+Plan-tab cards and stay bars · global undo · the transport/booking editors
+the captions reference.

@@ -218,7 +218,8 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
     <h1>Slovenia, planned</h1><span class="sub">a 20-step walkthrough · for Janice's review · ← → to move</span>
     <span class="spacer"></span><span class="counter"><span id="cur">1</span> / 20</span>
   </div>
-  <div class="ctx"><div id="phase" class="phase"></div><p id="caption"></p></div>
+  <div class="ctx"><div id="phase" class="phase"></div><p id="caption"></p>
+<p id="didline" style="margin:.45rem 0 0;font-size:.74rem;font-family:var(--fu);color:#cdbfa5;"><b style="color:#9fc4bb;">She does:</b> <span id="didtxt"></span></p></div>
   <div class="stage" id="stage"></div>
 </div>
 
@@ -231,18 +232,18 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
 
 <div id="caps" style="display:none">
 <p>It starts with two facts: <b>Slovenia</b>, and <b>roughly ten days in mid-May</b>. The composer asks for nothing else — no cities, no hotels, no commitments.</p>
-<p>The trip opens on its <b>Plan</b> tab: an empty, stretchable window of days. Cities from the scout wait below; both edges are soft.</p>
+<p>The trip opens on its <b>Plan</b> tab. She pins the soft idea to concrete-but-changeable dates — <b>✎ set dates → May 15–25</b> — and gets a stretchable window. Cities wait below.</p>
 <p>Three cities dropped in rough order — the split is a default, <b>2 · 4 · 4 nights</b>. Kranj stays on the tray. Every bar has its grip; every boundary its handle.</p>
 <p>Zhuzhing: grab the <b>boundary handle</b> and slide — Bled takes a night from Piran. Zero-sum between neighbors; the trip total doesn't move.</p>
 <p>The flights get booked and the window's outer edges <b>lock</b>. The trip can't stretch anymore without real money moving. Inside, still clay.</p>
 <p>The <b>stay strip</b> under each city: five Ljubljana candidates below, one dropped onto the city — it becomes a bar spanning the leg's nights. Bled and Piran still show their drop targets.</p>
-<p>Stays aren't 1:1 with cities: Bled's last night goes to <b>Hiša Franko</b>, Piran's last to <b>Brdo</b>. Drag a bar's edge — the neighbor takes the night.</p>
-<p>Booked stays wear a 🔒 and <b>resist</b>: grabbing Union's handle surfaces its terms — free cancellation ends <b>May 12</b>. That date now matters everywhere.</p>
-<p>Under each city, a <b>bucket</b>. Activities pile in with durations — no days yet. The bucket watches itself: <b>~18 h for ~3 open days — enough to lay out.</b></p>
-<p>Janice already knows one answer: <b>balloon = Tuesday</b>. She drags it from the bucket straight onto the day. It lands <b>pinned</b> — the machine will never move it.</p>
+<p>Stays aren't 1:1 with cities. Each city has its own candidate strip — she drops <b>Hiša Franko</b> from Bled's and <b>Brdo</b> from Piran's, then drags Toplice's edge: the neighbor takes the night.</p>
+<p>Each stay bar opens its editor on click — confirmation pasted, status set to <b>booked</b>. Booked bars wear a 🔒 and <b>resist</b>: grabbing Union's handle surfaces its terms — free cancellation ends <b>May 12</b>.</p>
+<p>Under each city, a <b>bucket</b>. Activities pile in with durations. <b>The balloon arrived booked-for-May-19, so it placed itself</b> — dated things never sit in the bucket. The rest waits: <b>~16 h for ~3 open days — enough to lay out.</b></p>
+<p>Janice already knows another answer: <b>lunch at Rustika on balloon day</b>. She drags it from the bucket straight onto Tue — manual placement works at any stage, and it lands <b>pinned</b>.</p>
 <p>Some days are for nothing: May 22 gets the <b>🪶 keep-it-light</b> toggle. The layout engine must leave it nearly empty. Recovery is a feature.</p>
-<p><b>“Lay out Bled.”</b> The machine deals the bucket across the days — booked dates pin, one heavy thing per day, closed-Mondays respected. <b>What doesn't fit becomes an alternate, not a casualty.</b></p>
-<p>She drags the toboggan to Tuesday. The instant a human edits, <b>auto-layout pauses</b> — and waits for the explicit “re-lay out around my pins.”</p>
+<p><b>“Lay out Bled.”</b> The machine deals all seven undated items around the two pins — closed-Mondays respected (Public &amp; Vegan lands Sunday), the drive day kept light. <b>The zipline doesn't fit and becomes an alternate, not a casualty.</b></p>
+<p>She drags the toboggan from Monday onto Wednesday — pair it with the drive day. The instant a human edits, <b>auto-layout pauses</b> — and waits for the explicit “re-lay out around my pins.”</p>
 <p>Tuesday looks right — <b>Solve</b>. The Days view: the machine sequenced by geography, inserted the drives, dropped lunch in its window, surfaced the free gap, assigned the clock.</p>
 <p>She nudges lunch to 12:30 — it <b>pins itself</b>, the day says “edited since solve,” and one button re-solves <b>around</b> her pins. The human always outranks.</p>
 <p>She tries the zipline on Tuesday anyway. The machine reflows — and <b>refuses to lie</b>: it names what can't fit and offers the next day instead of silently cramming.</p>
@@ -255,7 +256,7 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
 <div id="steps" style="display:none">
 
 <!-- ═ 1 · /trips + composer ═ -->
-<section data-phase="Where · the idea">
+<section data-phase="Where · the idea" data-did="types Slovenia · mid-May · ~10 days → presses Create trip.">
   <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
   <div class="pagebody">
     <div class="sect">Trips <button class="ctrl solid inlinectl">＋ New trip</button></div>
@@ -277,14 +278,14 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
 </section>
 
 <!-- ═ 2 · empty skeleton ═ -->
-<section data-phase="Where · the skeleton">
+<section data-phase="Where · the skeleton" data-did="sets the window to May 15–25 with ✎ set dates (still soft — changeable until something books).">
   <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
   <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">mid-May · ~10 days · all soft</span>
     <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
     <span class="spacer"></span><span class="chipbtn">Book</span><span class="chipbtn">Grid →</span></div>
   <div class="pagebody">
-    <div class="sect">The window — May 15 → 25 · both edges soft</div>
-    <div class="win"><span class="edge l"></span><span class="empty"><span class="dropz">⠿ drop a city here</span></span><span class="edge r"></span></div>
+    <div class="sect">The window — May 15 → 25 · both edges soft <button class="ctrl inlinectl">✎ set dates</button></div>
+    <div class="win"><span class="edge l" title="drag to shift the start"></span><span class="empty"><span class="dropz">⠿ drop a city here</span></span><span class="edge r" title="drag to shift the end"></span></div>
     <div class="datesrow"><span>Fri 15</span><span>Sun 17</span><span>Tue 19</span><span>Thu 21</span><span>Sat 23</span><span>Mon 25</span></div>
     <div class="sect" style="margin-top:1.4rem;">Cities from the scout</div>
     <div class="toolrow"><span class="citychip">⠿ Ljubljana</span><span class="citychip">⠿ Bled</span><span class="citychip">⠿ Piran</span><span class="citychip">⠿ Kranj</span><button class="ctrl">＋ other city…</button></div>
@@ -292,7 +293,7 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
 </section>
 
 <!-- ═ 3 · cities land ═ -->
-<section data-phase="Where · cities land">
+<section data-phase="Where · cities land" data-did="drags Ljubljana, then Bled, then Piran from the tray into the window.">
   <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
   <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25 · 10 nights</span>
     <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
@@ -310,7 +311,7 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
 </section>
 
 <!-- ═ 4 · trading nights ═ -->
-<section data-phase="Where · trading nights">
+<section data-phase="Where · trading nights" data-did="grabs the Bled | Piran ↔ handle and slides it one day left (mid-drag shown).">
   <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
   <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25 · 10 nights</span>
     <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
@@ -328,7 +329,7 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
 </section>
 
 <!-- ═ 5 · flights lock the edges ═ -->
-<section data-phase="Where · flights harden the edges">
+<section data-phase="Where · flights harden the edges" data-did="presses ＋ add transport twice, fills the flight editor, marks each booked → the edges lock themselves.">
   <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
   <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25 · edges locked by flights</span>
     <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
@@ -350,7 +351,7 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
 </section>
 
 <!-- ═ 6 · stay strip + shelf ═ -->
-<section data-phase="Stays · drop a hotel on the city">
+<section data-phase="Stays · drop a hotel on the city" data-did="drags the Union Eurostars card onto the Ljubljana segment.">
   <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
   <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
     <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
@@ -378,7 +379,7 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
 </section>
 
 <!-- ═ 7 · splitting stays ═ -->
-<section data-phase="Stays · splitting a leg">
+<section data-phase="Stays · splitting a leg" data-did="drops Hiša Franko and Brdo from their cities' candidate strips, then drags Toplice's ↔ edge one night left.">
   <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
   <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25 · 5 stays</span>
     <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
@@ -401,7 +402,7 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
 </section>
 
 <!-- ═ 8 · booking hardens ═ -->
-<section data-phase="Stays · booking hardens">
+<section data-phase="Stays · booking hardens" data-did="opens each stay bar (click = its editor), pastes the confirmation, sets status booked — then tries dragging Union's ↔.">
   <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
   <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25 · all stays booked</span>
     <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
@@ -420,7 +421,7 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
 </section>
 
 <!-- ═ 9 · the Bled bucket ═ -->
-<section data-phase="Gather · the Bled bucket">
+<section data-phase="Gather · the Bled bucket" data-did="presses ＋ from the pool and saves nine Bled items. The balloon arrives already booked for May 19 → it auto-places onto Tue.">
   <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
   <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
     <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
@@ -430,13 +431,14 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
     <div class="daycols">
       <div class="daycol"><div class="dh">Sun 17 <small>arrive</small></div><div class="cap"><i style="width:0%"></i></div></div>
       <div class="daycol"><div class="dh">Mon 18</div><div class="cap"><i style="width:0%"></i></div></div>
-      <div class="daycol"><div class="dh">Tue 19</div><div class="cap"><i style="width:0%"></i></div></div>
+      <div class="daycol"><div class="dh">Tue 19</div>
+        <div class="mini" style="--k:var(--k-act)"><b>Hot-air balloon</b> <span class="tag pin">📌 auto</span><small>booked for May 19 → placed itself</small></div>
+        <div class="cap"><i style="width:25%"></i></div></div>
       <div class="daycol"><div class="dh">Wed 20 <small>→ Soča</small></div><div class="cap"><i style="width:0%"></i></div></div>
     </div>
     <div class="bucketbox">
-      <div class="bh"><b>Bled bucket</b><span class="ready"><b>~18 h</b> gathered · ~3 open days · <b>enough to lay out</b></span><button class="layout-btn">Lay out Bled →</button></div>
+      <div class="bh"><b>Bled bucket</b><span class="ready"><b>8 undated items · ~16 h</b> · ~3 open days · <b>enough to lay out</b></span><button class="layout-btn">Lay out Bled →</button></div>
       <div class="cardrow">
-        <div class="mini" style="--k:var(--k-act)"><span class="grip2">⠿</span><b>Hot-air balloon</b><small>booked 🔒 May 19 · 5:30 · 2h</small></div>
         <div class="mini" style="--k:var(--k-act)"><span class="grip2">⠿</span><b>Vintgar Gorge</b><small>booked 🔒 · 2.5h</small></div>
         <div class="mini" style="--k:var(--k-act)"><span class="grip2">⠿</span><b>Bled Castle</b><small>~2h · opens 8:00</small></div>
         <div class="mini" style="--k:var(--k-act)"><span class="grip2">⠿</span><b>Via Ferrata</b><small>booked 🔒 · 1.5h</small></div>
@@ -452,7 +454,7 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
 </section>
 
 <!-- ═ 10 · manual pin ═ -->
-<section data-phase="Gather · manual placement, anytime">
+<section data-phase="Gather · manual placement, anytime" data-did="drags Rustika from the bucket onto Tue 19 — lunch on balloon day. It lands pinned.">
   <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
   <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
     <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
@@ -463,17 +465,18 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
       <div class="daycol"><div class="dh">Sun 17 <small>arrive</small></div><div class="dropz" style="width:100%;justify-content:center;">drop here</div><div class="cap"><i style="width:0%"></i></div></div>
       <div class="daycol"><div class="dh">Mon 18</div><div class="dropz" style="width:100%;justify-content:center;">drop here</div><div class="cap"><i style="width:0%"></i></div></div>
       <div class="daycol hot"><div class="dh">Tue 19</div>
-        <div class="mini" style="--k:var(--k-act);box-shadow:0 8px 20px rgba(13,76,68,.25);"><span class="grip2">⠿</span><b>Hot-air balloon</b> <span class="tag pin">📌 pinned</span><small>5:30 · booked · just dropped</small></div>
-        <div class="cap"><i style="width:25%"></i></div></div>
+        <div class="mini" style="--k:var(--k-act)"><b>Balloon</b> <span class="tag pin">📌 auto</span></div>
+        <div class="mini" style="--k:var(--k-meal);box-shadow:0 8px 20px rgba(13,76,68,.25);"><span class="grip2">⠿</span><b>Rustika</b> <span class="tag pin">📌 pinned</span><small>lunch on balloon day · just dropped</small></div>
+        <div class="cap"><i style="width:38%"></i></div></div>
       <div class="daycol"><div class="dh">Wed 20 <small>→ Soča</small></div><div class="dropz" style="width:100%;justify-content:center;">drop here</div><div class="cap"><i style="width:0%"></i></div></div>
     </div>
-    <div class="bucketbox"><div class="bh"><b>Bled bucket</b><span class="ready">8 left · ~16 h</span><button class="layout-btn">Lay out Bled →</button></div>
+    <div class="bucketbox"><div class="bh"><b>Bled bucket</b><span class="ready">7 left · ~15 h</span><button class="layout-btn">Lay out Bled →</button></div>
       <div class="cardrow">
         <div class="mini" style="--k:var(--k-act)"><span class="grip2">⠿</span><b>Vintgar Gorge</b></div>
         <div class="mini" style="--k:var(--k-act)"><span class="grip2">⠿</span><b>Bled Castle</b></div>
         <div class="mini" style="--k:var(--k-act)"><span class="grip2">⠿</span><b>Via Ferrata</b></div>
         <div class="mini" style="--k:var(--k-act)"><span class="grip2">⠿</span><b>Canyoning</b></div>
-        <div class="mini" style="--k:var(--k-meal)"><span class="grip2">⠿</span><b>Rustika</b></div>
+        <div class="mini" style="--k:var(--k-meal)"><span class="grip2">⠿</span><b>Public &amp; Vegan</b></div>
         <div class="mini" style="--k:var(--k-act)"><span class="grip2">⠿</span><b>Toboggan</b></div>
         <div class="mini" style="--k:var(--k-act)"><span class="grip2">⠿</span><b>Zipline</b></div>
       </div>
@@ -482,7 +485,7 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
 </section>
 
 <!-- ═ 11 · keep it light ═ -->
-<section data-phase="Gather · keep it light">
+<section data-phase="Gather · keep it light" data-did="scrolls to the Piran section and taps 🪶 on Fri 22.">
   <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
   <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
     <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
@@ -509,7 +512,7 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
 </section>
 
 <!-- ═ 12 · lay out deals ═ -->
-<section data-phase="Lay out · the machine deals">
+<section data-phase="Lay out · the machine deals" data-did="presses Lay out Bled → reviews the proposal.">
   <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
   <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
     <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
@@ -519,20 +522,21 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
     <div class="daycols">
       <div class="daycol"><div class="dh">Sun 17</div>
         <div class="mini" style="--k:var(--k-act)"><span class="grip2">⠿</span><b>Vintgar Gorge</b><small>arrive 10:30 🔒</small></div>
-        <div class="mini" style="--k:var(--k-meal)"><span class="grip2">⠿</span><b>Rustika</b></div>
+        <div class="mini" style="--k:var(--k-meal)"><span class="grip2">⠿</span><b>Public &amp; Vegan</b><small>lunch · open Sun ✓</small></div>
         <div class="cap"><i style="width:55%"></i></div></div>
       <div class="daycol"><div class="dh">Mon 18</div>
-        <div class="mini" style="--k:var(--k-act)"><span class="grip2">⠿</span><b>Castle hike</b></div>
         <div class="mini" style="--k:var(--k-act)"><span class="grip2">⠿</span><b>Canyoning</b><small>🔒</small></div>
-        <div class="cap"><i style="width:70%"></i></div></div>
+        <div class="mini" style="--k:var(--k-act)"><span class="grip2">⠿</span><b>Toboggan</b></div>
+        <div class="cap"><i style="width:60%"></i></div></div>
       <div class="daycol"><div class="dh">Tue 19</div>
         <div class="mini" style="--k:var(--k-act)"><b>Balloon</b> <span class="tag pin">📌</span></div>
+        <div class="mini" style="--k:var(--k-act)"><span class="grip2">⠿</span><b>Castle hike</b></div>
+        <div class="mini" style="--k:var(--k-meal)"><b>Rustika</b> <span class="tag pin">📌</span></div>
         <div class="mini" style="--k:var(--k-act)"><span class="grip2">⠿</span><b>Via Ferrata</b><small>🔒 16:00</small></div>
-        <div class="cap"><i style="width:75%"></i></div></div>
+        <div class="cap"><i style="width:90%"></i></div></div>
       <div class="daycol"><div class="dh">Wed 20</div>
-        <div class="mini" style="--k:var(--k-act)"><span class="grip2">⠿</span><b>Toboggan</b></div>
         <div class="mini" style="--k:var(--k-trav)"><b>→ Soča drive</b></div>
-        <div class="cap"><i style="width:60%"></i></div></div>
+        <div class="cap"><i style="width:30%"></i></div></div>
     </div>
     <div class="bucketbox"><div class="bh"><b>Didn't fit — alternates</b><span class="ready">stays in the bucket, ready if a slot opens</span></div>
       <div class="cardrow"><div class="mini ghost" style="--k:var(--k-act)"><span class="grip2">⠿</span><b>Zipline Dolinka</b><small>3h wouldn't fit · to book ⏰</small></div></div>
@@ -541,7 +545,7 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
 </section>
 
 <!-- ═ 13 · human takes the wheel ═ -->
-<section data-phase="Lay out · human takes the wheel">
+<section data-phase="Lay out · human takes the wheel" data-did="drags the toboggan from Mon onto Wed (pair it with the drive day) → auto-layout pauses.">
   <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
   <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
     <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
@@ -549,13 +553,16 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
   <div class="pagebody">
     <div class="sect">Bled</div>
     <div class="daycols">
-      <div class="daycol"><div class="dh">Sun 17</div><div class="mini" style="--k:var(--k-act)"><b>Vintgar</b></div><div class="mini" style="--k:var(--k-meal)"><b>Rustika</b></div></div>
-      <div class="daycol"><div class="dh">Mon 18</div><div class="mini" style="--k:var(--k-act)"><b>Castle</b></div><div class="mini" style="--k:var(--k-act)"><b>Canyoning</b></div></div>
-      <div class="daycol hot"><div class="dh">Tue 19</div>
+      <div class="daycol"><div class="dh">Sun 17</div><div class="mini" style="--k:var(--k-act)"><b>Vintgar</b></div><div class="mini" style="--k:var(--k-meal)"><b>Public &amp; Vegan</b></div></div>
+      <div class="daycol"><div class="dh">Mon 18</div><div class="mini" style="--k:var(--k-act)"><b>Canyoning</b></div></div>
+      <div class="daycol"><div class="dh">Tue 19</div>
         <div class="mini" style="--k:var(--k-act)"><b>Balloon</b> <span class="tag pin">📌</span></div>
-        <div class="mini" style="--k:var(--k-act);box-shadow:0 8px 20px rgba(13,76,68,.25);"><span class="grip2">⠿</span><b>Toboggan</b> <span class="tag pin">📌 just moved</span></div>
+        <div class="mini" style="--k:var(--k-act)"><b>Castle hike</b></div>
+        <div class="mini" style="--k:var(--k-meal)"><b>Rustika</b> <span class="tag pin">📌</span></div>
         <div class="mini" style="--k:var(--k-act)"><b>Via Ferrata</b></div></div>
-      <div class="daycol"><div class="dh">Wed 20</div><div class="mini" style="--k:var(--k-trav)"><b>→ Soča drive</b></div></div>
+      <div class="daycol hot"><div class="dh">Wed 20</div>
+        <div class="mini" style="--k:var(--k-act);box-shadow:0 8px 20px rgba(13,76,68,.25);"><span class="grip2">⠿</span><b>Toboggan</b> <span class="tag pin">📌 just moved</span></div>
+        <div class="mini" style="--k:var(--k-trav)"><b>→ Soča drive</b></div></div>
     </div>
     <div class="toolrow">
       <span class="paused">✋ edited by hand — auto-layout paused</span>
@@ -566,7 +573,7 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
 </section>
 
 <!-- ═ 14 · solve a day (Days view) ═ -->
-<section data-phase="The clock · solve a day">
+<section data-phase="The clock · solve a day" data-did="presses Solve Tue 19 → lands in the Days view on the solved day.">
   <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
   <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
     <span class="halves"><span>Plan</span><span>Shelf</span><span class="on">Days</span></span>
@@ -596,7 +603,7 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
 </section>
 
 <!-- ═ 15 · edit, pin, re-solve ═ -->
-<section data-phase="The clock · edit, pin, re-solve">
+<section data-phase="The clock · edit, pin, re-solve" data-did="opens Lunch with ✎, changes 12:00 → 12:30 → it pins itself.">
   <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
   <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
     <span class="halves"><span>Plan</span><span>Shelf</span><span class="on">Days</span></span>
@@ -619,7 +626,7 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
 </section>
 
 <!-- ═ 16 · over-pack honesty ═ -->
-<section data-phase="The clock · honest about too much">
+<section data-phase="The clock · honest about too much" data-did="drags Zipline Dolinka from the Shelf tray onto Tuesday anyway.">
   <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
   <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
     <span class="halves"><span>Plan</span><span>Shelf</span><span class="on">Days</span></span>
@@ -630,18 +637,19 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
   <div class="work" style="grid-template-columns:1fr;">
     <div class="canvas">
       <div class="chead"><h2>Tuesday, May 19</h2><span class="spacer"></span><span class="verdict bad">over-packed</span></div>
-      <div class="flagbar">⚠️ <b>Zipline Dolinka (3 h) couldn't fit.</b> Everything else reflowed — lunch slid 48 min, free time shrank to 2 h.
+      <div style="padding:.6rem 1rem 0;"><div class="mini ghost" style="--k:var(--k-act);display:inline-block;box-shadow:0 8px 20px rgba(163,67,31,.25);"><span class="grip2">⠿</span><b>Zipline Dolinka</b><small>just dropped from the Shelf — 3 h</small></div></div>
+      <div class="flagbar">⚠️ <b>Zipline Dolinka (3 h) couldn't fit.</b> Everything else reflowed — lunch slid +18 min, free time shrank.
         <button class="ctrl">→ move to Wed 20</button><button class="ctrl ghosted">↩ back to alternates</button></div>
-      <div class="tlr a" style="--k:var(--k-act)"><span class="t">5:30</span><span class="c"><b>Balloon</b> 🔒</span></div>
-      <div class="tlr a" style="--k:var(--k-act)"><span class="t">9:58</span><span class="c"><b>Vintgar Gorge</b> <span class="tag rest">moved in</span></span></div>
-      <div class="tlr a" style="--k:var(--k-meal)"><span class="t">12:48</span><span class="c"><b>Lunch · Rustika</b> <span class="tag rest">reflowed +48 min</span></span></div>
+      <div class="tlr a" style="--k:var(--k-act)"><span class="t">5:30</span><span class="c"><b>Balloon</b> 🔒 📌</span></div>
+      <div class="tlr a" style="--k:var(--k-act)"><span class="t">7:35</span><span class="c"><b>Bled Castle</b></span></div>
+      <div class="tlr a" style="--k:var(--k-meal)"><span class="t">12:48</span><span class="c"><b>Lunch · Rustika</b> 📌 <span class="tag rest">reflowed +18 min</span></span></div>
       <div class="tlr a" style="--k:var(--k-act)"><span class="t">4:00</span><span class="c"><b>Via Ferrata</b> 🔒</span></div>
     </div>
   </div>
 </section>
 
 <!-- ═ 17 · book page ═ -->
-<section data-phase="Before you go · the book page">
+<section data-phase="Before you go · the book page" data-did="presses Book ⏰ in the trip bar.">
   <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
   <div class="tripbar"><span class="chipbtn">← Days</span><span class="tname">Slovenia — Book</span><span class="tmeta">reservations · deadlines · cash · passes</span></div>
   <div class="pagebody">
@@ -666,7 +674,7 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
 </section>
 
 <!-- ═ 18 · the grid ═ -->
-<section data-phase="Before you go · the grid, generated">
+<section data-phase="Before you go · the grid, generated" data-did="presses Grid → in the trip bar.">
   <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
   <div class="tripbar"><span class="chipbtn">← Days</span><span class="tname">Slovenia — the Grid</span><span class="tmeta">11 days · 79 entries · generated from the trip</span>
     <span class="spacer"></span><button class="ctrl">🖨 print — one leg per page</button></div>
@@ -708,7 +716,7 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
 </section>
 
 <!-- ═ 19 · day-of phone ═ -->
-<section data-phase="On the trip">
+<section data-phase="On the trip" data-did="opens the trip on her phone on May 19 — it lands on today.">
   <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
   <div class="phonewrap"><div class="ph">
     <div class="phh"><span style="font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;">Slovenia · day 5 of 11</span><br><b>Tuesday, May 19</b></div>
@@ -722,7 +730,7 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
 </section>
 
 <!-- ═ 20 · variations ═ -->
-<section data-phase="What if · variations (step 2)">
+<section data-phase="What if · variations (step 2)" data-did="selects May 21–24 and presses ＋ new variation, sketching option B.">
   <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
   <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">the last 3 days · two futures</span>
     <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
@@ -759,6 +767,7 @@ function go(i){
   stage.replaceChildren(...[...steps[at].cloneNode(true).childNodes]);
   cap.replaceChildren(...[...caps[at].cloneNode(true).childNodes]);
   phase.textContent=steps[at].dataset.phase;
+  document.getElementById("didtxt").textContent=steps[at].dataset.did||"—";
   cur.textContent=at+1;
   [...dots.children].forEach((d,j)=>d.classList.toggle("on",j===at));
 }
