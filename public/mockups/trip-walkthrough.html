@@ -262,6 +262,44 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
 .edge2{position:absolute;top:-3px;bottom:-3px;width:9px;background:var(--panel-strong);border:1px solid var(--border);border-radius:4px;cursor:ew-resize;z-index:4;}
 .edge2.lock{background:#e7f1ee;}
 .edge2.lock::after{content:"🔒";font-size:.55rem;position:absolute;inset:0;display:flex;align-items:center;justify-content:center;}
+
+/* ════ FEEDBACK WIDGET (deck chrome, not app) ════ */
+#fbtab{position:fixed;right:1.1rem;bottom:4.4rem;z-index:95;display:flex;align-items:center;gap:.55rem;}
+#fbnudge{font-family:var(--fd);font-style:italic;font-size:.82rem;color:#5d5445;background:var(--panel);border:1px solid var(--border);
+border-radius:100px;padding:.3rem .85rem;box-shadow:0 4px 14px rgba(41,33,19,.12);animation:fbslide .6s ease .8s backwards;}
+@keyframes fbslide{from{opacity:0;transform:translateX(10px)}to{opacity:1;transform:none}}
+#fbbtn{font-family:var(--fu);font-size:.84rem;font-weight:700;color:#fff;background:var(--accent);border:0;border-radius:100px;
+padding:.55rem 1.15rem;cursor:pointer;box-shadow:0 6px 18px rgba(13,76,68,.35);display:inline-flex;align-items:center;gap:.45rem;position:relative;}
+#fbbtn:hover{transform:translateY(-1px);}
+#fbbtn::before{content:"";position:absolute;inset:-5px;border-radius:100px;border:2px solid rgba(13,76,68,.45);animation:fbpulse 2.4s ease-out infinite;pointer-events:none;}
+#fbbtn.quiet::before{animation:none;opacity:0;}
+@keyframes fbpulse{0%{transform:scale(.92);opacity:.8}70%{transform:scale(1.18);opacity:0}100%{opacity:0}}
+#fbbtn .fbcount{background:#f4eddc;color:var(--accent);border-radius:100px;font-size:.68rem;padding:.05rem .45rem;font-weight:700;}
+#fbpanel{position:fixed;right:1.1rem;bottom:7.4rem;z-index:96;width:min(340px,calc(100vw - 2.2rem));background:var(--panel);
+border:1px solid var(--border);border-radius:14px;box-shadow:0 22px 60px rgba(41,33,19,.28);display:none;flex-direction:column;overflow:hidden;}
+#fbpanel.open{display:flex;}
+#fbpanel .fbhead{background:#1b1814;color:#f4eddc;padding:.6rem .9rem;display:flex;align-items:baseline;gap:.5rem;cursor:grab;user-select:none;touch-action:none;}
+#fbpanel .fbhead:active{cursor:grabbing;}
+#fbpanel .fbhead b{font-family:var(--fd);font-weight:600;font-size:.92rem;}
+#fbpanel .fbhead .fbslideref{font-size:.7rem;color:#9fc4bb;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+#fbpanel .fbclose{background:none;border:0;color:#cdbfa5;font-size:.95rem;cursor:pointer;padding:0 .1rem;}
+#fbpanel textarea{margin:.7rem .8rem 0;border:1px solid var(--border);border-radius:9px;background:var(--bg);font-family:var(--fu);
+font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:vertical;}
+#fbpanel textarea:focus{outline:2px solid rgba(13,76,68,.35);}
+#fbpanel .fbrow{display:flex;align-items:center;gap:.6rem;padding:.55rem .8rem .65rem;}
+#fbsave{font-size:.78rem;font-weight:700;background:var(--accent);color:#fff;border:0;border-radius:100px;padding:.4rem 1rem;cursor:pointer;}
+#fbsave:disabled{opacity:.45;cursor:default;}
+#fbsaved{font-size:.74rem;color:var(--accent);font-weight:600;opacity:0;transition:opacity .25s;}
+#fbsaved.show{opacity:1;}
+#fbnotes{list-style:none;margin:0;padding:0 .8rem;max-height:150px;overflow-y:auto;}
+#fbnotes li{display:flex;gap:.5rem;align-items:baseline;font-size:.76rem;color:#2c2823;border-top:1px dashed var(--border);padding:.42rem .1rem;}
+#fbnotes li .fbtxt{flex:1;min-width:0;overflow-wrap:break-word;}
+#fbnotes li .fbdel{background:none;border:0;color:var(--muted);cursor:pointer;font-size:.72rem;padding:0;}
+#fbnotes li .fbdel:hover{color:var(--warn);}
+#fbpanel .fbfoot{border-top:1px solid var(--border);background:var(--panel-strong);padding:.45rem .8rem;display:flex;align-items:center;gap:.6rem;font-size:.7rem;color:var(--muted);}
+#fbpanel .fbfoot .spacer{flex:1}
+#fbcopy{font-size:.72rem;font-weight:700;border:1px solid var(--accent);color:var(--accent);background:var(--panel);border-radius:100px;padding:.22rem .7rem;cursor:pointer;}
+.dots i.fb{box-shadow:0 0 0 2px rgba(163,67,31,.45);}
 </style></head><body>
 <div class="deck">
   <div class="dhead">
@@ -278,6 +316,18 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
   <span class="dots" id="dots"></span>
   <button class="nbtn" id="next">Next →</button>
   <span class="hintkey">arrow keys work</span>
+</div>
+
+<div id="fbtab">
+  <span id="fbnudge">spot something? tell Chris →</span>
+  <button id="fbbtn" type="button">💬 Feedback <span class="fbcount" id="fbcount" hidden>0</span></button>
+</div>
+<div id="fbpanel" role="dialog" aria-label="Slide feedback">
+  <div class="fbhead" id="fbhead" title="Drag to move"><b>Feedback</b><span class="fbslideref" id="fbslideref"></span><button class="fbclose" id="fbclose" type="button" title="Close">✕</button></div>
+  <textarea id="fbtext" placeholder="What's confusing, wrong, or great about this slide?"></textarea>
+  <div class="fbrow"><button id="fbsave" type="button" disabled>Save feedback</button><span id="fbsaved">Saved ✓</span></div>
+  <ul id="fbnotes"></ul>
+  <div class="fbfoot"><span id="fbtally">no notes yet</span><span class="spacer"></span><button id="fbcopy" type="button">📋 Copy all</button></div>
 </div>
 
 <div id="caps" style="display:none">
@@ -424,9 +474,9 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
     <div class="sect" style="margin-top:1.4rem;">Cities from the scout</div>
     <div class="toolrow"><span class="citychip">⠿ Ljubljana</span><span class="citychip">⠿ Bled</span><span class="citychip">⠿ Piran</span><span class="citychip">⠿ Kranj</span><button class="ctrl">＋ other city…</button></div>
   
-    <div class="sect" style="margin-top:1.3rem;">Transport <button class="ctrl inlinectl">＋ add transport…</button></div>
+    <div class="sect" style="margin-top:1.3rem;">▾ Transport <button class="ctrl inlinectl">＋ add transport…</button></div>
     <p class="srcline">✈ nothing yet</p>
-    <div class="sect" style="margin-top:1.1rem;">Stays</div>
+    <div class="sect" style="margin-top:1.1rem;">▾ Stays</div>
     <p class="srcline">stays live under each city — add cities, then drop hotels</p>
   </div>
 </section>
@@ -456,9 +506,9 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
     <div class="sect" style="margin-top:1.4rem;">Cities from the scout</div>
     <div class="toolrow"><span class="citychip">⠿ Ljubljana</span><span class="citychip">⠿ Bled</span><span class="citychip">⠿ Piran</span><span class="citychip">⠿ Kranj</span><button class="ctrl">＋ other city…</button></div>
   
-    <div class="sect" style="margin-top:1.3rem;">Transport <button class="ctrl inlinectl">＋ add transport…</button></div>
+    <div class="sect" style="margin-top:1.3rem;">▾ Transport <button class="ctrl inlinectl">＋ add transport…</button></div>
     <p class="srcline">✈ nothing yet</p>
-    <div class="sect" style="margin-top:1.1rem;">Stays</div>
+    <div class="sect" style="margin-top:1.1rem;">▾ Stays</div>
     <p class="srcline">stays live under each city — add cities, then drop hotels</p>
   </div>
 </section>
@@ -480,9 +530,9 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
     </div>
     <div class="toolrow"><span class="lbl2">On the tray:</span><span class="citychip">⠿ Kranj</span><button class="ctrl">＋ other city…</button></div>
   
-    <div class="sect" style="margin-top:1.3rem;">Transport <button class="ctrl inlinectl">＋ add transport…</button></div>
+    <div class="sect" style="margin-top:1.3rem;">▾ Transport <button class="ctrl inlinectl">＋ add transport…</button></div>
     <p class="srcline">✈ nothing yet</p>
-    <div class="sect" style="margin-top:1.1rem;">Stays</div>
+    <div class="sect" style="margin-top:1.1rem;">▾ Stays</div>
     <p class="srcline">stays live under each city — add cities, then drop hotels</p>
   </div>
 </section>
@@ -508,9 +558,9 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
       <div class="pi"><b>Tržič</b>&nbsp;<span style="color:var(--muted);font-size:.7rem;">Slovenia</span><span style="margin-left:auto;color:var(--accent);font-weight:700;font-size:.72rem;">add</span></div>
     </div>
   
-    <div class="sect" style="margin-top:1.3rem;">Transport <button class="ctrl inlinectl">＋ add transport…</button></div>
+    <div class="sect" style="margin-top:1.3rem;">▾ Transport <button class="ctrl inlinectl">＋ add transport…</button></div>
     <p class="srcline">✈ nothing yet</p>
-    <div class="sect" style="margin-top:1.1rem;">Stays</div>
+    <div class="sect" style="margin-top:1.1rem;">▾ Stays</div>
     <p class="srcline">stays live under each city — add cities, then drop hotels</p>
   </div>
 </section>
@@ -533,9 +583,9 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
     <p class="dragnote">Bled +1 night · Piran −1</p>
     <div class="toolrow"><span class="lbl2">On the tray:</span><span class="citychip">⠿ Kranj</span><button class="ctrl">＋ other city…</button></div>
   
-    <div class="sect" style="margin-top:1.3rem;">Transport <button class="ctrl inlinectl">＋ add transport…</button></div>
+    <div class="sect" style="margin-top:1.3rem;">▾ Transport <button class="ctrl inlinectl">＋ add transport…</button></div>
     <p class="srcline">✈ nothing yet</p>
-    <div class="sect" style="margin-top:1.1rem;">Stays</div>
+    <div class="sect" style="margin-top:1.1rem;">▾ Stays</div>
     <p class="srcline">stays live under each city — add cities, then drop hotels</p>
   </div>
 </section>
@@ -560,7 +610,7 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
     <div class="cardrow">
       <div class="mini ghost" style="--k:var(--k-trav);border-color:var(--accent);"><b>✈ FRA → LJU</b> · Fri May 15<small>editing…</small></div>
     </div>
-    <div class="sect" style="margin-top:1.1rem;">Stays</div>
+    <div class="sect" style="margin-top:1.1rem;">▾ Stays</div>
     <p class="srcline">stays live under each city — search or add your own, then drop one on a city</p>
   </div>
   <div class="overlay"><div class="scrim2"></div>
@@ -600,7 +650,7 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
       <div class="mini" style="--k:var(--k-trav)"><b>✈ → FRA → LJU</b> · Fri May 15<small>arrive 9:30 PM local · booked 🔒</small></div>
       <div class="mini" style="--k:var(--k-trav)"><b>✈ LJU →</b> · Mon May 25<small>takeoff 9:30 AM · booked 🔒</small></div>
     </div>
-    <div class="sect" style="margin-top:1.1rem;">Stays</div>
+    <div class="sect" style="margin-top:1.1rem;">▾ Stays</div>
     <p class="srcline">stays live under each city — search or add your own, then drop one on a city</p>
   </div>
 </section>
@@ -630,7 +680,7 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
       <div class="mini" style="--k:var(--k-trav)"><b>✈ → FRA → LJU</b> · Fri May 15<small>booked 🔒</small></div>
       <div class="mini" style="--k:var(--k-trav)"><b>✈ LJU →</b> · Mon May 25<small>booked 🔒</small></div>
     </div>
-    <div class="sect" style="margin-top:1.1rem;">Stays</div>
+    <div class="sect" style="margin-top:1.1rem;">▾ Stays</div>
     <p class="srcline">stays live under each city — search or add your own, then drop one on a city</p>
   </div>
 </section>
@@ -1434,9 +1484,76 @@ function go(i){
 document.getElementById("prev").addEventListener("click",()=>go(at-1));
 document.getElementById("next").addEventListener("click",()=>go(at+1));
 addEventListener("keydown",(e)=>{
+  if(e.target instanceof Element&&e.target.matches("textarea,input"))return;
   if(e.key==="ArrowRight")go(at+1);
   if(e.key==="ArrowLeft")go(at-1);
+  if(e.key==="Escape")fbPanel.classList.remove("open");
 });
+
+/* ── feedback widget (deck chrome, not part of the app mockup) ── */
+const FBKEY="tw-feedback-v1";
+const fbPanel=document.getElementById("fbpanel"),fbBtn=document.getElementById("fbbtn"),
+fbNudge=document.getElementById("fbnudge"),fbText=document.getElementById("fbtext"),
+fbSave=document.getElementById("fbsave"),fbSavedMsg=document.getElementById("fbsaved"),
+fbNotes=document.getElementById("fbnotes"),fbRef=document.getElementById("fbslideref"),
+fbCount=document.getElementById("fbcount"),fbTally=document.getElementById("fbtally");
+function fbLoad(){try{return JSON.parse(localStorage.getItem(FBKEY))||[]}catch{return[]}}
+function fbStore(list){localStorage.setItem(FBKEY,JSON.stringify(list));}
+function fbSync(){
+  const list=fbLoad(),mine=list.filter(n=>n.s===at);
+  fbRef.textContent=`slide ${at+1} · ${steps[at].dataset.phase}`;
+  fbNotes.replaceChildren(...mine.map(n=>{
+    const li=document.createElement("li");
+    const tx=document.createElement("span");tx.className="fbtxt";tx.textContent=n.text;
+    const del=document.createElement("button");del.className="fbdel";del.type="button";del.textContent="✕";
+    del.addEventListener("click",()=>{fbStore(fbLoad().filter(m=>m.t!==n.t));fbSync();});
+    li.append(tx,del);return li;
+  }));
+  const slides=new Set(list.map(n=>n.s));
+  fbTally.textContent=list.length?`${list.length} note${list.length>1?"s":""} on ${slides.size} slide${slides.size>1?"s":""}`:"no notes yet";
+  fbCount.hidden=!list.length;fbCount.textContent=list.length;
+  if(list.length)fbBtn.classList.add("quiet");
+  [...dots.children].forEach((d,j)=>d.classList.toggle("fb",slides.has(j)));
+}
+fbBtn.addEventListener("click",()=>{
+  fbPanel.classList.toggle("open");fbNudge.remove();fbBtn.classList.add("quiet");
+  if(fbPanel.classList.contains("open")){fbSync();fbText.focus();}
+});
+document.getElementById("fbclose").addEventListener("click",()=>fbPanel.classList.remove("open"));
+fbText.addEventListener("input",()=>{fbSave.disabled=!fbText.value.trim();});
+fbSave.addEventListener("click",()=>{
+  const text=fbText.value.trim();if(!text)return;
+  fbStore([...fbLoad(),{s:at,phase:steps[at].dataset.phase,text,t:Date.now()}]);
+  fbText.value="";fbSave.disabled=true;fbSync();
+  fbSavedMsg.classList.add("show");setTimeout(()=>fbSavedMsg.classList.remove("show"),1600);
+});
+document.getElementById("fbcopy").addEventListener("click",async(e)=>{
+  const list=fbLoad();if(!list.length)return;
+  const out=["Trip walkthrough — Janice's feedback",""];
+  [...new Set(list.map(n=>n.s))].sort((a,b)=>a-b).forEach(s=>{
+    out.push(`Slide ${s+1} · ${list.find(n=>n.s===s).phase}`);
+    list.filter(n=>n.s===s).forEach(n=>out.push(`  – ${n.text}`));
+    out.push("");
+  });
+  try{await navigator.clipboard.writeText(out.join("\n"));e.target.textContent="Copied ✓";}
+  catch{e.target.textContent="Copy failed";}
+  setTimeout(()=>{e.target.textContent="📋 Copy all";},1600);
+});
+const fbHead=document.getElementById("fbhead");
+fbHead.addEventListener("pointerdown",(e)=>{
+  if(e.target.id==="fbclose")return;
+  const r=fbPanel.getBoundingClientRect(),dx=e.clientX-r.left,dy=e.clientY-r.top;
+  try{fbHead.setPointerCapture(e.pointerId);}catch{}
+  const move=(ev)=>{
+    const x=Math.max(8,Math.min(innerWidth-r.width-8,ev.clientX-dx));
+    const y=Math.max(8,Math.min(innerHeight-r.height-8,ev.clientY-dy));
+    fbPanel.style.left=x+"px";fbPanel.style.top=y+"px";
+    fbPanel.style.right="auto";fbPanel.style.bottom="auto";
+  };
+  const up=()=>{removeEventListener("pointermove",move);removeEventListener("pointerup",up);};
+  addEventListener("pointermove",move);addEventListener("pointerup",up);
+});
+const _go=go;go=function(i){_go(i);fbSync();};
 go(0);
 </script>
 </body></html>

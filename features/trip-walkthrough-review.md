@@ -53,6 +53,17 @@ pin (Rustika) · 25 keep-it-light + caves errand — LAY OUT 26 the deal
 GO 32 book page · 33 mark booked · 34 grid · 35 phone — WHAT IF (rewind)
 36 fork composer · 37 variations.
 
+## Janice's feedback widget (deck chrome, not part of the app mockup)
+
+Floating **💬 Feedback** button bottom-right (pulse ring + "spot something?
+tell Chris →" nudge until first use). Opens a small draggable panel (grab
+the dark header) — write a note, **Save feedback**; notes are per-slide,
+persist in `localStorage` (`tw-feedback-v1`), survive reload. Slides with
+notes get a ringed dot in the nav; the panel lists the current slide's
+notes with per-note ✕. **📋 Copy all** puts a plain-text digest on the
+clipboard to paste to Chris. Arrow keys are suppressed while typing;
+Esc closes the panel.
+
 ## Mechanical checks (run before any review handoff)
 
 Per-slide matrix script (in git history, commit 771384e): topbar/tripbar
