@@ -442,8 +442,8 @@ its literal label.
 > 2026-06-10, revised same day: "travelers shouldn't be a typed comma list").**
 > `trip.travelers[] = { name, kind: person|pet, chips: [veg|dog|kid|…] }` —
 > one structured row per traveler, each carrying its own restriction chips.
-> The trip's **active marker set is the union of those chips**: Cocoa's row
-> is *why* 🐾 lights up on Jim Thorpe; Slovenia has no dog row, so 🐾 hides
+> The trip's **active marker set is the union of those chips**: a pet row
+> is *why* 🐾 lights up on a dog trip; Slovenia has no dog row, so 🐾 hides
 > everywhere (data kept, "show all" escape hatch). No separate diet field —
 > it derives.
 >
@@ -540,7 +540,7 @@ view swap, same data — not a second model).
 | `OptionsDirectory` | `.city-card` / `.image-research-card` | candidate activities/dining as attribute cards (rating, hours, meals, price, `MarkerSet`); drag into a day |
 | `ExcursionRadius` | `.benchmark-pill` rows | side-trips grouped by drive-time radius (<1 hr, <3 hr) |
 | `AlternatesList` | `.day-card` (muted) | backup / rainy-day / parallel options off the timeline |
-| `StatusMatrix` | `.climate-legend` / table | activity × attribute → ✅/❌/N-A ("can Cocoa come?") |
+| `StatusMatrix` | `.climate-legend` / table | activity × attribute → ✅/❌/N-A ("can the dog come?") |
 | `CashNeeded` | `.benchmark-pill` | cash-only sum by currency |
 | `ReservationLedger` | `.checklist-card` | **lodging + activities** in one ledger: lead-time ("book 4–6 mo ahead"), confirmation, cancel-by countdown, soonest first. Lodging rows rank highest. (supersedes the old `BookingsLedger`) |
 

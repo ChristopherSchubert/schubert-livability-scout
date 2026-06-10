@@ -8,8 +8,7 @@
 River Gorge.xlsx (loose hour-grid) · P3 Gettysburg.docx (day-narrative) · P4
 Silverthorne.docx (directory + narrative + drive-radius day-trips) · P5 Jim
 Thorpe.docx (magazine: glance, limitations, booking checklist, schedules,
-dining guide, dog-status matrix, sources). Planners: Janice (primary) & Chris,
-+ Cocoa (125 lb Newfoundland) + vegetarian.
+dining guide, dog-status matrix, sources). Planners: Janice (primary) & Chris, vegetarian, sometimes traveling with a dog.
 
 ## Executive summary
 The five plans are **one trip at different fidelities** — directory → loose day
@@ -36,7 +35,7 @@ should be automated. → **Solve.**
 
 ### Theme 3 — Lodging is the first booking, with its own research→book lifecycle ⭐
 **Prevalence:** 5/5. **Observation:** P5 "BEFORE YOU GO": *"VRBO/Airbnb — filter
-'pets allowed,' message hosts to confirm 125 lb dog (many cap at 50–75 lbs).
+'pets allowed,' message hosts to confirm the dog (many cap weight).
 Book immediately — sells out 4–6 months ahead."* P1 carries a per-hotel block
 per leg (name, confirmation code, cancellation policy, parking, check-in/out,
 passes). P3/P4 lead with an "Airbnb" quick-link. **Interpretation:** lodging is
