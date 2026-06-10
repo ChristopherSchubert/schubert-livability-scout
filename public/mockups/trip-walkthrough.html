@@ -7,144 +7,218 @@
 --accent:#0d4c44;--radius:14px;--fd:'Fraunces',Georgia,serif;--fu:'Inter Tight',system-ui,sans-serif;--warn:#a3431f;
 --k-act:#0d4c44;--k-meal:#9a5a16;--k-trav:#2e5482;--k-stay:#665285;--k-err:#7d5e22;--k-flex:#6b6358;}
 *{box-sizing:border-box}html,body{margin:0;padding:0}
-body{background:var(--bg);color:var(--text);font-family:var(--fu);
-background-image:radial-gradient(rgba(120,100,60,.035) 1px,transparent 1px);background-size:4px 4px;}
-.deck{max-width:880px;margin:0 auto;padding:1.6rem 1.2rem 6rem;}
-.dhead{display:flex;align-items:baseline;gap:1rem;border-bottom:1px solid var(--border);padding-bottom:.7rem;margin-bottom:1rem;}
-.dhead h1{font-family:var(--fd);font-weight:500;font-size:1.5rem;margin:0;}
-.dhead .sub{font-size:.78rem;color:var(--muted);}
+body{background:#efe7d6;color:var(--text);font-family:var(--fu);}
+.deck{max-width:1160px;margin:0 auto;padding:1.4rem 1.2rem 5.4rem;}
+.dhead{display:flex;align-items:baseline;gap:1rem;padding-bottom:.5rem;}
+.dhead h1{font-family:var(--fd);font-weight:500;font-size:1.35rem;margin:0;}
+.dhead .sub{font-size:.76rem;color:var(--muted);}
 .dhead .spacer{flex:1}
 .counter{font-size:.8rem;color:var(--muted);font-variant-numeric:tabular-nums;}
-.phase{font-size:.7rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:.3rem;}
-#caption{font-family:var(--fd);font-size:1.06rem;line-height:1.45;color:#2c2823;margin:0 0 1.1rem;max-width:64ch;}
-#caption b{font-weight:600;}
-.stage{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);box-shadow:0 10px 30px rgba(41,33,19,.06);
-padding:1.4rem;min-height:430px;}
-.navbar{position:fixed;left:0;right:0;bottom:0;background:var(--panel);border-top:1px solid var(--border);padding:.7rem 1.2rem;
-display:flex;align-items:center;gap:1rem;justify-content:center;z-index:50;}
-.nbtn{font-size:1rem;font-weight:700;border:1px solid var(--border);background:var(--bg);border-radius:100px;padding:.5rem 1.4rem;cursor:pointer;}
+.ctx{background:#1b1814;color:#fbf6ea;border-radius:12px 12px 0 0;padding:.8rem 1.2rem .9rem;}
+.phase{font-size:.66rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#9fc4bb;margin-bottom:.2rem;}
+#caption{font-family:var(--fd);font-size:1rem;line-height:1.4;margin:0;max-width:92ch;color:#f4eddc;}
+#caption b{font-weight:600;color:#fff;}
+.stage{background:var(--bg);border:1px solid var(--border);border-top:0;border-radius:0 0 12px 12px;overflow:hidden;
+box-shadow:0 18px 50px rgba(41,33,19,.18);min-height:540px;
+background-image:radial-gradient(rgba(120,100,60,.035) 1px,transparent 1px);background-size:4px 4px;}
+.navbar{position:fixed;left:0;right:0;bottom:0;background:var(--panel);border-top:1px solid var(--border);padding:.6rem 1.2rem;
+display:flex;align-items:center;gap:1rem;justify-content:center;z-index:90;}
+.nbtn{font-size:.95rem;font-weight:700;border:1px solid var(--border);background:var(--bg);border-radius:100px;padding:.45rem 1.3rem;cursor:pointer;}
 .nbtn:hover{border-color:var(--accent);color:var(--accent);}
 .dots{display:flex;gap:4px;}
 .dots i{width:7px;height:7px;border-radius:50%;background:var(--border);cursor:pointer;}
 .dots i.on{background:var(--accent);}
 .hintkey{font-size:.72rem;color:var(--muted);}
 
-/* ── shared mini-UI vocabulary ── */
-.chrome{font-size:.72rem;color:var(--muted);border-bottom:1px solid var(--panel-strong);padding-bottom:.45rem;margin-bottom:1rem;display:flex;gap:1rem;align-items:center;}
-.chrome b{color:var(--text);font-family:var(--fd);font-size:.95rem;font-weight:500;}
-.chrome .pill{font-size:.66rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:var(--panel-strong);border-radius:100px;padding:.15rem .55rem;}
-.chrome .pill.warn{background:#f6ead8;color:var(--warn);}
-.skel{margin:1rem 0;}
-.skel .lbl{font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem;}
-.win{position:relative;height:46px;border:1.5px solid var(--border);border-radius:10px;background:var(--bg);display:flex;overflow:hidden;}
-.win .edge{position:absolute;top:0;bottom:0;width:9px;background:var(--panel-strong);border-inline:1px solid var(--border);cursor:ew-resize;z-index:2;}
-.win .edge.l{left:0}.win .edge.r{right:0}
-.win .edge.lock{background:#e7f1ee;cursor:default;}
-.win .edge.lock::after{content:"🔒";font-size:.6rem;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);}
-.legseg{height:100%;display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:600;border-right:1.5px solid var(--border);position:relative;}
-.legseg small{font-weight:400;color:var(--muted);margin-left:.35rem;}
-.legseg.lj{background:#eef2e6;}.legseg.bl{background:#e7f1ee;}.legseg.pi{background:#f3ecdf;}
-.legseg:last-child{border-right:0;}
-.boundary{position:absolute;top:-8px;bottom:-8px;width:3px;background:var(--accent);border-radius:2px;box-shadow:0 0 0 3px rgba(13,76,68,.18);}
-.dragnote{font-size:.74rem;color:var(--accent);font-weight:600;margin-top:.4rem;}
-.dragnote.warn{color:var(--warn);}
-.empty{display:flex;align-items:center;justify-content:center;color:var(--muted);font-style:italic;font-family:var(--fd);width:100%;}
-.staysrow{display:flex;margin-top:.5rem;gap:0;}
-.staybar{height:34px;border:1px solid var(--border);border-left:4px solid var(--k-stay);border-radius:7px;background:var(--panel);
-display:flex;align-items:center;gap:.4rem;padding:0 .55rem;font-size:.74rem;margin-right:2px;overflow:hidden;white-space:nowrap;}
-.staybar b{font-weight:600;}
-.staybar small{color:var(--muted);}
-.staybar .lock{font-size:.66rem;}
-.cardrow{display:flex;gap:.6rem;flex-wrap:wrap;margin:.6rem 0;}
-.mini{background:var(--bg);border:1px solid var(--border);border-left:4px solid var(--k,var(--border));border-radius:7px;
-padding:.45rem .7rem;font-size:.8rem;box-shadow:0 2px 6px rgba(41,33,19,.05);}
-.mini b{font-weight:600;}
-.mini small{display:block;color:var(--muted);font-size:.7rem;}
-.mini.ghost{opacity:.5;border-style:dashed;}
-.mini .mk{font-size:.66rem;background:var(--panel-strong);border:1px solid var(--border);border-radius:100px;padding:.05rem .4rem;margin-left:.3rem;}
-.mini .mk.ok{background:#e7f1ee;border-color:#bcd8d0;}
-.bucketbox{border:1.5px dashed var(--border);border-radius:10px;padding:.8rem 1rem;margin-top:.7rem;background:var(--bg);}
-.bucketbox .bh{display:flex;align-items:center;gap:.7rem;margin-bottom:.3rem;flex-wrap:wrap;}
-.bucketbox .bh b{font-family:var(--fd);font-size:1rem;font-weight:500;}
-.ready{font-size:.74rem;color:var(--muted);}
-.ready b{color:var(--accent);}
-.layout-btn{margin-left:auto;font-size:.78rem;font-weight:700;background:var(--accent);color:#fff;border:0;border-radius:100px;padding:.4rem 1rem;cursor:pointer;}
-.daycols{display:grid;grid-template-columns:repeat(4,1fr);gap:.6rem;margin-top:.8rem;}
-.daycol{border:1px solid var(--border);border-radius:9px;background:var(--bg);padding:.5rem;}
-.daycol .dh{font-size:.72rem;font-weight:700;margin-bottom:.4rem;display:flex;justify-content:space-between;align-items:center;gap:.3rem;flex-wrap:wrap;}
-.daycol .dh small{font-weight:400;color:var(--muted);}
-.daycol .mini{margin-bottom:.4rem;padding:.35rem .5rem;font-size:.74rem;box-shadow:none;}
-.cap{height:5px;border-radius:100px;background:var(--panel-strong);margin-top:.3rem;overflow:hidden;}
-.cap i{display:block;height:100%;background:var(--accent);}
-.light{font-size:.68rem;color:var(--k-stay);font-weight:700;}
-.paused{font-size:.72rem;color:var(--warn);font-weight:600;background:#f6ead8;border:1px solid #dcc3a8;border-radius:7px;padding:.35rem .6rem;display:inline-block;margin-top:.6rem;}
-.tl{border:1px solid var(--border);border-radius:9px;overflow:hidden;margin-top:.7rem;}
-.tlr{display:grid;grid-template-columns:96px 1fr;border-top:1px solid var(--panel-strong);font-size:.8rem;}
-.tlr:first-child{border-top:0;}
-.tlr .t{padding:.4rem .6rem;color:var(--muted);font-variant-numeric:tabular-nums;font-size:.74rem;border-right:1px solid var(--panel-strong);}
-.tlr .c{padding:.4rem .7rem;}
-.tlr.a{border-left:4px solid var(--k,var(--border));}
-.tlr.a .c{font-weight:600;}
-.tlr.m{background:repeating-linear-gradient(135deg,transparent,transparent 6px,rgba(120,100,60,.05) 6px,rgba(120,100,60,.05) 8px);color:#2c2823;}
-.tag{font-size:.62rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;border:1px solid #c4d2e2;background:#eaf0f6;color:var(--k-trav);border-radius:100px;padding:.06rem .4rem;margin-left:.4rem;font-weight:700;}
-.tag.rest{color:var(--k-flex);border-color:var(--border);background:var(--panel-strong);}
-.tag.pin{color:var(--k-stay);border-color:#d4cae2;background:#efeaf6;}
-.verd{font-size:.66rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;border-radius:100px;padding:.15rem .6rem;background:#e7f1ee;color:var(--accent);}
-.verd.bad{background:#f6e0d4;color:var(--warn);}
-.flagbar{font-size:.78rem;background:#f6e0d4;border:1px solid #dcb49a;border-radius:7px;padding:.5rem .7rem;color:#7c2f12;margin-top:.6rem;}
-.lrow{display:flex;gap:.8rem;align-items:center;border:1px solid var(--border);border-radius:8px;padding:.5rem .8rem;margin-bottom:.4rem;font-size:.8rem;background:var(--bg);}
-.lrow.urgent{border-color:#dcb49a;border-left:4px solid var(--warn);}
-.lrow b{font-weight:600;}
-.lrow .due{margin-left:auto;color:var(--warn);font-weight:700;font-size:.74rem;}
-.lrow .okk{margin-left:auto;color:var(--muted);font-size:.74rem;}
-.conf{font-size:.7rem;background:var(--panel-strong);border-radius:4px;padding:.04rem .35rem;}
-.ph{width:250px;border:6px solid #1b1814;border-radius:26px;background:var(--bg);margin:0 auto;overflow:hidden;}
-.ph .phh{background:var(--panel);border-bottom:1px solid var(--border);padding:.6rem .8rem;}
-.ph .phh b{font-family:var(--fd);font-weight:500;}
-.ph .bd{padding:.6rem;}
-.nextcard{border:1px solid var(--accent);border-left:4px solid var(--k-meal);border-radius:9px;padding:.5rem .6rem;box-shadow:0 6px 18px rgba(13,76,68,.15);font-size:.76rem;background:var(--panel);}
-.bigbtns{display:flex;gap:.35rem;margin-top:.4rem;}
-.bigbtns span{flex:1;text-align:center;font-size:.68rem;font-weight:700;border-radius:7px;padding:.4rem .2rem;}
-.bigbtns .d{background:var(--accent);color:#fff;}
-.bigbtns .c{background:var(--panel-strong);}
-.vartabs{display:flex;gap:.4rem;margin:.6rem 0;}
-.vartab{font-size:.78rem;font-weight:600;border:1px solid var(--border);border-radius:100px;padding:.3rem .9rem;color:var(--muted);}
-.vartab.on{background:#e7f1ee;color:var(--accent);border-color:#bcd8d0;}
-.decideby{font-size:.74rem;color:var(--warn);font-weight:600;margin-top:.5rem;}
-.gridthumb{display:grid;grid-template-columns:repeat(11,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-top:.7rem;}
-.gridthumb i{background:var(--panel);height:64px;position:relative;}
-.gridthumb i::after{content:"";position:absolute;left:15%;right:15%;border-radius:2px;background:var(--accent);opacity:.75;}
-.gridthumb i:nth-child(1)::after{top:55%;height:26%;background:var(--k-trav);}
-.gridthumb i:nth-child(2)::after{top:25%;height:38%;}
-.gridthumb i:nth-child(3)::after{top:28%;height:44%;}
-.gridthumb i:nth-child(4)::after{top:30%;height:30%;}
-.gridthumb i:nth-child(5)::after{top:8%;height:60%;}
-.gridthumb i:nth-child(6)::after{top:28%;height:40%;background:var(--k-trav);}
-.gridthumb i:nth-child(7)::after{top:30%;height:36%;}
-.gridthumb i:nth-child(8)::after{top:22%;height:30%;background:var(--k-flex);}
-.gridthumb i:nth-child(9)::after{top:10%;height:62%;}
-.gridthumb i:nth-child(10)::after{top:30%;height:34%;background:var(--k-stay);}
-.gridthumb i:nth-child(11)::after{top:12%;height:20%;background:var(--k-trav);}
-.ctrl{font-size:.74rem;font-weight:700;border:1px solid var(--accent);color:var(--accent);background:var(--panel);border-radius:100px;padding:.3rem .85rem;cursor:pointer;font-family:var(--fu);}
+/* ════ REAL PAGE CHROME ════ */
+.topbar{background:var(--panel);border-bottom:1px solid var(--border);padding:.5rem 1.4rem;display:flex;gap:1.3rem;align-items:center;font-size:.8rem;}
+.topbar .brand{font-family:var(--fd);font-weight:600;font-size:.95rem;color:var(--accent);}
+.topbar a{color:var(--muted);text-decoration:none;}
+.topbar a.on{color:var(--text);font-weight:600;border-bottom:2px solid var(--accent);}
+.tripbar{background:var(--panel);border-bottom:1px solid var(--border);padding:.6rem 1.4rem;display:flex;align-items:center;gap:1rem;}
+.tripbar .tname{font-family:var(--fd);font-size:1.1rem;}
+.tripbar .tmeta{font-size:.74rem;color:var(--muted);}
+.halves{display:flex;border:1px solid var(--border);border-radius:100px;overflow:hidden;margin-left:.4rem;}
+.halves span{font-size:.76rem;font-weight:600;color:var(--muted);padding:.32rem .95rem;cursor:pointer;}
+.halves span.on{background:var(--accent);color:#fff;}
+.tripbar .spacer{flex:1}
+.chipbtn{font-size:.74rem;font-weight:600;border:1px solid var(--border);background:var(--bg);border-radius:100px;padding:.32rem .85rem;color:#2c2823;display:inline-flex;gap:.35rem;align-items:center;cursor:pointer;}
+.chipbtn .badge{background:#f6e0d4;color:var(--warn);border-radius:100px;font-size:.66rem;padding:.03rem .4rem;font-weight:700;}
+.pagebody{padding:1.2rem 1.4rem 1.6rem;}
+.sect{font-size:.68rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:1.1rem 0 .5rem;display:flex;align-items:center;gap:.6rem;}
+.sect:first-child{margin-top:0;}
+.sect::after{content:"";flex:1;height:1px;background:var(--border);}
+.sect .inlinectl{margin-left:auto;}
+
+/* controls vocabulary */
+.ctrl{font-size:.74rem;font-weight:700;border:1px solid var(--accent);color:var(--accent);background:var(--panel);border-radius:100px;padding:.28rem .8rem;cursor:pointer;font-family:var(--fu);}
 .ctrl.solid{background:var(--accent);color:#fff;}
 .ctrl.ghosted{border-color:var(--border);color:var(--muted);}
-.grip2{color:var(--border);cursor:grab;margin-right:.25rem;}
-.hndl{position:absolute;top:50%;transform:translate(-50%,-50%);width:16px;height:28px;border-radius:5px;background:var(--panel);border:1.5px solid var(--accent);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:.62rem;font-weight:700;cursor:ew-resize;z-index:3;box-shadow:0 2px 8px rgba(13,76,68,.3);}
-.dropz{border:1.5px dashed var(--accent);background:rgba(210,230,225,.35);border-radius:7px;padding:.35rem .7rem;color:var(--accent);font-size:.72rem;font-weight:600;display:inline-flex;align-items:center;gap:.3rem;}
-.toolrow{display:flex;gap:.5rem;align-items:center;margin:.6rem 0 0;flex-wrap:wrap;}
-.toolrow .lbl2{font-size:.7rem;color:var(--muted);}
-.citychip{font-size:.76rem;font-weight:600;border:1px solid var(--border);background:var(--panel);border-radius:100px;padding:.25rem .7rem;cursor:grab;}
-.lightbtn{font-size:.66rem;font-weight:700;border:1px solid var(--border);border-radius:100px;background:var(--panel);padding:.1rem .5rem;cursor:pointer;color:var(--muted);}
+.grip2{color:#b9ad99;cursor:grab;margin-right:.25rem;}
+.hndl{position:absolute;top:50%;transform:translate(50%,-50%);right:0;width:15px;height:26px;border-radius:5px;background:var(--panel);border:1.5px solid var(--accent);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:700;cursor:ew-resize;z-index:3;box-shadow:0 2px 8px rgba(13,76,68,.3);}
+.hndl.hot{box-shadow:0 0 0 4px rgba(13,76,68,.18),0 2px 8px rgba(13,76,68,.3);}
+.hndl.warnh{border-color:var(--warn);color:var(--warn);box-shadow:0 0 0 4px rgba(163,67,31,.2);}
+.dropz{border:1.5px dashed var(--accent);background:rgba(210,230,225,.4);border-radius:7px;padding:.3rem .65rem;color:var(--accent);font-size:.72rem;font-weight:600;display:inline-flex;align-items:center;gap:.3rem;}
+.toolrow{display:flex;gap:.5rem;align-items:center;margin-top:.55rem;flex-wrap:wrap;}
+.lbl2{font-size:.7rem;color:var(--muted);}
+.citychip{font-size:.76rem;font-weight:600;border:1px solid var(--border);background:var(--panel);border-radius:100px;padding:.22rem .65rem;cursor:grab;}
+.dragnote{font-size:.74rem;color:var(--accent);font-weight:600;margin-top:.45rem;}
+.dragnote.warn{color:var(--warn);}
+
+/* skeleton */
+.win{position:relative;height:46px;border:1.5px solid var(--border);border-radius:10px;background:var(--panel);display:flex;}
+.win .edge{position:absolute;top:0;bottom:0;width:9px;background:var(--panel-strong);border-inline:1px solid var(--border);cursor:ew-resize;z-index:2;}
+.win .edge.l{left:0;border-radius:8px 0 0 8px}.win .edge.r{right:0;border-radius:0 8px 8px 0}
+.win .edge.lock{background:#e7f1ee;cursor:default;}
+.win .edge.lock::after{content:"🔒";font-size:.58rem;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);}
+.legseg{height:100%;display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:600;border-right:1.5px solid var(--border);position:relative;}
+.legseg small{font-weight:400;color:var(--muted);margin-left:.3rem;}
+.legseg.lj{background:#eef2e6;}.legseg.bl{background:#e7f1ee;}.legseg.pi{background:#f3ecdf;}
+.legseg:last-of-type{border-right:0;}
+.empty{display:flex;align-items:center;justify-content:center;color:var(--muted);font-style:italic;font-family:var(--fd);width:100%;}
+.datesrow{display:flex;justify-content:space-between;font-size:.66rem;color:var(--muted);margin:.25rem 2px 0;font-variant-numeric:tabular-nums;}
+.staysrow{display:flex;margin-top:.45rem;}
+.staybar{height:33px;border:1px solid var(--border);border-left:4px solid var(--k-stay);border-radius:7px;background:var(--panel);
+display:flex;align-items:center;gap:.35rem;padding:0 .55rem;font-size:.73rem;margin-right:2px;overflow:visible;white-space:nowrap;position:relative;}
+.staybar b{font-weight:600;}.staybar small{color:var(--muted);}
+.staybar .lock{font-size:.64rem;}
+
+/* cards, buckets, day strips */
+.cardrow{display:flex;gap:.55rem;flex-wrap:wrap;margin:.5rem 0 0;}
+.mini{background:var(--panel);border:1px solid var(--border);border-left:4px solid var(--k,var(--border));border-radius:7px;
+padding:.4rem .65rem;font-size:.78rem;box-shadow:0 2px 6px rgba(41,33,19,.05);}
+.mini b{font-weight:600;}
+.mini small{display:block;color:var(--muted);font-size:.68rem;}
+.mini.ghost{opacity:.5;border-style:dashed;}
+.mini .mk{font-size:.64rem;background:var(--panel-strong);border:1px solid var(--border);border-radius:100px;padding:.04rem .38rem;margin-left:.3rem;}
+.mini .mk.ok{background:#e7f1ee;border-color:#bcd8d0;}
+.bucketbox{border:1.5px dashed var(--border);border-radius:10px;padding:.7rem .9rem;margin-top:.6rem;background:rgba(255,253,246,.6);}
+.bucketbox .bh{display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;}
+.bucketbox .bh b{font-family:var(--fd);font-size:.95rem;font-weight:500;}
+.ready{font-size:.72rem;color:var(--muted);}
+.ready b{color:var(--accent);}
+.layout-btn{margin-left:auto;font-size:.76rem;font-weight:700;background:var(--accent);color:#fff;border:0;border-radius:100px;padding:.35rem .95rem;cursor:pointer;}
+.daycols{display:grid;grid-template-columns:repeat(4,1fr);gap:.55rem;margin-top:.6rem;}
+.daycol{border:1px solid var(--border);border-radius:9px;background:var(--panel);padding:.45rem;}
+.daycol.hot{border-color:var(--accent);}
+.daycol.dashed{border-style:dashed;}
+.daycol .dh{font-size:.7rem;font-weight:700;margin-bottom:.35rem;display:flex;justify-content:space-between;align-items:center;gap:.25rem;flex-wrap:wrap;}
+.daycol .dh small{font-weight:400;color:var(--muted);}
+.daycol .mini{margin-bottom:.35rem;padding:.3rem .45rem;font-size:.72rem;box-shadow:none;}
+.cap{height:5px;border-radius:100px;background:var(--panel-strong);margin-top:.25rem;overflow:hidden;}
+.cap i{display:block;height:100%;background:var(--accent);}
+.lightbtn{font-size:.62rem;font-weight:700;border:1px solid var(--border);border-radius:100px;background:var(--panel);padding:.06rem .45rem;cursor:pointer;color:var(--muted);}
 .lightbtn.on{border-color:#d4cae2;background:#efeaf6;color:var(--k-stay);}
-@media(max-width:640px){.daycols{grid-template-columns:repeat(2,1fr);}}
+.paused{font-size:.72rem;color:var(--warn);font-weight:600;background:#f6ead8;border:1px solid #dcc3a8;border-radius:7px;padding:.32rem .6rem;display:inline-block;}
+.tag{font-size:.6rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;border:1px solid #c4d2e2;background:#eaf0f6;color:var(--k-trav);border-radius:100px;padding:.05rem .38rem;margin-left:.35rem;}
+.tag.rest{color:var(--k-flex);border-color:var(--border);background:var(--panel-strong);}
+.tag.pin{color:var(--k-stay);border-color:#d4cae2;background:#efeaf6;}
+
+/* Days view (workspace) */
+.dayrail{background:var(--bg);border-bottom:1px solid var(--border);padding:.5rem 1.4rem .45rem;display:flex;gap:1.3rem;align-items:flex-end;overflow-x:auto;}
+.leg{display:flex;flex-direction:column;gap:.25rem;}
+.leg .legname{font-family:var(--fd);font-style:italic;font-size:.74rem;color:var(--muted);}
+.leg .chips{display:flex;gap:.3rem;}
+.dchip{min-width:40px;text-align:center;border:1px solid var(--border);border-radius:8px;background:var(--panel);padding:.22rem .35rem .2rem;}
+.dchip .dnum{font-weight:600;font-size:.8rem;font-variant-numeric:tabular-nums;display:block;}
+.dchip .dow{display:block;font-size:.64rem;color:var(--muted);}
+.dchip .state{display:block;margin:.15rem auto 0;width:6px;height:6px;border-radius:50%;background:#b8a36a;}
+.dchip.solved .state{background:var(--accent);}
+.dchip.on{border-color:var(--accent);background:#e7f1ee;}
+.dchip.on .dnum{color:var(--accent);}
+.work{display:grid;grid-template-columns:1fr 270px;gap:1.1rem;padding:1.1rem 1.4rem;align-items:start;}
+.canvas{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
+.chead{display:flex;align-items:center;gap:.7rem;padding:.75rem 1rem;border-bottom:1px solid var(--border);flex-wrap:wrap;}
+.chead h2{font-family:var(--fd);font-weight:500;font-size:1.15rem;margin:0;}
+.chead .sub{font-size:.72rem;color:var(--muted);}
+.chead .spacer{flex:1}
+.verdict{font-size:.66rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;border-radius:100px;padding:.18rem .6rem;background:#e7f1ee;color:var(--accent);}
+.verdict.bad{background:#f6e0d4;color:var(--warn);}
+.pillwarn{font-size:.64rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;background:#f6ead8;color:var(--warn);border-radius:100px;padding:.16rem .55rem;}
+.tlr{display:grid;grid-template-columns:92px 1fr;border-top:1px solid var(--panel-strong);font-size:.8rem;}
+.tlr:first-of-type{border-top:0;}
+.tlr .t{padding:.42rem .6rem;color:var(--muted);font-variant-numeric:tabular-nums;font-size:.72rem;border-right:1px solid var(--panel-strong);}
+.tlr .c{padding:.42rem .7rem;}
+.tlr.a{border-left:4px solid var(--k,var(--border));}
+.tlr.a .c b{font-weight:600;}
+.tlr.m{background:repeating-linear-gradient(135deg,transparent,transparent 6px,rgba(120,100,60,.05) 6px,rgba(120,100,60,.05) 8px);color:#2c2823;}
+.edit-aff{font-size:.68rem;color:var(--accent);font-weight:700;float:right;cursor:pointer;}
+.flagbar{font-size:.76rem;background:#f6e0d4;border:1px solid #dcb49a;border-radius:7px;padding:.5rem .7rem;color:#7c2f12;margin:.7rem 1rem;display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;}
+.tray{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
+.tray header{background:var(--panel-strong);padding:.55rem .8rem;}
+.tray header h3{font-family:var(--fd);font-weight:500;font-size:.92rem;margin:0;}
+.tray header .note{font-size:.66rem;color:var(--muted);margin:.1rem 0 0;}
+.tcard{margin:.5rem .6rem;background:var(--bg);border:1px solid var(--border);border-left:4px solid var(--k,var(--border));
+border-radius:7px;padding:.42rem .55rem;font-size:.76rem;cursor:grab;}
+.tcard small{display:block;color:var(--muted);font-size:.66rem;}
+
+/* book page */
+.lrow{display:flex;gap:.7rem;align-items:center;border:1px solid var(--border);border-radius:8px;padding:.45rem .8rem;margin-bottom:.4rem;font-size:.78rem;background:var(--panel);}
+.lrow.urgent{border-color:#dcb49a;border-left:4px solid var(--warn);}
+.lrow.todo{border-style:dashed;}
+.lrow b{font-weight:600;}
+.lrow .due{margin-left:auto;color:var(--warn);font-weight:700;font-size:.72rem;}
+.lrow .okk{margin-left:auto;color:var(--muted);font-size:.72rem;}
+.conf{font-size:.68rem;background:var(--panel-strong);border-radius:4px;padding:.03rem .35rem;font-variant-numeric:tabular-nums;}
+.twocol{display:grid;grid-template-columns:1fr 1.3fr;gap:1rem;margin-top:.8rem;align-items:start;}
+.panelbox{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:.7rem .9rem;}
+.panelbox h3{font-family:var(--fd);font-weight:500;font-size:.95rem;margin:0 0 .4rem;}
+.panelbox .line{display:flex;justify-content:space-between;font-size:.76rem;padding:.25rem 0;border-top:1px solid var(--panel-strong);}
+.panelbox .tot{font-family:var(--fd);font-size:1.6rem;}
+
+/* grid page */
+.gwrap{border:1px solid var(--border);border-radius:10px;background:var(--panel);overflow:hidden;margin-top:.4rem;display:flex;}
+.ggut{flex:0 0 44px;border-right:1px solid var(--border);position:relative;background:var(--panel);}
+.ggut span{position:absolute;right:5px;font-size:.62rem;color:var(--muted);transform:translateY(-6px);font-variant-numeric:tabular-nums;}
+.gfield{position:relative;flex:1;}
+.ghead2{display:grid;grid-template-columns:repeat(6,1fr);background:var(--panel-strong);border-bottom:1px solid var(--border);height:40px;}
+.ghead2 div{border-left:1px solid var(--border);padding:.2rem 0 0 .45rem;font-size:.7rem;font-weight:600;}
+.ghead2 div:first-child{border-left:0;}
+.ghead2 .lg{font-family:var(--fd);font-style:italic;color:var(--muted);font-size:.66rem;display:block;font-weight:400;}
+.gbody2{position:relative;height:340px;}
+.gline{position:absolute;left:0;right:0;height:1px;background:var(--panel-strong);}
+.gv{position:absolute;top:0;bottom:0;width:1px;background:var(--panel-strong);}
+.gb{position:absolute;border:1px solid var(--border);border-left:3px solid var(--kc,var(--border));border-radius:4px;background:var(--panel);
+font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
+.gb b{font-weight:600;display:block;font-size:.62rem;}
+.gb.cn{background:repeating-linear-gradient(135deg,var(--panel),var(--panel) 5px,rgba(120,100,60,.05) 5px,rgba(120,100,60,.05) 7px);}
+.gb.cn b{font-weight:400;color:var(--muted);}
+
+/* phone */
+.phonewrap{display:flex;justify-content:center;padding:1.4rem 0;}
+.ph{width:250px;border:6px solid #1b1814;border-radius:26px;background:var(--bg);overflow:hidden;}
+.ph .phh{background:var(--panel);border-bottom:1px solid var(--border);padding:.55rem .8rem;}
+.ph .phh b{font-family:var(--fd);font-weight:500;}
+.ph .bd{padding:.55rem;}
+.nextcard{border:1px solid var(--accent);border-left:4px solid var(--k-meal);border-radius:9px;padding:.45rem .55rem;box-shadow:0 6px 18px rgba(13,76,68,.15);font-size:.74rem;background:var(--panel);}
+.bigbtns{display:flex;gap:.3rem;margin-top:.35rem;}
+.bigbtns span{flex:1;text-align:center;font-size:.66rem;font-weight:700;border-radius:7px;padding:.35rem .2rem;cursor:pointer;}
+.bigbtns .d{background:var(--accent);color:#fff;}
+.bigbtns .c{background:var(--panel-strong);}
+
+/* trips list + variations */
+.tripcard{display:grid;grid-template-columns:1fr auto;gap:.3rem .8rem;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:.85rem 1.1rem;margin-bottom:.7rem;}
+.tripcard .nm{font-family:var(--fd);font-size:1.15rem;}
+.tripcard .legs{font-family:var(--fd);font-style:italic;color:var(--muted);font-size:.85rem;}
+.tripcard .meta{font-size:.72rem;color:var(--muted);}
+.tripcard.dim{opacity:.55;}
+.pillgrn{font-size:.64rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;background:#e7f1ee;color:var(--accent);border-radius:100px;padding:.16rem .55rem;justify-self:end;align-self:start;}
+.composer{background:var(--panel);border:1.5px solid var(--accent);border-radius:12px;padding:1rem 1.2rem;margin-bottom:1rem;box-shadow:0 12px 30px rgba(13,76,68,.12);}
+.composer .frow{display:flex;gap:.6rem;margin-bottom:.55rem;flex-wrap:wrap;}
+.composer .fld{display:flex;flex-direction:column;gap:.15rem;}
+.composer label{font-size:.66rem;color:var(--muted);}
+.composer input{font-family:var(--fu);font-size:.85rem;background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:.35rem .55rem;}
+.vartabs{display:flex;gap:.4rem;margin:.5rem 0;align-items:center;}
+.vartab{font-size:.76rem;font-weight:600;border:1px solid var(--border);border-radius:100px;padding:.26rem .8rem;color:var(--muted);cursor:pointer;}
+.vartab.on{background:#e7f1ee;color:var(--accent);border-color:#bcd8d0;}
+.decideby{font-size:.74rem;color:var(--warn);font-weight:600;margin-top:.45rem;}
 </style></head><body>
 <div class="deck">
   <div class="dhead">
     <h1>Slovenia, planned</h1><span class="sub">a 20-step walkthrough · for Janice's review · ← → to move</span>
     <span class="spacer"></span><span class="counter"><span id="cur">1</span> / 20</span>
   </div>
-  <div id="phase" class="phase"></div>
-  <p id="caption"></p>
+  <div class="ctx"><div id="phase" class="phase"></div><p id="caption"></p></div>
   <div class="stage" id="stage"></div>
 </div>
 
@@ -155,311 +229,518 @@ padding:.45rem .7rem;font-size:.8rem;box-shadow:0 2px 6px rgba(41,33,19,.05);}
   <span class="hintkey">arrow keys work</span>
 </div>
 
-<!-- captions, one per step, cloned into #caption (never innerHTML) -->
 <div id="caps" style="display:none">
-<p>It starts with two facts: <b>Slovenia</b>, and <b>roughly ten days in mid-May</b>. That's all a trip needs to exist — no cities, no hotels, no commitments.</p>
-<p>The trip opens as an empty <b>skeleton</b>: a stretchable window of days. Both edges are soft — May 15–25 is a guess, not a promise.</p>
-<p>Three cities from the scout's list, dropped in rough order. The split is a default — <b>2 · 4 · 4 nights</b> — nobody has decided anything yet.</p>
-<p>Zhuzhing: grab the <b>boundary</b> between two cities and slide it — Bled takes a night from Piran. Zero-sum between neighbors; the trip's total doesn't move.</p>
-<p>The flights get booked — and the trip's outer edges <b>cure</b>. The window can't stretch anymore without real money moving. Inside, everything is still clay.</p>
-<p>Now the <b>Stay shelf</b>: five Ljubljana candidates side by side. One gets dropped onto the city — it becomes a bar spanning the leg's nights. Still cancellable, still clay.</p>
-<p>Stays aren't 1:1 with cities. Bled's last night goes to <b>Hiša Franko</b> (the Soča valley splurge), Piran's last to <b>Brdo</b> near the airport. Drag a bar's edge — the neighbor takes the night. This is the zhuzh.</p>
-<p>Booked stays get a 🔒 and <b>resist the zhuzh</b>: moving one surfaces its cancellation terms first. Union is free to cancel until <b>May 12</b> — that date now matters everywhere.</p>
-<p>Under each city, a <b>bucket</b>. Activities pile in from the pool — no days, no times, just wants. The bucket watches itself: <b>~18 hours gathered for ~3 open days — enough to lay out.</b></p>
-<p>Janice already knows some answers: <b>balloon = Tuesday</b>. Drag it from the bucket straight onto the day — even now, before any layout. It lands <b>pinned</b>. The machine will never move it.</p>
-<p>And some days are for <b>nothing</b>. May 22 in Piran gets marked <b>keep it light</b> — the layout engine must leave it nearly empty. Recovery is a feature, not a gap.</p>
-<p><b>“Lay out Bled.”</b> The machine deals the bucket across the days: booked dates pin themselves, one heavy thing per day, closed-Mondays respected, load balanced. <b>What doesn't fit stays behind — as alternates, not casualties.</b></p>
-<p>Janice drags the toboggan to Tuesday. The moment a human edits, <b>auto-layout pauses</b> — it proposes nothing more until she asks again. Her arrangement wins by default.</p>
-<p>Tuesday looks right — <b>“Solve this day.”</b> The machine sequences by geography, inserts the drives, drops lunch in the window, surfaces the free gap, and assigns the clock. Hatched rows are its work.</p>
-<p>She nudges lunch to 12:30 — the entry <b>pins itself</b> and the day says “edited since solve.” One tap re-solves <b>around</b> her pins. Human and machine take turns; the human always outranks.</p>
-<p>She tries squeezing the zipline into Tuesday anyway. The machine reflows everything — and <b>refuses to lie</b>: it names what can't fit instead of silently cramming. One tap offers another day.</p>
-<p>The booking spine kept itself: every <b>to-book</b> item with its lead time, every cancel-by counting down, cash computed (<b>on-site ∧ cash-only = €927</b>), the passes remembered. Nothing hand-kept.</p>
-<p>And then the moment this whole tool exists for: <b>the grid prints itself.</b> Eleven days, 79 entries, every code and clothing note where it belongs — assembled from the plan, not typed into cells.</p>
-<p>Day-of, the phone lands on <b>today</b>: next-up leads with the two taps that matter, the confirmation code is one thumb away, finished things fade. The plan finally pays rent.</p>
-<p>The real story: they cancelled Piran betting on Trieste — and regretted it. <b>Variations</b> would let both futures live: two skeletons for the same 3 days, each holding its own refundable bookings, with a <b>decide-by date inherited from the cancellation deadlines</b>. Hop between them until one wins.</p>
+<p>It starts with two facts: <b>Slovenia</b>, and <b>roughly ten days in mid-May</b>. The composer asks for nothing else — no cities, no hotels, no commitments.</p>
+<p>The trip opens on its <b>Plan</b> tab: an empty, stretchable window of days. Cities from the scout wait below; both edges are soft.</p>
+<p>Three cities dropped in rough order — the split is a default, <b>2 · 4 · 4 nights</b>. Kranj stays on the tray. Every bar has its grip; every boundary its handle.</p>
+<p>Zhuzhing: grab the <b>boundary handle</b> and slide — Bled takes a night from Piran. Zero-sum between neighbors; the trip total doesn't move.</p>
+<p>The flights get booked and the window's outer edges <b>lock</b>. The trip can't stretch anymore without real money moving. Inside, still clay.</p>
+<p>The <b>stay strip</b> under each city: five Ljubljana candidates below, one dropped onto the city — it becomes a bar spanning the leg's nights. Bled and Piran still show their drop targets.</p>
+<p>Stays aren't 1:1 with cities: Bled's last night goes to <b>Hiša Franko</b>, Piran's last to <b>Brdo</b>. Drag a bar's edge — the neighbor takes the night.</p>
+<p>Booked stays wear a 🔒 and <b>resist</b>: grabbing Union's handle surfaces its terms — free cancellation ends <b>May 12</b>. That date now matters everywhere.</p>
+<p>Under each city, a <b>bucket</b>. Activities pile in with durations — no days yet. The bucket watches itself: <b>~18 h for ~3 open days — enough to lay out.</b></p>
+<p>Janice already knows one answer: <b>balloon = Tuesday</b>. She drags it from the bucket straight onto the day. It lands <b>pinned</b> — the machine will never move it.</p>
+<p>Some days are for nothing: May 22 gets the <b>🪶 keep-it-light</b> toggle. The layout engine must leave it nearly empty. Recovery is a feature.</p>
+<p><b>“Lay out Bled.”</b> The machine deals the bucket across the days — booked dates pin, one heavy thing per day, closed-Mondays respected. <b>What doesn't fit becomes an alternate, not a casualty.</b></p>
+<p>She drags the toboggan to Tuesday. The instant a human edits, <b>auto-layout pauses</b> — and waits for the explicit “re-lay out around my pins.”</p>
+<p>Tuesday looks right — <b>Solve</b>. The Days view: the machine sequenced by geography, inserted the drives, dropped lunch in its window, surfaced the free gap, assigned the clock.</p>
+<p>She nudges lunch to 12:30 — it <b>pins itself</b>, the day says “edited since solve,” and one button re-solves <b>around</b> her pins. The human always outranks.</p>
+<p>She tries the zipline on Tuesday anyway. The machine reflows — and <b>refuses to lie</b>: it names what can't fit and offers the next day instead of silently cramming.</p>
+<p>The <b>Book</b> page kept itself: to-books with lead times, cancel-bys counting down, cash = on-site ∧ cash-only = <b>€927</b>, passes remembered. Nothing hand-kept.</p>
+<p>The payoff: <b>the grid prints itself.</b> Every block computed from the plan, logistics one click deep, one leg per page on paper. The artifact Janice used to type — now output.</p>
+<p>Day-of, the phone lands on <b>today</b>: next-up leads with Directions and Call, the confirmation code one thumb away, finished things faded.</p>
+<p>The real story: they cancelled Piran betting on Trieste — and regretted it. <b>Variations</b> keep both futures alive on the same 3 days, each holding refundable bookings, with a <b>decide-by inherited from the cancellation deadlines</b>.</p>
 </div>
 
-<!-- step visuals -->
 <div id="steps" style="display:none">
 
+<!-- ═ 1 · /trips + composer ═ -->
 <section data-phase="Where · the idea">
-  <div class="chrome"><b>Trips</b><button class="ctrl solid" style="margin-left:auto;">＋ New trip</button></div>
-  <div class="cardrow">
-    <div class="mini" style="--k:var(--k-act);padding:1rem 1.4rem;">
-      <b style="font-family:var(--fd);font-size:1.3rem;font-weight:500;">Slovenia</b>
-      <small>mid-May 2026 · ~10 days · Janice &amp; Chris · vegetarian</small>
-      <small style="color:var(--accent);margin-top:.3rem;">dates still soft — nothing booked</small>
+  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="pagebody">
+    <div class="sect">Trips <button class="ctrl solid inlinectl">＋ New trip</button></div>
+    <div class="composer">
+      <div class="frow">
+        <span class="fld"><label>Where (big where)</label><input value="Slovenia" style="width:220px"></span>
+        <span class="fld"><label>Roughly when</label><input value="mid-May 2026" style="width:140px"></span>
+        <span class="fld"><label>About how long</label><input value="~10 days" style="width:100px"></span>
+      </div>
+      <div class="frow">
+        <span class="fld"><label>Travelers</label><input value="Janice, Chris" style="width:180px"></span>
+        <span class="fld"><label>Diet</label><input value="vegetarian" style="width:120px"></span>
+      </div>
+      <div class="toolrow"><button class="ctrl solid">Create trip →</button><span class="lbl2">dates stay soft until a flight or stay is booked</span></div>
+    </div>
+    <div class="tripcard dim"><div><div class="nm">Jim Thorpe</div><div class="legs">Carbon County, PA — May 22–25, 2026</div><div class="meta">Janice &amp; Chris + Cocoa 🐾</div></div><span class="pillgrn" style="background:#f6ead8;color:var(--warn);">⏰ 4 to book</span></div>
+    <div class="tripcard dim"><div><div class="nm">New River Gorge</div><div class="legs">Lansing, WV — Nov 11–13</div></div><span class="pillgrn" style="background:var(--panel-strong);color:var(--muted);">went · would return</span></div>
+  </div>
+</section>
+
+<!-- ═ 2 · empty skeleton ═ -->
+<section data-phase="Where · the skeleton">
+  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">mid-May · ~10 days · all soft</span>
+    <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
+    <span class="spacer"></span><span class="chipbtn">Book</span><span class="chipbtn">Grid →</span></div>
+  <div class="pagebody">
+    <div class="sect">The window — May 15 → 25 · both edges soft</div>
+    <div class="win"><span class="edge l"></span><span class="empty"><span class="dropz">⠿ drop a city here</span></span><span class="edge r"></span></div>
+    <div class="datesrow"><span>Fri 15</span><span>Sun 17</span><span>Tue 19</span><span>Thu 21</span><span>Sat 23</span><span>Mon 25</span></div>
+    <div class="sect" style="margin-top:1.4rem;">Cities from the scout</div>
+    <div class="toolrow"><span class="citychip">⠿ Ljubljana</span><span class="citychip">⠿ Bled</span><span class="citychip">⠿ Piran</span><span class="citychip">⠿ Kranj</span><button class="ctrl">＋ other city…</button></div>
+  </div>
+</section>
+
+<!-- ═ 3 · cities land ═ -->
+<section data-phase="Where · cities land">
+  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25 · 10 nights</span>
+    <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
+    <span class="spacer"></span><span class="chipbtn">Book</span><span class="chipbtn">Grid →</span></div>
+  <div class="pagebody">
+    <div class="sect">The window</div>
+    <div class="win"><span class="edge l"></span>
+      <span class="legseg lj" style="flex:2"><span class="grip2">⠿</span>Ljubljana<small>2n</small><span class="hndl">↔</span></span>
+      <span class="legseg bl" style="flex:4"><span class="grip2">⠿</span>Bled<small>4n</small><span class="hndl">↔</span></span>
+      <span class="legseg pi" style="flex:4"><span class="grip2">⠿</span>Piran<small>4n</small></span>
+    <span class="edge r"></span></div>
+    <div class="datesrow"><span>Fri 15</span><span>Sun 17</span><span>Tue 19</span><span>Thu 21</span><span>Sat 23</span><span>Mon 25</span></div>
+    <div class="toolrow"><span class="lbl2">⠿ drag to reorder · ↔ drag to trade nights · still on the tray:</span><span class="citychip">⠿ Kranj</span><button class="ctrl">＋ other city…</button></div>
+  </div>
+</section>
+
+<!-- ═ 4 · trading nights ═ -->
+<section data-phase="Where · trading nights">
+  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25 · 10 nights</span>
+    <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
+    <span class="spacer"></span><span class="chipbtn">Book</span><span class="chipbtn">Grid →</span></div>
+  <div class="pagebody">
+    <div class="sect">The window</div>
+    <div class="win"><span class="edge l"></span>
+      <span class="legseg lj" style="flex:2">Ljubljana<small>2n</small><span class="hndl">↔</span></span>
+      <span class="legseg bl" style="flex:4.5">Bled<small>4n → 5n</small><span class="hndl hot">↔</span></span>
+      <span class="legseg pi" style="flex:3.5">Piran<small>4n → 3n</small></span>
+    <span class="edge r"></span></div>
+    <div class="datesrow"><span>Fri 15</span><span>Sun 17</span><span>Tue 19</span><span>Thu 21</span><span>Sat 23</span><span>Mon 25</span></div>
+    <p class="dragnote">↔ dragging the Bled | Piran boundary — Bled +1 night, Piran −1 · release to keep</p>
+  </div>
+</section>
+
+<!-- ═ 5 · flights lock the edges ═ -->
+<section data-phase="Where · flights harden the edges">
+  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25 · edges locked by flights</span>
+    <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
+    <span class="spacer"></span><span class="chipbtn">Book</span><span class="chipbtn">Grid →</span></div>
+  <div class="pagebody">
+    <div class="sect">The window</div>
+    <div class="win"><span class="edge l lock"></span>
+      <span class="legseg lj" style="flex:2">Ljubljana<small>2n</small><span class="hndl">↔</span></span>
+      <span class="legseg bl" style="flex:4">Bled<small>4n</small><span class="hndl">↔</span></span>
+      <span class="legseg pi" style="flex:4">Piran<small>4n</small></span>
+    <span class="edge r lock"></span></div>
+    <div class="datesrow"><span>Fri 15</span><span>Sun 17</span><span>Tue 19</span><span>Thu 21</span><span>Sat 23</span><span>Mon 25</span></div>
+    <div class="sect" style="margin-top:1.3rem;">Transport <button class="ctrl inlinectl">＋ add transport…</button></div>
+    <div class="cardrow">
+      <div class="mini" style="--k:var(--k-trav)"><b>✈ → FRA → LJU</b> · Fri May 15<small>arrive 9:30 PM local · booked 🔒</small></div>
+      <div class="mini" style="--k:var(--k-trav)"><b>✈ LJU →</b> · Mon May 25<small>takeoff 9:30 AM · booked 🔒</small></div>
     </div>
   </div>
 </section>
 
-<section data-phase="Where · the skeleton">
-  <div class="chrome"><b>Slovenia</b><span class="pill">Zhuzh</span><span>May 15 – 25 · 10 nights · all soft</span></div>
-  <div class="skel"><div class="lbl">The window</div>
-    <div class="win"><span class="edge l"></span><span class="empty"><span class="dropz">⠿ drop a city here</span></span><span class="edge r"></span></div>
-    <div class="toolrow"><span class="lbl2">cities from the scout:</span>
-      <span class="citychip">⠿ Ljubljana</span><span class="citychip">⠿ Bled</span><span class="citychip">⠿ Piran</span><span class="citychip">⠿ Kranj</span>
-      <button class="ctrl">＋ other city…</button></div>
-  </div>
-</section>
-
-<section data-phase="Where · cities land">
-  <div class="chrome"><b>Slovenia</b><span class="pill">Zhuzh</span><span>May 15 – 25</span></div>
-  <div class="skel"><div class="lbl">The window</div>
-    <div class="win"><span class="edge l"></span>
-      <span class="legseg lj" style="flex:2">⠿ Ljubljana<small>2n</small><span class="hndl" style="right:-9px;left:auto;transform:translateY(-50%);">↔</span></span>
-      <span class="legseg bl" style="flex:4">⠿ Bled<small>4n</small><span class="hndl" style="right:-9px;left:auto;transform:translateY(-50%);">↔</span></span>
-      <span class="legseg pi" style="flex:4">⠿ Piran<small>4n</small></span>
-    <span class="edge r"></span></div>
-    <div class="toolrow"><span class="lbl2">drag ⠿ to reorder a city · drag ↔ to trade nights · still on the tray:</span><span class="citychip">⠿ Kranj</span></div>
-  </div>
-</section>
-
-<section data-phase="Where · trading nights">
-  <div class="chrome"><b>Slovenia</b><span class="pill">Zhuzh</span><span>May 15 – 25</span></div>
-  <div class="skel"><div class="lbl">The window</div>
-    <div class="win"><span class="edge l"></span>
-      <span class="legseg lj" style="flex:2">Ljubljana<small>2n</small></span>
-      <span class="legseg bl" style="flex:4.5">Bled<small>4n →</small><span class="hndl" style="right:-9px;left:auto;transform:translateY(-50%);box-shadow:0 0 0 4px rgba(13,76,68,.18);">↔</span></span>
-      <span class="legseg pi" style="flex:3.5">Piran<small>← 4n</small></span>
-    <span class="edge r"></span></div>
-    <p class="dragnote">↔ dragging the Bled | Piran boundary — Bled +1 night, Piran −1</p>
-  </div>
-</section>
-
-<section data-phase="Where · flights harden the edges">
-  <div class="chrome"><b>Slovenia</b><span class="pill">Zhuzh</span><span>May 15 – 25 · edges locked by flights</span></div>
-  <div class="skel"><div class="lbl">The window</div>
-    <div class="win"><span class="edge l lock"></span>
-      <span class="legseg lj" style="flex:2">Ljubljana<small>2n</small></span>
-      <span class="legseg bl" style="flex:4">Bled<small>4n</small></span>
-      <span class="legseg pi" style="flex:4">Piran<small>4n</small></span>
+<!-- ═ 6 · stay strip + shelf ═ -->
+<section data-phase="Stays · drop a hotel on the city">
+  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
+    <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
+    <span class="spacer"></span><span class="chipbtn">Book</span><span class="chipbtn">Grid →</span></div>
+  <div class="pagebody">
+    <div class="sect">The window</div>
+    <div class="win" style="height:36px"><span class="edge l lock"></span>
+      <span class="legseg lj" style="flex:2">Ljubljana</span><span class="legseg bl" style="flex:4">Bled</span><span class="legseg pi" style="flex:4">Piran</span>
     <span class="edge r lock"></span></div>
-  </div>
-  <div class="cardrow">
-    <div class="mini" style="--k:var(--k-trav)"><b>✈ → FRA → LJU</b> · Fri May 15<small>arrive 9:30 PM local · booked 🔒</small></div>
-    <div class="mini" style="--k:var(--k-trav)"><b>✈ LJU →</b> · Mon May 25<small>takeoff 9:30 AM · booked 🔒</small></div>
-    <button class="ctrl">＋ add transport…</button>
-  </div>
-</section>
-
-<section data-phase="Stays · the hotel shelf">
-  <div class="chrome"><b>Slovenia · Ljubljana</b><span class="pill">Stay shelf</span></div>
-  <div class="skel"><div class="lbl">Ljubljana · 2 nights</div>
-    <div class="win" style="height:38px"><span class="legseg lj" style="flex:1">Ljubljana <span class="dropz" style="margin-left:.6rem;">drop a hotel here</span></span></div>
-    <div class="staysrow"><span class="staybar" style="flex:1"><span class="grip2">⠿</span><b>Grand Hotel Union Eurostars</b><small>2 nights · just dropped</small><span class="hndl" style="right:-8px;left:auto;transform:translateY(-50%);">↔</span></span></div>
-  </div>
-  <div class="cardrow">
-    <div class="mini" style="--k:var(--k-stay)"><span class="grip2">⠿</span><b>Union Eurostars</b><small>old town · garage</small><span class="mk ok">chosen</span></div>
-    <div class="mini" style="--k:var(--k-stay)"><span class="grip2">⠿</span><b>Hotel Lev</b><small>★4.4</small></div>
-    <div class="mini" style="--k:var(--k-stay)"><span class="grip2">⠿</span><b>City Hotel</b><small>★4.2</small></div>
-    <div class="mini" style="--k:var(--k-stay)"><span class="grip2">⠿</span><b>Vander Urbani</b><small>★4.3 · boutique</small></div>
-    <div class="mini" style="--k:var(--k-stay)"><span class="grip2">⠿</span><b>Antiq Palace</b><small>★4.4</small></div>
-    <button class="ctrl">＋ add your own stay…</button>
+    <div class="sect" style="margin-top:.9rem;">Stays</div>
+    <div class="staysrow">
+      <span class="staybar" style="flex:2"><span class="grip2">⠿</span><b>Union Eurostars</b><small>2n · just dropped</small><span class="hndl">↔</span></span>
+      <span class="staybar" style="flex:4;border-style:dashed;border-left:1px dashed var(--border);justify-content:center;"><span class="dropz">drop a hotel on Bled</span></span>
+      <span class="staybar" style="flex:4;border-style:dashed;border-left:1px dashed var(--border);justify-content:center;"><span class="dropz">drop a hotel on Piran</span></span>
+    </div>
+    <div class="sect" style="margin-top:1.2rem;">Stay candidates · Ljubljana <button class="ctrl inlinectl">＋ add your own stay…</button></div>
+    <div class="cardrow">
+      <div class="mini" style="--k:var(--k-stay)"><span class="grip2">⠿</span><b>Union Eurostars</b><small>old town · garage</small><span class="mk ok">chosen</span></div>
+      <div class="mini" style="--k:var(--k-stay)"><span class="grip2">⠿</span><b>Hotel Lev</b><small>★4.4</small></div>
+      <div class="mini" style="--k:var(--k-stay)"><span class="grip2">⠿</span><b>City Hotel</b><small>★4.2</small></div>
+      <div class="mini" style="--k:var(--k-stay)"><span class="grip2">⠿</span><b>Vander Urbani</b><small>★4.3 · boutique</small></div>
+      <div class="mini" style="--k:var(--k-stay)"><span class="grip2">⠿</span><b>Antiq Palace</b><small>★4.4</small></div>
+    </div>
   </div>
 </section>
 
+<!-- ═ 7 · splitting stays ═ -->
 <section data-phase="Stays · splitting a leg">
-  <div class="chrome"><b>Slovenia</b><span class="pill">Zhuzh</span><span>5 stays across 3 cities</span></div>
-  <div class="skel"><div class="lbl">Cities</div>
-    <div class="win" style="height:34px"><span class="edge l lock"></span>
-      <span class="legseg lj" style="flex:2">Ljubljana</span>
-      <span class="legseg bl" style="flex:4">Bled + Soča</span>
-      <span class="legseg pi" style="flex:4">Piran + Kranj</span>
+  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25 · 5 stays</span>
+    <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
+    <span class="spacer"></span><span class="chipbtn">Book</span><span class="chipbtn">Grid →</span></div>
+  <div class="pagebody">
+    <div class="sect">The window</div>
+    <div class="win" style="height:36px"><span class="edge l lock"></span>
+      <span class="legseg lj" style="flex:2">Ljubljana</span><span class="legseg bl" style="flex:4">Bled + Soča</span><span class="legseg pi" style="flex:4">Piran + Kranj</span>
     <span class="edge r lock"></span></div>
-    <div class="lbl" style="margin-top:.6rem;">Stays — bars under the cities</div>
+    <div class="sect" style="margin-top:.9rem;">Stays <button class="ctrl inlinectl">✂ split a stay…</button></div>
     <div class="staysrow">
       <span class="staybar" style="flex:2"><b>Union</b><small>2n</small></span>
-      <span class="staybar" style="flex:3"><span class="grip2">⠿</span><b>Toplice</b><small>3n · lakefront</small><span class="hndl" style="right:-8px;left:auto;transform:translateY(-50%);box-shadow:0 0 0 4px rgba(13,76,68,.18);">↔</span></span>
-      <span class="staybar" style="flex:1"><b>Hiša Franko</b><small>1n</small></span>
+      <span class="staybar" style="flex:3"><span class="grip2">⠿</span><b>Toplice</b><small>4n → 3n</small><span class="hndl hot">↔</span></span>
+      <span class="staybar" style="flex:1"><b>H. Franko</b><small>1n</small></span>
       <span class="staybar" style="flex:3"><b>Hotel Piran</b><small>3n</small></span>
       <span class="staybar" style="flex:1"><b>Brdo</b><small>1n</small></span>
     </div>
-    <p class="dragnote">↔ Toplice trimmed from 4 → 3 nights; Hiša Franko took the vacated night</p>
-    <div class="toolrow"><button class="ctrl">✂ split a stay…</button><button class="ctrl ghosted">＋ add stay to a gap</button></div>
+    <p class="dragnote">↔ Toplice trimmed 4 → 3 nights — Hiša Franko takes the vacated night</p>
   </div>
 </section>
 
+<!-- ═ 8 · booking hardens ═ -->
 <section data-phase="Stays · booking hardens">
-  <div class="chrome"><b>Slovenia</b><span class="pill">Zhuzh</span><span class="pill warn">⏰ cancel-bys live</span></div>
-  <div class="skel"><div class="lbl">Stays</div>
+  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25 · all stays booked</span>
+    <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
+    <span class="spacer"></span><span class="chipbtn">Book <span class="badge">⏰ 1</span></span><span class="chipbtn">Grid →</span></div>
+  <div class="pagebody">
+    <div class="sect">Stays</div>
     <div class="staysrow">
-      <span class="staybar" style="flex:2"><span class="lock">🔒</span><b>Union</b><small>free to May 12</small><span class="hndl" style="right:-8px;left:auto;transform:translateY(-50%);box-shadow:0 0 0 4px rgba(163,67,31,.25);border-color:var(--warn);color:var(--warn);">↔</span></span>
+      <span class="staybar" style="flex:2"><span class="lock">🔒</span><b>Union</b><small>free to May 12</small><span class="hndl warnh">↔</span></span>
       <span class="staybar" style="flex:3"><span class="lock">🔒</span><b>Toplice</b><small>held to arrival</small></span>
       <span class="staybar" style="flex:1"><span class="lock">🔒</span><b>H. Franko</b></span>
       <span class="staybar" style="flex:3"><span class="lock">🔒</span><b>Hotel Piran</b><small>2 days prior</small></span>
       <span class="staybar" style="flex:1"><span class="lock">🔒</span><b>Brdo</b></span>
     </div>
-    <p class="dragnote warn">trying to trim Union → “free cancellation ends May 12 — after that this bar costs money to move”</p>
+    <p class="dragnote warn">↔ grabbing Union — “free cancellation ends <b>May 12</b>. After that, moving this bar costs money.”</p>
   </div>
 </section>
 
+<!-- ═ 9 · the Bled bucket ═ -->
 <section data-phase="Gather · the Bled bucket">
-  <div class="chrome"><b>Slovenia · Bled</b><span class="pill">Gather</span></div>
-  <div class="bucketbox">
-    <div class="bh"><b>Bled bucket</b><span class="ready"><b>~18 h</b> gathered · ~3 open days · <b>enough to lay out</b></span><button class="layout-btn">Lay out Bled →</button></div>
-    <div class="cardrow">
-      <div class="mini" style="--k:var(--k-act)"><b>Hot-air balloon</b><small>booked 🔒 May 19 · 5:30 · 2h</small></div>
-      <div class="mini" style="--k:var(--k-act)"><b>Vintgar Gorge</b><small>booked 🔒 · 2.5h · arrive 10:30</small></div>
-      <div class="mini" style="--k:var(--k-act)"><b>Bled Castle</b><small>~2h · opens 8:00</small></div>
-      <div class="mini" style="--k:var(--k-act)"><b>Via Ferrata</b><small>booked 🔒 · 1.5h</small></div>
-      <div class="mini" style="--k:var(--k-act)"><b>Canyoning</b><small>booked 🔒 · 2h</small></div>
-      <div class="mini" style="--k:var(--k-meal)"><b>Pizzeria Rustika</b><small>~1h</small><span class="mk ok">veg ✓</span></div>
-      <div class="mini" style="--k:var(--k-meal)"><b>Public &amp; Vegan Kitchen</b><small>closed Mondays</small></div>
-      <div class="mini" style="--k:var(--k-act)"><b>Straža toboggan</b><small>~1.5h</small></div>
-      <div class="mini" style="--k:var(--k-act)"><span class="grip2">⠿</span><b>Zipline Dolinka</b><small>to book ⏰ · 3h</small></div>
+  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
+    <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
+    <span class="spacer"></span><span class="chipbtn">Book <span class="badge">⏰ 1</span></span><span class="chipbtn">Grid →</span></div>
+  <div class="pagebody">
+    <div class="sect">Bled · May 17–20 · Toplice + Hiša Franko</div>
+    <div class="daycols">
+      <div class="daycol"><div class="dh">Sun 17 <small>arrive</small></div><div class="cap"><i style="width:0%"></i></div></div>
+      <div class="daycol"><div class="dh">Mon 18</div><div class="cap"><i style="width:0%"></i></div></div>
+      <div class="daycol"><div class="dh">Tue 19</div><div class="cap"><i style="width:0%"></i></div></div>
+      <div class="daycol"><div class="dh">Wed 20 <small>→ Soča</small></div><div class="cap"><i style="width:0%"></i></div></div>
     </div>
-    <div class="toolrow"><button class="ctrl">＋ from the pool…</button><button class="ctrl">＋ add your own…</button><span class="lbl2">⠿ drag any card straight onto a day</span></div>
+    <div class="bucketbox">
+      <div class="bh"><b>Bled bucket</b><span class="ready"><b>~18 h</b> gathered · ~3 open days · <b>enough to lay out</b></span><button class="layout-btn">Lay out Bled →</button></div>
+      <div class="cardrow">
+        <div class="mini" style="--k:var(--k-act)"><span class="grip2">⠿</span><b>Hot-air balloon</b><small>booked 🔒 May 19 · 5:30 · 2h</small></div>
+        <div class="mini" style="--k:var(--k-act)"><span class="grip2">⠿</span><b>Vintgar Gorge</b><small>booked 🔒 · 2.5h</small></div>
+        <div class="mini" style="--k:var(--k-act)"><span class="grip2">⠿</span><b>Bled Castle</b><small>~2h · opens 8:00</small></div>
+        <div class="mini" style="--k:var(--k-act)"><span class="grip2">⠿</span><b>Via Ferrata</b><small>booked 🔒 · 1.5h</small></div>
+        <div class="mini" style="--k:var(--k-act)"><span class="grip2">⠿</span><b>Canyoning</b><small>booked 🔒 · 2h</small></div>
+        <div class="mini" style="--k:var(--k-meal)"><span class="grip2">⠿</span><b>Rustika</b><small>~1h</small><span class="mk ok">veg ✓</span></div>
+        <div class="mini" style="--k:var(--k-meal)"><span class="grip2">⠿</span><b>Public &amp; Vegan</b><small>closed Mon</small></div>
+        <div class="mini" style="--k:var(--k-act)"><span class="grip2">⠿</span><b>Toboggan</b><small>~1.5h</small></div>
+        <div class="mini" style="--k:var(--k-act)"><span class="grip2">⠿</span><b>Zipline</b><small>to book ⏰ · 3h</small></div>
+      </div>
+      <div class="toolrow"><button class="ctrl">＋ from the pool…</button><button class="ctrl">＋ add your own…</button><span class="lbl2">⠿ or drag a card straight onto a day</span></div>
+    </div>
   </div>
 </section>
 
+<!-- ═ 10 · manual pin ═ -->
 <section data-phase="Gather · manual placement, anytime">
-  <div class="chrome"><b>Slovenia · Bled</b><span class="pill">Gather</span></div>
-  <div class="daycols">
-    <div class="daycol"><div class="dh">Sun 17 <small>arrive</small></div><div class="cap"><i style="width:20%"></i></div></div>
-    <div class="daycol"><div class="dh">Mon 18</div><div class="dropz" style="width:100%;justify-content:center;">drop here</div><div class="cap"><i style="width:0%"></i></div></div>
-    <div class="daycol" style="border-color:var(--accent);">
-      <div class="dh">Tue 19</div>
-      <div class="mini" style="--k:var(--k-act);box-shadow:0 8px 20px rgba(13,76,68,.25);"><span class="grip2">⠿</span><b>Hot-air balloon</b> <span class="tag pin">📌 pinned</span><small>5:30 · booked · just dropped</small></div>
-      <div class="cap"><i style="width:25%"></i></div>
+  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
+    <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
+    <span class="spacer"></span><span class="chipbtn">Book <span class="badge">⏰ 1</span></span><span class="chipbtn">Grid →</span></div>
+  <div class="pagebody">
+    <div class="sect">Bled · May 17–20</div>
+    <div class="daycols">
+      <div class="daycol"><div class="dh">Sun 17 <small>arrive</small></div><div class="dropz" style="width:100%;justify-content:center;">drop here</div><div class="cap"><i style="width:0%"></i></div></div>
+      <div class="daycol"><div class="dh">Mon 18</div><div class="dropz" style="width:100%;justify-content:center;">drop here</div><div class="cap"><i style="width:0%"></i></div></div>
+      <div class="daycol hot"><div class="dh">Tue 19</div>
+        <div class="mini" style="--k:var(--k-act);box-shadow:0 8px 20px rgba(13,76,68,.25);"><span class="grip2">⠿</span><b>Hot-air balloon</b> <span class="tag pin">📌 pinned</span><small>5:30 · booked · just dropped</small></div>
+        <div class="cap"><i style="width:25%"></i></div></div>
+      <div class="daycol"><div class="dh">Wed 20 <small>→ Soča</small></div><div class="dropz" style="width:100%;justify-content:center;">drop here</div><div class="cap"><i style="width:0%"></i></div></div>
     </div>
-    <div class="daycol"><div class="dh">Wed 20 <small>→ Soča</small></div><div class="cap"><i style="width:30%"></i></div></div>
+    <div class="bucketbox"><div class="bh"><b>Bled bucket</b><span class="ready">8 left · ~16 h</span><button class="layout-btn">Lay out Bled →</button></div>
+      <div class="cardrow">
+        <div class="mini" style="--k:var(--k-act)"><span class="grip2">⠿</span><b>Vintgar Gorge</b></div>
+        <div class="mini" style="--k:var(--k-act)"><span class="grip2">⠿</span><b>Bled Castle</b></div>
+        <div class="mini" style="--k:var(--k-act)"><span class="grip2">⠿</span><b>Via Ferrata</b></div>
+        <div class="mini" style="--k:var(--k-act)"><span class="grip2">⠿</span><b>Canyoning</b></div>
+        <div class="mini" style="--k:var(--k-meal)"><span class="grip2">⠿</span><b>Rustika</b></div>
+        <div class="mini" style="--k:var(--k-act)"><span class="grip2">⠿</span><b>Toboggan</b></div>
+        <div class="mini" style="--k:var(--k-act)"><span class="grip2">⠿</span><b>Zipline</b></div>
+      </div>
+    </div>
   </div>
-  <p class="dragnote">⠿ dragged from the bucket — manual placement is always allowed, at any stage</p>
 </section>
 
+<!-- ═ 11 · keep it light ═ -->
 <section data-phase="Gather · keep it light">
-  <div class="chrome"><b>Slovenia · Piran</b><span class="pill">Gather</span></div>
-  <div class="daycols">
-    <div class="daycol"><div class="dh">Thu 21 <small>arrive</small><button class="lightbtn">🪶</button></div><div class="cap"><i style="width:35%"></i></div></div>
-    <div class="daycol" style="border-style:dashed;">
-      <div class="dh">Fri 22 <button class="lightbtn on">🪶 keep it light · on</button></div>
-      <div style="font-size:.72rem;color:var(--muted);font-style:italic;">the engine may place one stroll, nothing more</div>
-      <div class="cap"><i style="width:8%"></i></div>
+  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
+    <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
+    <span class="spacer"></span><span class="chipbtn">Book <span class="badge">⏰ 1</span></span><span class="chipbtn">Grid →</span></div>
+  <div class="pagebody">
+    <div class="sect">Piran · May 21–24 · Hotel Piran + Brdo</div>
+    <div class="daycols">
+      <div class="daycol"><div class="dh">Thu 21 <small>arrive</small><button class="lightbtn">🪶</button></div><div class="cap"><i style="width:35%"></i></div></div>
+      <div class="daycol dashed"><div class="dh">Fri 22 <button class="lightbtn on">🪶 light · on</button></div>
+        <div style="font-size:.7rem;color:var(--muted);font-style:italic;">the engine may place one stroll, nothing more</div>
+        <div class="cap"><i style="width:8%"></i></div></div>
+      <div class="daycol"><div class="dh">Sat 23 <small>Venice</small><button class="lightbtn">🪶</button></div><div class="cap"><i style="width:80%"></i></div></div>
+      <div class="daycol"><div class="dh">Sun 24 <small>→ Brdo</small><button class="lightbtn">🪶</button></div><div class="cap"><i style="width:30%"></i></div></div>
     </div>
-    <div class="daycol"><div class="dh">Sat 23 <small>Venice day</small><button class="lightbtn">🪶</button></div><div class="cap"><i style="width:80%"></i></div></div>
-    <div class="daycol"><div class="dh">Sun 24 <small>→ Brdo</small><button class="lightbtn">🪶</button></div><div class="cap"><i style="width:30%"></i></div></div>
+    <div class="bucketbox"><div class="bh"><b>Piran bucket</b><span class="ready">6 items · ~9 h</span><button class="layout-btn">Lay out Piran →</button></div>
+      <div class="cardrow">
+        <div class="mini" style="--k:var(--k-act)"><span class="grip2">⠿</span><b>Vintage boat cruise</b><small>booked 🔒 · cash €511</small></div>
+        <div class="mini" style="--k:var(--k-trav)"><span class="grip2">⠿</span><b>Catamaran → Venice</b><small>booked 🔒 May 23</small></div>
+        <div class="mini" style="--k:var(--k-act)"><span class="grip2">⠿</span><b>Explore Piran walls</b></div>
+        <div class="mini" style="--k:var(--k-meal)"><span class="grip2">⠿</span><b>Heaven Terrace 99</b></div>
+      </div>
+    </div>
   </div>
 </section>
 
+<!-- ═ 12 · lay out deals ═ -->
 <section data-phase="Lay out · the machine deals">
-  <div class="chrome"><b>Slovenia · Bled</b><span class="pill">Lay out</span><span class="verd">proposal</span></div>
-  <div class="daycols">
-    <div class="daycol"><div class="dh">Sun 17</div>
-      <div class="mini" style="--k:var(--k-act)"><b>Vintgar Gorge</b><small>arrive 10:30 🔒</small></div>
-      <div class="mini" style="--k:var(--k-meal)"><b>Rustika</b></div>
-      <div class="cap"><i style="width:55%"></i></div></div>
-    <div class="daycol"><div class="dh">Mon 18</div>
-      <div class="mini" style="--k:var(--k-act)"><b>Castle hike</b></div>
-      <div class="mini" style="--k:var(--k-act)"><b>Canyoning</b><small>🔒</small></div>
-      <div class="cap"><i style="width:70%"></i></div></div>
-    <div class="daycol"><div class="dh">Tue 19</div>
-      <div class="mini" style="--k:var(--k-act)"><b>Balloon</b> <span class="tag pin">📌</span></div>
-      <div class="mini" style="--k:var(--k-act)"><b>Via Ferrata</b><small>🔒 16:00</small></div>
-      <div class="cap"><i style="width:75%"></i></div></div>
-    <div class="daycol"><div class="dh">Wed 20</div>
-      <div class="mini" style="--k:var(--k-act)"><b>Toboggan</b></div>
-      <div class="mini" style="--k:var(--k-trav)"><b>→ Soča drive</b></div>
-      <div class="cap"><i style="width:60%"></i></div></div>
+  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
+    <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
+    <span class="spacer"></span><span class="chipbtn">Book <span class="badge">⏰ 1</span></span><span class="chipbtn">Grid →</span></div>
+  <div class="pagebody">
+    <div class="sect">Bled · laid out — a proposal <span class="inlinectl" style="display:inline-flex;gap:.4rem;"><button class="ctrl solid">✓ keep this layout</button><button class="ctrl">↶ undo</button></span></div>
+    <div class="daycols">
+      <div class="daycol"><div class="dh">Sun 17</div>
+        <div class="mini" style="--k:var(--k-act)"><span class="grip2">⠿</span><b>Vintgar Gorge</b><small>arrive 10:30 🔒</small></div>
+        <div class="mini" style="--k:var(--k-meal)"><span class="grip2">⠿</span><b>Rustika</b></div>
+        <div class="cap"><i style="width:55%"></i></div></div>
+      <div class="daycol"><div class="dh">Mon 18</div>
+        <div class="mini" style="--k:var(--k-act)"><span class="grip2">⠿</span><b>Castle hike</b></div>
+        <div class="mini" style="--k:var(--k-act)"><span class="grip2">⠿</span><b>Canyoning</b><small>🔒</small></div>
+        <div class="cap"><i style="width:70%"></i></div></div>
+      <div class="daycol"><div class="dh">Tue 19</div>
+        <div class="mini" style="--k:var(--k-act)"><b>Balloon</b> <span class="tag pin">📌</span></div>
+        <div class="mini" style="--k:var(--k-act)"><span class="grip2">⠿</span><b>Via Ferrata</b><small>🔒 16:00</small></div>
+        <div class="cap"><i style="width:75%"></i></div></div>
+      <div class="daycol"><div class="dh">Wed 20</div>
+        <div class="mini" style="--k:var(--k-act)"><span class="grip2">⠿</span><b>Toboggan</b></div>
+        <div class="mini" style="--k:var(--k-trav)"><b>→ Soča drive</b></div>
+        <div class="cap"><i style="width:60%"></i></div></div>
+    </div>
+    <div class="bucketbox"><div class="bh"><b>Didn't fit — alternates</b><span class="ready">stays in the bucket, ready if a slot opens</span></div>
+      <div class="cardrow"><div class="mini ghost" style="--k:var(--k-act)"><span class="grip2">⠿</span><b>Zipline Dolinka</b><small>3h wouldn't fit · to book ⏰</small></div></div>
+    </div>
   </div>
-  <div class="bucketbox" style="margin-top:.8rem;"><div class="bh"><b>Didn't fit — alternates</b><span class="ready">stays in the bucket, ready if a slot opens</span></div>
-    <div class="cardrow"><div class="mini ghost" style="--k:var(--k-act)"><span class="grip2">⠿</span><b>Zipline Dolinka</b><small>3h wouldn't fit · to book ⏰</small></div></div>
-  </div>
-  <div class="toolrow"><button class="ctrl solid">✓ keep this layout</button><button class="ctrl">↶ undo</button><span class="lbl2">or just ⠿ drag cards between days — that pauses auto</span></div>
 </section>
 
+<!-- ═ 13 · human takes the wheel ═ -->
 <section data-phase="Lay out · human takes the wheel">
-  <div class="chrome"><b>Slovenia · Bled</b><span class="pill">Lay out</span></div>
-  <div class="daycols">
-    <div class="daycol"><div class="dh">Sun 17</div><div class="mini" style="--k:var(--k-act)"><b>Vintgar</b></div><div class="mini" style="--k:var(--k-meal)"><b>Rustika</b></div></div>
-    <div class="daycol"><div class="dh">Mon 18</div><div class="mini" style="--k:var(--k-act)"><b>Castle</b></div><div class="mini" style="--k:var(--k-act)"><b>Canyoning</b></div></div>
-    <div class="daycol" style="border-color:var(--accent);"><div class="dh">Tue 19</div>
-      <div class="mini" style="--k:var(--k-act)"><b>Balloon</b> <span class="tag pin">📌</span></div>
-      <div class="mini" style="--k:var(--k-act)"><b>Toboggan</b> <span class="tag pin">📌 just moved</span></div>
-      <div class="mini" style="--k:var(--k-act)"><b>Via Ferrata</b></div></div>
-    <div class="daycol"><div class="dh">Wed 20</div><div class="mini" style="--k:var(--k-trav)"><b>→ Soča drive</b></div></div>
-  </div>
-  <div class="toolrow">
-    <span class="paused" style="margin-top:0;">✋ edited by hand — auto-layout paused</span>
-    <button class="ctrl">↻ re-lay out around my pins</button>
-    <button class="ctrl solid">Solve Tue 19 →</button>
+  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
+    <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
+    <span class="spacer"></span><span class="chipbtn">Book <span class="badge">⏰ 1</span></span><span class="chipbtn">Grid →</span></div>
+  <div class="pagebody">
+    <div class="sect">Bled</div>
+    <div class="daycols">
+      <div class="daycol"><div class="dh">Sun 17</div><div class="mini" style="--k:var(--k-act)"><b>Vintgar</b></div><div class="mini" style="--k:var(--k-meal)"><b>Rustika</b></div></div>
+      <div class="daycol"><div class="dh">Mon 18</div><div class="mini" style="--k:var(--k-act)"><b>Castle</b></div><div class="mini" style="--k:var(--k-act)"><b>Canyoning</b></div></div>
+      <div class="daycol hot"><div class="dh">Tue 19</div>
+        <div class="mini" style="--k:var(--k-act)"><b>Balloon</b> <span class="tag pin">📌</span></div>
+        <div class="mini" style="--k:var(--k-act);box-shadow:0 8px 20px rgba(13,76,68,.25);"><span class="grip2">⠿</span><b>Toboggan</b> <span class="tag pin">📌 just moved</span></div>
+        <div class="mini" style="--k:var(--k-act)"><b>Via Ferrata</b></div></div>
+      <div class="daycol"><div class="dh">Wed 20</div><div class="mini" style="--k:var(--k-trav)"><b>→ Soča drive</b></div></div>
+    </div>
+    <div class="toolrow">
+      <span class="paused">✋ edited by hand — auto-layout paused</span>
+      <button class="ctrl">↻ re-lay out around my pins</button>
+      <button class="ctrl solid">Solve Tue 19 →</button>
+    </div>
   </div>
 </section>
 
+<!-- ═ 14 · solve a day (Days view) ═ -->
 <section data-phase="The clock · solve a day">
-  <div class="chrome"><b>Tuesday, May 19 · Bled</b><span class="verd">feasible</span><button class="ctrl" style="margin-left:auto;">↻ Re-solve</button><span class="lbl2">✎ click any row to edit</span></div>
-  <div class="tl">
-    <div class="tlr m"><span class="t">5:25</span><span class="c">Drive to the launch field <span class="tag">auto · 4 min</span></span></div>
-    <div class="tlr a" style="--k:var(--k-act)"><span class="t">5:30 – 7:30</span><span class="c">Hot-air balloon (private) 🔒</span></div>
-    <div class="tlr a" style="--k:var(--k-act)"><span class="t">7:35 – 9:35</span><span class="c">Bled Castle — hike + tour</span></div>
-    <div class="tlr m"><span class="t">9:35</span><span class="c">Rest <span class="tag rest">auto</span></span></div>
-    <div class="tlr a" style="--k:var(--k-meal)"><span class="t">12:00 – 1:00</span><span class="c">Lunch · Pizzeria Rustika</span></div>
-    <div class="tlr m"><span class="t">1:00 – 3:55</span><span class="c">Free time <span class="tag rest">auto · surfaced</span></span></div>
-    <div class="tlr a" style="--k:var(--k-act)"><span class="t">4:00 – 5:30</span><span class="c">Via Ferrata Hvadnik 🔒</span></div>
+  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
+    <span class="halves"><span>Plan</span><span>Shelf</span><span class="on">Days</span></span>
+    <span class="spacer"></span><span class="chipbtn">Book <span class="badge">⏰ 1</span></span><span class="chipbtn">Grid →</span></div>
+  <div class="dayrail">
+    <div class="leg"><span class="legname">Ljubljana</span><div class="chips"><span class="dchip"><span class="dow">Fri</span><span class="dnum">15</span><span class="state"></span></span><span class="dchip"><span class="dow">Sat</span><span class="dnum">16</span><span class="state"></span></span></div></div>
+    <div class="leg"><span class="legname">Bled</span><div class="chips"><span class="dchip"><span class="dow">Sun</span><span class="dnum">17</span><span class="state"></span></span><span class="dchip"><span class="dow">Mon</span><span class="dnum">18</span><span class="state"></span></span><span class="dchip on solved"><span class="dow">Tue</span><span class="dnum">19</span><span class="state"></span></span><span class="dchip"><span class="dow">Wed</span><span class="dnum">20</span><span class="state"></span></span></div></div>
+    <div class="leg"><span class="legname">Piran</span><div class="chips"><span class="dchip"><span class="dow">Thu</span><span class="dnum">21</span><span class="state"></span></span><span class="dchip"><span class="dow">Fri</span><span class="dnum">22</span><span class="state"></span></span><span class="dchip"><span class="dow">Sat</span><span class="dnum">23</span><span class="state"></span></span><span class="dchip"><span class="dow">Sun</span><span class="dnum">24</span><span class="state"></span></span><span class="dchip"><span class="dow">Mon</span><span class="dnum">25</span><span class="state"></span></span></div></div>
+  </div>
+  <div class="work">
+    <div class="canvas">
+      <div class="chead"><h2>Tuesday, May 19</h2><span class="sub">Bled · solved just now</span><span class="spacer"></span><span class="verdict">feasible</span><button class="ctrl">↻ Re-solve</button></div>
+      <div class="tlr m"><span class="t">5:25</span><span class="c">Drive to the launch field <span class="tag">auto · 4 min</span></span></div>
+      <div class="tlr a" style="--k:var(--k-act)"><span class="t">5:30 – 7:30</span><span class="c"><b>Hot-air balloon (private)</b> 🔒 <span class="edit-aff">✎</span></span></div>
+      <div class="tlr m"><span class="t">7:30</span><span class="c">Drive back toward the lake <span class="tag">auto · 4 min</span></span></div>
+      <div class="tlr a" style="--k:var(--k-act)"><span class="t">7:35 – 9:35</span><span class="c"><b>Bled Castle — hike + tour</b> <span class="edit-aff">✎</span></span></div>
+      <div class="tlr m"><span class="t">9:35</span><span class="c">Rest <span class="tag rest">auto</span></span></div>
+      <div class="tlr a" style="--k:var(--k-meal)"><span class="t">12:00 – 1:00</span><span class="c"><b>Lunch · Pizzeria Rustika</b> <span class="edit-aff">✎</span></span></div>
+      <div class="tlr m"><span class="t">1:00 – 3:55</span><span class="c">Free time <span class="tag rest">auto · surfaced</span></span></div>
+      <div class="tlr a" style="--k:var(--k-act)"><span class="t">4:00 – 5:30</span><span class="c"><b>Via Ferrata Hvadnik</b> 🔒 📌 <span class="edit-aff">✎</span></span></div>
+    </div>
+    <aside class="tray"><header><h3>Shelf · Bled</h3><p class="note">drag onto the day</p></header>
+      <div class="tcard" style="--k:var(--k-act)"><span class="grip2">⠿</span><b>Zipline Dolinka</b><small>★5.0 · ~3 h · to book ⏰</small></div>
+      <div class="tcard" style="--k:var(--k-meal)"><span class="grip2">⠿</span><b>Public &amp; Vegan Kitchen</b><small>veg ✓ patio ✓ · closed Mon</small></div>
+    </aside>
   </div>
 </section>
 
+<!-- ═ 15 · edit, pin, re-solve ═ -->
 <section data-phase="The clock · edit, pin, re-solve">
-  <div class="chrome"><b>Tuesday, May 19</b><span class="pill warn">edited since solve</span><button class="ctrl" style="margin-left:auto;">↻ Re-solve around pins</button></div>
-  <div class="tl">
-    <div class="tlr a" style="--k:var(--k-act)"><span class="t">5:30 – 7:30</span><span class="c">Balloon 🔒</span></div>
-    <div class="tlr a" style="--k:var(--k-meal)"><span class="t">12:30 – 1:30</span><span class="c">Lunch · Rustika <span class="tag pin">📌 pinned by your edit</span> <span style="font-size:.7rem;color:var(--accent);font-weight:700;float:right;cursor:pointer;">✎ edit</span></span></div>
-    <div class="tlr m"><span class="t">1:30 – 3:55</span><span class="c">Free time <span class="tag rest">reflowed</span></span></div>
-    <div class="tlr a" style="--k:var(--k-act)"><span class="t">4:00 – 5:30</span><span class="c">Via Ferrata 🔒</span></div>
+  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
+    <span class="halves"><span>Plan</span><span>Shelf</span><span class="on">Days</span></span>
+    <span class="spacer"></span><span class="chipbtn">Book <span class="badge">⏰ 1</span></span><span class="chipbtn">Grid →</span></div>
+  <div class="dayrail">
+    <div class="leg"><span class="legname">Bled</span><div class="chips"><span class="dchip"><span class="dow">Sun</span><span class="dnum">17</span><span class="state"></span></span><span class="dchip"><span class="dow">Mon</span><span class="dnum">18</span><span class="state"></span></span><span class="dchip on solved"><span class="dow">Tue</span><span class="dnum">19</span><span class="state"></span></span><span class="dchip"><span class="dow">Wed</span><span class="dnum">20</span><span class="state"></span></span></div></div>
+  </div>
+  <div class="work">
+    <div class="canvas">
+      <div class="chead"><h2>Tuesday, May 19</h2><span class="pillwarn">edited since solve</span><span class="spacer"></span><button class="ctrl">↻ Re-solve around pins</button></div>
+      <div class="tlr a" style="--k:var(--k-act)"><span class="t">5:30 – 7:30</span><span class="c"><b>Balloon</b> 🔒</span></div>
+      <div class="tlr a" style="--k:var(--k-meal)"><span class="t">12:30 – 1:30</span><span class="c"><b>Lunch · Rustika</b> <span class="tag pin">📌 pinned by your edit</span> <span class="edit-aff">✎</span></span></div>
+      <div class="tlr m"><span class="t">1:30 – 3:55</span><span class="c">Free time <span class="tag rest">reflowed</span></span></div>
+      <div class="tlr a" style="--k:var(--k-act)"><span class="t">4:00 – 5:30</span><span class="c"><b>Via Ferrata</b> 🔒</span></div>
+    </div>
+    <aside class="tray"><header><h3>Shelf · Bled</h3><p class="note">drag onto the day</p></header>
+      <div class="tcard" style="--k:var(--k-act)"><span class="grip2">⠿</span><b>Zipline Dolinka</b><small>★5.0 · ~3 h</small></div>
+    </aside>
   </div>
 </section>
 
+<!-- ═ 16 · over-pack honesty ═ -->
 <section data-phase="The clock · honest about too much">
-  <div class="chrome"><b>Tuesday, May 19</b><span class="verd bad">over-packed</span></div>
-  <div class="flagbar">⚠️ <b>Zipline Dolinka (3 h) couldn't fit.</b> Everything else reflowed — lunch slid 48 min, free time shrank to 2 h.
-<span style="display:inline-flex;gap:.4rem;margin-left:.5rem;"><button class="ctrl">→ move to Wed 20</button><button class="ctrl ghosted">↩ back to alternates</button></span></div>
-  <div class="tl">
-    <div class="tlr a" style="--k:var(--k-act)"><span class="t">5:30</span><span class="c">Balloon 🔒</span></div>
-    <div class="tlr a" style="--k:var(--k-act)"><span class="t">9:58</span><span class="c">Vintgar Gorge (moved in)</span></div>
-    <div class="tlr a" style="--k:var(--k-meal)"><span class="t">12:48</span><span class="c">Lunch · Rustika <span class="tag rest">reflowed +48 min</span></span></div>
-    <div class="tlr a" style="--k:var(--k-act)"><span class="t">4:00</span><span class="c">Via Ferrata 🔒</span></div>
+  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
+    <span class="halves"><span>Plan</span><span>Shelf</span><span class="on">Days</span></span>
+    <span class="spacer"></span><span class="chipbtn">Book <span class="badge">⏰ 1</span></span><span class="chipbtn">Grid →</span></div>
+  <div class="dayrail">
+    <div class="leg"><span class="legname">Bled</span><div class="chips"><span class="dchip"><span class="dow">Sun</span><span class="dnum">17</span><span class="state"></span></span><span class="dchip"><span class="dow">Mon</span><span class="dnum">18</span><span class="state"></span></span><span class="dchip on"><span class="dow">Tue</span><span class="dnum">19</span><span class="state" style="background:var(--warn)"></span></span><span class="dchip"><span class="dow">Wed</span><span class="dnum">20</span><span class="state"></span></span></div></div>
+  </div>
+  <div class="work" style="grid-template-columns:1fr;">
+    <div class="canvas">
+      <div class="chead"><h2>Tuesday, May 19</h2><span class="spacer"></span><span class="verdict bad">over-packed</span></div>
+      <div class="flagbar">⚠️ <b>Zipline Dolinka (3 h) couldn't fit.</b> Everything else reflowed — lunch slid 48 min, free time shrank to 2 h.
+        <button class="ctrl">→ move to Wed 20</button><button class="ctrl ghosted">↩ back to alternates</button></div>
+      <div class="tlr a" style="--k:var(--k-act)"><span class="t">5:30</span><span class="c"><b>Balloon</b> 🔒</span></div>
+      <div class="tlr a" style="--k:var(--k-act)"><span class="t">9:58</span><span class="c"><b>Vintgar Gorge</b> <span class="tag rest">moved in</span></span></div>
+      <div class="tlr a" style="--k:var(--k-meal)"><span class="t">12:48</span><span class="c"><b>Lunch · Rustika</b> <span class="tag rest">reflowed +48 min</span></span></div>
+      <div class="tlr a" style="--k:var(--k-act)"><span class="t">4:00</span><span class="c"><b>Via Ferrata</b> 🔒</span></div>
+    </div>
   </div>
 </section>
 
+<!-- ═ 17 · book page ═ -->
 <section data-phase="Before you go · the book page">
-  <div class="chrome"><b>Slovenia · Book</b><span class="pill warn">⏰ 2 need action</span></div>
-  <div class="lrow urgent"><b>Hotel Union</b> — free cancellation ends <span class="conf">SYN2281-99143</span><span class="due">cancel by May 12</span></div>
-  <div class="lrow" style="border-style:dashed;"><b>Postojna Cave</b> — decide &amp; book <span class="okk">to book · combo ~€49</span><button class="ctrl" style="margin-left:.6rem;">mark booked…</button></div>
-  <div class="lrow"><b>Hot-air balloon</b> <span class="conf">401780164673</span><span class="okk">prepaid 🔒</span></div>
-  <div class="lrow"><b>Via Ferrata</b> <span class="conf">#138953</span><span class="okk">prepaid 🔒</span></div>
-  <div class="cardrow" style="margin-top:.7rem;">
-    <div class="mini" style="--k:var(--k-err);padding:.7rem 1rem;"><b style="font-family:var(--fd);font-size:1.2rem;">€927 cash</b><small>paragliding 380 · vintage boat 511 · Pletna 36</small></div>
-    <div class="mini" style="--k:var(--k-act)"><b>Passes</b><small>City Card · Julian Alps Card · Venice day passes</small></div>
+  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="tripbar"><span class="chipbtn">← Days</span><span class="tname">Slovenia — Book</span><span class="tmeta">reservations · deadlines · cash · passes</span></div>
+  <div class="pagebody">
+    <div class="sect">Needs action</div>
+    <div class="lrow urgent"><b>Hotel Union</b> — free cancellation ends <span class="conf">SYN2281-99143</span><span class="due">cancel by May 12</span></div>
+    <div class="lrow todo"><b>Postojna Cave</b> — decide &amp; book <span class="okk">to book · combo ~€49</span><button class="ctrl" style="margin-left:.5rem;">mark booked…</button></div>
+    <div class="sect">Booked</div>
+    <div class="lrow"><b>Hot-air balloon</b> <span class="conf">401780164673</span><span class="okk">prepaid 🔒</span></div>
+    <div class="lrow"><b>Canyoning — Altitude</b> <span class="conf">#138923</span><span class="okk">prepaid 🔒</span></div>
+    <div class="lrow"><b>Via Ferrata</b> <span class="conf">#138953</span><span class="okk">prepaid 🔒</span></div>
+    <div class="twocol">
+      <div class="panelbox"><h3>Cash to carry</h3><div class="tot">€927</div>
+        <div class="line"><span>Paragliding (pay after)</span><b>€380</b></div>
+        <div class="line"><span>Vintage boat (pay after)</span><b>€511</b></div>
+        <div class="line"><span>Pletna boat</span><b>€36</b></div></div>
+      <div class="panelbox"><h3>Passes</h3>
+        <div class="line"><span>Ljubljana City Card — funicular, cruise, museums</span><b>buy May 16</b></div>
+        <div class="line"><span>Julian Alps Card</span><b>at Toplice</b></div>
+        <div class="line"><span>Venice day-visitor passes</span><b>May 23</b></div></div>
+    </div>
   </div>
 </section>
 
+<!-- ═ 18 · the grid ═ -->
 <section data-phase="Before you go · the grid, generated">
-  <div class="chrome"><b>Slovenia — the Grid</b><button class="ctrl" style="margin-left:auto;">🖨 print — one leg per page</button><span class="lbl2">click any block for its logistics</span></div>
-  <div class="gridthumb"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
-  <p class="dragnote" style="color:var(--muted);font-weight:400;font-style:italic;font-family:var(--fd);">the artifact Janice used to build by hand — now the output, not the work</p>
+  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="tripbar"><span class="chipbtn">← Days</span><span class="tname">Slovenia — the Grid</span><span class="tmeta">11 days · 79 entries · generated from the trip</span>
+    <span class="spacer"></span><button class="ctrl">🖨 print — one leg per page</button></div>
+  <div class="pagebody">
+    <div class="lbl2" style="margin-bottom:.4rem;">click any block for its logistics — notes, codes, contacts · showing May 17–22 of 11 days</div>
+    <div class="gwrap">
+      <div class="ggut" style="height:380px;"><span style="top:100px">6a</span><span style="top:150px">9a</span><span style="top:200px">12p</span><span style="top:250px">3p</span><span style="top:300px">6p</span><span style="top:350px">9p</span></div>
+      <div class="gfield">
+        <div class="ghead2">
+          <div><span class="lg">Bled</span>Sun 17</div><div>Mon 18</div><div>Tue 19</div><div>Wed 20</div><div><span class="lg">Piran</span>Thu 21</div><div>Fri 22</div>
+        </div>
+        <div class="gbody2">
+          <div class="gline" style="top:60px"></div><div class="gline" style="top:110px"></div><div class="gline" style="top:160px"></div><div class="gline" style="top:210px"></div><div class="gline" style="top:260px"></div><div class="gline" style="top:310px"></div>
+          <div class="gv" style="left:16.66%"></div><div class="gv" style="left:33.33%"></div><div class="gv" style="left:50%"></div><div class="gv" style="left:66.66%"></div><div class="gv" style="left:83.33%"></div>
+          <div class="gb" style="--kc:var(--k-trav);left:.4%;width:15.5%;top:96px;height:26px"><b>Drive → Vintgar</b></div>
+          <div class="gb" style="--kc:var(--k-act);left:.4%;width:15.5%;top:128px;height:44px"><b>Vintgar Gorge</b>11:00 🔒</div>
+          <div class="gb cn" style="--kc:var(--k-stay);left:.4%;width:15.5%;top:196px;height:22px"><b>Check in · Toplice</b></div>
+          <div class="gb" style="--kc:var(--k-act);left:.4%;width:15.5%;top:226px;height:30px"><b>Pletna boat</b>💶</div>
+          <div class="gb" style="--kc:var(--k-meal);left:.4%;width:15.5%;top:282px;height:26px"><b>Julijana</b></div>
+          <div class="gb" style="--kc:var(--k-act);left:17%;width:15.5%;top:118px;height:38px"><b>Castle hike</b></div>
+          <div class="gb" style="--kc:var(--k-act);left:17%;width:15.5%;top:176px;height:42px"><b>Canyoning</b>🔒</div>
+          <div class="gb" style="--kc:var(--k-meal);left:17%;width:15.5%;top:276px;height:26px"><b>Old Cellar</b></div>
+          <div class="gb" style="--kc:var(--k-act);left:33.7%;width:15.5%;top:18px;height:40px"><b>Balloon</b>5:30 🔒</div>
+          <div class="gb" style="--kc:var(--k-act);left:33.7%;width:15.5%;top:70px;height:38px"><b>Castle</b></div>
+          <div class="gb" style="--kc:var(--k-meal);left:33.7%;width:15.5%;top:160px;height:24px"><b>Rustika</b></div>
+          <div class="gb cn" style="--kc:var(--k-flex);left:33.7%;width:15.5%;top:190px;height:40px"><b>Free</b></div>
+          <div class="gb" style="--kc:var(--k-act);left:33.7%;width:15.5%;top:236px;height:34px"><b>Via Ferrata</b>🔒</div>
+          <div class="gb" style="--kc:var(--k-trav);left:50.4%;width:15.5%;top:106px;height:48px"><b>Vršič Pass drive</b></div>
+          <div class="gb" style="--kc:var(--k-act);left:50.4%;width:15.5%;top:186px;height:36px"><b>Paragliding</b>💶 €380</div>
+          <div class="gb" style="--kc:var(--k-meal);left:50.4%;width:15.5%;top:268px;height:30px"><b>Hiša Franko</b>🔒</div>
+          <div class="gb" style="--kc:var(--k-trav);left:67%;width:15.5%;top:96px;height:44px"><b>Drive → Piran</b></div>
+          <div class="gb" style="--kc:var(--k-act);left:67%;width:15.5%;top:206px;height:34px"><b>Vintage boat</b>💶 €511</div>
+          <div class="gb cn" style="--kc:var(--k-flex);left:83.7%;width:15.5%;top:120px;height:90px"><b>🪶 light day</b>Istria · strolls</div>
+          <div class="gb" style="--kc:var(--k-meal);left:83.7%;width:15.5%;top:268px;height:26px"><b>Heaven 99</b></div>
+        </div>
+      </div>
+    </div>
+  </div>
 </section>
 
+<!-- ═ 19 · day-of phone ═ -->
 <section data-phase="On the trip">
-  <div class="ph"><div class="phh"><span style="font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;">Slovenia · day 5</span><br><b>Tuesday, May 19</b></div>
-  <div class="bd">
-    <div style="font-size:.7rem;color:var(--muted);margin-bottom:.3rem;">✓ balloon · ✓ castle</div>
-    <div class="nextcard"><span style="font-size:.6rem;font-weight:700;color:var(--accent);text-transform:uppercase;">Next · in 20 min</span><br><b>Lunch · Pizzeria Rustika</b><br><span style="color:var(--muted);">0.8 km — an 11-min walk · veg ✓</span>
-      <div class="bigbtns"><span class="d">📍 Directions</span><span class="c">📞 Call</span></div></div>
-    <div style="font-size:.72rem;color:var(--muted);margin-top:.4rem;">4:00 Via Ferrata · <span class="conf">#138953</span></div>
+  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="phonewrap"><div class="ph">
+    <div class="phh"><span style="font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;">Slovenia · day 5 of 11</span><br><b>Tuesday, May 19</b></div>
+    <div class="bd">
+      <div style="font-size:.68rem;color:var(--muted);margin-bottom:.3rem;">✓ balloon · ✓ castle</div>
+      <div class="nextcard"><span style="font-size:.58rem;font-weight:700;color:var(--accent);text-transform:uppercase;">Next · in 20 min</span><br><b>Lunch · Pizzeria Rustika</b><br><span style="color:var(--muted);">0.8 km — an 11-min walk · veg ✓</span>
+        <div class="bigbtns"><span class="d">📍 Directions</span><span class="c">📞 Call</span></div></div>
+      <div style="font-size:.7rem;color:var(--muted);margin-top:.4rem;">4:00 Via Ferrata · <span class="conf">#138953</span> <span style="color:var(--accent);font-weight:700;">copy</span></div>
+    </div>
   </div></div>
 </section>
 
-<section data-phase="What if · variations">
-  <div class="chrome"><b>Slovenia · the last 3 days</b><span class="pill">variations · step 2</span></div>
-  <div class="vartabs"><span class="vartab on">Option A — all-in Piran ✓ active</span><span class="vartab">Option B — Trieste · Piran · Rovinj</span><button class="ctrl">＋ new variation…</button></div>
-  <div class="skel">
-    <div class="win" style="height:36px"><span class="legseg pi" style="flex:3">Piran<small>3n · Hotel Piran 🔒 free-cancel 2d prior</small></span></div>
-    <div class="staysrow" style="opacity:.45;margin-top:.7rem;">
+<!-- ═ 20 · variations ═ -->
+<section data-phase="What if · variations (step 2)">
+  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">the last 3 days · two futures</span>
+    <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
+    <span class="spacer"></span><span class="chipbtn">Book <span class="badge">⏰ 1</span></span><span class="chipbtn">Grid →</span></div>
+  <div class="pagebody">
+    <div class="sect">May 21 – 24 · a fork</div>
+    <div class="vartabs">
+      <span class="vartab on">Option A — all-in Piran ✓ active</span>
+      <span class="vartab">Option B — Trieste · Piran · Rovinj</span>
+      <button class="ctrl">＋ new variation…</button>
+    </div>
+    <div class="win" style="height:38px"><span class="legseg pi" style="flex:3">Piran<small>3n · Hotel Piran 🔒 free-cancel 2d prior</small></span></div>
+    <div class="staysrow" style="opacity:.45;">
       <span class="staybar" style="flex:1"><b>Trieste</b><small>1n</small></span>
       <span class="staybar" style="flex:1"><b>Piran</b><small>1n</small></span>
       <span class="staybar" style="flex:1"><b>Rovinj</b><small>1n</small></span>
     </div>
-    <div class="toolrow" style="opacity:.75;"><span class="lbl2">option B, dormant — its bookings refundable</span><button class="ctrl">make B active</button><button class="ctrl ghosted">compare side by side</button></div>
+    <div class="toolrow" style="opacity:.8;"><span class="lbl2">option B, dormant — its bookings refundable</span><button class="ctrl">make B active</button><button class="ctrl ghosted">compare side by side</button></div>
     <p class="decideby">⏰ decide by May 19 — Hotel Piran's free-cancellation deadline is the fork's expiry</p>
   </div>
 </section>
@@ -475,7 +756,7 @@ steps.forEach((_,i)=>{const d=document.createElement("i");d.addEventListener("cl
 let at=0;
 function go(i){
   at=Math.max(0,Math.min(steps.length-1,i));
-  stage.replaceChildren(steps[at].cloneNode(true));
+  stage.replaceChildren(...[...steps[at].cloneNode(true).childNodes]);
   cap.replaceChildren(...[...caps[at].cloneNode(true).childNodes]);
   phase.textContent=steps[at].dataset.phase;
   cur.textContent=at+1;
