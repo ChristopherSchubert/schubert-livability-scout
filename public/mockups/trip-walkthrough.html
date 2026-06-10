@@ -16,7 +16,8 @@ body{background:#efe7d6;color:var(--text);font-family:var(--fu);}
 .counter{font-size:.8rem;color:var(--muted);font-variant-numeric:tabular-nums;}
 .ctx{background:#1b1814;color:#fbf6ea;border-radius:12px 12px 0 0;padding:.8rem 1.2rem .9rem;}
 .phase{font-size:.66rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#9fc4bb;margin-bottom:.2rem;}
-#caption{font-family:var(--fd);font-size:1rem;line-height:1.4;margin:0;max-width:92ch;color:#f4eddc;}
+#caption{font-family:var(--fd);font-size:1rem;line-height:1.4;margin:0;max-width:92ch;color:#f4eddc;min-height:4.2em;}
+#didline{min-height:2.7em;}
 #caption b{font-weight:600;color:#fff;}
 .stage{background:var(--bg);border:1px solid var(--border);border-top:0;border-radius:0 0 12px 12px;overflow:hidden;
 box-shadow:0 18px 50px rgba(41,33,19,.18);min-height:540px;
@@ -35,7 +36,8 @@ display:flex;align-items:center;gap:1rem;justify-content:center;z-index:90;}
 .topbar .brand{font-family:var(--fd);font-weight:600;font-size:.95rem;color:var(--accent);}
 .topbar a{color:var(--muted);text-decoration:none;}
 .topbar a.on{color:var(--text);font-weight:600;border-bottom:2px solid var(--accent);}
-.tripbar{background:var(--panel);border-bottom:1px solid var(--border);padding:.6rem 1.4rem;display:flex;align-items:center;gap:1rem;}
+.tripbar{background:var(--panel);border-bottom:1px solid var(--border);padding:.6rem 1.4rem;display:flex;align-items:center;gap:1rem;position:relative;}
+.tripbar .halves{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);margin-left:0;}
 .tripbar .tname{font-family:var(--fd);font-size:1.1rem;}
 .tripbar .crumb{font-size:.76rem;color:var(--muted);cursor:pointer;}
 .tripbar .crumb b{color:var(--accent);font-weight:600;}

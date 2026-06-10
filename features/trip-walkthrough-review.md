@@ -105,6 +105,16 @@ active state (Trips), within-Plan focus = the window's outlined segment
 solved" subhead, phone view carries trip · day-N-of-M. **App renamed:
 Livability Scout → Schubert Atlas** across all mockups.
 
+## Stable chrome (the "Plan|Shelf|Days jumps around" fix)
+
+Two motions compounded: (1) the context band's height varied with caption/
+did length (up to ~40px), bouncing the whole stage vertically every slide —
+#caption now reserves 3 lines (min-height 4.2em) and #didline 2 (2.7em),
+so the band is constant-height; (2) the segmented control sat in flow after
+variable-width trip meta text — it's now absolutely centered in the tripbar,
+same x on every slide. Feedback pipeline is LIVE: migration 0015 applied
+2026-06-10, prod POST → row verified end-to-end, test rows removed.
+
 ## Mechanical checks (run before any review handoff)
 
 Per-slide matrix script (in git history, commit 771384e): topbar/tripbar
