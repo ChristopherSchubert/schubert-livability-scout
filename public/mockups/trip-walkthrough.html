@@ -235,6 +235,8 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
 .sheet .fld{flex:1;display:flex;flex-direction:column;gap:.12rem;}
 .sheet label{font-size:.64rem;color:var(--muted);}
 .sheet input,.sheet select{font-family:var(--fu);font-size:.8rem;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:.3rem .45rem;width:100%;}
+.sheet input[type=checkbox],.sheet input[type=radio]{width:auto;flex:0 0 auto;}
+.sheet label:has(input[type=radio]),.sheet label:has(input[type=checkbox]){font-size:.78rem;color:var(--text);}
 .sheet .hint2{font-size:.66rem;color:var(--muted);}
 .sheet footer{border-top:1px solid var(--border);margin-top:.8rem;padding-top:.6rem;display:flex;gap:.45rem;align-items:center;flex-wrap:wrap;}
 .sheet .x2{position:absolute;top:.5rem;right:.7rem;color:var(--muted);cursor:pointer;}
@@ -293,6 +295,9 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
 #fbsaved.show{opacity:1;}
 #fbnotes{list-style:none;margin:0;padding:0 .8rem;max-height:150px;overflow-y:auto;}
 #fbnotes li{display:flex;gap:.5rem;align-items:baseline;font-size:.76rem;color:#2c2823;border-top:1px dashed var(--border);padding:.42rem .1rem;}
+#fbnotes li.here{background:#f2eddd;border-radius:6px;}
+#fbnotes li .fbjump{flex:0 0 auto;font-size:.62rem;font-weight:700;color:var(--accent);background:#e7f1ee;border:0;border-radius:100px;padding:.1rem .45rem;cursor:pointer;font-variant-numeric:tabular-nums;}
+#fbnotes li .fbjump:hover{background:var(--accent);color:#fff;}
 #fbnotes li .fbtxt{flex:1;min-width:0;overflow-wrap:break-word;}
 #fbnotes li .fbdel{background:none;border:0;color:var(--muted);cursor:pointer;font-size:.72rem;padding:0;}
 #fbnotes li .fbdel:hover{color:var(--warn);}
@@ -716,7 +721,7 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
       <div class="mini" style="--k:var(--k-stay);margin-bottom:.45rem;"><b>City Hotel</b><small>★4.2 (2,054)</small><br><button class="savebtn done">✓ shortlisted</button></div>
       <div class="mini" style="--k:var(--k-stay);margin-bottom:.45rem;"><b>Vander Urbani Resort</b><small>★4.3 (612) · riverside · boutique</small><br><button class="savebtn done">✓ shortlisted</button></div>
       <div class="mini" style="--k:var(--k-stay);margin-bottom:.45rem;"><b>Antiq Palace</b><small>★4.4 (388) · old town</small><br><button class="savebtn done">✓ shortlisted</button></div>
-      <p class="hint2" style="margin-top:.5rem;">not here? <u>＋ add your own stay</u> — a B&amp;B no cache knows</p>
+      <p class="hint2" style="margin-top:.5rem;">not here? <u>＋ add your own…</u> — a B&amp;B no cache knows</p>
     </aside>
   </div>
 </section>
@@ -728,12 +733,12 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
     <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
     <span class="spacer"></span><span class="chipbtn">Book</span><span class="chipbtn">Grid →</span></div>
   <div class="pagebody">
-    <div class="collapsec">▸ <b>Transport</b> · 2 booked ✈</div>
     <div class="sect">The window</div>
     <div class="win" style="height:36px"><span class="edge l lock"></span>
       <span class="legseg lj" style="flex:2">Ljubljana<span class="hndl">↔</span></span><span class="legseg bl" style="flex:4">Bled<span class="hndl">↔</span></span><span class="legseg pi" style="flex:4">Piran</span>
     <span class="edge r lock"></span></div>
     <div class="toolrow" style="margin-top:.3rem;"><span class="lbl2">On the tray:</span><span class="citychip">⠿ Kranj</span><button class="ctrl">＋ other city…</button></div>
+    <div class="collapsec">▸ <b>Transport</b> · 2 booked ✈</div>
     <div class="sect" style="margin-top:.9rem;">▾ Stays</div>
     <div class="staysrow">
       <span class="staybar" style="flex:2"><span class="grip2">⠿</span><b>Union Eurostars</b><small>2 nights</small><span class="hndl">↔</span></span>
@@ -758,11 +763,11 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
     <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
     <span class="spacer"></span><span class="chipbtn">Book</span><span class="chipbtn">Grid →</span></div>
   <div class="pagebody">
-    <div class="collapsec">▸ <b>Transport</b> · 2 booked ✈</div>
     <div class="sect">The window</div>
     <div class="win" style="height:36px"><span class="edge l lock"></span>
       <span class="legseg lj" style="flex:2">Ljubljana<span class="hndl">↔</span></span><span class="legseg bl" style="flex:4">Bled + Soča<span class="hndl">↔</span></span><span class="legseg pi" style="flex:4">Piran + Kranj</span>
     <span class="edge r lock"></span></div>
+    <div class="collapsec">▸ <b>Transport</b> · 2 booked ✈</div>
     <div class="sect" style="margin-top:.9rem;">▾ Stays <button class="ctrl inlinectl">✂ split a stay…</button></div>
     <div class="staysrow">
       <span class="staybar" style="flex:2"><b>Union</b><small>2n</small></span>
@@ -810,11 +815,11 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
     <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
     <span class="spacer"></span><span class="chipbtn">Book</span><span class="chipbtn">Grid →</span></div>
   <div class="pagebody">
-    <div class="collapsec">▸ <b>Transport</b> · 2 booked ✈</div>
     <div class="sect">The window</div>
     <div class="win" style="height:36px"><span class="edge l lock"></span>
       <span class="legseg lj" style="flex:2">Ljubljana<span class="hndl">↔</span></span><span class="legseg bl" style="flex:4">Bled + Soča<span class="hndl">↔</span></span><span class="legseg pi" style="flex:4">Piran + Kranj</span>
     <span class="edge r lock"></span></div>
+    <div class="collapsec">▸ <b>Transport</b> · 2 booked ✈</div>
     <div class="sect" style="margin-top:.9rem;">▾ Stays <button class="ctrl inlinectl">✂ split a stay…</button></div>
     <div class="staysrow">
       <span class="staybar" style="flex:2"><b>Union</b><small>2n</small></span>
@@ -1237,12 +1242,16 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
   </div>
   <div class="pagebody" style="min-height:430px;">
     <div class="canvas" style="margin:1.1rem 1.4rem;">
-      <div class="chead"><h2>Tuesday, May 19</h2></div>
-      <div class="tlr a" style="--k:var(--k-act)"><span class="t">5:30 – 7:30</span><span class="c"><b>Balloon</b> 🔒</span></div>
-      <div class="tlr a" style="--k:var(--k-meal);background:#faf3e3;"><span class="t">12:00 – 1:00</span><span class="c"><b>Lunch · Rustika</b> <span class="edit-aff">✎</span></span></div>
-      <div class="tlr a" style="--k:var(--k-act)"><span class="t">4:00 – 5:30</span><span class="c"><b>Via Ferrata</b> 🔒</span></div>
+      <div class="chead"><h2>Tuesday, May 19</h2><span class="sub">Bled · solved just now</span><span class="spacer"></span><span class="verdict">feasible</span><button class="ctrl">↻ Re-solve</button></div>
+      <div class="tlr m"><span class="t">5:25</span><span class="c">Drive to the launch field <span class="tag">auto · 4 min</span></span></div>
+      <div class="tlr a" style="--k:var(--k-act)"><span class="t">5:30 – 7:30</span><span class="c"><b>Hot-air balloon (private)</b> 🔒 <span class="edit-aff">✎</span></span></div>
+      <div class="tlr m"><span class="t">7:30</span><span class="c">Drive back toward the lake <span class="tag">auto · 4 min</span></span></div>
+      <div class="tlr a" style="--k:var(--k-act)"><span class="t">7:35 – 9:35</span><span class="c"><b>Bled Castle — hike + tour</b> <span class="edit-aff">✎</span></span></div>
+      <div class="tlr m"><span class="t">9:35</span><span class="c">Rest <span class="tag rest">auto</span></span></div>
+      <div class="tlr a" style="--k:var(--k-meal);background:#faf3e3;"><span class="t">12:00 – 1:00</span><span class="c"><b>Lunch · Pizzeria Rustika</b> <span class="edit-aff">✎</span></span></div>
+      <div class="tlr m"><span class="t">1:00 – 3:55</span><span class="c">Free time <span class="tag rest">auto</span></span></div>
+      <div class="tlr a" style="--k:var(--k-act)"><span class="t">4:00 – 5:30</span><span class="c"><b>Via Ferrata Hvadnik</b> 🔒 📌 <span class="edit-aff">✎</span></span></div>
     </div>
-  </div>
   <div class="overlay"><div class="scrim2"></div>
     <aside class="sheet"><span class="x2">×</span>
       <span class="kl">meal · no booking</span><h3>Lunch · Pizzeria Rustika</h3>
@@ -1416,6 +1425,11 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
     <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
     <span class="spacer"></span><span class="chipbtn">Book <span class="badge">⏰ 1</span></span><span class="chipbtn">Grid →</span></div>
   <div class="pagebody" style="min-height:430px;">
+    <div class="win" style="height:30px;"><span class="edge l lock"></span>
+      <span class="legseg lj" style="flex:2;font-size:.7rem;">Ljubljana</span>
+      <span class="legseg bl" style="flex:4;font-size:.7rem;">Bled</span>
+      <span class="legseg pi" style="flex:4;font-size:.7rem;outline:2px solid var(--accent);outline-offset:-2px;">Piran · May 21–24 selected</span>
+    <span class="edge r lock"></span></div>
     <div class="collapsec">▸ <b>Transport</b> · 2 booked ✈</div>
     <div class="collapsec">▸ <b>Stays</b> · 5 booked 🔒</div>
     <div class="sect">May 21 – 24 · a fork</div>
@@ -1441,6 +1455,11 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
     <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
     <span class="spacer"></span><span class="chipbtn">Book <span class="badge">⏰ 1</span></span><span class="chipbtn">Grid →</span></div>
   <div class="pagebody">
+    <div class="win" style="height:30px;"><span class="edge l lock"></span>
+      <span class="legseg lj" style="flex:2;font-size:.7rem;">Ljubljana</span>
+      <span class="legseg bl" style="flex:4;font-size:.7rem;">Bled</span>
+      <span class="legseg pi" style="flex:4;font-size:.7rem;outline:2px solid var(--accent);outline-offset:-2px;">Piran · May 21–24 · forked A/B</span>
+    <span class="edge r lock"></span></div>
     <div class="collapsec">▸ <b>Transport</b> · 2 booked ✈</div>
     <div class="collapsec">▸ <b>Stays</b> · 5 booked 🔒</div>
     <div class="sect">May 21 – 24 · a fork</div>
@@ -1483,8 +1502,7 @@ function go(i){
   cur.textContent=at+1;
   [...dots.children].forEach((d,j)=>d.classList.toggle("on",j===at));
   if(at!==was&&!noMotion.matches)
-    for(const el of [stage,cap.parentElement])
-      el.animate([{opacity:.45},{opacity:1}],{duration:150,easing:"ease-out"});
+    stage.animate([{opacity:.85},{opacity:1}],{duration:120,easing:"ease-out"});
 }
 document.getElementById("prev").addEventListener("click",()=>go(at-1));
 document.getElementById("next").addEventListener("click",()=>go(at+1));
@@ -1522,14 +1540,19 @@ async function fbSend(note){
 }
 function fbRetry(){fbLoad().filter(n=>!n.sent).forEach(n=>fbSend(n));}
 function fbSync(){
-  const list=fbLoad(),mine=list.filter(n=>n.s===at);
+  const list=fbLoad().slice().sort((a,b)=>a.s-b.s||a.t-b.t);
   fbRef.textContent=`slide ${at+1} · ${steps[at].dataset.phase}`;
-  fbNotes.replaceChildren(...mine.map(n=>{
+  fbNotes.replaceChildren(...list.map(n=>{
     const li=document.createElement("li");
+    if(n.s===at)li.className="here";
+    const jump=document.createElement("button");jump.className="fbjump";jump.type="button";
+    jump.textContent=n.s+1;jump.title=`go to slide ${n.s+1}`;
+    jump.addEventListener("click",()=>go(n.s));
     const tx=document.createElement("span");tx.className="fbtxt";tx.textContent=n.text;
+    if(!n.sent){const u=document.createElement("small");u.textContent=" · unsent";u.style.color="var(--warn)";tx.append(u);}
     const del=document.createElement("button");del.className="fbdel";del.type="button";del.textContent="✕";
     del.addEventListener("click",()=>{fbStore(fbLoad().filter(m=>m.t!==n.t));fbSync();});
-    li.append(tx,del);return li;
+    li.append(jump,tx,del);return li;
   }));
   const slides=new Set(list.map(n=>n.s)),pending=list.filter(n=>!n.sent).length;
   fbTally.textContent=list.length
@@ -1583,6 +1606,7 @@ fbHead.addEventListener("pointerdown",(e)=>{
 });
 const _go=go;go=function(i){_go(i);fbSync();};
 go(0);
+if(fbLoad().length){fbNudge.remove();fbBtn.classList.add("quiet");fbPanel.classList.add("open");fbSync();}
 fbRetry();
 </script>
 </body></html>

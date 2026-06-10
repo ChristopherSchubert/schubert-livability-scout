@@ -65,10 +65,30 @@ preview); failures keep the note in `localStorage` (`tw-feedback-v1`)
 flagged unsent and retry on panel-open and page-load — status line says
 "Sent to Chris ✓" vs "Saved here — will retry", tally shows pending count.
 Slides with notes get a ringed dot in the nav; per-note ✕ removes locally
-(a sent note is already submitted). **📋 Copy all** remains as the manual
-backup. Arrow keys are suppressed while typing; Esc closes the panel.
+(a sent note is already submitted). The panel lists **all** notes (every
+slide), each with a numbered jump-chip that navigates to its slide; the
+current slide's notes are highlighted. When notes exist, the panel
+**auto-opens on load** and stays open across slides. **📋 Copy all**
+remains as the manual backup. Arrow keys are suppressed while typing;
+Esc closes the panel.
 Read back the notes with the authed app user or via the pg/Keychain
 script pattern (`scripts/.col.mjs`).
+
+## 2026-06-10 four-review pass (navigation · controls · IA · UX)
+
+Run at the owner's request; all 37 slides. Found & fixed: (1) `.sheet
+input{width:100%}` stretched checkboxes/radios, wrecking slides 29/36's
+right pane — exempted + label styling scoped; (2) slide 29's backdrop day
+had 3 of slide 28's 8 rows — full solved day restored; (3) slides 36/37
+lacked the trip window (anatomy rule) — added with the May 21–24 range
+marked selected (36) / forked A/B (37); (4) slides 14/15/17 rendered the
+collapsed Transport bar above the window — canonical order restored;
+(5) "＋ add your own stay" label variant unified to "＋ add your own…";
+(6) slide-change fade caused a flash (dark band animating + deep dip) —
+now stage-only, .85→1, 120ms. Verified clean: did-line controls exist on
+their slides; mechanism trails (Lay out 21→26, Solve 27→28, mark-booked
+32→33); tab states; topbar; styled control vocabulary; honest refusal +
+empty states (31); grid pagination honesty (34).
 
 ## Mechanical checks (run before any review handoff)
 
