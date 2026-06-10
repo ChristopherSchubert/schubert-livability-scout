@@ -165,10 +165,66 @@ leadTime?, bookBy?, confirmation?, cancelBy?, prepaid?, cost? }` — one ledger
 over lodging *and* activities, deadline-aware. Lodging reservations are the
 highest-priority (book 4–6 mo ahead). Supersedes the old `bookingsLedger`.
 
-**Entry atom:** `{ id, day, time, kind, title, note, place, markers[], booking, cost, role }`
-— `time` is point | range | fuzzy; each `marker` carries an optional `source`;
-`place` carries address + map link + phone; `role` is `anchor | connective`
-(see §3.5).
+**Entry atom — v2** (2026-06-10, after the owner's editor review + an audit of
+all 79 real entries' notes for structure hiding in prose):
+
+```jsonc
+{
+  "id": "…", "day": "YYYY-MM-DD", "role": "anchor | connective",
+  "time": { /* bucket | range | point */ },          // local to the leg's tz
+
+  // WHAT × COMMITMENT — two dimensions, not one. The old `kind` enum mixed
+  // them ("booked" and "meal" were never the same axis). Category = what it
+  // is and drives the display hue; status = how committed, and drives the
+  // lock/badge treatment.
+  "category": "travel | meal | activity | stay | errand",
+  "status":   "booked | reserved | open",
+
+  "title": "…", "note": "…",                          // note = color only now
+  "place": { "lat", "lon", "address" },
+
+  // LOGISTICS (was buried in notes — the artifact's real payload)
+  "meetingPoint": "parking behind Teja bar",          // where exactly
+  "arriveBy": "10:30",                                // early-arrival demand
+  "vendor": "Flying Bear",                            // who runs it
+  "contact": { "name"?, "phone"?, "email"? },         // structured, not "a / b"
+  "url": "…",
+
+  // PREP (Janice's CLOTHING: rows, made first-class)
+  "wear": "sports clothing, sturdy waterproof shoes",
+  "bring": "swimsuit, towel, dry change",
+  "requirements": "fit enough to run ~20 m; passports",
+
+  // MONEY — structured; "380 EUR · cash" in one text box was a schema sin
+  "cost": { "amount": 190, "currency": "EUR", "per": "person | total",
+            "estimate": false, "cashOnly": true, "payWhen": "before | after" },
+
+  "booking": { "confirmation", "prepaid", "cancelBy" },
+  "coveredBy": "pass:ljubljana-city-card",            // ↓ passes
+  "openHours": "…",                                   // Solve soft constraint
+  "markers": [ { "type", "value"?, "source"? } ]
+}
+```
+
+**Passes (trip-level, new).** "Covered by the City Card" appears three times in
+one trip; the Julian Alps Card and Venice day-visitor passes too. A pass is
+bought once (an `errand` entry) and referenced by entries via `coveredBy` —
+so the Cash/cost rollups don't double-count, and "what does this card get us"
+is answerable. `trip.passes[] = { id, name, cost, covers? }`.
+
+**Timezone rule.** All entry times are **local to where the event happens**;
+each leg carries an IANA `tz` (trip-level default, per-leg override). The UI
+labels times ("local · CEST") and flags any leg-boundary day where the zone
+changes. Slovenia is single-zone; US trips won't be.
+
+**Display mapping (supersedes the six-kind color key).** Category → hue
+(travel slate, meal amber, activity green, stay plum, errand ochre);
+status → treatment (booked = solid spine + 🔒/code; reserved = 📞 badge;
+open = dashed). Role (anchor/connective) keeps the hatch distinction.
+Migration: old `kind` → `(category, status)` by mapping (`booked`→activity/
+booked with per-entry overrides, `meal`→meal, `travel`→travel, `checkin`→stay,
+`todo`→errand, `flexible`→activity/open); the seeded Slovenia trip migrates by
+script.
 
 ---
 
@@ -362,12 +418,15 @@ time, swaps a restaurant, pastes a confirmation code, changes a note.
 **Form.** A side sheet (desktop) / full-screen sheet (mobile) opened from any
 entry — workspace rows, grid popover ("Edit →"), tray cards.
 
-| Field group | Fields |
+| Field group | Fields (entry model v2) |
 |---|---|
-| What | title · kind (6-select) · note |
-| When | day (select) · time mode (bucket / range / point) · start–end · duration |
-| Booking | confirmation · prepaid · cancel-by · cost (amount + currency + cash-only) |
-| Reach | contact · url · place (PlaceRef picker) |
+| What | title · **category** (travel/meal/activity/stay/errand) · **status** (booked/reserved/open) · note |
+| When | day · time mode (bucket/range/point) · start–end · duration · **tz label ("local · CEST")** |
+| Logistics | **meeting point** · **arrive by** · vendor · place (PlaceRef picker) |
+| Prep | **wear** · **bring** · requirements |
+| Money | amount · currency (select) · **per person/total** · estimate · cash-only · pay before/after |
+| Booking | confirmation · prepaid · cancel-by · **covered by pass** |
+| Reach | contact **{name · phone · email}** · url |
 
 | Action | Semantics |
 |---|---|

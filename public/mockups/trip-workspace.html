@@ -270,11 +270,12 @@ font-size:.82rem;border-radius:100px;padding:.5rem 1.1rem;z-index:90;display:non
     <div class="fgroup"><div class="glabel">What</div>
       <div class="frow"><span class="fld"><label for="ed-title">Title</label><input id="ed-title"></span></div>
       <div class="frow">
-        <span class="fld"><label for="ed-kind">Kind</label><select id="ed-kind"><option>booked</option><option>flexible</option><option>travel</option><option>meal</option><option>checkin</option><option>todo</option></select></span>
+        <span class="fld"><label for="ed-cat">Category — what it is</label><select id="ed-cat"><option>activity</option><option>meal</option><option>travel</option><option>stay</option><option>errand</option></select></span>
+        <span class="fld"><label for="ed-status">Status — how committed</label><select id="ed-status"><option>booked</option><option>reserved</option><option>open</option></select></span>
       </div>
-      <div class="frow"><span class="fld"><label for="ed-note">Note — the on-the-ground logistics</label><textarea id="ed-note"></textarea></span></div>
+      <div class="frow"><span class="fld"><label for="ed-note">Note — color &amp; context only (logistics get their own fields below)</label><textarea id="ed-note"></textarea></span></div>
     </div>
-    <div class="fgroup"><div class="glabel">When</div>
+    <div class="fgroup"><div class="glabel">When <span style="font-weight:400;letter-spacing:0;text-transform:none;">— local time · CEST (Europe/Ljubljana)</span></div>
       <div class="frow">
         <span class="fld"><label for="ed-day">Day</label><select id="ed-day">
           <option>2026-05-17</option><option>2026-05-18</option><option selected>2026-05-19</option><option>2026-05-20</option>
@@ -282,15 +283,40 @@ font-size:.82rem;border-radius:100px;padding:.5rem 1.1rem;z-index:90;display:non
         <span class="fld"><label for="ed-start">Start</label><input id="ed-start" type="time"></span>
         <span class="fld"><label for="ed-end">End</label><input id="ed-end" type="time"></span>
       </div>
+      <div class="frow">
+        <span class="fld"><label for="ed-arrive">Arrive by — if earlier than start</label><input id="ed-arrive" type="time"></span>
+        <span class="fld"></span>
+      </div>
+    </div>
+    <div class="fgroup"><div class="glabel">Logistics</div>
+      <div class="frow"><span class="fld"><label for="ed-meet">Meeting point</label><input id="ed-meet" placeholder="parking behind Teja bar"></span></div>
+      <div class="frow"><span class="fld"><label for="ed-vendor">Vendor / operator</label><input id="ed-vendor" placeholder="Flying Bear"></span></div>
+    </div>
+    <div class="fgroup"><div class="glabel">Prep</div>
+      <div class="frow"><span class="fld"><label for="ed-wear">Wear</label><input id="ed-wear" placeholder="sturdy waterproof shoes, dress warm"></span></div>
+      <div class="frow"><span class="fld"><label for="ed-bring">Bring</label><input id="ed-bring" placeholder="swimsuit, towel, dry change"></span></div>
+    </div>
+    <div class="fgroup"><div class="glabel">Money</div>
+      <div class="frow">
+        <span class="fld" style="flex:0 0 90px;"><label for="ed-amount">Amount</label><input id="ed-amount" type="number" inputmode="decimal"></span>
+        <span class="fld" style="flex:0 0 86px;"><label for="ed-cur">Currency</label><select id="ed-cur"><option>EUR</option><option>USD</option></select></span>
+        <span class="fld"><label for="ed-per">Per</label><select id="ed-per"><option>total</option><option>person</option></select></span>
+      </div>
+      <div class="frow">
+        <span class="checkline"><input type="checkbox" id="ed-cash"><label for="ed-cash">Cash only</label></span>
+        <span class="checkline"><input type="checkbox" id="ed-payafter"><label for="ed-payafter">Pay after</label></span>
+      </div>
     </div>
     <div class="fgroup"><div class="glabel">Booking</div>
       <div class="frow">
         <span class="fld"><label for="ed-conf">Confirmation</label><input id="ed-conf"></span>
         <span class="fld" style="flex:0 0 92px;"><label>&nbsp;</label><span class="checkline"><input type="checkbox" id="ed-prepaid"><label for="ed-prepaid">Prepaid</label></span></span>
       </div>
+    </div>
+    <div class="fgroup"><div class="glabel">Contact</div>
       <div class="frow">
-        <span class="fld"><label for="ed-cost">Cost</label><input id="ed-cost" placeholder="380 EUR · cash"></span>
-        <span class="fld"><label for="ed-contact">Contact</label><input id="ed-contact"></span>
+        <span class="fld"><label for="ed-cphone">Phone</label><input id="ed-cphone" type="tel"></span>
+        <span class="fld"><label for="ed-cemail">Email</label><input id="ed-cemail" type="email"></span>
       </div>
     </div>
   </div>
@@ -307,30 +333,40 @@ font-size:.82rem;border-radius:100px;padding:.5rem 1.1rem;z-index:90;display:non
 <script>
 // One editor, every door. Rows indexed in DOM order; values are the real
 // solved-day data. Mock interactions: Save/Pin/Delete show their semantics.
+// Entry model v2: category (what) × status (commitment), structured
+// logistics/prep/money/contact — split out of the old prose notes.
 const ROWS = [
-  {kind:"travel",machine:true,title:"Drive to the launch field",note:"Auto-inserted travel · 4 min estimate (straight-line × road factor). Adjust the anchors around it and Re-solve.",day:"2026-05-19",start:"05:25",end:"05:30"},
-  {kind:"booked",title:"Hot-air balloon (private)",note:"Pickup ~05:35 in front of Hotel Toplice. Sports clothing + sturdy, ideally waterproof shoes — morning dew on the field. Breakfast and balloon.",day:"2026-05-19",start:"05:30",end:"07:30",conf:"401780164673",prepaid:true,contact:"info@bcb.si / +386 41 664 545"},
-  {kind:"travel",machine:true,title:"Drive back toward the lake",note:"Auto-inserted travel · 4 min estimate.",day:"2026-05-19",start:"07:30",end:"07:35"},
-  {kind:"flexible",title:"Bled Castle — hike up + tour",note:"Opens 8:00 · lakeshore path, 30–40 min up.",day:"2026-05-19",start:"07:35",end:"09:35"},
-  {kind:"flexible",machine:true,title:"Rest",note:"Auto-inserted buffer after a heavy item.",day:"2026-05-19",start:"09:35",end:"09:55"},
-  {kind:"meal",title:"Lunch · Pizzeria Rustika",note:"In your lunch window · 0.8 km from Hotel Toplice.",day:"2026-05-19",start:"12:00",end:"13:00"},
-  {kind:"flexible",machine:true,title:"Open time",note:"Auto-surfaced free gap.",day:"2026-05-19",start:"13:00",end:"15:55"},
-  {kind:"travel",machine:true,title:"Walk to the meeting point",note:"Auto-inserted travel · 4 min estimate.",day:"2026-05-19",start:"15:55",end:"16:00"},
-  {kind:"booked",title:"Via Ferrata Hvadnik",note:"Ljubljanska cesta 1 — the yellow doors.",day:"2026-05-19",start:"16:00",end:"17:30",conf:"#138953",prepaid:true,pinned:true},
+  {cat:"travel",status:"open",machine:true,title:"Drive to the launch field",note:"Auto-inserted travel · 4 min estimate (straight-line × road factor). Adjust the anchors around it and Re-solve.",day:"2026-05-19",start:"05:25",end:"05:30"},
+  {cat:"activity",status:"booked",title:"Hot-air balloon (private)",note:"Breakfast and balloon.",day:"2026-05-19",start:"05:30",end:"07:30",
+    meet:"In front of Hotel Toplice (pickup ~05:35)",vendor:"Balloon Center Barje",wear:"Sports clothing, sturdy waterproof shoes — morning dew on the field",
+    prepaid:true,conf:"401780164673",phone:"+386 41 664 545",email:"info@bcb.si"},
+  {cat:"travel",status:"open",machine:true,title:"Drive back toward the lake",note:"Auto-inserted travel · 4 min estimate.",day:"2026-05-19",start:"07:30",end:"07:35"},
+  {cat:"activity",status:"open",title:"Bled Castle — hike up + tour",note:"Lakeshore path, 30–40 min up — it earns the view.",day:"2026-05-19",start:"07:35",end:"09:35",arrive:"08:00"},
+  {cat:"activity",status:"open",machine:true,title:"Rest",note:"Auto-inserted buffer after a heavy item.",day:"2026-05-19",start:"09:35",end:"09:55"},
+  {cat:"meal",status:"open",title:"Lunch · Pizzeria Rustika",note:"In your lunch window · 0.8 km from Hotel Toplice.",day:"2026-05-19",start:"12:00",end:"13:00"},
+  {cat:"activity",status:"open",machine:true,title:"Open time",note:"Auto-surfaced free gap.",day:"2026-05-19",start:"13:00",end:"15:55"},
+  {cat:"travel",status:"open",machine:true,title:"Walk to the meeting point",note:"Auto-inserted travel · 4 min estimate.",day:"2026-05-19",start:"15:55",end:"16:00"},
+  {cat:"activity",status:"booked",title:"Via Ferrata Hvadnik",note:"",day:"2026-05-19",start:"16:00",end:"17:30",
+    meet:"Ljubljanska cesta 1, 4260 Bled — the yellow doors",vendor:"Altitude Activities",conf:"#138953",prepaid:true,pinned:true,
+    phone:"+386 70 138 811",email:"info@altitude-activities.com"},
 ];
-const KC={booked:"var(--kind-booked)",flexible:"var(--kind-flexible)",travel:"var(--kind-travel)",meal:"var(--kind-meal)",checkin:"var(--kind-checkin)",todo:"var(--kind-todo)"};
+const KC={activity:"var(--kind-booked)",meal:"var(--kind-meal)",travel:"var(--kind-travel)",stay:"var(--kind-checkin)",errand:"var(--kind-todo)"};
 const ed=document.getElementById("editor"),scr=document.getElementById("edscrim"),toast=document.getElementById("toast");
 const $=(id)=>document.getElementById(id);
 let cur=null;
 function openEd(e){
   cur=e;
-  $("ed-kindlbl").textContent=e.machine?e.kind+" · auto":e.kind;
-  $("ed-kindlbl").style.setProperty("--k",KC[e.kind]);
+  $("ed-kindlbl").textContent=e.machine?e.cat+" · auto":e.cat+" · "+e.status;
+  $("ed-kindlbl").style.setProperty("--k",KC[e.cat]);
   $("ed-title-h").textContent=e.machine?"Machine entry":"Edit entry";
-  $("ed-title").value=e.title; $("ed-kind").value=e.kind; $("ed-note").value=e.note||"";
-  $("ed-day").value=e.day; $("ed-start").value=e.start; $("ed-end").value=e.end;
+  $("ed-title").value=e.title; $("ed-cat").value=e.cat; $("ed-status").value=e.status; $("ed-note").value=e.note||"";
+  $("ed-day").value=e.day; $("ed-start").value=e.start; $("ed-end").value=e.end; $("ed-arrive").value=e.arrive||"";
+  $("ed-meet").value=e.meet||""; $("ed-vendor").value=e.vendor||"";
+  $("ed-wear").value=e.wear||""; $("ed-bring").value=e.bring||"";
+  $("ed-amount").value=e.amount??""; $("ed-cur").value=e.cur||"EUR"; $("ed-per").value=e.per||"total";
+  $("ed-cash").checked=!!e.cash; $("ed-payafter").checked=!!e.payafter;
   $("ed-conf").value=e.conf||""; $("ed-prepaid").checked=!!e.prepaid;
-  $("ed-cost").value=e.cost||""; $("ed-contact").value=e.contact||"";
+  $("ed-cphone").value=e.phone||""; $("ed-cemail").value=e.email||"";
   $("ed-pinnote").style.display=e.pinned?"block":"none";
   $("ed-pin").textContent=e.pinned?"📌 Unpin":"📌 Pin";
   ed.style.display="flex";scr.style.display="block";
