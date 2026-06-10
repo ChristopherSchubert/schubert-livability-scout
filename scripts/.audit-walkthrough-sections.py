@@ -17,9 +17,9 @@ def sections(p):
     body = p.split('>', 1)[1]
     sigs = []
     for m in re.finditer(
-        r'<div class="(sect|collapsec|bucketbox|staysrow|cardrow|daycols|canvas|dayrail|win|cal|vartabs|toolrow)[ "]'
+        r'<div class="(sect|collapsec|bucketbox|staysrow|cardrow|daycols|canvas|dayrail|win|cal|vartabs|toolrow)[ "]|<p class="(?:srcline|dragnote)'
         r'|<aside class="(sheet|tray)|<div class="pop\b|<div class="overlay', body):
-        cls = m.group(1) or m.group(2) or ('pop' if 'pop' in m.group(0) else 'overlay')
+        cls = m.group(1) or m.group(2) or ('srcline' if '<p' in m.group(0) else 'pop' if 'pop' in m.group(0) else 'overlay')
         if cls in ('sect', 'collapsec'):
             t = re.sub(r'<[^>]+>', '', body[m.end():body.find('</div>', m.end())])
             sigs.append(('sect:' if cls == 'sect' else 'bar:') + ' '.join(t.split())[:34])
