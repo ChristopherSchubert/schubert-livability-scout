@@ -265,16 +265,22 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
 <div id="caps" style="display:none">
 <p>It starts with the where and a <b>provisional when</b> — Slovenia, May 15–25, explicitly rough. A calendar can't lay out “mid-May,” so dates are concrete from the first minute; <b>soft means slideable, not absent</b>. Travelers are <b>rows</b>, each carrying their own restriction chips — the trip's marker set derives from them.</p>
 <p>＋ chip opens the <b>picker</b> — the same marker taxonomy used everywhere else in the app, plus a custom option. A chip added here follows its traveler onto every screen of the trip.</p>
+<p>＋ traveler and ＋ pet add <b>rows</b>. Shown on the trip that needs it: Jim Thorpe's composer, where ＋ pet creates Cocoa's row with the <b>🐾 chip pre-attached</b> — and that single row is why every Jim Thorpe screen shows dog markers.</p>
 <p>The trip opens on its <b>Plan</b> tab with the provisional window already drawn — May 15–25 came in from the composer. Both edges slide freely (nothing is booked); <b>✎ adjust dates</b> is the value-editor for the same thing. Cities wait below.</p>
 <p>✎ adjust dates opens the <b>value editor for the same thing the edges drag</b> — fields and handles always agree. Until something books, both stay free.</p>
 <p>Three cities dropped in rough order — the split is a default, <b>2 · 4 · 4 nights</b>. Kranj stays on the tray. Every bar has its grip; every boundary its handle.</p>
+<p>＋ other city opens a <b>place search</b> — any city resolves, not just the scout's list. (Trieste enters the story here; it returns in the variations finale.) An added city lands on the tray as a chip, ready to drag in.</p>
 <p>Zhuzhing: grab the <b>boundary handle</b> and slide — Bled takes a night from Piran. Zero-sum between neighbors; the trip total doesn't move.</p>
 <p>The flights get booked and the window's outer edges <b>lock</b>. The trip can't stretch anymore without real money moving. Inside, still clay.</p>
 <p>＋ add transport opens the <b>transport editor</b>: route, each end's local clock, ticket fields that wait honestly empty until ticketed — and the consequence stated before it happens: <b>booking this locks the trip's end date.</b></p>
+<p>Locked is <b>not frozen</b>: the lock holds only the outer edges. Inside, she drops Kranj in and trades nights freely. The lock's tooltip names its cause and its exit — <b>change the return flight and the edge softens</b>. Hardening is always reversible at the price of the thing that caused it.</p>
 <p>The <b>stay strip</b> under each city. Candidates come from 🔍 search or ＋ add your own (each card: ✎ edit · ✕ remove). She drags Union onto the city — it becomes a bar spanning the leg's nights.</p>
+<p>🔍 search hotels is where candidates come from: a place search scoped to the leg, results <b>＋ shortlist</b>-able onto the strip — and an add-your-own escape hatch for places no cache knows. The strip in the previous step is this sheet's output.</p>
 <p>Stays aren't 1:1 with cities. Each city has its own candidate strip — she drops <b>Hiša Franko</b> from Bled's and <b>Brdo</b> from Piran's, then drags Toplice's edge: the neighbor takes the night.</p>
+<p>✂ split a stay asks one question — <b>after which night?</b> — and the split leaves an honest open slot (“night of May 20 — drop a stay”) rather than silently stretching a neighbor. Hiša Franko lands in that slot next.</p>
 <p>Each stay bar opens its editor on click — confirmation pasted, status set to <b>booked</b>. Booked bars wear a 🔒 and <b>resist</b>: grabbing Union's handle surfaces its terms — free cancellation ends <b>May 12</b>.</p>
 <p>The stay bar's click opens the <b>stay editor</b> — this is where booking actually happens: status to <b>booked</b>, confirmation pasted, the free-cancellation date captured once and reused everywhere (the bar's resistance, the Book page's countdown, the ⏰ badge).</p>
+<p>How you reach a city's bucket: <b>the window is the navigation</b> — click the Bled segment and the page focuses Bled's section: its stays, its days, and an empty bucket stating its three ways in (browse suggestions · add your own · booked-and-dated places itself).</p>
 <p>How things get in: she browses the <b>Bled pool</b> (sourced from the places cache) and presses <b>+ Save</b>; the balloon was <b>added by hand</b> — no cache knows it. Every card carries <b>✎ edit · ✕ remove</b>. The balloon arrived booked-for-May-19 so it placed itself; the rest waits: <b>~16 h for ~3 open days.</b></p>
 <p>＋ add your own opens the <b>item editor</b> for things no cache knows. The balloon gets its real fields — duration, vendor, confirmation, date+time, meeting point, wear — and the editor states the consequence: <b>has a date → will be placed on Tue 19.</b></p>
 <p>The ✎ on any card opens the same editor (duration and hours live here; cited markers are read-only). ✕ removes — <b>with an Undo toast, never silently</b>. She undoes it; the toboggan survives.</p>
@@ -344,6 +350,27 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
   </div>
 </section>
 
+<section data-phase="Where · ＋ traveler and ＋ pet" data-did="on the Jim Thorpe composer, presses ＋ pet — a new row appears with the 🐾 chip already on it.">
+  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="pagebody">
+    <div class="sect">Trips · the same composer, another trip</div>
+    <div class="composer">
+      <div class="frow">
+        <span class="fld"><label>Where (big where)</label><input value="Jim Thorpe, PA" style="width:200px"></span>
+        <span class="fld"><label>From — provisional</label><input type="date" value="2026-05-22"></span>
+        <span class="fld"><label>To — provisional</label><input type="date" value="2026-05-25"></span>
+      </div>
+      <div class="frow" style="flex-direction:column;align-items:stretch;gap:.35rem;">
+        <label style="font-size:.66rem;color:var(--muted);">Travelers</label>
+        <div class="travrow"><b>Janice</b><span class="tchip">🥦 vegetarian <i>✕</i></span><button class="addchip">＋ chip</button><span class="x">✕</span></div>
+        <div class="travrow"><b>Chris</b><span class="tchip">🥦 vegetarian <i>✕</i></span><button class="addchip">＋ chip</button><span class="x">✕</span></div>
+        <div class="travrow" style="border-color:var(--accent);box-shadow:0 6px 16px rgba(13,76,68,.15);"><b><input value="Cocoa" style="border:0;background:none;font-weight:600;width:80px;font-family:var(--fu);"></b><span class="tchip">🐾 dog · 125 lb <i>✕</i></span><button class="addchip">＋ chip</button><span class="x">✕</span></div>
+        <div class="toolrow" style="margin-top:0;"><button class="ctrl">＋ traveler</button><button class="ctrl" style="background:#e7f1ee;">＋ pet</button></div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ═ 2 · empty skeleton ═ -->
 <section data-phase="Where · the skeleton" data-did="drags the window\u2019s right edge to test it — it slides freely; nothing booked yet.">
   <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
@@ -393,6 +420,27 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
     <span class="edge r"></span></div>
     <div class="datesrow"><span>Fri 15</span><span>Sun 17</span><span>Tue 19</span><span>Thu 21</span><span>Sat 23</span><span>Mon 25</span></div>
     <div class="toolrow"><span class="lbl2">On the tray:</span><span class="citychip">⠿ Kranj</span><button class="ctrl">＋ other city…</button></div>
+  </div>
+</section>
+
+<section data-phase="Where · ＋ other city" data-did="presses ＋ other city and types — any place works, not just the scout's list.">
+  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25 · 10 nights</span>
+    <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
+    <span class="spacer"></span><span class="chipbtn">Book</span><span class="chipbtn">Grid →</span></div>
+  <div class="pagebody" style="position:relative;">
+    <div class="sect">The window</div>
+    <div class="win"><span class="edge l"></span>
+      <span class="legseg lj" style="flex:2">Ljubljana<small>2n</small></span>
+      <span class="legseg bl" style="flex:4">Bled<small>4n</small></span>
+      <span class="legseg pi" style="flex:4">Piran<small>4n</small></span>
+    <span class="edge r"></span></div>
+    <div class="toolrow"><span class="lbl2">On the tray:</span><span class="citychip">⠿ Kranj</span><button class="ctrl" style="background:#e7f1ee;">＋ other city…</button></div>
+    <div class="pop" style="left:180px;top:150px;width:250px;">
+      <input value="trie" style="width:100%;font-family:var(--fu);font-size:.8rem;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:.35rem .5rem;margin-bottom:.4rem;">
+      <div class="pi"><b>Trieste</b>&nbsp;<span style="color:var(--muted);font-size:.7rem;">Italy</span><span style="margin-left:auto;color:var(--accent);font-weight:700;font-size:.72rem;">add</span></div>
+      <div class="pi"><b>Tržič</b>&nbsp;<span style="color:var(--muted);font-size:.7rem;">Slovenia</span><span style="margin-left:auto;color:var(--accent);font-weight:700;font-size:.72rem;">add</span></div>
+    </div>
   </div>
 </section>
 
@@ -459,6 +507,27 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
   </div>
 </section>
 
+<section data-phase="Where · locked, not frozen" data-did="with the edges locked, she still drags Kranj into the window — and hovers the lock to see its cause and its exit.">
+  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
+    <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
+    <span class="spacer"></span><span class="chipbtn">Book</span><span class="chipbtn">Grid →</span></div>
+  <div class="pagebody" style="position:relative;">
+    <div class="sect">The window</div>
+    <div class="win"><span class="edge l lock"></span>
+      <span class="legseg lj" style="flex:2">Ljubljana<small>2n</small><span class="hndl">↔</span></span>
+      <span class="legseg bl" style="flex:4">Bled<small>4n</small><span class="hndl">↔</span></span>
+      <span class="legseg pi" style="flex:3">Piran<small>3n</small><span class="hndl">↔</span></span>
+      <span class="legseg" style="flex:1;background:#fffdf6;border:1.5px dashed var(--accent);">Kranj<small>1n</small></span>
+    <span class="edge r lock"></span></div>
+    <div class="pop" style="right:8px;top:118px;width:250px;font-size:.74rem;padding:.55rem .7rem;">
+      🔒 Set by your return flight (May 25). Inside stays editable — to move this edge, <b>change the flight</b>.
+      <div style="margin-top:.4rem;"><button class="ctrl" style="font-size:.68rem;">open the flight →</button></div>
+    </div>
+    <p class="dragnote">Kranj +1 night · Piran −1</p>
+  </div>
+</section>
+
 <!-- ═ 6 · stay strip + shelf ═ -->
 <section data-phase="Stays · drop a hotel on the city" data-did="drags the Union Eurostars card onto the Ljubljana segment.">
   <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
@@ -488,6 +557,25 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
   </div>
 </section>
 
+<section data-phase="Stays · 🔍 search hotels" data-did="presses 🔍 search hotels — results come from Google Places near the leg; ＋ shortlist puts one on the strip.">
+  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
+    <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
+    <span class="spacer"></span><span class="chipbtn">Book</span><span class="chipbtn">Grid →</span></div>
+  <div class="pagebody" style="min-height:430px;"></div>
+  <div class="overlay"><div class="scrim2"></div>
+    <aside class="sheet"><span class="x2">×</span>
+      <span class="kl">stays · Ljubljana · May 15–17</span><h3>Search hotels</h3>
+      <div class="frow"><span class="fld"><input value="old town ljubljana" placeholder="search near the leg…"></span></div>
+      <p class="hint2">from Google Places near Ljubljana old town · ranked by rating × reviews</p>
+      <div class="mini" style="--k:var(--k-stay);margin-bottom:.45rem;"><b>Grand Hotel Union Eurostars</b><small>★4.5 (3,932) · old town</small><br><button class="savebtn">＋ shortlist</button></div>
+      <div class="mini" style="--k:var(--k-stay);margin-bottom:.45rem;"><b>Vander Urbani Resort</b><small>★4.3 (612) · riverside · boutique</small><br><button class="savebtn done">✓ shortlisted</button></div>
+      <div class="mini" style="--k:var(--k-stay);margin-bottom:.45rem;"><b>Antiq Palace</b><small>★4.4 (388) · old town</small><br><button class="savebtn">＋ shortlist</button></div>
+      <p class="hint2" style="margin-top:.5rem;">not here? <u>＋ add your own stay</u> — a B&amp;B no cache knows</p>
+    </aside>
+  </div>
+</section>
+
 <!-- ═ 7 · splitting stays ═ -->
 <section data-phase="Stays · splitting a leg" data-did="drops Hiša Franko and Brdo from their cities' candidate strips, then drags Toplice's ↔ edge one night left.">
   <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
@@ -508,6 +596,28 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
       <span class="staybar" style="flex:1"><b>Brdo</b><small>1n</small></span>
     </div>
     <p class="dragnote">Toplice −1 night · Hiša Franko +1</p>
+  </div>
+</section>
+
+<section data-phase="Stays · ✂ split a stay" data-did="presses ✂ split a stay on Toplice and picks the night — the split creates an open slot to drop a stay into.">
+  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
+    <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
+    <span class="spacer"></span><span class="chipbtn">Book</span><span class="chipbtn">Grid →</span></div>
+  <div class="pagebody" style="position:relative;">
+    <div class="sect">Stays</div>
+    <div class="staysrow">
+      <span class="staybar" style="flex:2"><b>Union</b><small>2n</small></span>
+      <span class="staybar" style="flex:3;border-color:var(--accent);"><b>Toplice</b><small>3n</small></span>
+      <span class="staybar" style="flex:1;border-style:dashed;border-left:1px dashed var(--border);justify-content:center;"><span class="dropz">night of May 20 — drop a stay</span></span>
+      <span class="staybar" style="flex:4"><b>Hotel Piran</b><small>3n+1</small></span>
+    </div>
+    <div class="pop" style="left:300px;top:108px;width:240px;">
+      <div style="font-size:.76rem;font-weight:600;margin-bottom:.35rem;">Split Toplice after…</div>
+      <div class="pi">night 1 · May 17</div>
+      <div class="pi">night 2 · May 18</div>
+      <div class="pi" style="background:var(--panel-strong);font-weight:700;">night 3 · May 19 ✓</div>
+    </div>
   </div>
 </section>
 
@@ -560,6 +670,31 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
   </div>
 </section>
 
+<section data-phase="Gather · getting to the Bled bucket" data-did="clicks the Bled segment in the window — the page focuses Bled's section: stays, days, and an empty bucket with its three ways in.">
+  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
+    <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
+    <span class="spacer"></span><span class="chipbtn">Book <span class="badge">⏰ 1</span></span><span class="chipbtn">Grid →</span></div>
+  <div class="pagebody">
+    <div class="win" style="height:30px;"><span class="edge l lock"></span>
+      <span class="legseg lj" style="flex:2;font-size:.7rem;">Ljubljana</span>
+      <span class="legseg bl" style="flex:4;font-size:.7rem;outline:2px solid var(--accent);outline-offset:-2px;">Bled ✓</span>
+      <span class="legseg pi" style="flex:4;font-size:.7rem;">Piran</span>
+    <span class="edge r lock"></span></div>
+    <div class="sect" style="margin-top:1rem;">Bled · May 17–20 · Toplice + Hiša Franko</div>
+    <div class="daycols">
+      <div class="daycol"><div class="dh">Sun 17 <small>arrive</small></div><div class="cap"><i style="width:0%"></i></div></div>
+      <div class="daycol"><div class="dh">Mon 18</div><div class="cap"><i style="width:0%"></i></div></div>
+      <div class="daycol"><div class="dh">Tue 19</div><div class="cap"><i style="width:0%"></i></div></div>
+      <div class="daycol"><div class="dh">Wed 20 <small>→ Soča</small></div><div class="cap"><i style="width:0%"></i></div></div>
+    </div>
+    <div class="bucketbox">
+      <div class="bh"><b>Bled bucket</b><span class="ready">empty — the want-list for this city</span></div>
+      <div class="toolrow" style="margin-top:.3rem;"><button class="ctrl">Browse suggestions →</button><button class="ctrl">＋ add your own…</button><span class="lbl2">booked &amp; dated things skip the bucket — they place themselves</span></div>
+    </div>
+  </div>
+</section>
+
 <!-- ═ 9 · the Bled bucket ═ -->
 <section data-phase="Gather · the Bled bucket" data-did="browses the Bled pool, presses + Save on eight items, adds the balloon by hand (＋ add your own) — it arrives booked → auto-places onto Tue.">
   <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
@@ -596,7 +731,7 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
         <div class="mini" style="--k:var(--k-act)"><span class="iacts"><i title="edit">✎</i><i title="remove">✕</i></span><span class="grip2">⠿</span><b>Toboggan</b><small>~1.5h</small></div>
         <div class="mini" style="--k:var(--k-act)"><span class="iacts"><i title="edit">✎</i><i title="remove">✕</i></span><span class="grip2">⠿</span><b>Zipline</b><small>to book ⏰ · 3h</small></div>
       </div>
-      <div class="toolrow"><button class="ctrl">＋ from the pool…</button><button class="ctrl">＋ add your own…</button></div>
+      <div class="toolrow"><button class="ctrl">Browse suggestions →</button><button class="ctrl">＋ add your own…</button></div>
     </div>
   </div>
 </section>

@@ -244,6 +244,27 @@ trip — the Janice-review artifact.
   (the grid view). Drag is for *placement* (pool→day, day→day); the editor is
   for *values*.
 
+
+### Pool vs. bucket, locks, and splits (owner control-census, 2026-06-10)
+
+- **Pool ≠ bucket.** The *pool* is suggestions — Google-cache candidates near
+  the leg's stay, browsable, not part of the trip. The *bucket* is the trip's
+  saved want-list per city. Exactly three ways in: ① **＋ Save** from a
+  suggestion · ② **＋ add your own** (item editor) · ③ booked-and-dated items
+  skip the bucket and **place themselves**. The bucket's jump control is
+  "Browse suggestions →" (opens the Shelf scoped to the city) — there is no
+  fourth path.
+- **Reaching a bucket: the window is the navigation.** Click a city segment →
+  the Plan page focuses that city's section (stays · days · bucket).
+- **Locked ≠ frozen.** Booked flights lock only the trip's outer edges.
+  Inside: add/remove/reorder cities and trade nights freely. Every lock's
+  tooltip names its cause and its exit ("set by your return flight — change
+  the flight to move this"); hardening is reversible at the price of the
+  thing that caused it.
+- **Splitting a stay** asks one question — *after which night?* — and leaves
+  an honest open slot ("night of May 20 — drop a stay"), never silently
+  stretching a neighbor.
+
 ## 6. What this forces on the mockups (the fix list)
 
 1. **Re-frame mockup 2 as the workspace**: Trip bar + Day rail + one day
