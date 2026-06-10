@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jim Thorpe — trip home · mockup</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fbf6ea;--panel:#fffdf6;--panel-strong:#f4eddc;--border:#d8ccb8;--text:#1b1814;--muted:#6b6358;
+--accent:#0d4c44;--radius:14px;--font-display:'Fraunces',Georgia,serif;--font-ui:'Inter Tight',system-ui,sans-serif;--warn:#a3431f;}
+*{box-sizing:border-box}html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--font-ui);background-image:radial-gradient(rgba(120,100,60,.035) 1px,transparent 1px);background-size:4px 4px;}
+.topbar{background:var(--panel);border-bottom:1px solid var(--border);padding:.55rem 1.6rem;display:flex;gap:1.4rem;align-items:center;font-size:.82rem;}
+.topbar .brand{font-family:var(--font-display);font-weight:600;font-size:1rem;color:var(--accent);}
+.topbar a{color:var(--muted);text-decoration:none;}.topbar a.on{color:var(--text);font-weight:600;border-bottom:2px solid var(--accent);}
+.tripbar{position:sticky;top:0;z-index:30;background:var(--panel);border-bottom:1px solid var(--border);padding:.7rem 1.6rem;display:flex;align-items:center;gap:1.2rem;box-shadow:0 4px 14px rgba(41,33,19,.05);}
+.tripbar .back{font-size:.82rem;color:var(--accent);text-decoration:none;font-weight:600;}
+.tripbar .tname{font-family:var(--font-display);font-size:1.18rem;}
+.tripbar .tmeta{font-size:.78rem;color:var(--muted);}
+.tripbar .spacer{flex:1}
+.halves{display:flex;border:1px solid var(--border);border-radius:100px;overflow:hidden;}
+.halves a{font-size:.8rem;font-weight:600;color:var(--muted);padding:.4rem 1.1rem;text-decoration:none;}
+.halves a.on{background:var(--accent);color:#fff;}
+.chipbtn{font-size:.78rem;font-weight:600;border:1px solid var(--border);background:var(--bg);border-radius:100px;padding:.4rem .95rem;color:#2c2823;text-decoration:none;display:inline-flex;gap:.4rem;align-items:center;}
+.chipbtn .badge{background:#f6e0d4;color:var(--warn);border-radius:100px;font-size:.7rem;padding:.05rem .45rem;font-weight:700;}
+.wrap{max-width:920px;margin:0 auto;padding:1.8rem 1.6rem 5rem;}
+.glance{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
+.glance .cell{background:var(--panel);padding:1rem 1.1rem;}
+.glance .k{font-size:.68rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);}
+.glance .v{font-family:var(--font-display);font-size:1.08rem;margin-top:.25rem;}
+.glance .v small{font-family:var(--font-ui);font-size:.76rem;color:var(--muted);display:block;font-weight:400;}
+h2{font-family:var(--font-display);font-weight:500;font-size:1.35rem;margin:2.2rem 0 .9rem;}
+.limit{display:flex;gap:.8rem;background:var(--panel);border:1px solid #dcb49a;border-left:4px solid var(--warn);border-radius:10px;padding:.8rem 1rem;margin-bottom:.7rem;}
+.limit.ok{border-color:var(--border);border-left-color:var(--accent);}
+.limit .t{font-weight:600;font-size:.9rem;}
+.limit p{margin:.2rem 0 0;font-size:.82rem;color:#2c2823;}
+.src{font-size:.72rem;color:var(--muted);font-style:italic;border-left:1px solid var(--border);padding-left:.5rem;margin-left:.5rem;}
+.chk{display:grid;grid-template-columns:auto 1fr auto;gap:.7rem;align-items:start;background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:.7rem .9rem;margin-bottom:.55rem;}
+.chk input{margin-top:.2rem;}
+.chk .t{font-weight:600;font-size:.88rem;}
+.chk p{margin:.15rem 0 0;font-size:.78rem;color:var(--muted);}
+.lead{font-size:.7rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--warn);background:#f6ead8;border-radius:100px;padding:.18rem .6rem;white-space:nowrap;}
+table{width:100%;border-collapse:collapse;background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;font-size:.85rem;}
+th{font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);text-align:left;padding:.55rem .8rem;background:var(--panel-strong);}
+td{padding:.55rem .8rem;border-top:1px solid var(--panel-strong);}
+.yes{color:var(--accent);font-weight:700;} .no{color:var(--warn);font-weight:700;} .na{color:var(--muted);}
+.tips{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:1rem 1.2rem;font-size:.85rem;}
+.tips li{margin-bottom:.4rem;}
+.note{font-family:var(--font-display);font-style:italic;color:var(--muted);font-size:.88rem;margin-top:.6rem;}
+</style></head><body>
+<nav class="topbar"><span class="brand">Livability Scout</span><a href="#">Board</a><a href="#">Planning</a><a class="on" href="trips.html">Trips</a><a href="#">Visited</a></nav>
+<div class="tripbar">
+  <a class="back" href="trips.html">← Trips</a>
+  <span class="tname">Jim Thorpe</span><span class="tmeta">May 22–25, 2026 · 3 nights · Janice &amp; Chris + Cocoa 🐾</span>
+  <span class="halves"><a href="#" class="on">Overview</a><a href="#">Shelf</a><a href="#">Days</a></span>
+  <span class="spacer"></span>
+  <a class="chipbtn" href="#">Book <span class="badge">⏰ 4</span></a>
+</div>
+<div class="wrap">
+
+  <div class="glance">
+    <div class="cell"><div class="k">Dates</div><div class="v">May 22–25, 2026<small>Memorial Day weekend · 3 nights</small></div></div>
+    <div class="cell"><div class="k">Getting there</div><div class="v">~5 h drive<small>270 mi via I-76 E (PA Turnpike)</small></div></div>
+    <div class="cell"><div class="k">Stay</div><div class="v">Blueberry Hill<small>check-in 4:00 PM</small></div></div>
+    <div class="cell"><div class="k">Travelers</div><div class="v">Janice, Chris + Cocoa<small>125 lb Newfoundland — markers show 🐾</small></div></div>
+    <div class="cell"><div class="k">Diet</div><div class="v">Vegetarian<small>verified options throughout</small></div></div>
+    <div class="cell"><div class="k">Theme</div><div class="v">🚂 trains &amp; trails</div></div>
+  </div>
+
+  <h2>Read first — verified limitations</h2>
+  <div class="limit"><span>🦌</span><div><span class="t">Spruce Ridge Reindeer — no dogs allowed</span><span class="src">Yelp · Feb 2026 + Pocono Mtns listing</span>
+    <p>Open year-round with spring tours, but pets are not permitted. Cocoa can't join.</p></div></div>
+  <div class="limit"><span>👻</span><div><span class="t">Rotary Ghost Walks run Sept–Nov only</span><span class="src">rotary listing</span>
+    <p>Not available Memorial Day weekend. The Trolley's Ghosts &amp; Graveyards tour may run — call to confirm May availability.</p></div></div>
+  <div class="limit"><span>🌊</span><div><span class="t">Glen Onoko Falls main trail — closed since 2019</span><span class="src">official closure</span>
+    <p>Do not attempt. Replaced with the easy-access Buttermilk &amp; Luke's Falls.</p></div></div>
+  <div class="limit ok"><span>🚂</span><div><span class="t">Lehigh Gorge Scenic Railway — dogs ride free</span><span class="src">lgsry.com · 570-325-8485</span>
+    <p>Cocoa gets her own ticket. Book in advance, from $22/adult.</p></div></div>
+
+  <h2>Before you go — derived from every "to book" entry</h2>
+  <div class="chk"><input type="checkbox" checked><div><span class="t">Lodging — confirm the 125 lb dog</span><p>Filter pets-allowed, then message hosts — many cap at 50–75 lbs. Blueberry Hill confirmed.</p></div><span class="lead">books 4–6 mo out</span></div>
+  <div class="chk"><input type="checkbox"><div><span class="t">Lehigh Gorge Scenic Railway</span><p>lgsry.com or 570-325-8485 · the 70-min ride · Cocoa rides free.</p></div><span class="lead">book ahead</span></div>
+  <div class="chk"><input type="checkbox"><div><span class="t">Jim Thorpe Trolley tour</span><p>jimthorpetrolley.com — Cocoa welcome on the open-air trolley.</p></div><span class="lead">book ahead</span></div>
+  <div class="chk"><input type="checkbox"><div><span class="t">Wild Elder — patio table</span><p>Books up fast on holiday weekends; call for outdoor seating.</p></div><span class="lead">call ahead</span></div>
+  <div class="chk"><input type="checkbox"><div><span class="t">Stone Row Pub — patio table</span><p>Same — holiday weekend pressure.</p></div><span class="lead">call ahead</span></div>
+
+  <h2>Can Cocoa come? — the status matrix</h2>
+  <table>
+    <tr><th>Activity</th><th>Dogs</th><th>Source</th></tr>
+    <tr><td>Lehigh Gorge Scenic Railway</td><td class="yes">✅ rides free, leashed</td><td class="src" style="border:0;padding-left:.8rem;">lgsry.com</td></tr>
+    <tr><td>Jim Thorpe Trolley (open-air)</td><td class="yes">✅ welcome</td><td class="src" style="border:0;padding-left:.8rem;">jimthorpetrolley.com</td></tr>
+    <tr><td>Lehigh Gorge trail (D&amp;L)</td><td class="yes">✅ leashed · crushed stone</td><td class="src" style="border:0;padding-left:.8rem;">state-park rules</td></tr>
+    <tr><td>Mauch Chunk Lake trails</td><td class="yes">✅ 6-ft leash · not the beach</td><td class="src" style="border:0;padding-left:.8rem;">park policy</td></tr>
+    <tr><td>Spruce Ridge Reindeer</td><td class="no">❌ no pets</td><td class="src" style="border:0;padding-left:.8rem;">Yelp · Feb 2026</td></tr>
+    <tr><td>Rotary Ghost Walk</td><td class="na">— closed in May</td><td class="src" style="border:0;padding-left:.8rem;">seasonal</td></tr>
+  </table>
+
+  <h2>Tips</h2>
+  <div class="tips"><ul>
+    <li>🐾 Cooling mat + travel water bowl — Newfies overheat in May. The Lehigh has riverside splash spots on the gorge trail.</li>
+    <li>📸 Cocoa stops for photos every 50 yards — budget extra time.</li>
+  </ul></div>
+
+  <p class="note">Mockup — the trip frame on real Jim Thorpe data: glance, cited limitations, the checklist <em>derived</em> from to-book entries, the dog matrix, tips. This trip carries 🐾 so dog markers are active everywhere; Slovenia hides them.</p>
+</div>
+</body></html>

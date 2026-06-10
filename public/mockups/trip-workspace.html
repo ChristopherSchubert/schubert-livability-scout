@@ -120,23 +120,23 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);line-heig
 <!-- app TopBar (Trips joins the existing modes) -->
 <nav class="topbar">
   <span class="brand">Livability Scout</span>
-  <a href="#">Board</a><a href="#">Planning</a><a class="on" href="#">Trips</a><a href="#">Visited</a>
+  <a href="#">Board</a><a href="#">Planning</a><a class="on" href="trips.html">Trips</a><a href="#">Visited</a>
 </nav>
 
 <!-- TRIP BAR — which trip, which half. Never scrolls away. -->
 <div class="tripbar">
   <span class="tname">Slovenia</span>
   <span class="tmeta">May 15–25, 2026 · 10 nights · Janice &amp; Chris</span>
-  <span class="halves"><button>Shelf</button><button class="on">Days</button></span>
+  <span class="halves"><a href="trip-shelf.html" style="font-size:.8rem;font-weight:600;color:var(--muted);padding:.4rem 1.1rem;text-decoration:none;">Shelf</a><button class="on">Days</button></span>
   <span class="spacer"></span>
-  <button class="chipbtn">Book <span class="badge">⏰ 1</span></button>
-  <button class="chipbtn">Grid →</button>
+  <a class="chipbtn" href="trip-book.html" style="text-decoration:none;">Book <span class="badge">⏰ 1</span></a>
+  <a class="chipbtn" href="trip-grid.html" style="text-decoration:none;">Grid →</a>
 </div>
 
 <!-- DAY RAIL — which day, what's around it. Fill-state dots = trip-wide progress. -->
 <div class="dayrail">
   <div class="leg"><span class="legname">Ljubljana</span><div class="chips">
-    <div class="dchip has"><span class="dow">Fri</span><span class="dnum">15</span><span class="state"></span></div>
+    <a class="dchip has" href="trip-flightday.html" style="text-decoration:none;color:inherit;display:inline-block;"><span class="dow">Fri</span><span class="dnum">15</span><span class="state"></span></a>
     <div class="dchip has"><span class="dow">Sat</span><span class="dnum">16</span><span class="state"></span></div>
   </div></div>
   <div class="leg"><span class="legname">Bled</span><div class="chips">
@@ -147,7 +147,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);line-heig
   </div></div>
   <div class="leg"><span class="legname">Piran</span><div class="chips">
     <div class="dchip has"><span class="dow">Thu</span><span class="dnum">21</span><span class="state"></span></div>
-    <div class="dchip has"><span class="dow">Fri</span><span class="dnum">22</span><span class="state"></span></div>
+    <a class="dchip has" href="trip-block.html" style="text-decoration:none;color:inherit;display:inline-block;"><span class="dow">Fri</span><span class="dnum">22</span><span class="state"></span></a>
     <div class="dchip has"><span class="dow">Sat</span><span class="dnum">23</span><span class="state"></span></div>
     <div class="dchip has"><span class="dow">Sun</span><span class="dnum">24</span><span class="state"></span></div>
     <div class="dchip has"><span class="dow">Mon</span><span class="dnum">25</span><span class="state"></span></div>

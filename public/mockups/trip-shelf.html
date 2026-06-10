@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Slovenia — Shelf · mockup</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fbf6ea;--panel:#fffdf6;--panel-strong:#f4eddc;--border:#d8ccb8;--text:#1b1814;--muted:#6b6358;
+--accent:#0d4c44;--radius:14px;--font-display:'Fraunces',Georgia,serif;--font-ui:'Inter Tight',system-ui,sans-serif;--warn:#a3431f;
+--kind-meal:#9a5a16;--kind-checkin:#665285;}
+*{box-sizing:border-box}html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--font-ui);background-image:radial-gradient(rgba(120,100,60,.035) 1px,transparent 1px);background-size:4px 4px;}
+.topbar{background:var(--panel);border-bottom:1px solid var(--border);padding:.55rem 1.6rem;display:flex;gap:1.4rem;align-items:center;font-size:.82rem;}
+.topbar .brand{font-family:var(--font-display);font-weight:600;font-size:1rem;color:var(--accent);}
+.topbar a{color:var(--muted);text-decoration:none;}.topbar a.on{color:var(--text);font-weight:600;border-bottom:2px solid var(--accent);}
+.tripbar{position:sticky;top:0;z-index:30;background:var(--panel);border-bottom:1px solid var(--border);padding:.7rem 1.6rem;display:flex;align-items:center;gap:1.2rem;box-shadow:0 4px 14px rgba(41,33,19,.05);}
+.tripbar .tname{font-family:var(--font-display);font-size:1.18rem;}
+.tripbar .tmeta{font-size:.78rem;color:var(--muted);}
+.halves{display:flex;border:1px solid var(--border);border-radius:100px;overflow:hidden;}
+.halves a{font-size:.8rem;font-weight:600;color:var(--muted);padding:.4rem 1.1rem;text-decoration:none;}
+.halves a.on{background:var(--accent);color:#fff;}
+.tripbar .spacer{flex:1}
+.chipbtn{font-size:.78rem;font-weight:600;border:1px solid var(--border);background:var(--bg);border-radius:100px;padding:.4rem .95rem;color:#2c2823;text-decoration:none;}
+.wrap{max-width:980px;margin:0 auto;padding:1.8rem 1.6rem 5rem;}
+.bar{display:flex;gap:.4rem;flex-wrap:wrap;align-items:center;margin-bottom:1.2rem;}
+.fchip{font-size:.76rem;font-weight:600;border:1px solid var(--border);background:var(--panel);border-radius:100px;padding:.25rem .75rem;color:var(--muted);cursor:pointer;}
+.fchip.on{background:#e7f1ee;color:var(--accent);border-color:#bcd8d0;}
+.bar .note{font-size:.74rem;color:var(--muted);margin-left:.4rem;}
+h2{font-family:var(--font-display);font-weight:500;font-size:1.3rem;margin:1.8rem 0 .8rem;display:flex;align-items:baseline;gap:.7rem;}
+h2 small{font-family:var(--font-ui);font-size:.76rem;color:var(--muted);font-weight:400;}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.9rem;}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:.75rem .9rem;position:relative;}
+.card .nm{font-weight:600;font-size:.9rem;padding-right:1.4rem;}
+.card .meta{font-size:.74rem;color:var(--muted);margin:.15rem 0 .4rem;}
+.card .grip{position:absolute;top:.6rem;right:.6rem;color:var(--border);cursor:grab;}
+.mks{display:flex;gap:.3rem;flex-wrap:wrap;}
+.mk{font-size:.72rem;font-weight:500;background:var(--panel-strong);border:1px solid var(--border);border-radius:100px;padding:.1rem .5rem;color:#2c2823;}
+.mk.cited{border-color:#bcd8d0;background:#e7f1ee;}
+.mk.warnnote{border-color:#dcc3a8;background:#f6ead8;color:var(--warn);}
+.verify{font-size:.72rem;color:var(--accent);text-decoration:none;font-weight:600;}
+.card .acts{margin-top:.5rem;display:flex;gap:.5rem;align-items:center;}
+.addbtn{font-size:.74rem;font-weight:600;border:1px solid var(--accent);color:var(--accent);background:none;border-radius:100px;padding:.2rem .7rem;cursor:pointer;}
+.staycard{border-left:4px solid var(--kind-checkin);}
+.booked{font-size:.7rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;background:#e7f1ee;color:var(--accent);border-radius:100px;padding:.15rem .6rem;}
+.own{border-style:dashed;background:var(--bg);display:flex;align-items:center;justify-content:center;min-height:96px;color:var(--accent);font-weight:600;font-size:.84rem;cursor:pointer;}
+.note{font-family:var(--font-display);font-style:italic;color:var(--muted);font-size:.88rem;margin-top:2rem;}
+@media(max-width:760px){.grid{grid-template-columns:1fr;}}
+</style></head><body>
+<nav class="topbar"><span class="brand">Livability Scout</span><a href="#">Board</a><a href="#">Planning</a><a class="on" href="trips.html">Trips</a><a href="#">Visited</a></nav>
+<div class="tripbar">
+  <span class="tname">Slovenia</span><span class="tmeta">May 15–25, 2026</span>
+  <span class="halves"><a class="on" href="trip-shelf.html">Shelf</a><a href="trip-workspace.html">Days</a></span>
+  <span class="spacer"></span>
+  <a class="chipbtn" href="trip-book.html">Book ⏰ 1</a><a class="chipbtn" href="trip-grid.html">Grid →</a>
+</div>
+<div class="wrap">
+
+  <div class="bar">
+    <span class="fchip on">Bled</span><span class="fchip">Ljubljana</span><span class="fchip">Piran</span>
+    <span style="width:1rem"></span>
+    <span class="fchip on">All</span><span class="fchip">Eat &amp; drink</span><span class="fchip">See &amp; do</span><span class="fchip">Veg ✓</span><span class="fchip">Patio ✓</span>
+    <span class="note">chips filtered for this trip — no dog, no kids (<a href="#" style="color:var(--accent)">show all</a>)</span>
+  </div>
+
+  <h2>Stay <small>booked first · per leg</small></h2>
+  <div class="grid">
+    <div class="card staycard"><div class="nm">Grand Hotel Toplice</div><div class="meta">Bled lakefront · check-in 2 PM</div>
+      <div class="mks"><span class="booked">● Booked · PH27710297</span></div></div>
+    <div class="card staycard"><div class="nm">Hotel Lovec</div><div class="meta">★4.3 (974) · 0.24 km from the lake</div>
+      <div class="mks"><span class="mk">shortlisted</span></div>
+      <div class="acts"><button class="addbtn">Choose instead</button></div></div>
+    <div class="card staycard"><div class="nm">Penzion Berc</div><div class="meta">★4.8 (339) · 0.50 km</div>
+      <div class="mks"><span class="mk">shortlisted</span></div>
+      <div class="acts"><button class="addbtn">Choose instead</button></div></div>
+  </div>
+
+  <h2>Eat &amp; drink <small>64 candidates near Bled · ranked by rating × review volume · distances from Hotel Toplice</small></h2>
+  <div class="grid">
+    <div class="card"><span class="grip">⠿</span><div class="nm">Pizzeria Rustika</div><div class="meta">★4.7 (4,819) · 0.8 km · €€</div>
+      <div class="mks"><span class="mk cited">Veg ✓</span><span class="mk cited">Patio ✓</span></div>
+      <div class="acts"><button class="addbtn">+ Save to trip</button><span class="verify">on the trip · May 19</span></div></div>
+    <div class="card"><span class="grip">⠿</span><div class="nm">Public &amp; Vegan Kitchen</div><div class="meta">★4.7 (2,046) · 0.3 km</div>
+      <div class="mks"><span class="mk cited">Veg ✓</span><span class="mk cited">Patio ✓</span><span class="mk cited">Accessible ✓</span><span class="mk warnnote">Closed Mondays</span></div>
+      <div class="acts"><button class="addbtn">+ Save to trip</button></div></div>
+    <div class="card"><span class="grip">⠿</span><div class="nm">Oštarija Peglez'n</div><div class="meta">★4.5 (4,513) · 0.45 km · €€</div>
+      <div class="mks"><span class="mk">Not verified yet</span></div>
+      <div class="acts"><button class="addbtn">+ Save to trip</button><a class="verify" href="#">Verify markers (1 lookup)</a></div></div>
+    <div class="card"><span class="grip">⠿</span><div class="nm">Confectionery Zima</div><div class="meta">★4.6 (3,386) · 0.7 km · €€</div>
+      <div class="mks"><span class="mk">Not verified yet</span></div>
+      <div class="acts"><button class="addbtn">+ Save to trip</button><a class="verify" href="#">Verify markers</a></div></div>
+    <div class="card"><span class="grip">⠿</span><div class="nm">Mega Burger Bled</div><div class="meta">★4.7 (2,085) · 0.6 km · €€</div>
+      <div class="mks"><span class="mk">Not verified yet</span></div>
+      <div class="acts"><button class="addbtn">+ Save to trip</button><a class="verify" href="#">Verify markers</a></div></div>
+    <div class="card own">+ Add your own place</div>
+  </div>
+
+  <h2>See &amp; do <small>19 candidates</small></h2>
+  <div class="grid">
+    <div class="card"><span class="grip">⠿</span><div class="nm">Bled Castle</div><div class="meta">★4.4 (34,279) · 1.0 km · opens 8:00</div>
+      <div class="mks"><span class="mk cited">Kids ✓ <i style="display:none"></i></span></div>
+      <div class="acts"><button class="addbtn">+ Save to trip</button><span class="verify">on the trip · May 19</span></div></div>
+    <div class="card"><span class="grip">⠿</span><div class="nm">Zipline Dolinka</div><div class="meta">★5.0 (5,446) · 0.5 km · ~3 hrs</div>
+      <div class="mks"><span class="mk">Not verified yet</span></div>
+      <div class="acts"><button class="addbtn">+ Save to trip</button><a class="verify" href="#">Verify markers</a></div></div>
+    <div class="card"><span class="grip">⠿</span><div class="nm">Straža hill toboggan</div><div class="meta">★4.7 (1,752) · 1.1 km · ~1.5 hrs</div>
+      <div class="mks"><span class="mk">Not verified yet</span></div>
+      <div class="acts"><button class="addbtn">+ Save to trip</button><a class="verify" href="#">Verify markers</a></div></div>
+    <div class="card"><span class="grip">⠿</span><div class="nm">Blejsko jezero — the lake walk</div><div class="meta">★4.8 (414) · 0.7 km</div>
+      <div class="mks"><span class="mk">Not verified yet</span></div>
+      <div class="acts"><button class="addbtn">+ Save to trip</button></div></div>
+    <div class="card own">+ Add your own (the balloon company, the via ferrata guide…)</div>
+  </div>
+
+  <p class="note">Mockup — the Shelf is the want-list. Candidates come from the real cached pool; saving pulls one onto the trip; "Verify markers" is the on-demand single lookup; dog/kid chips are hidden because this trip has neither. Drag a saved card onto a day in the Days view.</p>
+</div>
+</body></html>

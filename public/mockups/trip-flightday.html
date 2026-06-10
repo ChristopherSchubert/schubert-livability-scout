@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Slovenia — May 15, travel day · mockup</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fbf6ea;--panel:#fffdf6;--panel-strong:#f4eddc;--border:#d8ccb8;--text:#1b1814;--muted:#6b6358;
+--accent:#0d4c44;--radius:14px;--font-display:'Fraunces',Georgia,serif;--font-ui:'Inter Tight',system-ui,sans-serif;--warn:#a3431f;
+--kind-travel:#2e5482;--kind-meal:#9a5a16;--kind-checkin:#665285;--kind-flexible:#6b6358;}
+*{box-sizing:border-box}html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--font-ui);background-image:radial-gradient(rgba(120,100,60,.035) 1px,transparent 1px);background-size:4px 4px;}
+.topbar{background:var(--panel);border-bottom:1px solid var(--border);padding:.55rem 1.6rem;display:flex;gap:1.4rem;align-items:center;font-size:.82rem;}
+.topbar .brand{font-family:var(--font-display);font-weight:600;font-size:1rem;color:var(--accent);}
+.topbar a{color:var(--muted);text-decoration:none;}.topbar a.on{color:var(--text);font-weight:600;border-bottom:2px solid var(--accent);}
+.tripbar{position:sticky;top:0;z-index:30;background:var(--panel);border-bottom:1px solid var(--border);padding:.7rem 1.6rem;display:flex;align-items:center;gap:1.2rem;box-shadow:0 4px 14px rgba(41,33,19,.05);}
+.tripbar .back{font-size:.82rem;color:var(--accent);text-decoration:none;font-weight:600;}
+.tripbar .tname{font-family:var(--font-display);font-size:1.18rem;}
+.tripbar .tmeta{font-size:.78rem;color:var(--muted);}
+.wrap{max-width:860px;margin:0 auto;padding:1.8rem 1.6rem 5rem;}
+.chead{display:flex;align-items:baseline;gap:.9rem;margin-bottom:1rem;}
+.chead h1{font-family:var(--font-display);font-weight:500;font-size:1.6rem;margin:0;}
+.chead .sub{font-size:.78rem;color:var(--muted);}
+.tzflag{font-size:.72rem;font-weight:600;background:#eaf0f6;color:var(--kind-travel);border:1px solid #c4d2e2;border-radius:100px;padding:.18rem .65rem;}
+.canvas{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);box-shadow:0 10px 30px rgba(41,33,19,.06);overflow:hidden;}
+.tl-row{display:grid;grid-template-columns:96px 1fr;border-top:1px solid var(--panel-strong);}
+.tl-row:first-child{border-top:0;}
+.tl-row .tt{font-variant-numeric:tabular-nums;font-size:.78rem;color:var(--muted);padding:.6rem .8rem;border-right:1px solid var(--panel-strong);}
+.tl-row .tt small{display:block;font-size:.66rem;color:var(--muted);}
+.tl-row .tc{padding:.55rem 1rem;}
+.tl-row.anchor{border-left:4px solid var(--k,var(--border));}
+.tl-row .nm{font-weight:600;font-size:.92rem;}
+.kindlbl{font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--k,var(--muted));margin-right:.5rem;}
+.tl-row.machine{background:repeating-linear-gradient(135deg,transparent,transparent 7px,rgba(120,100,60,.045) 7px,rgba(120,100,60,.045) 9px);}
+.tl-row.machine .tc{color:#2c2823;font-size:.84rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;}
+.machinetag{font-size:.7rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--kind-travel);border:1px solid #c4d2e2;background:#eaf0f6;border-radius:100px;padding:.12rem .5rem;}
+.flightcard{margin-top:.45rem;border:1px solid #c4d2e2;background:#f4f7fa;border-radius:8px;padding:.6rem .8rem;display:grid;grid-template-columns:auto 1fr auto;gap:.3rem 1.2rem;align-items:center;}
+.flightcard .ap{font-family:var(--font-display);font-size:1.3rem;font-variant-numeric:tabular-nums;}
+.flightcard .ap small{font-family:var(--font-ui);font-size:.7rem;color:var(--muted);display:block;}
+.flightcard .arrow{color:var(--kind-travel);font-size:1.1rem;text-align:center;}
+.flightcard .det{grid-column:1 / -1;display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;font-size:.76rem;color:var(--muted);border-top:1px solid #dde6ee;padding-top:.45rem;margin-top:.2rem;}
+.addslot{font-size:.74rem;font-weight:600;color:var(--accent);border:1px dashed var(--accent);border-radius:100px;padding:.12rem .6rem;text-decoration:none;}
+.statuslink{font-size:.74rem;font-weight:600;color:var(--kind-travel);text-decoration:none;border-bottom:1px dotted var(--kind-travel);}
+.arrivebar{display:flex;gap:.5rem;align-items:center;font-size:.78rem;color:var(--warn);background:#f6ead8;border:1px solid #dcc3a8;border-radius:7px;padding:.4rem .7rem;margin-top:.45rem;}
+.conf{font-size:.76rem;background:var(--panel-strong);border-radius:5px;padding:.08rem .45rem;font-variant-numeric:tabular-nums;}
+.anchnote{font-size:.76rem;color:var(--muted);}
+.note{font-family:var(--font-display);font-style:italic;color:var(--muted);font-size:.88rem;margin-top:1.6rem;}
+</style></head><body>
+<nav class="topbar"><span class="brand">Livability Scout</span><a href="#">Board</a><a href="#">Planning</a><a class="on" href="trips.html">Trips</a><a href="#">Visited</a></nav>
+<div class="tripbar"><a class="back" href="trip-workspace.html">← Days</a><span class="tname">Slovenia</span><span class="tmeta">Friday, May 15 · the travel day</span></div>
+<div class="wrap">
+
+  <div class="chead"><h1>Friday, May 15</h1><span class="sub">Frankfurt layover → Ljubljana</span>
+  <span class="tzflag">single zone today — all times CEST</span></div>
+
+  <div class="canvas">
+    <div class="tl-row anchor" style="--k:var(--kind-travel)"><div class="tt">2:00 PM<small>FRA local</small></div><div class="tc">
+      <span class="kindlbl">Travel · flight</span><span class="nm">Land in Frankfurt</span>
+      <div class="flightcard">
+        <span class="ap">??? <small>origin</small></span><span class="arrow">→</span><span class="ap">FRA <small>Frankfurt</small></span>
+        <div class="det"><a class="addslot" href="#">+ carrier &amp; flight number</a><a class="addslot" href="#">+ PNR</a><span>status link builds from carrier + number + date</span></div>
+      </div>
+      <div class="anchnote" style="margin-top:.4rem;">Clear customs ~2:30, then the layover is yours till 5:30.</div>
+    </div></div>
+
+    <div class="tl-row anchor" style="--k:var(--kind-flexible)"><div class="tt">3:30 PM</div><div class="tc">
+      <span class="kindlbl">Activity · no booking</span><span class="nm">Römerberg + old town</span>
+      <div class="anchnote">Wander the Kleinmarkthalle. Dessert at Zeit für Brot ~4:30.</div>
+    </div></div>
+
+    <div class="tl-row machine"><div class="tt">5:30 PM</div><div class="tc">Leave for the airport <span class="machinetag">auto · from arrive-by + transit est.</span></div></div>
+
+    <div class="tl-row anchor" style="--k:var(--kind-travel)"><div class="tt">8:00 PM<small>FRA local</small></div><div class="tc">
+      <span class="kindlbl">Travel · flight · booked</span><span class="nm">Frankfurt → Ljubljana</span>
+      <div class="arrivebar">⏰ Be at the gate area by <b>6:30 PM</b> — boarding 8:00, international lead 1½ h</div>
+      <div class="flightcard">
+        <span class="ap">FRA <small>dep 8:00 PM local</small></span><span class="arrow">✈</span><span class="ap">LJU <small>arr 9:30 PM local</small></span>
+        <div class="det"><a class="addslot" href="#">+ carrier &amp; flight number</a><a class="addslot" href="#">+ PNR · seat · terminal</a><a class="statuslink" href="#">flight status ↗ (builds when number is set)</a></div>
+      </div>
+    </div></div>
+
+    <div class="tl-row anchor" style="--k:var(--kind-travel)"><div class="tt">10:30 PM</div><div class="tc">
+      <span class="kindlbl">Travel</span><span class="nm">Pick up the rental car</span>
+    </div></div>
+
+    <div class="tl-row anchor" style="--k:var(--kind-checkin)"><div class="tt">11:30 PM</div><div class="tc">
+      <span class="kindlbl">Stay · booked</span><span class="nm">Check in — Grand Hotel Union Eurostars</span>
+      <div class="anchnote" style="margin-top:.25rem;"><span class="conf">SYN2281-99143</span> &nbsp;24-hour desk — late arrival is fine · hotel garage at Miklošičeva 3, elevator to reception.</div>
+    </div></div>
+  </div>
+
+  <p class="note">Mockup — the travel-day rendering. Flights are travel anchors with a transport card: airports + each end's local clock, the arrive-by lead surfaced as its own bar, and the leave-for-airport row generated by Solve. Carrier/number/PNR aren't in the source spreadsheet, so they render as honest <em>add</em> slots — the status deep-link lights up once a number exists. Never invented.</p>
+</div>
+</body></html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trips — mockup</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fbf6ea;--panel:#fffdf6;--panel-strong:#f4eddc;--border:#d8ccb8;--text:#1b1814;--muted:#6b6358;
+--accent:#0d4c44;--radius:14px;--font-display:'Fraunces',Georgia,serif;--font-ui:'Inter Tight',system-ui,sans-serif;--warn:#a3431f;}
+*{box-sizing:border-box}html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--font-ui);background-image:radial-gradient(rgba(120,100,60,.035) 1px,transparent 1px);background-size:4px 4px;}
+.topbar{background:var(--panel);border-bottom:1px solid var(--border);padding:.55rem 1.6rem;display:flex;gap:1.4rem;align-items:center;font-size:.82rem;}
+.topbar .brand{font-family:var(--font-display);font-weight:600;font-size:1rem;color:var(--accent);}
+.topbar a{color:var(--muted);text-decoration:none;}
+.topbar a.on{color:var(--text);font-weight:600;border-bottom:2px solid var(--accent);}
+.wrap{max-width:880px;margin:0 auto;padding:2.2rem 1.6rem 5rem;}
+.head{display:flex;align-items:baseline;gap:1rem;margin-bottom:1.6rem;}
+.head h1{font-family:var(--font-display);font-weight:500;font-size:2rem;margin:0;}
+.head .spacer{flex:1}
+.newbtn{font-size:.82rem;font-weight:600;background:var(--accent);color:#fff;border:0;border-radius:100px;padding:.5rem 1.2rem;cursor:pointer;}
+.sect{font-size:.7rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:1.8rem 0 .8rem;display:flex;align-items:center;gap:.6rem;}
+.sect::after{content:"";flex:1;height:1px;background:var(--border);}
+.trip{display:grid;grid-template-columns:1fr auto;gap:.4rem 1rem;background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);
+box-shadow:0 10px 30px rgba(41,33,19,.06);padding:1.1rem 1.4rem;margin-bottom:1rem;text-decoration:none;color:inherit;}
+.trip:hover{border-color:var(--accent);}
+.trip .nm{font-family:var(--font-display);font-size:1.35rem;}
+.trip .legs{font-family:var(--font-display);font-style:italic;color:var(--muted);font-size:.95rem;}
+.trip .meta{font-size:.78rem;color:var(--muted);margin-top:.3rem;display:flex;gap:1rem;flex-wrap:wrap;}
+.trip .right{text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:.4rem;}
+.pill{font-size:.7rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;border-radius:100px;padding:.2rem .65rem;}
+.pill.live{background:#e7f1ee;color:var(--accent);}
+.pill.todo{background:#f6ead8;color:var(--warn);}
+.pill.past{background:var(--panel-strong);color:var(--muted);}
+.dots{display:flex;gap:3px;}
+.dots i{width:7px;height:7px;border-radius:50%;background:#b8a36a;display:inline-block;}
+.dots i.s{background:var(--accent);} .dots i.e{background:var(--border);}
+.mk{font-size:.72rem;background:var(--panel-strong);border:1px solid var(--border);border-radius:100px;padding:.1rem .5rem;}
+.foot{font-family:var(--font-display);font-style:italic;color:var(--muted);font-size:.88rem;margin-top:2rem;}
+</style></head><body>
+<nav class="topbar"><span class="brand">Livability Scout</span><a href="#">Board</a><a href="#">Planning</a><a class="on" href="trips.html">Trips</a><a href="#">Visited</a></nav>
+<div class="wrap">
+  <div class="head"><h1>Trips</h1><span class="spacer"></span><button class="newbtn">+ New trip</button></div>
+
+  <div class="sect">Coming up</div>
+
+  <a class="trip" href="trip-workspace.html">
+    <div>
+      <div class="nm">Slovenia</div>
+      <div class="legs">Ljubljana · Bled · Piran — May 15–25, 2026 · 10 nights</div>
+      <div class="meta"><span>Janice &amp; Chris</span><span>🥦 vegetarian</span><span>79 entries · 7 bookings · €927 cash</span></div>
+    </div>
+    <div class="right">
+      <span class="pill live">1 day solved</span>
+      <span class="dots"><i></i><i></i><i></i><i></i><i class="s"></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+      <span style="font-size:.72rem;color:var(--muted);">11 days · dots = fill state</span>
+    </div>
+  </a>
+
+  <a class="trip" href="trip-jimthorpe.html">
+    <div>
+      <div class="nm">Jim Thorpe</div>
+      <div class="legs">Carbon County, PA — Memorial Day · May 22–25, 2026 · 3 nights</div>
+      <div class="meta"><span>Janice &amp; Chris + Cocoa 🐾</span><span>~5 h drive from Pittsburgh</span><span>3 verified limitations</span></div>
+    </div>
+    <div class="right">
+      <span class="pill todo">⏰ 4 to book</span>
+      <span class="dots"><i class="e"></i><i class="e"></i><i class="e"></i><i class="e"></i></span>
+      <span style="font-size:.72rem;color:var(--muted);">gathering — sells out 4–6 mo ahead</span>
+    </div>
+  </a>
+
+  <div class="sect">Past</div>
+
+  <a class="trip" href="#">
+    <div>
+      <div class="nm">New River Gorge</div>
+      <div class="legs">Lansing, WV — Nov 11–13 · 2 nights</div>
+      <div class="meta"><span>TreeTops zipline · Endless Wall · Nuttallburg</span></div>
+    </div>
+    <div class="right"><span class="pill past">went · would return</span></div>
+  </a>
+
+  <p class="foot">Mockup — three real trips. The card answers: when, who (markers follow the travelers), how committed (to-book badge = the derived checklist), and how filled (the day dots from the rail).</p>
+</div>
+</body></html>

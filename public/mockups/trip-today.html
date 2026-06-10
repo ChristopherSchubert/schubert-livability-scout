@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Slovenia — today (phone) · mockup</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fbf6ea;--panel:#fffdf6;--panel-strong:#f4eddc;--border:#d8ccb8;--text:#1b1814;--muted:#6b6358;
+--accent:#0d4c44;--radius:14px;--font-display:'Fraunces',Georgia,serif;--font-ui:'Inter Tight',system-ui,sans-serif;--warn:#a3431f;
+--kind-booked:#0d4c44;--kind-meal:#9a5a16;--kind-travel:#2e5482;--kind-flexible:#6b6358;}
+*{box-sizing:border-box}html,body{margin:0;padding:0}
+body{background:#3a352c;font-family:var(--font-ui);display:flex;justify-content:center;padding:2rem 1rem;min-height:100vh;}
+.phone{width:390px;background:var(--bg);border-radius:38px;border:8px solid #1b1814;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.4);
+background-image:radial-gradient(rgba(120,100,60,.035) 1px,transparent 1px);background-size:4px 4px;color:var(--text);}
+.phead{background:var(--panel);border-bottom:1px solid var(--border);padding:1.1rem 1.2rem .8rem;position:relative;}
+.phead .trip{font-size:.72rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);}
+.phead h1{font-family:var(--font-display);font-weight:500;font-size:1.5rem;margin:.15rem 0 0;}
+.phead .sub{font-size:.78rem;color:var(--muted);}
+.dayswipe{display:flex;gap:.4rem;padding:.6rem 1.2rem;background:var(--panel);border-bottom:1px solid var(--border);overflow-x:auto;}
+.dchip{min-width:40px;text-align:center;border:1px solid var(--border);border-radius:9px;background:var(--bg);padding:.25rem .4rem;font-size:.78rem;}
+.dchip b{display:block;font-variant-numeric:tabular-nums;}
+.dchip.on{border-color:var(--accent);background:#e7f1ee;color:var(--accent);}
+.scroll{padding:1rem 1rem 2rem;}
+.nowline{display:flex;align-items:center;gap:.5rem;font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--warn);margin:.8rem 0 .4rem;}
+.nowline::after{content:"";flex:1;height:2px;background:var(--warn);opacity:.4;}
+.ecard{background:var(--panel);border:1px solid var(--border);border-left:4px solid var(--k,var(--border));border-radius:10px;padding:.7rem .9rem;margin-bottom:.6rem;}
+.ecard .t{font-variant-numeric:tabular-nums;font-size:.74rem;color:var(--muted);}
+.ecard .nm{font-weight:600;font-size:.95rem;}
+.ecard.next{box-shadow:0 8px 24px rgba(13,76,68,.18);border-color:var(--accent);}
+.ecard.next .nextlbl{font-size:.66rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);}
+.ecard.done{opacity:.55;}
+.ecard .note{font-size:.8rem;color:#2c2823;margin-top:.3rem;}
+.bigrow{display:flex;gap:.5rem;margin-top:.55rem;}
+.bigbtn{flex:1;text-align:center;font-size:.8rem;font-weight:700;border-radius:10px;padding:.6rem .4rem;text-decoration:none;}
+.bigbtn.dir{background:var(--accent);color:#fff;}
+.bigbtn.call{background:var(--panel-strong);color:var(--text);}
+.codebar{margin-top:.5rem;background:var(--panel-strong);border-radius:8px;padding:.45rem .6rem;display:flex;justify-content:space-between;align-items:center;}
+.codebar code{font-size:.9rem;font-variant-numeric:tabular-nums;letter-spacing:.04em;}
+.codebar .copy{font-size:.7rem;font-weight:700;color:var(--accent);}
+.machine{background:none;border:0;border-left:2px dashed var(--border);border-radius:0;padding:.3rem .9rem;margin-bottom:.5rem;color:var(--muted);font-size:.8rem;}
+.note2{font-family:var(--font-display);font-style:italic;color:#d8ccb8;font-size:.85rem;max-width:390px;margin-top:1rem;text-align:center;}
+.wrapcol{display:flex;flex-direction:column;align-items:center;}
+</style></head><body>
+<div class="wrapcol">
+<div class="phone">
+  <div class="phead">
+    <div class="trip">Slovenia · day 5 of 11</div>
+    <h1>Tuesday, May 19</h1>
+    <div class="sub">Bled · balloon day · all times local (CEST)</div>
+  </div>
+  <div class="dayswipe">
+    <span class="dchip">Sun<b>17</b></span><span class="dchip">Mon<b>18</b></span><span class="dchip on">Tue<b>19</b></span><span class="dchip">Wed<b>20</b></span><span class="dchip">Thu<b>21</b></span>
+  </div>
+  <div class="scroll">
+
+    <div class="ecard done" style="--k:var(--kind-booked)">
+      <div class="t">5:30 – 7:30 ✓</div><div class="nm">Hot-air balloon (private)</div>
+    </div>
+    <div class="ecard done" style="--k:var(--kind-flexible)">
+      <div class="t">7:35 – 9:35 ✓</div><div class="nm">Bled Castle — hike + tour</div>
+    </div>
+
+    <div class="nowline">Now · 11:40</div>
+
+    <div class="ecard next" style="--k:var(--kind-meal)">
+      <span class="nextlbl">Next up · in 20 min</span>
+      <div class="t">12:00 – 1:00</div><div class="nm">Lunch · Pizzeria Rustika</div>
+      <div class="note">0.8 km — an 11-minute walk. Veg ✓ patio ✓.</div>
+      <div class="bigrow"><a class="bigbtn dir" href="#">📍 Directions</a><a class="bigbtn call" href="#">📞 Call</a></div>
+    </div>
+
+    <div class="machine">1:00 – 3:55 · free — the lake is right there</div>
+
+    <div class="ecard" style="--k:var(--kind-booked)">
+      <div class="t">4:00 – 5:30</div><div class="nm">Via Ferrata Hvadnik</div>
+      <div class="note">Meet: Ljubljanska cesta 1 — <b>the yellow doors</b>. Leave the hotel by 3:55.</div>
+      <div class="codebar"><span style="font-size:.7rem;color:var(--muted)">confirmation</span><code>#138953</code><span class="copy">copy</span></div>
+      <div class="bigrow"><a class="bigbtn dir" href="#">📍 Directions</a><a class="bigbtn call" href="#">📞 +386 70 138 811</a></div>
+    </div>
+
+    <div class="ecard" style="--k:var(--kind-meal)">
+      <div class="t">9:00 PM</div><div class="nm">Room service · balcony</div>
+    </div>
+
+  </div>
+</div>
+<p class="note2">Mockup — day-of on the phone: lands on today, next-up leads with the two taps that matter (directions · call), confirmation codes one thumb away, finished entries fade. Renders from cached data.</p>
+</div>
+</body></html>

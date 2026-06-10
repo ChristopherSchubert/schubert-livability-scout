@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Slovenia — May 22, blocked · mockup</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fbf6ea;--panel:#fffdf6;--panel-strong:#f4eddc;--border:#d8ccb8;--text:#1b1814;--muted:#6b6358;
+--accent:#0d4c44;--radius:14px;--font-display:'Fraunces',Georgia,serif;--font-ui:'Inter Tight',system-ui,sans-serif;--warn:#a3431f;
+--kind-meal:#9a5a16;--kind-flexible:#6b6358;--kind-todo:#7d5e22;}
+*{box-sizing:border-box}html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--font-ui);background-image:radial-gradient(rgba(120,100,60,.035) 1px,transparent 1px);background-size:4px 4px;}
+.topbar{background:var(--panel);border-bottom:1px solid var(--border);padding:.55rem 1.6rem;display:flex;gap:1.4rem;align-items:center;font-size:.82rem;}
+.topbar .brand{font-family:var(--font-display);font-weight:600;font-size:1rem;color:var(--accent);}
+.topbar a{color:var(--muted);text-decoration:none;}.topbar a.on{color:var(--text);font-weight:600;border-bottom:2px solid var(--accent);}
+.tripbar{position:sticky;top:0;z-index:30;background:var(--panel);border-bottom:1px solid var(--border);padding:.7rem 1.6rem;display:flex;align-items:center;gap:1.2rem;box-shadow:0 4px 14px rgba(41,33,19,.05);}
+.tripbar .back{font-size:.82rem;color:var(--accent);text-decoration:none;font-weight:600;}
+.tripbar .tname{font-family:var(--font-display);font-size:1.18rem;}
+.tripbar .tmeta{font-size:.78rem;color:var(--muted);}
+.wrap{max-width:860px;margin:0 auto;padding:1.8rem 1.6rem 5rem;}
+.chead{display:flex;align-items:center;gap:.9rem;margin-bottom:.4rem;}
+.chead h1{font-family:var(--font-display);font-weight:500;font-size:1.6rem;margin:0;}
+.chead .sub{font-size:.78rem;color:var(--muted);}
+.chead .spacer{flex:1;}
+.verdict{font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;border-radius:100px;padding:.22rem .7rem;background:var(--panel-strong);color:var(--muted);}
+.solvebtn{font-size:.84rem;font-weight:600;border:1px solid var(--accent);background:var(--accent);color:#fff;border-radius:100px;padding:.5rem 1.2rem;cursor:pointer;}
+.capacity{display:flex;align-items:center;gap:.8rem;background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:.6rem 1rem;margin:1rem 0 1.4rem;font-size:.82rem;}
+.capbar{flex:1;height:8px;border-radius:100px;background:var(--panel-strong);overflow:hidden;}
+.capbar i{display:block;height:100%;width:62%;background:linear-gradient(90deg,var(--accent),#b8a36a);}
+.bucket{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:1rem 1.2rem;margin-bottom:1rem;}
+.bucket .bl{font-size:.7rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:.6rem;margin-bottom:.7rem;}
+.bucket .bl::after{content:"";flex:1;height:1px;background:var(--border);}
+.bucket .bl .load{font-weight:500;letter-spacing:0;text-transform:none;}
+.acard{display:inline-flex;align-items:center;gap:.55rem;background:var(--bg);border:1px solid var(--border);border-left:4px solid var(--k,var(--border));
+border-radius:7px;padding:.55rem .85rem;margin:0 .5rem .5rem 0;font-size:.87rem;box-shadow:0 2px 6px rgba(41,33,19,.05);cursor:grab;}
+.acard .grip{color:var(--border);}
+.acard b{font-weight:600;}
+.acard .dur{font-size:.74rem;color:var(--muted);}
+.fuzzy{font-size:.72rem;color:var(--muted);font-style:italic;}
+.dropzone{border:1.5px dashed var(--border);border-radius:7px;padding:.5rem .9rem;color:var(--muted);font-size:.8rem;display:inline-block;}
+.note{font-family:var(--font-display);font-style:italic;color:var(--muted);font-size:.88rem;margin-top:1.6rem;}
+</style></head><body>
+<nav class="topbar"><span class="brand">Livability Scout</span><a href="#">Board</a><a href="#">Planning</a><a class="on" href="trips.html">Trips</a><a href="#">Visited</a></nav>
+<div class="tripbar"><a class="back" href="trip-workspace.html">← Days</a><span class="tname">Slovenia</span><span class="tmeta">Friday, May 22 · Piran — blocked, not yet solved</span></div>
+<div class="wrap">
+
+  <div class="chead">
+    <h1>Friday, May 22</h1><span class="sub">Piran · 6 anchors placed · times still fuzzy</span>
+    <span class="spacer"></span>
+    <span class="verdict">not solved</span>
+    <button class="solvebtn">Solve this day →</button>
+  </div>
+
+  <div class="capacity">
+    <span>Day load</span>
+    <div class="capbar"><i></i></div>
+    <span><b>~8½ h</b> of anchors + est. travel in a ~14 h day — <b style="color:var(--accent)">fits comfortably</b></span>
+  </div>
+
+  <div class="bucket">
+    <div class="bl">Morning <span class="load">· ~4 h placed</span></div>
+    <span class="acard" style="--k:var(--kind-flexible)"><span class="grip">⠿</span><b>Explore inland Istria</b><span class="dur">~2 h</span><span class="fuzzy">sometime</span></span>
+    <span class="acard" style="--k:var(--kind-flexible)"><span class="grip">⠿</span><b>Vespa or bike tour</b><span class="dur">~2 h</span><span class="fuzzy">decide which</span></span>
+  </div>
+  <div class="bucket">
+    <div class="bl">Afternoon <span class="load">· ~3 h placed</span></div>
+    <span class="acard" style="--k:var(--kind-flexible)"><span class="grip">⠿</span><b>Explore Piran</b><span class="dur">~2.5 h</span><span class="fuzzy">Tartini Sq · cathedral bell tower · the wall at sunset</span></span>
+    <span class="acard" style="--k:var(--kind-todo)"><span class="grip">⠿</span><b>Snacks for the Venice boat</b><span class="dur">~30 m</span></span>
+    <span class="dropzone">drop another anchor here</span>
+  </div>
+  <div class="bucket">
+    <div class="bl">Evening <span class="load">· ~1½ h placed</span></div>
+    <span class="acard" style="--k:var(--kind-meal)"><span class="grip">⠿</span><b>Sunset drinks · Heaven Terrace 99</b><span class="dur">~1 h</span></span>
+    <span class="acard" style="--k:var(--kind-todo)"><span class="grip">⠿</span><b>Decide: caves or not? Book if yes</b><span class="dur">~15 m</span><span class="fuzzy">to book ⏰</span></span>
+  </div>
+
+  <p class="note">Mockup — a blocked day before Solve: anchors sit in buckets at fuzzy time, each carrying a duration estimate. The day-load bar pre-empts over-packing <em>here</em>, before Solve ever runs. "Solve this day" sequences them by geography, inserts travel and meals, and assigns the clock — like May 19.</p>
+</div>
+</body></html>

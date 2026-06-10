@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Slovenia — Book · mockup</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fbf6ea;--panel:#fffdf6;--panel-strong:#f4eddc;--border:#d8ccb8;--text:#1b1814;--muted:#6b6358;
+--accent:#0d4c44;--radius:14px;--font-display:'Fraunces',Georgia,serif;--font-ui:'Inter Tight',system-ui,sans-serif;--warn:#a3431f;--plum:#665285;}
+*{box-sizing:border-box}html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--font-ui);background-image:radial-gradient(rgba(120,100,60,.035) 1px,transparent 1px);background-size:4px 4px;}
+.topbar{background:var(--panel);border-bottom:1px solid var(--border);padding:.55rem 1.6rem;display:flex;gap:1.4rem;align-items:center;font-size:.82rem;}
+.topbar .brand{font-family:var(--font-display);font-weight:600;font-size:1rem;color:var(--accent);}
+.topbar a{color:var(--muted);text-decoration:none;}.topbar a.on{color:var(--text);font-weight:600;border-bottom:2px solid var(--accent);}
+.tripbar{position:sticky;top:0;z-index:30;background:var(--panel);border-bottom:1px solid var(--border);padding:.7rem 1.6rem;display:flex;align-items:center;gap:1.2rem;box-shadow:0 4px 14px rgba(41,33,19,.05);}
+.tripbar .back{font-size:.82rem;color:var(--accent);text-decoration:none;font-weight:600;}
+.tripbar .tname{font-family:var(--font-display);font-size:1.18rem;}
+.tripbar .tmeta{font-size:.78rem;color:var(--muted);}
+.wrap{max-width:920px;margin:0 auto;padding:1.8rem 1.6rem 5rem;}
+h2{font-family:var(--font-display);font-weight:500;font-size:1.3rem;margin:1.6rem 0 .8rem;display:flex;align-items:baseline;gap:.7rem;}
+h2 small{font-family:var(--font-ui);font-size:.76rem;color:var(--muted);font-weight:400;}
+.row{display:grid;grid-template-columns:1.5fr auto auto auto;gap:1rem;align-items:center;background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:.7rem 1rem;margin-bottom:.5rem;}
+.row.urgent{border-color:#dcb49a;border-left:4px solid var(--warn);}
+.row.todo{border-style:dashed;}
+.row .t{font-weight:600;font-size:.9rem;}
+.row .sub{font-size:.74rem;color:var(--muted);margin-top:.1rem;}
+.kindtag{font-size:.66rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;}
+.kindtag.lodging{color:var(--plum);} .kindtag.activity{color:var(--accent);} .kindtag.tobook{color:var(--warn);}
+.conf{font-size:.76rem;background:var(--panel-strong);border-radius:5px;padding:.08rem .45rem;font-variant-numeric:tabular-nums;}
+.due{font-size:.76rem;font-weight:700;color:var(--warn);}
+.ok{font-size:.76rem;color:var(--muted);}
+.paid{font-size:.7rem;font-weight:700;background:#e7f1ee;color:var(--accent);border-radius:100px;padding:.12rem .55rem;letter-spacing:.05em;text-transform:uppercase;}
+.bookbtn{font-size:.76rem;font-weight:600;border:1px solid var(--accent);color:var(--accent);background:none;border-radius:100px;padding:.25rem .8rem;cursor:pointer;}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:1.4rem;align-items:start;margin-top:1.6rem;}
+.panelbox{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:1rem 1.2rem;}
+.panelbox h3{font-family:var(--font-display);font-weight:500;font-size:1.1rem;margin:0 0 .6rem;}
+.line{display:flex;justify-content:space-between;font-size:.84rem;padding:.35rem 0;border-top:1px solid var(--panel-strong);}
+.line .amt{font-variant-numeric:tabular-nums;font-weight:600;}
+.tot{font-family:var(--font-display);font-size:2rem;}
+.passrow{border-top:1px solid var(--panel-strong);padding:.5rem 0;font-size:.84rem;}
+.passrow .t{font-weight:600;}
+.passrow .sub{font-size:.74rem;color:var(--muted);}
+.note{font-family:var(--font-display);font-style:italic;color:var(--muted);font-size:.88rem;margin-top:2rem;}
+@media(max-width:760px){.cols{grid-template-columns:1fr;}.row{grid-template-columns:1fr;gap:.3rem;}}
+</style></head><body>
+<nav class="topbar"><span class="brand">Livability Scout</span><a href="#">Board</a><a href="#">Planning</a><a class="on" href="trips.html">Trips</a><a href="#">Visited</a></nav>
+<div class="tripbar"><a class="back" href="trip-workspace.html">← Days</a><span class="tname">Slovenia — Book</span>
+<span class="tmeta">reservations · deadlines · cash · passes</span></div>
+<div class="wrap">
+
+  <h2>Needs action <small>derived from every "to book" entry + soonest deadlines</small></h2>
+  <div class="row urgent">
+    <div><div class="t">Hotel Union Eurostars — free cancellation ends</div><div class="sub">Ljubljana · May 15–16 · after this it's penalty territory</div></div>
+    <span class="kindtag lodging">lodging</span><span class="conf">SYN2281-99143</span><span class="due">cancel by May 12 · 4 weeks out</span>
+  </div>
+  <div class="row todo">
+    <div><div class="t">Postojna Cave — decide &amp; book</div><div class="sub">the final-day question · combo w/ Predjama ~€49 · download the app if going</div></div>
+    <span class="kindtag tobook">to book</span><span></span><button class="bookbtn">Mark booked…</button>
+  </div>
+
+  <h2>Booked <small>money committed · confirmation + cancellation each</small></h2>
+  <div class="row"><div><div class="t">Grand Hotel Union Eurostars</div><div class="sub">Ljubljana · 2 nights</div></div><span class="kindtag lodging">lodging</span><span class="conf">SYN2281-99143</span><span class="ok">free to May 12</span></div>
+  <div class="row"><div><div class="t">Grand Hotel Toplice</div><div class="sub">Bled · 3 nights · lakefront</div></div><span class="kindtag lodging">lodging</span><span class="conf">PH27710297</span><span class="ok">held to arrival</span></div>
+  <div class="row"><div><div class="t">Hotel Piran</div><div class="sub">Piran · 4 nights · seafront</div></div><span class="kindtag lodging">lodging</span><span class="conf">PH27710036</span><span class="ok">2 days prior</span></div>
+  <div class="row"><div><div class="t">Hot-air balloon (private)</div><div class="sub">May 19 · 5:30 · pickup at Toplice</div></div><span class="kindtag activity">activity</span><span class="conf">401780164673</span><span class="paid">prepaid</span></div>
+  <div class="row"><div><div class="t">Vintgar Gorge canyon walk</div><div class="sub">May 17 · check-in window 11:00–11:20</div></div><span class="kindtag activity">activity</span><span></span><span class="paid">prepaid</span></div>
+  <div class="row"><div><div class="t">Canyoning — Altitude Activities</div><div class="sub">May 18 · 13:30 · the yellow doors</div></div><span class="kindtag activity">activity</span><span class="conf">#138923</span><span class="paid">prepaid</span></div>
+  <div class="row"><div><div class="t">Via Ferrata Hvadnik</div><div class="sub">May 19 · 16:00</div></div><span class="kindtag activity">activity</span><span class="conf">#138953</span><span class="paid">prepaid</span></div>
+  <div class="row"><div><div class="t">Catamaran to Venice</div><div class="sub">May 23 · 8:00 · Red Lighthouse pier · arrive 7:30</div></div><span class="kindtag activity">activity</span><span></span><span class="paid">prepaid</span></div>
+
+  <div class="cols">
+    <div class="panelbox">
+      <h3>Cash to carry</h3>
+      <div class="tot">€927</div>
+      <div style="font-size:.74rem;color:var(--muted);margin-bottom:.6rem;">= every on-site ∧ cash-only cost. Prepaid never needs wallet cash.</div>
+      <div class="line"><span>Paragliding · Flying Bear <span style="color:var(--muted)">(booked, pay after)</span></span><span class="amt">€380</span></div>
+      <div class="line"><span>Vintage boat · Piran <span style="color:var(--muted)">(pay after)</span></span><span class="amt">€511</span></div>
+      <div class="line"><span>Pletna boat · Bled Island</span><span class="amt">€36</span></div>
+    </div>
+    <div class="panelbox">
+      <h3>Passes</h3>
+      <div class="passrow"><div class="t">Ljubljana City Card</div><div class="sub">buy May 16 · covers the funicular, the boat cruise, museums — 3 entries reference it, so their costs don't double-count</div></div>
+      <div class="passrow"><div class="t">Julian Alps Card</div><div class="sub">pick up at Toplice check-in</div></div>
+      <div class="passrow"><div class="t">Venice day-visitor passes</div><div class="sub">required May 23 — present with passports at San Basilio</div></div>
+    </div>
+  </div>
+
+  <p class="note">Mockup — the booking spine on real data. "Needs action" sorts soonest-deadline-first and includes every to-book entry; the ⏰ badge on the Trip bar is this page's count. Lodging rows rank above activities because they book earliest.</p>
+</div>
+</body></html>
