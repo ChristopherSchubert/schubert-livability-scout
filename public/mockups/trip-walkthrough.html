@@ -125,6 +125,17 @@ padding:.45rem .7rem;font-size:.8rem;box-shadow:0 2px 6px rgba(41,33,19,.05);}
 .gridthumb i:nth-child(9)::after{top:10%;height:62%;}
 .gridthumb i:nth-child(10)::after{top:30%;height:34%;background:var(--k-stay);}
 .gridthumb i:nth-child(11)::after{top:12%;height:20%;background:var(--k-trav);}
+.ctrl{font-size:.74rem;font-weight:700;border:1px solid var(--accent);color:var(--accent);background:var(--panel);border-radius:100px;padding:.3rem .85rem;cursor:pointer;font-family:var(--fu);}
+.ctrl.solid{background:var(--accent);color:#fff;}
+.ctrl.ghosted{border-color:var(--border);color:var(--muted);}
+.grip2{color:var(--border);cursor:grab;margin-right:.25rem;}
+.hndl{position:absolute;top:50%;transform:translate(-50%,-50%);width:16px;height:28px;border-radius:5px;background:var(--panel);border:1.5px solid var(--accent);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:.62rem;font-weight:700;cursor:ew-resize;z-index:3;box-shadow:0 2px 8px rgba(13,76,68,.3);}
+.dropz{border:1.5px dashed var(--accent);background:rgba(210,230,225,.35);border-radius:7px;padding:.35rem .7rem;color:var(--accent);font-size:.72rem;font-weight:600;display:inline-flex;align-items:center;gap:.3rem;}
+.toolrow{display:flex;gap:.5rem;align-items:center;margin:.6rem 0 0;flex-wrap:wrap;}
+.toolrow .lbl2{font-size:.7rem;color:var(--muted);}
+.citychip{font-size:.76rem;font-weight:600;border:1px solid var(--border);background:var(--panel);border-radius:100px;padding:.25rem .7rem;cursor:grab;}
+.lightbtn{font-size:.66rem;font-weight:700;border:1px solid var(--border);border-radius:100px;background:var(--panel);padding:.1rem .5rem;cursor:pointer;color:var(--muted);}
+.lightbtn.on{border-color:#d4cae2;background:#efeaf6;color:var(--k-stay);}
 @media(max-width:640px){.daycols{grid-template-columns:repeat(2,1fr);}}
 </style></head><body>
 <div class="deck">
@@ -172,7 +183,7 @@ padding:.45rem .7rem;font-size:.8rem;box-shadow:0 2px 6px rgba(41,33,19,.05);}
 <div id="steps" style="display:none">
 
 <section data-phase="Where · the idea">
-  <div class="chrome"><b>Trips</b><span class="pill">+ New trip</span></div>
+  <div class="chrome"><b>Trips</b><button class="ctrl solid" style="margin-left:auto;">＋ New trip</button></div>
   <div class="cardrow">
     <div class="mini" style="--k:var(--k-act);padding:1rem 1.4rem;">
       <b style="font-family:var(--fd);font-size:1.3rem;font-weight:500;">Slovenia</b>
@@ -185,7 +196,10 @@ padding:.45rem .7rem;font-size:.8rem;box-shadow:0 2px 6px rgba(41,33,19,.05);}
 <section data-phase="Where · the skeleton">
   <div class="chrome"><b>Slovenia</b><span class="pill">Zhuzh</span><span>May 15 – 25 · 10 nights · all soft</span></div>
   <div class="skel"><div class="lbl">The window</div>
-    <div class="win"><span class="edge l"></span><span class="empty">drop cities into the window</span><span class="edge r"></span></div>
+    <div class="win"><span class="edge l"></span><span class="empty"><span class="dropz">⠿ drop a city here</span></span><span class="edge r"></span></div>
+    <div class="toolrow"><span class="lbl2">cities from the scout:</span>
+      <span class="citychip">⠿ Ljubljana</span><span class="citychip">⠿ Bled</span><span class="citychip">⠿ Piran</span><span class="citychip">⠿ Kranj</span>
+      <button class="ctrl">＋ other city…</button></div>
   </div>
 </section>
 
@@ -193,12 +207,12 @@ padding:.45rem .7rem;font-size:.8rem;box-shadow:0 2px 6px rgba(41,33,19,.05);}
   <div class="chrome"><b>Slovenia</b><span class="pill">Zhuzh</span><span>May 15 – 25</span></div>
   <div class="skel"><div class="lbl">The window</div>
     <div class="win"><span class="edge l"></span>
-      <span class="legseg lj" style="flex:2">Ljubljana<small>2n</small></span>
-      <span class="legseg bl" style="flex:4">Bled<small>4n</small></span>
-      <span class="legseg pi" style="flex:4">Piran<small>4n</small></span>
+      <span class="legseg lj" style="flex:2">⠿ Ljubljana<small>2n</small><span class="hndl" style="right:-9px;left:auto;transform:translateY(-50%);">↔</span></span>
+      <span class="legseg bl" style="flex:4">⠿ Bled<small>4n</small><span class="hndl" style="right:-9px;left:auto;transform:translateY(-50%);">↔</span></span>
+      <span class="legseg pi" style="flex:4">⠿ Piran<small>4n</small></span>
     <span class="edge r"></span></div>
+    <div class="toolrow"><span class="lbl2">drag ⠿ to reorder a city · drag ↔ to trade nights · still on the tray:</span><span class="citychip">⠿ Kranj</span></div>
   </div>
-  <div class="cardrow"><div class="mini ghost" style="--k:var(--k-flex)"><b>Kranj?</b><small>maybe the last night, near the airport</small></div></div>
 </section>
 
 <section data-phase="Where · trading nights">
@@ -206,7 +220,7 @@ padding:.45rem .7rem;font-size:.8rem;box-shadow:0 2px 6px rgba(41,33,19,.05);}
   <div class="skel"><div class="lbl">The window</div>
     <div class="win"><span class="edge l"></span>
       <span class="legseg lj" style="flex:2">Ljubljana<small>2n</small></span>
-      <span class="legseg bl" style="flex:4.5">Bled<small>4n →</small><span class="boundary" style="right:-2px"></span></span>
+      <span class="legseg bl" style="flex:4.5">Bled<small>4n →</small><span class="hndl" style="right:-9px;left:auto;transform:translateY(-50%);box-shadow:0 0 0 4px rgba(13,76,68,.18);">↔</span></span>
       <span class="legseg pi" style="flex:3.5">Piran<small>← 4n</small></span>
     <span class="edge r"></span></div>
     <p class="dragnote">↔ dragging the Bled | Piran boundary — Bled +1 night, Piran −1</p>
@@ -225,21 +239,23 @@ padding:.45rem .7rem;font-size:.8rem;box-shadow:0 2px 6px rgba(41,33,19,.05);}
   <div class="cardrow">
     <div class="mini" style="--k:var(--k-trav)"><b>✈ → FRA → LJU</b> · Fri May 15<small>arrive 9:30 PM local · booked 🔒</small></div>
     <div class="mini" style="--k:var(--k-trav)"><b>✈ LJU →</b> · Mon May 25<small>takeoff 9:30 AM · booked 🔒</small></div>
+    <button class="ctrl">＋ add transport…</button>
   </div>
 </section>
 
 <section data-phase="Stays · the hotel shelf">
   <div class="chrome"><b>Slovenia · Ljubljana</b><span class="pill">Stay shelf</span></div>
   <div class="skel"><div class="lbl">Ljubljana · 2 nights</div>
-    <div class="win" style="height:38px"><span class="legseg lj" style="flex:1">Ljubljana</span></div>
-    <div class="staysrow"><span class="staybar" style="flex:1"><b>Grand Hotel Union Eurostars</b><small>2 nights · dropped from the shelf</small></span></div>
+    <div class="win" style="height:38px"><span class="legseg lj" style="flex:1">Ljubljana <span class="dropz" style="margin-left:.6rem;">drop a hotel here</span></span></div>
+    <div class="staysrow"><span class="staybar" style="flex:1"><span class="grip2">⠿</span><b>Grand Hotel Union Eurostars</b><small>2 nights · just dropped</small><span class="hndl" style="right:-8px;left:auto;transform:translateY(-50%);">↔</span></span></div>
   </div>
   <div class="cardrow">
-    <div class="mini" style="--k:var(--k-stay)"><b>Union Eurostars</b><small>old town · garage</small><span class="mk ok">chosen</span></div>
-    <div class="mini" style="--k:var(--k-stay)"><b>Hotel Lev</b><small>★4.4</small></div>
-    <div class="mini" style="--k:var(--k-stay)"><b>City Hotel</b><small>★4.2</small></div>
-    <div class="mini" style="--k:var(--k-stay)"><b>Vander Urbani</b><small>★4.3 · boutique</small></div>
-    <div class="mini" style="--k:var(--k-stay)"><b>Antiq Palace</b><small>★4.4</small></div>
+    <div class="mini" style="--k:var(--k-stay)"><span class="grip2">⠿</span><b>Union Eurostars</b><small>old town · garage</small><span class="mk ok">chosen</span></div>
+    <div class="mini" style="--k:var(--k-stay)"><span class="grip2">⠿</span><b>Hotel Lev</b><small>★4.4</small></div>
+    <div class="mini" style="--k:var(--k-stay)"><span class="grip2">⠿</span><b>City Hotel</b><small>★4.2</small></div>
+    <div class="mini" style="--k:var(--k-stay)"><span class="grip2">⠿</span><b>Vander Urbani</b><small>★4.3 · boutique</small></div>
+    <div class="mini" style="--k:var(--k-stay)"><span class="grip2">⠿</span><b>Antiq Palace</b><small>★4.4</small></div>
+    <button class="ctrl">＋ add your own stay…</button>
   </div>
 </section>
 
@@ -254,12 +270,13 @@ padding:.45rem .7rem;font-size:.8rem;box-shadow:0 2px 6px rgba(41,33,19,.05);}
     <div class="lbl" style="margin-top:.6rem;">Stays — bars under the cities</div>
     <div class="staysrow">
       <span class="staybar" style="flex:2"><b>Union</b><small>2n</small></span>
-      <span class="staybar" style="flex:3"><b>Toplice</b><small>3n · lakefront</small></span>
+      <span class="staybar" style="flex:3"><span class="grip2">⠿</span><b>Toplice</b><small>3n · lakefront</small><span class="hndl" style="right:-8px;left:auto;transform:translateY(-50%);box-shadow:0 0 0 4px rgba(13,76,68,.18);">↔</span></span>
       <span class="staybar" style="flex:1"><b>Hiša Franko</b><small>1n</small></span>
       <span class="staybar" style="flex:3"><b>Hotel Piran</b><small>3n</small></span>
       <span class="staybar" style="flex:1"><b>Brdo</b><small>1n</small></span>
     </div>
     <p class="dragnote">↔ Toplice trimmed from 4 → 3 nights; Hiša Franko took the vacated night</p>
+    <div class="toolrow"><button class="ctrl">✂ split a stay…</button><button class="ctrl ghosted">＋ add stay to a gap</button></div>
   </div>
 </section>
 
@@ -267,7 +284,7 @@ padding:.45rem .7rem;font-size:.8rem;box-shadow:0 2px 6px rgba(41,33,19,.05);}
   <div class="chrome"><b>Slovenia</b><span class="pill">Zhuzh</span><span class="pill warn">⏰ cancel-bys live</span></div>
   <div class="skel"><div class="lbl">Stays</div>
     <div class="staysrow">
-      <span class="staybar" style="flex:2"><span class="lock">🔒</span><b>Union</b><small>free to May 12</small></span>
+      <span class="staybar" style="flex:2"><span class="lock">🔒</span><b>Union</b><small>free to May 12</small><span class="hndl" style="right:-8px;left:auto;transform:translateY(-50%);box-shadow:0 0 0 4px rgba(163,67,31,.25);border-color:var(--warn);color:var(--warn);">↔</span></span>
       <span class="staybar" style="flex:3"><span class="lock">🔒</span><b>Toplice</b><small>held to arrival</small></span>
       <span class="staybar" style="flex:1"><span class="lock">🔒</span><b>H. Franko</b></span>
       <span class="staybar" style="flex:3"><span class="lock">🔒</span><b>Hotel Piran</b><small>2 days prior</small></span>
@@ -290,8 +307,9 @@ padding:.45rem .7rem;font-size:.8rem;box-shadow:0 2px 6px rgba(41,33,19,.05);}
       <div class="mini" style="--k:var(--k-meal)"><b>Pizzeria Rustika</b><small>~1h</small><span class="mk ok">veg ✓</span></div>
       <div class="mini" style="--k:var(--k-meal)"><b>Public &amp; Vegan Kitchen</b><small>closed Mondays</small></div>
       <div class="mini" style="--k:var(--k-act)"><b>Straža toboggan</b><small>~1.5h</small></div>
-      <div class="mini" style="--k:var(--k-act)"><b>Zipline Dolinka</b><small>to book ⏰ · 3h</small></div>
+      <div class="mini" style="--k:var(--k-act)"><span class="grip2">⠿</span><b>Zipline Dolinka</b><small>to book ⏰ · 3h</small></div>
     </div>
+    <div class="toolrow"><button class="ctrl">＋ from the pool…</button><button class="ctrl">＋ add your own…</button><span class="lbl2">⠿ drag any card straight onto a day</span></div>
   </div>
 </section>
 
@@ -299,10 +317,10 @@ padding:.45rem .7rem;font-size:.8rem;box-shadow:0 2px 6px rgba(41,33,19,.05);}
   <div class="chrome"><b>Slovenia · Bled</b><span class="pill">Gather</span></div>
   <div class="daycols">
     <div class="daycol"><div class="dh">Sun 17 <small>arrive</small></div><div class="cap"><i style="width:20%"></i></div></div>
-    <div class="daycol"><div class="dh">Mon 18</div><div class="cap"><i style="width:0%"></i></div></div>
+    <div class="daycol"><div class="dh">Mon 18</div><div class="dropz" style="width:100%;justify-content:center;">drop here</div><div class="cap"><i style="width:0%"></i></div></div>
     <div class="daycol" style="border-color:var(--accent);">
       <div class="dh">Tue 19</div>
-      <div class="mini" style="--k:var(--k-act)"><b>Hot-air balloon</b> <span class="tag pin">📌 pinned</span><small>5:30 · booked</small></div>
+      <div class="mini" style="--k:var(--k-act);box-shadow:0 8px 20px rgba(13,76,68,.25);"><span class="grip2">⠿</span><b>Hot-air balloon</b> <span class="tag pin">📌 pinned</span><small>5:30 · booked · just dropped</small></div>
       <div class="cap"><i style="width:25%"></i></div>
     </div>
     <div class="daycol"><div class="dh">Wed 20 <small>→ Soča</small></div><div class="cap"><i style="width:30%"></i></div></div>
@@ -313,14 +331,14 @@ padding:.45rem .7rem;font-size:.8rem;box-shadow:0 2px 6px rgba(41,33,19,.05);}
 <section data-phase="Gather · keep it light">
   <div class="chrome"><b>Slovenia · Piran</b><span class="pill">Gather</span></div>
   <div class="daycols">
-    <div class="daycol"><div class="dh">Thu 21 <small>arrive</small></div><div class="cap"><i style="width:35%"></i></div></div>
+    <div class="daycol"><div class="dh">Thu 21 <small>arrive</small><button class="lightbtn">🪶</button></div><div class="cap"><i style="width:35%"></i></div></div>
     <div class="daycol" style="border-style:dashed;">
-      <div class="dh">Fri 22 <span class="light">🪶 keep it light</span></div>
+      <div class="dh">Fri 22 <button class="lightbtn on">🪶 keep it light · on</button></div>
       <div style="font-size:.72rem;color:var(--muted);font-style:italic;">the engine may place one stroll, nothing more</div>
       <div class="cap"><i style="width:8%"></i></div>
     </div>
-    <div class="daycol"><div class="dh">Sat 23 <small>Venice day</small></div><div class="cap"><i style="width:80%"></i></div></div>
-    <div class="daycol"><div class="dh">Sun 24 <small>→ Brdo</small></div><div class="cap"><i style="width:30%"></i></div></div>
+    <div class="daycol"><div class="dh">Sat 23 <small>Venice day</small><button class="lightbtn">🪶</button></div><div class="cap"><i style="width:80%"></i></div></div>
+    <div class="daycol"><div class="dh">Sun 24 <small>→ Brdo</small><button class="lightbtn">🪶</button></div><div class="cap"><i style="width:30%"></i></div></div>
   </div>
 </section>
 
@@ -345,8 +363,9 @@ padding:.45rem .7rem;font-size:.8rem;box-shadow:0 2px 6px rgba(41,33,19,.05);}
       <div class="cap"><i style="width:60%"></i></div></div>
   </div>
   <div class="bucketbox" style="margin-top:.8rem;"><div class="bh"><b>Didn't fit — alternates</b><span class="ready">stays in the bucket, ready if a slot opens</span></div>
-    <div class="cardrow"><div class="mini ghost" style="--k:var(--k-act)"><b>Zipline Dolinka</b><small>3h wouldn't fit · to book ⏰</small></div></div>
+    <div class="cardrow"><div class="mini ghost" style="--k:var(--k-act)"><span class="grip2">⠿</span><b>Zipline Dolinka</b><small>3h wouldn't fit · to book ⏰</small></div></div>
   </div>
+  <div class="toolrow"><button class="ctrl solid">✓ keep this layout</button><button class="ctrl">↶ undo</button><span class="lbl2">or just ⠿ drag cards between days — that pauses auto</span></div>
 </section>
 
 <section data-phase="Lay out · human takes the wheel">
@@ -360,11 +379,15 @@ padding:.45rem .7rem;font-size:.8rem;box-shadow:0 2px 6px rgba(41,33,19,.05);}
       <div class="mini" style="--k:var(--k-act)"><b>Via Ferrata</b></div></div>
     <div class="daycol"><div class="dh">Wed 20</div><div class="mini" style="--k:var(--k-trav)"><b>→ Soča drive</b></div></div>
   </div>
-  <span class="paused">✋ edited by hand — auto-layout paused · <u>re-lay out around my pins</u> when you want it again</span>
+  <div class="toolrow">
+    <span class="paused" style="margin-top:0;">✋ edited by hand — auto-layout paused</span>
+    <button class="ctrl">↻ re-lay out around my pins</button>
+    <button class="ctrl solid">Solve Tue 19 →</button>
+  </div>
 </section>
 
 <section data-phase="The clock · solve a day">
-  <div class="chrome"><b>Tuesday, May 19 · Bled</b><span class="verd">feasible</span></div>
+  <div class="chrome"><b>Tuesday, May 19 · Bled</b><span class="verd">feasible</span><button class="ctrl" style="margin-left:auto;">↻ Re-solve</button><span class="lbl2">✎ click any row to edit</span></div>
   <div class="tl">
     <div class="tlr m"><span class="t">5:25</span><span class="c">Drive to the launch field <span class="tag">auto · 4 min</span></span></div>
     <div class="tlr a" style="--k:var(--k-act)"><span class="t">5:30 – 7:30</span><span class="c">Hot-air balloon (private) 🔒</span></div>
@@ -377,10 +400,10 @@ padding:.45rem .7rem;font-size:.8rem;box-shadow:0 2px 6px rgba(41,33,19,.05);}
 </section>
 
 <section data-phase="The clock · edit, pin, re-solve">
-  <div class="chrome"><b>Tuesday, May 19</b><span class="pill warn">edited since solve</span><span class="pill" style="background:#e7f1ee;color:var(--accent);">↻ Re-solve around pins</span></div>
+  <div class="chrome"><b>Tuesday, May 19</b><span class="pill warn">edited since solve</span><button class="ctrl" style="margin-left:auto;">↻ Re-solve around pins</button></div>
   <div class="tl">
     <div class="tlr a" style="--k:var(--k-act)"><span class="t">5:30 – 7:30</span><span class="c">Balloon 🔒</span></div>
-    <div class="tlr a" style="--k:var(--k-meal)"><span class="t">12:30 – 1:30</span><span class="c">Lunch · Rustika <span class="tag pin">📌 pinned by your edit</span></span></div>
+    <div class="tlr a" style="--k:var(--k-meal)"><span class="t">12:30 – 1:30</span><span class="c">Lunch · Rustika <span class="tag pin">📌 pinned by your edit</span> <span style="font-size:.7rem;color:var(--accent);font-weight:700;float:right;cursor:pointer;">✎ edit</span></span></div>
     <div class="tlr m"><span class="t">1:30 – 3:55</span><span class="c">Free time <span class="tag rest">reflowed</span></span></div>
     <div class="tlr a" style="--k:var(--k-act)"><span class="t">4:00 – 5:30</span><span class="c">Via Ferrata 🔒</span></div>
   </div>
@@ -388,7 +411,8 @@ padding:.45rem .7rem;font-size:.8rem;box-shadow:0 2px 6px rgba(41,33,19,.05);}
 
 <section data-phase="The clock · honest about too much">
   <div class="chrome"><b>Tuesday, May 19</b><span class="verd bad">over-packed</span></div>
-  <div class="flagbar">⚠️ <b>Zipline Dolinka (3 h) couldn't fit.</b> Everything else reflowed — lunch slid 48 min, free time shrank to 2 h. <u>Move it to Wed 20?</u> · <u>Back to alternates</u></div>
+  <div class="flagbar">⚠️ <b>Zipline Dolinka (3 h) couldn't fit.</b> Everything else reflowed — lunch slid 48 min, free time shrank to 2 h.
+<span style="display:inline-flex;gap:.4rem;margin-left:.5rem;"><button class="ctrl">→ move to Wed 20</button><button class="ctrl ghosted">↩ back to alternates</button></span></div>
   <div class="tl">
     <div class="tlr a" style="--k:var(--k-act)"><span class="t">5:30</span><span class="c">Balloon 🔒</span></div>
     <div class="tlr a" style="--k:var(--k-act)"><span class="t">9:58</span><span class="c">Vintgar Gorge (moved in)</span></div>
@@ -400,7 +424,7 @@ padding:.45rem .7rem;font-size:.8rem;box-shadow:0 2px 6px rgba(41,33,19,.05);}
 <section data-phase="Before you go · the book page">
   <div class="chrome"><b>Slovenia · Book</b><span class="pill warn">⏰ 2 need action</span></div>
   <div class="lrow urgent"><b>Hotel Union</b> — free cancellation ends <span class="conf">SYN2281-99143</span><span class="due">cancel by May 12</span></div>
-  <div class="lrow" style="border-style:dashed;"><b>Postojna Cave</b> — decide &amp; book <span class="okk">to book · combo ~€49</span></div>
+  <div class="lrow" style="border-style:dashed;"><b>Postojna Cave</b> — decide &amp; book <span class="okk">to book · combo ~€49</span><button class="ctrl" style="margin-left:.6rem;">mark booked…</button></div>
   <div class="lrow"><b>Hot-air balloon</b> <span class="conf">401780164673</span><span class="okk">prepaid 🔒</span></div>
   <div class="lrow"><b>Via Ferrata</b> <span class="conf">#138953</span><span class="okk">prepaid 🔒</span></div>
   <div class="cardrow" style="margin-top:.7rem;">
@@ -410,7 +434,7 @@ padding:.45rem .7rem;font-size:.8rem;box-shadow:0 2px 6px rgba(41,33,19,.05);}
 </section>
 
 <section data-phase="Before you go · the grid, generated">
-  <div class="chrome"><b>Slovenia — the Grid</b><span class="pill">print · one leg per page</span></div>
+  <div class="chrome"><b>Slovenia — the Grid</b><button class="ctrl" style="margin-left:auto;">🖨 print — one leg per page</button><span class="lbl2">click any block for its logistics</span></div>
   <div class="gridthumb"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
   <p class="dragnote" style="color:var(--muted);font-weight:400;font-style:italic;font-family:var(--fd);">the artifact Janice used to build by hand — now the output, not the work</p>
 </section>
@@ -427,7 +451,7 @@ padding:.45rem .7rem;font-size:.8rem;box-shadow:0 2px 6px rgba(41,33,19,.05);}
 
 <section data-phase="What if · variations">
   <div class="chrome"><b>Slovenia · the last 3 days</b><span class="pill">variations · step 2</span></div>
-  <div class="vartabs"><span class="vartab on">Option A — all-in Piran</span><span class="vartab">Option B — Trieste · Piran · Rovinj</span></div>
+  <div class="vartabs"><span class="vartab on">Option A — all-in Piran ✓ active</span><span class="vartab">Option B — Trieste · Piran · Rovinj</span><button class="ctrl">＋ new variation…</button></div>
   <div class="skel">
     <div class="win" style="height:36px"><span class="legseg pi" style="flex:3">Piran<small>3n · Hotel Piran 🔒 free-cancel 2d prior</small></span></div>
     <div class="staysrow" style="opacity:.45;margin-top:.7rem;">
@@ -435,7 +459,7 @@ padding:.45rem .7rem;font-size:.8rem;box-shadow:0 2px 6px rgba(41,33,19,.05);}
       <span class="staybar" style="flex:1"><b>Piran</b><small>1n</small></span>
       <span class="staybar" style="flex:1"><b>Rovinj</b><small>1n</small></span>
     </div>
-    <p class="dragnote" style="opacity:.6">option B, dormant — one tap away, its bookings refundable</p>
+    <div class="toolrow" style="opacity:.75;"><span class="lbl2">option B, dormant — its bookings refundable</span><button class="ctrl">make B active</button><button class="ctrl ghosted">compare side by side</button></div>
     <p class="decideby">⏰ decide by May 19 — Hotel Piran's free-cancellation deadline is the fork's expiry</p>
   </div>
 </section>
