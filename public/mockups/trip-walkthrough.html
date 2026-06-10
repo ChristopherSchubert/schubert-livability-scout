@@ -224,11 +224,31 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
 .srcline{font-size:.66rem;color:var(--muted);font-style:italic;margin:.15rem 0 0;}
 .savebtn{font-size:.64rem;font-weight:700;border:1px solid var(--accent);color:var(--accent);background:none;border-radius:100px;padding:.06rem .5rem;cursor:pointer;margin-top:.25rem;}
 .savebtn.done{border-color:var(--border);color:var(--muted);}
+.stage{position:relative;}
+.overlay{position:absolute;inset:0;display:flex;justify-content:flex-end;z-index:6;}
+.scrim2{position:absolute;inset:0;background:rgba(27,24,20,.22);}
+.sheet{position:relative;width:350px;max-width:86%;background:var(--panel);border-left:1px solid var(--border);box-shadow:-16px 0 44px rgba(41,33,19,.3);padding:1rem 1.1rem;overflow-y:auto;}
+.sheet h3{font-family:var(--fd);font-weight:500;font-size:1.1rem;margin:0 0 .2rem;}
+.sheet .kl{font-size:.66rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);}
+.sheet .glabel{font-size:.64rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:.8rem 0 .35rem;}
+.sheet .frow{display:flex;gap:.5rem;margin-bottom:.45rem;}
+.sheet .fld{flex:1;display:flex;flex-direction:column;gap:.12rem;}
+.sheet label{font-size:.64rem;color:var(--muted);}
+.sheet input,.sheet select{font-family:var(--fu);font-size:.8rem;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:.3rem .45rem;width:100%;}
+.sheet .hint2{font-size:.66rem;color:var(--muted);}
+.sheet footer{border-top:1px solid var(--border);margin-top:.8rem;padding-top:.6rem;display:flex;gap:.45rem;align-items:center;flex-wrap:wrap;}
+.sheet .x2{position:absolute;top:.5rem;right:.7rem;color:var(--muted);cursor:pointer;}
+.pop{position:absolute;z-index:7;background:var(--panel);border:1px solid var(--border);border-radius:10px;box-shadow:0 16px 40px rgba(41,33,19,.3);padding:.6rem .7rem;}
+.pop .pi{display:flex;align-items:center;gap:.5rem;font-size:.78rem;padding:.3rem .4rem;border-radius:6px;cursor:pointer;}
+.pop .pi:hover{background:var(--panel-strong);}
+.pop .pi.sel{color:var(--muted);}
+.toast2{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);background:#1b1814;color:#fbf6ea;font-size:.76rem;border-radius:100px;padding:.45rem 1rem;z-index:7;}
+.toast2 b{color:#9fc4bb;cursor:pointer;}
 </style></head><body>
 <div class="deck">
   <div class="dhead">
-    <h1>Slovenia, planned</h1><span class="sub">a 20-step walkthrough · for Janice's review · ← → to move</span>
-    <span class="spacer"></span><span class="counter"><span id="cur">1</span> / 20</span>
+    <h1>Slovenia, planned</h1><span class="sub">a step-by-step walkthrough · for Janice's review · ← → to move</span>
+    <span class="spacer"></span><span class="counter"><span id="cur">1</span> / <span id="tot"></span></span>
   </div>
   <div class="ctx"><div id="phase" class="phase"></div><p id="caption"></p>
 <p id="didline" style="margin:.45rem 0 0;font-size:.74rem;font-family:var(--fu);color:#cdbfa5;"><b style="color:#9fc4bb;">She does:</b> <span id="didtxt"></span></p></div>
@@ -244,25 +264,34 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
 
 <div id="caps" style="display:none">
 <p>It starts with the where and a <b>provisional when</b> — Slovenia, May 15–25, explicitly rough. A calendar can't lay out “mid-May,” so dates are concrete from the first minute; <b>soft means slideable, not absent</b>. Travelers are <b>rows</b>, each carrying their own restriction chips — the trip's marker set derives from them.</p>
+<p>＋ chip opens the <b>picker</b> — the same marker taxonomy used everywhere else in the app, plus a custom option. A chip added here follows its traveler onto every screen of the trip.</p>
 <p>The trip opens on its <b>Plan</b> tab with the provisional window already drawn — May 15–25 came in from the composer. Both edges slide freely (nothing is booked); <b>✎ adjust dates</b> is the value-editor for the same thing. Cities wait below.</p>
+<p>✎ adjust dates opens the <b>value editor for the same thing the edges drag</b> — fields and handles always agree. Until something books, both stay free.</p>
 <p>Three cities dropped in rough order — the split is a default, <b>2 · 4 · 4 nights</b>. Kranj stays on the tray. Every bar has its grip; every boundary its handle.</p>
 <p>Zhuzhing: grab the <b>boundary handle</b> and slide — Bled takes a night from Piran. Zero-sum between neighbors; the trip total doesn't move.</p>
 <p>The flights get booked and the window's outer edges <b>lock</b>. The trip can't stretch anymore without real money moving. Inside, still clay.</p>
+<p>＋ add transport opens the <b>transport editor</b>: route, each end's local clock, ticket fields that wait honestly empty until ticketed — and the consequence stated before it happens: <b>booking this locks the trip's end date.</b></p>
 <p>The <b>stay strip</b> under each city. Candidates come from 🔍 search or ＋ add your own (each card: ✎ edit · ✕ remove). She drags Union onto the city — it becomes a bar spanning the leg's nights.</p>
 <p>Stays aren't 1:1 with cities. Each city has its own candidate strip — she drops <b>Hiša Franko</b> from Bled's and <b>Brdo</b> from Piran's, then drags Toplice's edge: the neighbor takes the night.</p>
 <p>Each stay bar opens its editor on click — confirmation pasted, status set to <b>booked</b>. Booked bars wear a 🔒 and <b>resist</b>: grabbing Union's handle surfaces its terms — free cancellation ends <b>May 12</b>.</p>
+<p>The stay bar's click opens the <b>stay editor</b> — this is where booking actually happens: status to <b>booked</b>, confirmation pasted, the free-cancellation date captured once and reused everywhere (the bar's resistance, the Book page's countdown, the ⏰ badge).</p>
 <p>How things get in: she browses the <b>Bled pool</b> (sourced from the places cache) and presses <b>+ Save</b>; the balloon was <b>added by hand</b> — no cache knows it. Every card carries <b>✎ edit · ✕ remove</b>. The balloon arrived booked-for-May-19 so it placed itself; the rest waits: <b>~16 h for ~3 open days.</b></p>
+<p>＋ add your own opens the <b>item editor</b> for things no cache knows. The balloon gets its real fields — duration, vendor, confirmation, date+time, meeting point, wear — and the editor states the consequence: <b>has a date → will be placed on Tue 19.</b></p>
+<p>The ✎ on any card opens the same editor (duration and hours live here; cited markers are read-only). ✕ removes — <b>with an Undo toast, never silently</b>. She undoes it; the toboggan survives.</p>
 <p>Janice already knows another answer: <b>lunch at Rustika on balloon day</b>. She drags it from the bucket straight onto Tue — manual placement works at any stage, and it lands <b>pinned</b>.</p>
 <p>Some days are for nothing: May 22 gets the <b>🪶 keep-it-light</b> toggle. The layout engine must leave it nearly empty. Recovery is a feature.</p>
 <p><b>“Lay out Bled.”</b> The machine deals all seven undated items around the two pins — closed-Mondays respected (Public &amp; Vegan lands Sunday), the drive day kept light. <b>The zipline doesn't fit and becomes an alternate, not a casualty.</b></p>
 <p>She drags the toboggan from Monday onto Wednesday — pair it with the drive day. The instant a human edits, <b>auto-layout pauses</b> — and waits for the explicit “re-lay out around my pins.”</p>
 <p>Tuesday looks right — <b>Solve</b>. The Days view: the machine sequenced by geography, inserted the drives, dropped lunch in its window, surfaced the free gap, assigned the clock.</p>
 <p>Time changes go through the editor: she opens Lunch with <b>✎</b> and sets <b>12:30</b>. It <b>pins itself</b>, the day says “edited since solve,” and one button re-solves <b>around</b> her pins. (Drag-to-retime belongs to the grid view — list rows don't pretend to support it.)</p>
+<p>This is the sheet the ✎ opened: <b>one editor, every door</b> — same fields here as on the Shelf. She types 12:30, and the moment a solved time changes, <b>Hold at this time checks itself</b>. Done returns to the day, now marked edited.</p>
 <p>She tries the zipline on Tuesday anyway. The machine reflows — and <b>refuses to lie</b>: it names what can't fit and offers the next day instead of silently cramming.</p>
 <p>The <b>Book</b> page kept itself: to-books with lead times, cancel-bys counting down, cash = on-site ∧ cash-only = <b>€927</b>, passes remembered. Nothing hand-kept.</p>
+<p>“Mark booked…” opens the booking sheet: confirmation, date, money. The consequence chain is stated and automatic — <b>dated → placed on Sun 24, booked → off the Needs-action list, on-site cost → into the cash tally.</b></p>
 <p>The payoff: <b>the grid prints itself.</b> Every block computed from the plan, logistics one click deep, one leg per page on paper. The artifact Janice used to type — now output.</p>
 <p>Day-of, the phone lands on <b>today</b>: next-up leads with Directions and Call, the confirmation code one thumb away, finished things faded.</p>
 <p>The real story: they cancelled Piran betting on Trieste — and regretted it. <b>Variations</b> keep both futures alive on the same 3 days, each holding refundable bookings, with a <b>decide-by inherited from the cancellation deadlines</b>.</p>
+<p>＋ new variation opens the <b>fork composer</b>: name it, start blank or copy the current plan — and the decide-by rule is stated up front, derived from whatever cancellation deadlines end up inside.</p>
 </div>
 
 <div id="steps" style="display:none">
@@ -293,6 +322,28 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
   </div>
 </section>
 
+<section data-phase="Where · adding a chip" data-did="taps ＋ chip on Janice's row — the picker offers the same marker taxonomy the whole app uses.">
+  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="pagebody" style="position:relative;">
+    <div class="sect">Trips</div>
+    <div class="composer">
+      <div class="frow" style="flex-direction:column;align-items:stretch;gap:.35rem;">
+        <label style="font-size:.66rem;color:var(--muted);">Travelers</label>
+        <div class="travrow" style="border-color:var(--accent);"><b>Janice</b><span class="tchip">🥦 vegetarian <i>✕</i></span><button class="addchip" style="border-color:var(--accent);color:var(--accent);">＋ chip</button><span class="x">✕</span></div>
+        <div class="travrow"><b>Chris</b><span class="tchip">🥦 vegetarian <i>✕</i></span><button class="addchip">＋ chip</button><span class="x">✕</span></div>
+      </div>
+    </div>
+    <div class="pop" style="left:330px;top:120px;width:210px;">
+      <div class="pi sel">🥦 vegetarian ✓</div>
+      <div class="pi">🌱 vegan</div>
+      <div class="pi">🚫🥜 nut allergy</div>
+      <div class="pi">♿ limited mobility</div>
+      <div class="pi">🧒 kid</div>
+      <div class="pi" style="border-top:1px solid var(--panel-strong);color:var(--accent);font-weight:600;">＋ custom chip…</div>
+    </div>
+  </div>
+</section>
+
 <!-- ═ 2 · empty skeleton ═ -->
 <section data-phase="Where · the skeleton" data-did="drags the window\u2019s right edge to test it — it slides freely; nothing booked yet.">
   <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
@@ -305,6 +356,25 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
     <div class="datesrow"><span>Fri 15</span><span>Sun 17</span><span>Tue 19</span><span>Thu 21</span><span>Sat 23</span><span>Mon 25</span></div>
     <div class="sect" style="margin-top:1.4rem;">Cities from the scout</div>
     <div class="toolrow"><span class="citychip">⠿ Ljubljana</span><span class="citychip">⠿ Bled</span><span class="citychip">⠿ Piran</span><span class="citychip">⠿ Kranj</span><button class="ctrl">＋ other city…</button></div>
+  </div>
+</section>
+
+<section data-phase="Where · adjusting the dates" data-did="opens ✎ adjust dates — the same values the edges drag, as fields.">
+  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25 · provisional</span>
+    <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
+    <span class="spacer"></span><span class="chipbtn">Book</span><span class="chipbtn">Grid →</span></div>
+  <div class="pagebody" style="position:relative;">
+    <div class="sect">The window — May 15 → 25 · provisional <button class="ctrl inlinectl" style="background:#e7f1ee;">✎ adjust dates</button></div>
+    <div class="win"><span class="edge l"></span><span class="empty"><span class="dropz">⠿ drop a city here</span></span><span class="edge r"></span></div>
+    <div class="pop" style="right:24px;top:64px;width:280px;">
+      <div class="frow" style="display:flex;gap:.5rem;">
+        <span class="fld" style="flex:1;display:flex;flex-direction:column;gap:.12rem;"><label style="font-size:.64rem;color:var(--muted);">From</label><input type="date" value="2026-05-15" style="font-size:.8rem;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:.3rem .45rem;"></span>
+        <span class="fld" style="flex:1;display:flex;flex-direction:column;gap:.12rem;"><label style="font-size:.64rem;color:var(--muted);">To</label><input type="date" value="2026-05-25" style="font-size:.8rem;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:.3rem .45rem;"></span>
+      </div>
+      <div style="font-size:.7rem;color:var(--muted);margin:.3rem 0 .5rem;">10 nights · provisional</div>
+      <button class="ctrl solid">Done</button>
+    </div>
   </div>
 </section>
 
@@ -363,6 +433,29 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
       <div class="mini" style="--k:var(--k-trav)"><b>✈ → FRA → LJU</b> · Fri May 15<small>arrive 9:30 PM local · booked 🔒</small></div>
       <div class="mini" style="--k:var(--k-trav)"><b>✈ LJU →</b> · Mon May 25<small>takeoff 9:30 AM · booked 🔒</small></div>
     </div>
+  </div>
+</section>
+
+<section data-phase="Where · the transport editor" data-did="presses ＋ add transport, picks flight, fills FRA → LJU with each end's local time, sets status booked.">
+  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
+    <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
+    <span class="spacer"></span><span class="chipbtn">Book</span><span class="chipbtn">Grid →</span></div>
+  <div class="pagebody" style="min-height:430px;"></div>
+  <div class="overlay"><div class="scrim2"></div>
+    <aside class="sheet"><span class="x2">×</span>
+      <span class="kl">travel · flight</span><h3>Frankfurt → Ljubljana</h3>
+      <div class="glabel">Route</div>
+      <div class="frow"><span class="fld"><label>From</label><input value="FRA"></span><span class="fld"><label>To</label><input value="LJU"></span><span class="fld"><label>Date</label><input type="date" value="2026-05-15"></span></div>
+      <div class="frow"><span class="fld"><label>Departs — FRA local</label><input value="8:00 PM"></span><span class="fld"><label>Arrives — LJU local</label><input value="9:30 PM"></span></div>
+      <div class="glabel">Ticket</div>
+      <div class="frow"><span class="fld"><label>Carrier + number</label><input placeholder="add when ticketed"></span><span class="fld"><label>PNR</label><input placeholder="—"></span></div>
+      <p class="hint2">status link builds itself once carrier + number exist</p>
+      <div class="frow"><span class="fld"><label>Status</label><select><option>booked</option><option>reserved</option><option>to book</option></select></span>
+      <span class="fld"><label>Payment</label><select><option>prepaid</option><option>on site</option></select></span></div>
+      <p class="hint2">⚠ booking this locks the trip's end date (May 25)</p>
+      <footer><span class="hint2">Saved ✓ · autosaves</span><span style="flex:1"></span><button class="ctrl solid">Done</button></footer>
+    </aside>
   </div>
 </section>
 
@@ -437,6 +530,36 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
   </div>
 </section>
 
+<section data-phase="Stays · the stay editor" data-did="clicks the Union bar — pastes the confirmation, sets status booked; the cancel-by date flows to the Book page.">
+  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
+    <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
+    <span class="spacer"></span><span class="chipbtn">Book <span class="badge">⏰ 1</span></span><span class="chipbtn">Grid →</span></div>
+  <div class="pagebody" style="min-height:430px;">
+    <div class="sect">Stays</div>
+    <div class="staysrow">
+      <span class="staybar" style="flex:2;border-color:var(--accent);"><b>Union</b><small>2n</small></span>
+      <span class="staybar" style="flex:3"><b>Toplice</b><small>3n</small></span>
+      <span class="staybar" style="flex:1"><b>H. Franko</b></span>
+      <span class="staybar" style="flex:3"><b>Hotel Piran</b></span>
+      <span class="staybar" style="flex:1"><b>Brdo</b></span>
+    </div>
+  </div>
+  <div class="overlay"><div class="scrim2"></div>
+    <aside class="sheet"><span class="x2">×</span>
+      <span class="kl">stay · Ljubljana · May 15–17</span><h3>Grand Hotel Union Eurostars</h3>
+      <div class="glabel">Booking</div>
+      <div class="frow"><span class="fld"><label>Status</label><select><option>booked</option><option>reserved</option><option>to book</option><option>shortlisted</option></select></span></div>
+      <div class="frow"><span class="fld"><label>Confirmation</label><input value="SYN2281-99143"></span></div>
+      <div class="frow"><span class="fld"><label>Free cancellation until</label><input type="date" value="2026-05-12"></span></div>
+      <div class="glabel">Arrival</div>
+      <div class="frow"><span class="fld"><label>Check-in</label><input value="3:00 PM"></span><span class="fld"><label>Check-out</label><input value="12:00 PM"></span></div>
+      <div class="frow"><span class="fld"><label>Parking</label><input value="hotel garage · Miklošičeva 3"></span></div>
+      <footer><span class="hint2">Saved ✓ · autosaves</span><span style="flex:1"></span><button class="ctrl solid">Done</button></footer>
+    </aside>
+  </div>
+</section>
+
 <!-- ═ 9 · the Bled bucket ═ -->
 <section data-phase="Gather · the Bled bucket" data-did="browses the Bled pool, presses + Save on eight items, adds the balloon by hand (＋ add your own) — it arrives booked → auto-places onto Tue.">
   <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
@@ -476,6 +599,57 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
       <div class="toolrow"><button class="ctrl">＋ from the pool…</button><button class="ctrl">＋ add your own…</button></div>
     </div>
   </div>
+</section>
+
+<section data-phase="Gather · add your own (the balloon)" data-did="presses ＋ add your own and fills the balloon end-to-end — booked, dated, prepaid, with pickup and dress notes in their fields.">
+  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
+    <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
+    <span class="spacer"></span><span class="chipbtn">Book <span class="badge">⏰ 1</span></span><span class="chipbtn">Grid →</span></div>
+  <div class="pagebody" style="min-height:430px;"></div>
+  <div class="overlay"><div class="scrim2"></div>
+    <aside class="sheet"><span class="x2">×</span>
+      <span class="kl">activity · booked</span><h3>Hot-air balloon (private)</h3>
+      <div class="glabel">What</div>
+      <div class="frow"><span class="fld"><label>Duration</label><input value="~2 h"></span><span class="fld"><label>Vendor</label><input value="Balloon Center Barje"></span></div>
+      <div class="glabel">Booking</div>
+      <div class="frow"><span class="fld"><label>Status</label><select><option>booked</option></select></span><span class="fld"><label>Confirmation</label><input value="401780164673"></span></div>
+      <div class="frow"><span class="fld"><label>Date</label><input type="date" value="2026-05-19"></span><span class="fld"><label>Time</label><input value="5:30 AM"></span></div>
+      <p class="hint2">has a date → will be placed on Tue 19</p>
+      <div class="glabel">Logistics</div>
+      <div class="frow"><span class="fld"><label>Meeting point</label><input value="in front of Hotel Toplice · pickup ~5:35"></span></div>
+      <div class="frow"><span class="fld"><label>Wear</label><input value="sports clothing · sturdy waterproof shoes"></span></div>
+      <div class="frow"><span class="fld"><label>Phone</label><input value="+386 41 664 545"></span><span class="fld"><label>Email</label><input value="info@bcb.si"></span></div>
+      <footer><span class="hint2">Saved ✓ · autosaves</span><span style="flex:1"></span><button class="ctrl solid">Done</button></footer>
+    </aside>
+  </div>
+</section>
+
+<section data-phase="Gather · edit and remove" data-did="opens Rustika with ✎ (durations and chips live here), then taps ✕ on the toboggan — and immediately Undoes it.">
+  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
+    <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
+    <span class="spacer"></span><span class="chipbtn">Book <span class="badge">⏰ 1</span></span><span class="chipbtn">Grid →</span></div>
+  <div class="pagebody" style="min-height:430px;">
+    <div class="sect">Bled bucket</div>
+    <div class="cardrow">
+      <div class="mini" style="--k:var(--k-meal);border-color:var(--accent);"><span class="iacts"><i>✎</i><i>✕</i></span><span class="grip2">⠿</span><b>Rustika</b><small>~1h</small></div>
+      <div class="mini ghost" style="--k:var(--k-act)"><span class="grip2">⠿</span><b>Toboggan</b><small>~1.5h</small></div>
+      <div class="mini" style="--k:var(--k-act)"><span class="iacts"><i>✎</i><i>✕</i></span><span class="grip2">⠿</span><b>Bled Castle</b><small>~2h</small></div>
+    </div>
+  </div>
+  <div class="overlay" style="pointer-events:none;"><div></div>
+    <aside class="sheet" style="pointer-events:auto;"><span class="x2">×</span>
+      <span class="kl">meal · no booking</span><h3>Pizzeria Rustika</h3>
+      <div class="glabel">Planning</div>
+      <div class="frow"><span class="fld"><label>Duration</label><input value="~1 h"></span><span class="fld"><label>Open hours</label><input value="daily 12:00–22:00"></span></div>
+      <div class="glabel">Markers — cited</div>
+      <div style="display:flex;gap:.3rem;"><span class="tchip">Veg ✓</span><span class="tchip">Patio ✓</span></div>
+      <p class="hint2">from Google Places · 2026-06-10 — markers come from sources, not this form</p>
+      <footer><button class="ctrl danger" style="border-color:#dcb49a;color:#a3431f;">Remove</button><span style="flex:1"></span><span class="hint2">Saved ✓</span><button class="ctrl solid">Done</button></footer>
+    </aside>
+  </div>
+  <div class="toast2">Toboggan removed from the bucket · <b>Undo</b></div>
 </section>
 
 <!-- ═ 10 · manual pin ═ -->
@@ -650,6 +824,27 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
   </div>
 </section>
 
+<section data-phase="The clock · the entry editor" data-did="the ✎ on Lunch opened this sheet — she sets Start 12:30; ‘Hold at this time' checks itself.">
+  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
+    <span class="halves"><span>Plan</span><span>Shelf</span><span class="on">Days</span></span>
+    <span class="spacer"></span><span class="chipbtn">Book <span class="badge">⏰ 1</span></span><span class="chipbtn">Grid →</span></div>
+  <div class="pagebody" style="min-height:430px;"></div>
+  <div class="overlay"><div class="scrim2"></div>
+    <aside class="sheet"><span class="x2">×</span>
+      <span class="kl">meal · no booking</span><h3>Lunch · Pizzeria Rustika</h3>
+      <div class="glabel">When — local time · CEST</div>
+      <div class="frow"><span class="fld"><label>Day</label><select><option>Tue, May 19</option></select></span>
+        <span class="fld"><label>Start</label><input value="12:30 PM" style="border-color:var(--accent);"></span>
+        <span class="fld"><label>End</label><input value="1:30 PM"></span></div>
+      <div style="display:flex;align-items:center;gap:.4rem;font-size:.78rem;margin:.3rem 0 .1rem;"><input type="checkbox" checked><span>📌 Hold at this time — Re-solve won't move it</span></div>
+      <div class="glabel">Markers — cited</div>
+      <div style="display:flex;gap:.3rem;"><span class="tchip">Veg ✓</span><span class="tchip">Patio ✓</span></div>
+      <footer><button class="ctrl danger" style="border-color:#dcb49a;color:#a3431f;">Delete</button><span style="flex:1"></span><span class="hint2">Saved ✓ · autosaves</span><select class="ctrl" style="appearance:auto;"><option>Move to…</option></select><button class="ctrl solid">Done</button></footer>
+    </aside>
+  </div>
+</section>
+
 <!-- ═ 16 · over-pack honesty ═ -->
 <section data-phase="The clock · honest about too much" data-did="drags Zipline Dolinka from the Shelf tray onto Tuesday anyway.">
   <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
@@ -695,6 +890,26 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
         <div class="line"><span>Julian Alps Card</span><b>at Toplice</b></div>
         <div class="line"><span>Venice day-visitor passes</span><b>May 23</b></div></div>
     </div>
+  </div>
+</section>
+
+<section data-phase="Before you go · marking it booked" data-did="presses mark booked… on Postojna, pastes the confirmation, picks the day — it pins onto Sun 24.">
+  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="tripbar"><span class="chipbtn">← Days</span><span class="tname">Slovenia — Book</span></div>
+  <div class="pagebody" style="min-height:430px;">
+    <div class="sect">Needs action</div>
+    <div class="lrow todo" style="border-color:var(--accent);"><b>Postojna Cave</b> — decide &amp; book <span class="okk">to book · combo ~€49</span></div>
+  </div>
+  <div class="overlay"><div class="scrim2"></div>
+    <aside class="sheet"><span class="x2">×</span>
+      <span class="kl">activity · to book → booked</span><h3>Postojna Cave + Predjama</h3>
+      <div class="glabel">Booking</div>
+      <div class="frow"><span class="fld"><label>Confirmation</label><input value="PJ-88231"></span></div>
+      <div class="frow"><span class="fld"><label>Date</label><input type="date" value="2026-05-24"></span><span class="fld"><label>Time</label><input value="11:30 AM"></span></div>
+      <div class="frow"><span class="fld"><label>Cost</label><input value="49"></span><span class="fld"><label>Currency</label><select><option>EUR</option></select></span><span class="fld"><label>Payment</label><select><option>on site</option><option>prepaid</option></select></span></div>
+      <p class="hint2">has a date → will be placed on Sun 24 · leaves the Needs-action list</p>
+      <footer><span class="hint2">Saved ✓</span><span style="flex:1"></span><button class="ctrl solid">Done</button></footer>
+    </aside>
   </div>
 </section>
 
@@ -778,6 +993,27 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
   </div>
 </section>
 
+<section data-phase="What if · creating the variation" data-did="selects May 21–24, presses ＋ new variation, names option B, starts from a blank skeleton.">
+  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 21–24 selected</span>
+    <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
+    <span class="spacer"></span><span class="chipbtn">Book <span class="badge">⏰ 1</span></span><span class="chipbtn">Grid →</span></div>
+  <div class="pagebody" style="min-height:430px;"></div>
+  <div class="overlay"><div class="scrim2"></div>
+    <aside class="sheet"><span class="x2">×</span>
+      <span class="kl">variation · May 21–24</span><h3>New variation</h3>
+      <div class="frow"><span class="fld"><label>Name</label><input value="Trieste · Piran · Rovinj"></span></div>
+      <div class="glabel">Start from</div>
+      <div style="display:flex;flex-direction:column;gap:.3rem;font-size:.78rem;">
+        <label style="display:flex;gap:.4rem;align-items:center;"><input type="radio" name="vfrom" checked> blank skeleton for these days</label>
+        <label style="display:flex;gap:.4rem;align-items:center;"><input type="radio" name="vfrom"> a copy of the current plan</label>
+      </div>
+      <p class="hint2">decide-by will follow the earliest cancellation deadline inside either option</p>
+      <footer><span style="flex:1"></span><button class="ctrl solid">Create variation</button></footer>
+    </aside>
+  </div>
+</section>
+
 </div>
 
 <script>
@@ -785,6 +1021,7 @@ const steps=[...document.querySelectorAll("#steps > section")];
 const caps=[...document.querySelectorAll("#caps > p")];
 const stage=document.getElementById("stage"),cap=document.getElementById("caption"),
 phase=document.getElementById("phase"),cur=document.getElementById("cur"),dots=document.getElementById("dots");
+document.getElementById("tot").textContent=steps.length;
 steps.forEach((_,i)=>{const d=document.createElement("i");d.addEventListener("click",()=>go(i));dots.append(d);});
 let at=0;
 function go(i){
