@@ -183,7 +183,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);line-heig
       <span class="kindlbl">Meal</span><span class="nm">Lunch · Pizzeria Rustika</span>
       <div class="bookrow"><span class="anchnote">in your lunch window · 0.8 km from Hotel Toplice</span></div>
     </div></div>
-    <div class="tl-row machine"><div class="tt">1:00 – 3:55</div><div class="tc">Open time <span class="machinetag rest">auto</span></div></div>
+    <div class="tl-row machine"><div class="tt">1:00 – 3:55</div><div class="tc">Free time <span class="machinetag rest">auto</span></div></div>
     <div class="tl-row machine"><div class="tt">3:55 – 4:00</div><div class="tc">Walk to the meeting point <span class="machinetag">auto · 4 min est.</span></div></div>
     <div class="tl-row anchor" style="--k:var(--kind-booked)"><div class="tt">4:00 – 5:30</div><div class="tc">
       <span class="kindlbl">Booked</span><span class="nm">Via Ferrata Hvadnik</span> <span class="pinbadge">📌 pinned</span>
@@ -271,7 +271,7 @@ font-size:.82rem;border-radius:100px;padding:.5rem 1.1rem;z-index:90;display:non
       <div class="frow"><span class="fld"><label for="ed-title">Title</label><input id="ed-title"></span></div>
       <div class="frow">
         <span class="fld"><label for="ed-cat">Category — what it is</label><select id="ed-cat"><option>activity</option><option>meal</option><option>travel</option><option>stay</option><option>errand</option></select></span>
-        <span class="fld"><label for="ed-status">Status — how committed</label><select id="ed-status"><option>booked</option><option>reserved</option><option>open</option></select></span>
+        <span class="fld"><label for="ed-status">Status — how committed</label><select id="ed-status"><option value="none">no booking needed</option><option value="toBook">to book</option><option value="reserved">reserved</option><option value="booked">booked</option></select></span>
       </div>
       <div class="frow"><span class="fld"><label for="ed-note">Note — color &amp; context only (logistics get their own fields below)</label><textarea id="ed-note"></textarea></span></div>
     </div>
@@ -337,16 +337,16 @@ font-size:.82rem;border-radius:100px;padding:.5rem 1.1rem;z-index:90;display:non
 // Entry model v2: category (what) × status (commitment), structured
 // logistics/prep/money/contact — split out of the old prose notes.
 const ROWS = [
-  {cat:"travel",status:"open",machine:true,title:"Drive to the launch field",note:"Auto-inserted travel · 4 min estimate (straight-line × road factor). Adjust the anchors around it and Re-solve.",day:"2026-05-19",start:"05:25",end:"05:30"},
+  {cat:"travel",status:"none",machine:true,title:"Drive to the launch field",note:"Auto-inserted travel · 4 min estimate (straight-line × road factor). Adjust the anchors around it and Re-solve.",day:"2026-05-19",start:"05:25",end:"05:30"},
   {cat:"activity",status:"booked",title:"Hot-air balloon (private)",note:"Breakfast and balloon.",day:"2026-05-19",start:"05:30",end:"07:30",
     meet:"In front of Hotel Toplice (pickup ~05:35)",vendor:"Balloon Center Barje",wear:"Sports clothing, sturdy waterproof shoes — morning dew on the field",
     prepaid:true,conf:"401780164673",phone:"+386 41 664 545",email:"info@bcb.si"},
-  {cat:"travel",status:"open",machine:true,title:"Drive back toward the lake",note:"Auto-inserted travel · 4 min estimate.",day:"2026-05-19",start:"07:30",end:"07:35"},
-  {cat:"activity",status:"open",title:"Bled Castle — hike up + tour",note:"Lakeshore path, 30–40 min up — it earns the view.",day:"2026-05-19",start:"07:35",end:"09:35",arrive:"08:00"},
-  {cat:"activity",status:"open",machine:true,title:"Rest",note:"Auto-inserted buffer after a heavy item.",day:"2026-05-19",start:"09:35",end:"09:55"},
-  {cat:"meal",status:"open",title:"Lunch · Pizzeria Rustika",note:"In your lunch window · 0.8 km from Hotel Toplice.",day:"2026-05-19",start:"12:00",end:"13:00"},
-  {cat:"activity",status:"open",machine:true,title:"Open time",note:"Auto-surfaced free gap.",day:"2026-05-19",start:"13:00",end:"15:55"},
-  {cat:"travel",status:"open",machine:true,title:"Walk to the meeting point",note:"Auto-inserted travel · 4 min estimate.",day:"2026-05-19",start:"15:55",end:"16:00"},
+  {cat:"travel",status:"none",machine:true,title:"Drive back toward the lake",note:"Auto-inserted travel · 4 min estimate.",day:"2026-05-19",start:"07:30",end:"07:35"},
+  {cat:"activity",status:"none",title:"Bled Castle — hike up + tour",note:"Lakeshore path, 30–40 min up — it earns the view.",day:"2026-05-19",start:"07:35",end:"09:35",arrive:"08:00"},
+  {cat:"activity",status:"none",machine:true,title:"Rest",note:"Auto-inserted buffer after a heavy item.",day:"2026-05-19",start:"09:35",end:"09:55"},
+  {cat:"meal",status:"none",title:"Lunch · Pizzeria Rustika",note:"In your lunch window · 0.8 km from Hotel Toplice.",day:"2026-05-19",start:"12:00",end:"13:00"},
+  {cat:"activity",status:"none",machine:true,title:"Free time",note:"Auto-surfaced free gap.",day:"2026-05-19",start:"13:00",end:"15:55"},
+  {cat:"travel",status:"none",machine:true,title:"Walk to the meeting point",note:"Auto-inserted travel · 4 min estimate.",day:"2026-05-19",start:"15:55",end:"16:00"},
   {cat:"activity",status:"booked",title:"Via Ferrata Hvadnik",note:"",day:"2026-05-19",start:"16:00",end:"17:30",
     meet:"Ljubljanska cesta 1, 4260 Bled — the yellow doors",vendor:"Altitude Activities",conf:"#138953",prepaid:true,pinned:true,
     phone:"+386 70 138 811",email:"info@altitude-activities.com"},
@@ -357,7 +357,7 @@ const $=(id)=>document.getElementById(id);
 let cur=null;
 function openEd(e){
   cur=e;
-  $("ed-kindlbl").textContent=e.machine?e.cat+" · auto":e.cat+" · "+e.status;
+  $("ed-kindlbl").textContent=e.machine?e.cat+" · auto":e.cat+" · "+({none:"no booking",toBook:"to book"}[e.status]||e.status);
   $("ed-kindlbl").style.setProperty("--k",KC[e.cat]);
   $("ed-title-h").textContent=e.machine?"Machine entry":"Edit entry";
   $("ed-title").value=e.title; $("ed-cat").value=e.cat; $("ed-status").value=e.status; $("ed-note").value=e.note||"";

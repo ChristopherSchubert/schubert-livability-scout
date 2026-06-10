@@ -175,10 +175,21 @@ all 79 real entries' notes for structure hiding in prose):
 
   // WHAT × COMMITMENT — two dimensions, not one. The old `kind` enum mixed
   // them ("booked" and "meal" were never the same axis). Category = what it
-  // is and drives the display hue; status = how committed, and drives the
-  // lock/badge treatment.
+  // is and drives the display hue; status = the commitment ladder, and
+  // drives the lock/badge treatment.
+  //
+  // The ladder (axis = what breaking it costs):
+  //   none     — no booking applicable; walk-in, do it whenever
+  //   toBook   — booking NEEDED but not yet made ("sells out 4–6 mo ahead")
+  //   reserved — a slot is held, no money moved (dinner reservation);
+  //              breaking it costs goodwill
+  //   booked   — money committed: ticketed/prepaid/penalty-backed, carries
+  //              confirmation + cancel-by; breaking it costs money
+  // The pre-trip BookingChecklist DERIVES from the data: every `toBook`
+  // entry + its lead time. (Earlier draft had "open", which conflated
+  // none/toBook and word-collided with the machine's "Open time" gaps.)
   "category": "travel | meal | activity | stay | errand",
-  "status":   "booked | reserved | open",
+  "status":   "none | toBook | reserved | booked",
 
   "title": "…", "note": "…",                          // note = color only now
   "place": { "lat", "lon", "address" },
