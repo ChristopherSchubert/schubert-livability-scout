@@ -243,6 +243,10 @@ trip — the Janice-review artifact.
   empties because its item was placed; "Lay out" becomes keep/undo while a
   proposal is pending; a dropzone fills). Cropping a page "for focus" is a
   continuity bug, not a presentation choice.
+- **The constant-anatomy rule.** A page's section skeleton is fixed — on the
+  Plan tab: Window · Transport · Stays · per-city sections. Sections render
+  their empty states (with their entry controls) from the first moment;
+  they never materialize once populated. An empty state teaches the page.
 - **The gesture-honesty rule.** Never narrate a gesture the rendered controls
   can't perform. Time changes in the **list** view go through the editor
   (✎ → time fields); drag-to-retime exists only where a time axis is drawn
