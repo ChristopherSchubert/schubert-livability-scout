@@ -111,4 +111,140 @@ h2 small{font-family:var(--font-ui);font-size:.76rem;color:var(--muted);font-wei
 
   <p class="note">Mockup — the Shelf is the want-list. Candidates come from the real cached pool; saving pulls one onto the trip; "Verify markers" is the on-demand single lookup; dog/kid chips are hidden because this trip has neither. Drag a saved card onto a day in the Days view.</p>
 </div>
+
+<!-- ── EntryEditor, shelf door — click any card ── -->
+<style>
+.card{cursor:pointer;}
+.card:hover{border-color:var(--accent);}
+#edscrim{position:fixed;inset:0;background:rgba(27,24,20,.18);z-index:70;display:none;}
+#editor{position:fixed;top:0;right:0;bottom:0;width:380px;max-width:94vw;background:var(--panel);border-left:1px solid var(--border);
+box-shadow:-18px 0 44px rgba(41,33,19,.18);z-index:75;display:none;flex-direction:column;}
+#editor header{padding:1rem 1.2rem .7rem;border-bottom:1px solid var(--border);display:flex;align-items:baseline;gap:.6rem;}
+#editor header h2{font-family:var(--font-display);font-weight:500;font-size:1.2rem;margin:0;}
+#editor header .kl{font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);}
+#editor header .x{margin-left:auto;border:0;background:none;font-size:1.15rem;color:var(--muted);cursor:pointer;}
+#editor .body{padding:1rem 1.2rem;overflow-y:auto;flex:1;}
+.fgroup{margin-bottom:1.1rem;}
+.fgroup .glabel{font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.4rem;}
+.frow{display:flex;gap:.5rem;margin-bottom:.5rem;}
+.fld{flex:1;display:flex;flex-direction:column;gap:.2rem;}
+.fld label{font-size:.72rem;color:var(--muted);}
+.fld input,.fld select,.fld textarea{font-family:var(--font-ui);font-size:.85rem;color:var(--text);background:var(--bg);
+border:1px solid var(--border);border-radius:7px;padding:.42rem .55rem;}
+.fld textarea{min-height:64px;resize:vertical;}
+.fld input:focus,.fld select:focus,.fld textarea:focus{outline:none;border-color:var(--accent);}
+.mkline{display:flex;gap:.3rem;flex-wrap:wrap;align-items:center;}
+.hint{font-size:.72rem;color:var(--muted);}
+#editor footer{border-top:1px solid var(--border);padding:.8rem 1.2rem;display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;}
+.btn{font-family:var(--font-ui);font-size:.8rem;font-weight:600;border-radius:100px;padding:.45rem 1rem;cursor:pointer;border:1px solid var(--border);background:var(--bg);color:#2c2823;}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff;}
+.btn.danger{color:#a3431f;border-color:#dcb49a;}
+#editor footer .sep{flex:1;}
+#toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:var(--text);color:var(--bg);
+font-size:.82rem;border-radius:100px;padding:.5rem 1.1rem;z-index:90;display:none;}
+</style>
+<div id="edscrim"></div>
+<aside id="editor" role="dialog" aria-modal="true" aria-label="Edit shelf item">
+  <header><span class="kl" id="ed-kl"></span><h2>Edit item</h2><button class="x" aria-label="Close">×</button></header>
+  <div class="body">
+    <div class="fgroup"><div class="glabel">What</div>
+      <div class="frow"><span class="fld"><label for="ed-title">Title</label><input id="ed-title"></span></div>
+      <div class="frow">
+        <span class="fld"><label for="ed-cat">Category</label><select id="ed-cat"><option>activity</option><option>meal</option><option>travel</option><option>stay</option><option>errand</option></select></span>
+        <span class="fld"><label for="ed-status">Status</label><select id="ed-status"><option value="none">no booking needed</option><option value="toBook">to book</option><option value="reserved">reserved</option><option value="booked">booked</option></select></span>
+      </div>
+      <div class="frow"><span class="fld"><label for="ed-note">Note</label><textarea id="ed-note"></textarea></span></div>
+    </div>
+    <div class="fgroup"><div class="glabel">Planning — not placed on a day yet</div>
+      <div class="frow">
+        <span class="fld"><label for="ed-dur">Duration estimate</label><input id="ed-dur" placeholder="~2 h — Solve needs this"></span>
+        <span class="fld"><label for="ed-hours">Open hours</label><input id="ed-hours" placeholder="opens 8:00"></span>
+      </div>
+      <p class="hint">Booking it gives it a real date &amp; time — that places it on the day automatically.</p>
+    </div>
+    <div class="fgroup"><div class="glabel">Markers — cited, from sources</div>
+      <div class="mkline" id="ed-mks"></div>
+      <p class="hint" id="ed-mkhint"></p>
+    </div>
+    <div class="fgroup"><div class="glabel">Money</div>
+      <div class="frow">
+        <span class="fld" style="flex:0 0 90px;"><label for="ed-amount">Amount</label><input id="ed-amount" type="number"></span>
+        <span class="fld" style="flex:0 0 86px;"><label for="ed-cur">Currency</label><select id="ed-cur"><option>EUR</option><option>USD</option></select></span>
+        <span class="fld"><label for="ed-payment">Payment</label><select id="ed-payment"><option value="onSite">on site</option><option value="prepaid">prepaid</option></select></span>
+      </div>
+    </div>
+    <div class="fgroup"><div class="glabel">Logistics &amp; contact</div>
+      <div class="frow"><span class="fld"><label for="ed-vendor">Vendor / operator</label><input id="ed-vendor"></span></div>
+      <div class="frow">
+        <span class="fld"><label for="ed-cphone">Phone</label><input id="ed-cphone" type="tel"></span>
+        <span class="fld"><label for="ed-curl">Link</label><input id="ed-curl" type="url"></span>
+      </div>
+    </div>
+  </div>
+  <footer>
+    <button class="btn danger" id="ed-remove">Remove</button>
+    <span class="sep"></span>
+    <span class="hint" id="ed-savestate">Saved ✓ · autosaves</span>
+    <select id="ed-place" class="btn"><option value="">Place on a day…</option><option>Sun, May 17</option><option>Mon, May 18</option><option>Tue, May 19</option><option>Wed, May 20</option></select>
+    <button class="btn primary" id="ed-done">Done</button>
+  </footer>
+</aside>
+<div id="toast"></div>
+<script>
+// One editor, every door — the Shelf door. Items aren't placed yet, so When
+// becomes Planning (duration estimate + hours); booking something dates it,
+// which places it. Card order matches ITEMS.
+const ITEMS=[
+ {cat:"stay",status:"booked",title:"Grand Hotel Toplice",note:"Bled lakefront. Check-in 2 PM.",vendor:"Sava Hotels",mks:[["Booked · PH27710297","conf"]]},
+ {cat:"stay",status:"none",title:"Hotel Lovec",note:"Shortlisted alternative.",hours:"",mks:[["shortlisted",""]]},
+ {cat:"stay",status:"none",title:"Penzion Berc",note:"Shortlisted alternative.",mks:[["shortlisted",""]]},
+ {cat:"meal",status:"none",title:"Pizzeria Rustika",note:"On the trip — May 19 lunch.",dur:"~1 h",hours:"daily 12:00–22:00",mks:[["Veg ✓","Google · 2026-06-10"],["Patio ✓","Google · 2026-06-10"]]},
+ {cat:"meal",status:"none",title:"Public & Vegan Kitchen",note:"",dur:"~1 h",hours:"closed Mondays",mks:[["Veg ✓","Google · 2026-06-10"],["Patio ✓","Google · 2026-06-10"],["Accessible ✓","Google · 2026-06-10"]]},
+ {cat:"meal",status:"none",title:"Oštarija Peglez'n",note:"",dur:"~1 h",mks:[]},
+ {cat:"meal",status:"none",title:"Confectionery Zima",note:"",dur:"~30 m",mks:[]},
+ {cat:"meal",status:"none",title:"Mega Burger Bled",note:"",dur:"~45 m",mks:[]},
+ {cat:"activity",status:"none",title:"Bled Castle",note:"Hike the lakeshore path up (30–40 min) — it earns the view.",dur:"~2 h",hours:"opens 8:00",mks:[["Kids ✓","Google · 2026-06-10"]]},
+ {cat:"activity",status:"toBook",title:"Zipline Dolinka",note:"",dur:"~3 h",vendor:"Zipline Dolinka Bled",mks:[]},
+ {cat:"activity",status:"none",title:"Straža hill toboggan",note:"",dur:"~1.5 h",mks:[]},
+ {cat:"activity",status:"none",title:"Blejsko jezero — the lake walk",note:"",dur:"~1.5 h",mks:[]},
+];
+const ed=document.getElementById("editor"),scr=document.getElementById("edscrim"),toast=document.getElementById("toast");
+const $=(id)=>document.getElementById(id);
+let cur=null;
+function say(m){toast.textContent=m;toast.style.display="block";clearTimeout(say.t);say.t=setTimeout(()=>toast.style.display="none",3000);}
+function openEd(e){
+  cur=e;
+  $("ed-kl").textContent=e.cat+" · "+({none:"no booking",toBook:"to book"}[e.status]||e.status);
+  $("ed-title").value=e.title;$("ed-cat").value=e.cat;$("ed-status").value=e.status;$("ed-note").value=e.note||"";
+  $("ed-dur").value=e.dur||"";$("ed-hours").value=e.hours||"";
+  $("ed-amount").value=e.amount??"";$("ed-cur").value=e.cur||"EUR";$("ed-payment").value=e.payment||"onSite";
+  $("ed-vendor").value=e.vendor||"";$("ed-cphone").value=e.phone||"";$("ed-curl").value=e.url||"";
+  const mk=$("ed-mks");mk.replaceChildren();
+  for(const [label,src] of (e.mks||[])){
+    const sp=document.createElement("span");sp.className="mk"+(src&&src.includes("Google")?" cited":"");
+    sp.textContent=label;if(src)sp.title=src;mk.append(sp);
+  }
+  $("ed-mkhint").textContent=(e.mks&&e.mks.length)?"Hover a chip for its source. Markers come from sources, not this form.":"Not verified yet — Verify runs one lookup.";
+  ed.style.display="flex";scr.style.display="block";$("ed-title").focus();
+}
+function closeEd(){ed.style.display="none";scr.style.display="none";}
+document.querySelectorAll(".card:not(.own)").forEach((c,i)=>{
+  c.setAttribute("role","button");c.setAttribute("tabindex","0");
+  const open=(ev)=>{if(ev.target.closest(".addbtn,.verify"))return;openEd(ITEMS[i]);};
+  c.addEventListener("click",open);
+  c.addEventListener("keydown",(ev)=>{if(ev.key==="Enter"){openEd(ITEMS[i]);}});
+});
+let saveT;
+ed.querySelectorAll(".body input,.body select,.body textarea").forEach((el)=>el.addEventListener("input",()=>{
+  $("ed-savestate").textContent="Saving…";clearTimeout(saveT);
+  saveT=setTimeout(()=>{$("ed-savestate").textContent="Saved ✓ · autosaves";},600);
+  if(el.id==="ed-status"&&el.value==="booked")say("Booked items get a date & time — that places it on the day");
+}));
+$("ed-done").addEventListener("click",closeEd);
+ed.querySelector(".x").addEventListener("click",closeEd);
+scr.addEventListener("click",closeEd);
+addEventListener("keydown",(e)=>{if(e.key==="Escape")closeEd();});
+$("ed-place").addEventListener("change",(e)=>{const v=e.target.value;if(!v)return;e.target.value="";closeEd();say("Placed on "+v+" at fuzzy time — find it in that day's buckets");});
+$("ed-remove").addEventListener("click",()=>{closeEd();say("Removed from the trip · Undo — still findable in the pool");});
+</script>
 </body></html>
