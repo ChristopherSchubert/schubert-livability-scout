@@ -37,6 +37,9 @@ display:flex;align-items:center;gap:1rem;justify-content:center;z-index:90;}
 .topbar a.on{color:var(--text);font-weight:600;border-bottom:2px solid var(--accent);}
 .tripbar{background:var(--panel);border-bottom:1px solid var(--border);padding:.6rem 1.4rem;display:flex;align-items:center;gap:1rem;}
 .tripbar .tname{font-family:var(--fd);font-size:1.1rem;}
+.tripbar .crumb{font-size:.76rem;color:var(--muted);cursor:pointer;}
+.tripbar .crumb b{color:var(--accent);font-weight:600;}
+.chipbtn.onpage{background:var(--accent);border-color:var(--accent);color:#fff;}
 .tripbar .tmeta{font-size:.74rem;color:var(--muted);}
 .halves{display:flex;border:1px solid var(--border);border-radius:100px;overflow:hidden;margin-left:.4rem;}
 .halves span{font-size:.76rem;font-weight:600;color:var(--muted);padding:.32rem .95rem;cursor:pointer;}
@@ -379,7 +382,7 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
 
 <!-- ═ 1 · /trips + composer ═ -->
 <section data-phase="Where · the idea" data-did="presses ＋ New trip.">
-  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <nav class="topbar"><span class="brand">Schubert Atlas</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
   <div class="pagebody">
     <div class="sect">Trips <button class="ctrl solid inlinectl" style="box-shadow:0 0 0 4px rgba(13,76,68,.18);">＋ New trip</button></div>
     <div class="tripcard"><div><div class="nm">Silverthorne</div><div class="legs">Summit County, CO — late June · ~4 days</div><div class="meta">Janice &amp; Chris</div></div><span class="pillgrn" style="background:var(--panel-strong);color:var(--muted);">gathering</span></div>
@@ -388,7 +391,7 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
 </section>
 
 <section data-phase="Where · the composer" data-did="names the trip, sets the provisional dates, adds Janice and Chris — then taps ＋ chip on Janice's row.">
-  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <nav class="topbar"><span class="brand">Schubert Atlas</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
   <div class="pagebody">
     <div class="sect">Trips</div>
     <div class="composer">
@@ -410,7 +413,7 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
 </section>
 
 <section data-phase="Where · adding a chip" data-did="picks 🥦 vegetarian for Janice — then does the same on Chris's row.">
-  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <nav class="topbar"><span class="brand">Schubert Atlas</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
   <div class="pagebody" style="position:relative;">
     <div class="sect">Trips</div>
     <div class="composer">
@@ -439,7 +442,7 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
 
 
 <section data-phase="Where · create the trip" data-did="presses Create trip →.">
-  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <nav class="topbar"><span class="brand">Schubert Atlas</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
   <div class="pagebody">
     <div class="sect">Trips</div>
     <div class="composer">
@@ -463,8 +466,8 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
 
 <!-- ═ 2 · empty skeleton ═ -->
 <section data-phase="Where · the skeleton" data-did="drags the window's right edge to test it — it slides freely; nothing booked yet.">
-  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
-  <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25 · provisional</span>
+  <nav class="topbar"><span class="brand">Schubert Atlas</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="tripbar"><span class="crumb"><b>Trips</b> ›</span><span class="tname">Slovenia</span><span class="tmeta">May 15–25 · provisional</span>
     <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
     <span class="spacer"></span><span class="chipbtn">Book</span><span class="chipbtn">Grid →</span></div>
   <div class="pagebody">
@@ -487,8 +490,8 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
 </section>
 
 <section data-phase="Where · adjusting the dates" data-did="opens ✎ adjust dates — the same values the edges drag, as fields.">
-  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
-  <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25 · provisional</span>
+  <nav class="topbar"><span class="brand">Schubert Atlas</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="tripbar"><span class="crumb"><b>Trips</b> ›</span><span class="tname">Slovenia</span><span class="tmeta">May 15–25 · provisional</span>
     <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
     <span class="spacer"></span><span class="chipbtn">Book</span><span class="chipbtn">Grid →</span></div>
   <div class="pagebody" style="position:relative;">
@@ -520,8 +523,8 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
 
 <!-- ═ 3 · cities land ═ -->
 <section data-phase="Where · cities land" data-did="drags Ljubljana, then Bled, then Piran from the tray into the window.">
-  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
-  <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25 · 10 nights</span>
+  <nav class="topbar"><span class="brand">Schubert Atlas</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="tripbar"><span class="crumb"><b>Trips</b> ›</span><span class="tname">Slovenia</span><span class="tmeta">May 15–25 · 10 nights</span>
     <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
     <span class="spacer"></span><span class="chipbtn">Book</span><span class="chipbtn">Grid →</span></div>
   <div class="pagebody">
@@ -543,8 +546,8 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
 </section>
 
 <section data-phase="Where · ＋ other city" data-did="presses ＋ other city and types — any place works, not just the scout's list.">
-  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
-  <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25 · 10 nights</span>
+  <nav class="topbar"><span class="brand">Schubert Atlas</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="tripbar"><span class="crumb"><b>Trips</b> ›</span><span class="tname">Slovenia</span><span class="tmeta">May 15–25 · 10 nights</span>
     <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
     <span class="spacer"></span><span class="chipbtn">Book</span><span class="chipbtn">Grid →</span></div>
   <div class="pagebody" style="position:relative;">
@@ -572,8 +575,8 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
 
 <!-- ═ 4 · trading nights ═ -->
 <section data-phase="Where · trading nights" data-did="grabs the Bled | Piran ↔ handle and slides it a day to feel it — then releases back; the split stays 2·4·4.">
-  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
-  <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25 · 10 nights</span>
+  <nav class="topbar"><span class="brand">Schubert Atlas</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="tripbar"><span class="crumb"><b>Trips</b> ›</span><span class="tname">Slovenia</span><span class="tmeta">May 15–25 · 10 nights</span>
     <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
     <span class="spacer"></span><span class="chipbtn">Book</span><span class="chipbtn">Grid →</span></div>
   <div class="pagebody">
@@ -597,8 +600,8 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
 
 <!-- ═ 5 · flights lock the edges ═ -->
 <section data-phase="Where · the transport editor" data-did="presses ＋ add transport on the empty Transport section, fills the outbound with each end's local time, sets status booked — then repeats for the return.">
-  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
-  <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
+  <nav class="topbar"><span class="brand">Schubert Atlas</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="tripbar"><span class="crumb"><b>Trips</b> ›</span><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
     <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
     <span class="spacer"></span><span class="chipbtn">Book</span><span class="chipbtn">Grid →</span></div>
   <div class="pagebody" style="min-height:430px;">
@@ -636,8 +639,8 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
 </section>
 
 <section data-phase="Where · flights harden the edges" data-did="saves — both flights sit in Transport, and the window's outer edges lock themselves.">
-  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
-  <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
+  <nav class="topbar"><span class="brand">Schubert Atlas</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="tripbar"><span class="crumb"><b>Trips</b> ›</span><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
     <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
     <span class="spacer"></span><span class="chipbtn">Book</span><span class="chipbtn">Grid →</span></div>
   <div class="pagebody">
@@ -661,8 +664,8 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
 </section>
 
 <section data-phase="Where · locked, not frozen" data-did="with the edges locked, she drags Kranj in to prove the inside is still editable — then ↶ undoes it; Kranj will end up a stay under the Piran leg instead.">
-  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
-  <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
+  <nav class="topbar"><span class="brand">Schubert Atlas</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="tripbar"><span class="crumb"><b>Trips</b> ›</span><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
     <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
     <span class="spacer"></span><span class="chipbtn">Book</span><span class="chipbtn">Grid →</span></div>
   <div class="pagebody" style="position:relative;">
@@ -692,8 +695,8 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
 
 <!-- ═ 6 · stay strip + shelf ═ -->
 <section data-phase="Stays · 🔍 search hotels" data-did="folds ▸ Transport closed, opens Stays below it, presses 🔍 search hotels on Ljubljana — and shortlists all five results.">
-  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
-  <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
+  <nav class="topbar"><span class="brand">Schubert Atlas</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="tripbar"><span class="crumb"><b>Trips</b> ›</span><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
     <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
     <span class="spacer"></span><span class="chipbtn">Book</span><span class="chipbtn">Grid →</span></div>
   <div class="pagebody" style="min-height:430px;">
@@ -728,8 +731,8 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
 
 <!-- ═ 7 · splitting stays ═ -->
 <section data-phase="Stays · drop a hotel on the city" data-did="drags Union Eurostars from the shortlist onto the Ljubljana segment.">
-  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
-  <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
+  <nav class="topbar"><span class="brand">Schubert Atlas</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="tripbar"><span class="crumb"><b>Trips</b> ›</span><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
     <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
     <span class="spacer"></span><span class="chipbtn">Book</span><span class="chipbtn">Grid →</span></div>
   <div class="pagebody">
@@ -758,8 +761,8 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
 </section>
 
 <section data-phase="Stays · the other cities" data-did="repeats the search-and-drop for Bled and Piran — Toplice and Hotel Piran land as four-night bars.">
-  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
-  <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25 · 3 stays</span>
+  <nav class="topbar"><span class="brand">Schubert Atlas</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="tripbar"><span class="crumb"><b>Trips</b> ›</span><span class="tname">Slovenia</span><span class="tmeta">May 15–25 · 3 stays</span>
     <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
     <span class="spacer"></span><span class="chipbtn">Book</span><span class="chipbtn">Grid →</span></div>
   <div class="pagebody">
@@ -781,8 +784,8 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
 </section>
 
 <section data-phase="Stays · ✂ split a stay" data-did="presses ✂ split a stay on Toplice and picks the night — the split creates an open slot to drop a stay into.">
-  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
-  <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
+  <nav class="topbar"><span class="brand">Schubert Atlas</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="tripbar"><span class="crumb"><b>Trips</b> ›</span><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
     <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
     <span class="spacer"></span><span class="chipbtn">Book</span><span class="chipbtn">Grid →</span></div>
   <div class="pagebody" style="position:relative;">
@@ -810,8 +813,8 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
 </section>
 
 <section data-phase="Stays · the splurge night" data-did="adds Hiša Franko (＋ add your own — the splurge) and drops it into the open slot; the same split-and-drop later hands Brdo the last night.">
-  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
-  <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25 · 5 stays</span>
+  <nav class="topbar"><span class="brand">Schubert Atlas</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="tripbar"><span class="crumb"><b>Trips</b> ›</span><span class="tname">Slovenia</span><span class="tmeta">May 15–25 · 5 stays</span>
     <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
     <span class="spacer"></span><span class="chipbtn">Book</span><span class="chipbtn">Grid →</span></div>
   <div class="pagebody">
@@ -833,8 +836,8 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
 
 <!-- ═ 8 · booking hardens ═ -->
 <section data-phase="Stays · the stay editor" data-did="clicks the Union bar — pastes the confirmation, sets status booked; the cancel-by date flows to the Book page.">
-  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
-  <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
+  <nav class="topbar"><span class="brand">Schubert Atlas</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="tripbar"><span class="crumb"><b>Trips</b> ›</span><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
     <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
     <span class="spacer"></span><span class="chipbtn">Book</span><span class="chipbtn">Grid →</span></div>
   <div class="pagebody" style="min-height:430px;">
@@ -870,8 +873,8 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
 </section>
 
 <section data-phase="Stays · booking hardens" data-did="books the other four the same way — every bar locks; then she tests Union's ↔.">
-  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
-  <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25 · all stays booked</span>
+  <nav class="topbar"><span class="brand">Schubert Atlas</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="tripbar"><span class="crumb"><b>Trips</b> ›</span><span class="tname">Slovenia</span><span class="tmeta">May 15–25 · all stays booked</span>
     <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
     <span class="spacer"></span><span class="chipbtn">Book <span class="badge">⏰ 1</span></span><span class="chipbtn">Grid →</span></div>
   <div class="pagebody">
@@ -894,8 +897,8 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
 </section>
 
 <section data-phase="Gather · getting to the Bled bucket" data-did="clicks the Bled segment in the window — the page focuses Bled's section: stays, days, and an empty bucket with its three ways in.">
-  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
-  <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
+  <nav class="topbar"><span class="brand">Schubert Atlas</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="tripbar"><span class="crumb"><b>Trips</b> ›</span><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
     <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
     <span class="spacer"></span><span class="chipbtn">Book <span class="badge">⏰ 1</span></span><span class="chipbtn">Grid →</span></div>
   <div class="pagebody">
@@ -922,8 +925,8 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
 
 <!-- ═ 9 · the Bled bucket ═ -->
 <section data-phase="Gather · the Bled bucket" data-did="browses the Bled suggestions and presses + Save on eight — the bucket fills.">
-  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
-  <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
+  <nav class="topbar"><span class="brand">Schubert Atlas</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="tripbar"><span class="crumb"><b>Trips</b> ›</span><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
     <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
     <span class="spacer"></span><span class="chipbtn">Book <span class="badge">⏰ 1</span></span><span class="chipbtn">Grid →</span></div>
   <div class="pagebody">
@@ -967,8 +970,8 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
 </section>
 
 <section data-phase="Gather · add your own (the balloon)" data-did="presses ＋ add your own and fills the balloon end-to-end — booked, dated, prepaid, with pickup and dress notes in their fields.">
-  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
-  <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
+  <nav class="topbar"><span class="brand">Schubert Atlas</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="tripbar"><span class="crumb"><b>Trips</b> ›</span><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
     <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
     <span class="spacer"></span><span class="chipbtn">Book <span class="badge">⏰ 1</span></span><span class="chipbtn">Grid →</span></div>
   <div class="pagebody" style="min-height:430px;">
@@ -1007,8 +1010,8 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
 </section>
 
 <section data-phase="Gather · edit and remove" data-did="opens Rustika with ✎ (durations and chips live here), then taps ✕ on the toboggan — and immediately Undoes it.">
-  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
-  <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
+  <nav class="topbar"><span class="brand">Schubert Atlas</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="tripbar"><span class="crumb"><b>Trips</b> ›</span><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
     <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
     <span class="spacer"></span><span class="chipbtn">Book <span class="badge">⏰ 1</span></span><span class="chipbtn">Grid →</span></div>
   <div class="pagebody" style="min-height:430px;">
@@ -1048,8 +1051,8 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
 
 <!-- ═ 10 · manual pin ═ -->
 <section data-phase="Gather · manual placement, anytime" data-did="drags Rustika from the bucket onto Tue 19 — lunch on balloon day. It lands pinned.">
-  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
-  <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
+  <nav class="topbar"><span class="brand">Schubert Atlas</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="tripbar"><span class="crumb"><b>Trips</b> ›</span><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
     <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
     <span class="spacer"></span><span class="chipbtn">Book <span class="badge">⏰ 1</span></span><span class="chipbtn">Grid →</span></div>
   <div class="pagebody">
@@ -1087,8 +1090,8 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
 
 <!-- ═ 11 · keep it light ═ -->
 <section data-phase="Gather · keep it light" data-did="clicks the Piran segment, taps 🪶 on Fri 22 — and adds one errand by hand: decide the Postojna caves (to book ⏰).">
-  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
-  <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
+  <nav class="topbar"><span class="brand">Schubert Atlas</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="tripbar"><span class="crumb"><b>Trips</b> ›</span><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
     <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
     <span class="spacer"></span><span class="chipbtn">Book <span class="badge">⏰ 2</span></span><span class="chipbtn">Grid →</span></div>
   <div class="pagebody">
@@ -1123,8 +1126,8 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
 
 <!-- ═ 12 · lay out deals ═ -->
 <section data-phase="Lay out · the machine deals" data-did="back on Bled (one click on its segment), presses Lay out Bled → reviews the proposal.">
-  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
-  <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
+  <nav class="topbar"><span class="brand">Schubert Atlas</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="tripbar"><span class="crumb"><b>Trips</b> ›</span><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
     <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
     <span class="spacer"></span><span class="chipbtn">Book <span class="badge">⏰ 2</span></span><span class="chipbtn">Grid →</span></div>
   <div class="pagebody">
@@ -1165,8 +1168,8 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
 
 <!-- ═ 13 · human takes the wheel ═ -->
 <section data-phase="Lay out · human takes the wheel" data-did="drags the toboggan from Mon onto Wed (pair it with the drive day) → auto-layout pauses.">
-  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
-  <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
+  <nav class="topbar"><span class="brand">Schubert Atlas</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="tripbar"><span class="crumb"><b>Trips</b> ›</span><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
     <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
     <span class="spacer"></span><span class="chipbtn">Book <span class="badge">⏰ 2</span></span><span class="chipbtn">Grid →</span></div>
   <div class="pagebody">
@@ -1204,8 +1207,8 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
 
 <!-- ═ 14 · solve a day (Days view) ═ -->
 <section data-phase="The clock · solve a day" data-did="presses Solve Tue 19 → lands in the Days view on the solved day.">
-  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
-  <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
+  <nav class="topbar"><span class="brand">Schubert Atlas</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="tripbar"><span class="crumb"><b>Trips</b> ›</span><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
     <span class="halves"><span>Plan</span><span>Shelf</span><span class="on">Days</span></span>
     <span class="spacer"></span><span class="chipbtn">Book <span class="badge">⏰ 2</span></span><span class="chipbtn">Grid →</span></div>
   <div class="dayrail">
@@ -1233,8 +1236,8 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
 
 <!-- ═ 15 · edit, pin, re-solve ═ -->
 <section data-phase="The clock · the entry editor" data-did="opens Lunch with ✎ — this sheet appears; she types Start 12:30 and ‘Hold at this time' checks itself.">
-  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
-  <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
+  <nav class="topbar"><span class="brand">Schubert Atlas</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="tripbar"><span class="crumb"><b>Trips</b> ›</span><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
     <span class="halves"><span>Plan</span><span>Shelf</span><span class="on">Days</span></span>
     <span class="spacer"></span><span class="chipbtn">Book <span class="badge">⏰ 2</span></span><span class="chipbtn">Grid →</span></div>
   <div class="dayrail">
@@ -1269,8 +1272,8 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
 
 <!-- ═ 16 · over-pack honesty ═ -->
 <section data-phase="The clock · edit, pin, re-solve" data-did="Done — back on the day: lunch pinned at 12:30, the day marked edited, one button to re-solve around pins.">
-  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
-  <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
+  <nav class="topbar"><span class="brand">Schubert Atlas</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="tripbar"><span class="crumb"><b>Trips</b> ›</span><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
     <span class="halves"><span>Plan</span><span>Shelf</span><span class="on">Days</span></span>
     <span class="spacer"></span><span class="chipbtn">Book <span class="badge">⏰ 2</span></span><span class="chipbtn">Grid →</span></div>
   <div class="dayrail">
@@ -1291,8 +1294,8 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
 </section>
 
 <section data-phase="The clock · honest about too much" data-did="drags Zipline Dolinka from the Shelf tray onto Tuesday anyway.">
-  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
-  <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
+  <nav class="topbar"><span class="brand">Schubert Atlas</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="tripbar"><span class="crumb"><b>Trips</b> ›</span><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
     <span class="halves"><span>Plan</span><span>Shelf</span><span class="on">Days</span></span>
     <span class="spacer"></span><span class="chipbtn">Book <span class="badge">⏰ 2</span></span><span class="chipbtn">Grid →</span></div>
   <div class="dayrail">
@@ -1317,9 +1320,10 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
 
 <!-- ═ 17 · book page ═ -->
 <section data-phase="Before you go · the book page" data-did="presses Book ⏰ in the trip bar.">
-  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
-  <div class="tripbar"><span class="chipbtn">← Days</span><span class="tname">Slovenia — Book</span><span class="tmeta">reservations · deadlines · cash · passes</span></div>
+  <nav class="topbar"><span class="brand">Schubert Atlas</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="tripbar"><span class="crumb"><b>Trips</b> ›</span><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span><div class="halves"><span>Plan</span><span>Shelf</span><span>Days</span></div><span class="spacer"></span><span class="chipbtn onpage">Book <span class="badge">⏰ 2</span></span><span class="chipbtn">Grid →</span></div>
   <div class="pagebody">
+    <h2 style="font-family:var(--fd);font-weight:500;font-size:1.15rem;margin:0 0 .9rem;">Book <small style="font-size:.74rem;color:var(--muted);font-family:var(--fu);">reservations · deadlines · cash · passes</small></h2>
     <div class="sect">Needs action</div>
     <div class="lrow urgent"><b>Hotel Union</b> — free cancellation ends <span class="conf">SYN2281-99143</span><span class="due">cancel by May 12</span></div>
     <div class="lrow todo"><b>Postojna Cave</b> — decide &amp; book <span class="okk">to book · combo ~€49</span><button class="ctrl" style="margin-left:.5rem;">mark booked…</button></div>
@@ -1343,9 +1347,10 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
 </section>
 
 <section data-phase="Before you go · marking it booked" data-did="presses mark booked… on Postojna, pastes the confirmation, picks the day — it pins onto Sun 24.">
-  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
-  <div class="tripbar"><span class="chipbtn">← Days</span><span class="tname">Slovenia — Book</span></div>
+  <nav class="topbar"><span class="brand">Schubert Atlas</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="tripbar"><span class="crumb"><b>Trips</b> ›</span><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span><div class="halves"><span>Plan</span><span>Shelf</span><span>Days</span></div><span class="spacer"></span><span class="chipbtn onpage">Book <span class="badge">⏰ 2</span></span><span class="chipbtn">Grid →</span></div>
   <div class="pagebody" style="min-height:430px;">
+    <h2 style="font-family:var(--fd);font-weight:500;font-size:1.15rem;margin:0 0 .9rem;">Book <small style="font-size:.74rem;color:var(--muted);font-family:var(--fu);">reservations · deadlines · cash · passes</small></h2>
     <div class="sect">Needs action</div>
     <div class="lrow todo" style="border-color:var(--accent);"><b>Postojna Cave</b> — decide &amp; book <span class="okk">to book · combo ~€49</span></div>
   </div>
@@ -1364,10 +1369,10 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
 
 <!-- ═ 18 · the grid ═ -->
 <section data-phase="Before you go · the grid, generated" data-did="presses Grid → in the trip bar.">
-  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
-  <div class="tripbar"><span class="chipbtn">← Days</span><span class="tname">Slovenia — the Grid</span><span class="tmeta">11 days · 79 entries · generated from the trip</span>
-    <span class="spacer"></span><button class="ctrl">🖨 print — one leg per page</button></div>
+  <nav class="topbar"><span class="brand">Schubert Atlas</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="tripbar"><span class="crumb"><b>Trips</b> ›</span><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span><div class="halves"><span>Plan</span><span>Shelf</span><span>Days</span></div><span class="spacer"></span><span class="chipbtn">Book <span class="badge">⏰ 1</span></span><span class="chipbtn onpage">Grid →</span></div>
   <div class="pagebody">
+    <h2 style="font-family:var(--fd);font-weight:500;font-size:1.15rem;margin:0 0 .9rem;display:flex;align-items:baseline;gap:.6rem;">The grid <small style="font-size:.74rem;color:var(--muted);font-family:var(--fu);">11 days · 79 entries · generated from the trip</small><span style="flex:1"></span><button class="ctrl">🖨 print — one leg per page</button></h2>
     <div class="lbl2" style="margin-bottom:.4rem;">May 17–22 · 5 more days →</div>
     <div class="gwrap">
       <div class="ggut" style="height:380px;"><span style="top:100px">6a</span><span style="top:150px">9a</span><span style="top:200px">12p</span><span style="top:250px">3p</span><span style="top:300px">6p</span><span style="top:350px">9p</span></div>
@@ -1406,7 +1411,7 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
 
 <!-- ═ 19 · day-of phone ═ -->
 <section data-phase="On the trip" data-did="opens the trip on her phone on May 19 — it lands on today.">
-  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <nav class="topbar"><span class="brand">Schubert Atlas</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
   <div class="phonewrap"><div class="ph">
     <div class="phh"><span style="font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;">Slovenia · day 5 of 11</span><br><b>Tuesday, May 19</b></div>
     <div class="bd">
@@ -1420,8 +1425,8 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
 
 <!-- ═ 20 · variations ═ -->
 <section data-phase="What if (rewind · pre-trip) · creating the variation" data-did="selects May 21–24, presses ＋ new variation, names option B, starts from a blank skeleton.">
-  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
-  <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 21–24 selected</span>
+  <nav class="topbar"><span class="brand">Schubert Atlas</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="tripbar"><span class="crumb"><b>Trips</b> ›</span><span class="tname">Slovenia</span><span class="tmeta">May 21–24 selected</span>
     <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
     <span class="spacer"></span><span class="chipbtn">Book <span class="badge">⏰ 1</span></span><span class="chipbtn">Grid →</span></div>
   <div class="pagebody" style="min-height:430px;">
@@ -1450,8 +1455,8 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
     </aside>
   </div>
 </section><section data-phase="What if (rewind · pre-trip) · variations" data-did="hops between A and B with the tabs — and sees the deadline the fork lives under.">
-  <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
-  <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">the last 3 days · two futures</span>
+  <nav class="topbar"><span class="brand">Schubert Atlas</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="tripbar"><span class="crumb"><b>Trips</b> ›</span><span class="tname">Slovenia</span><span class="tmeta">the last 3 days · two futures</span>
     <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
     <span class="spacer"></span><span class="chipbtn">Book <span class="badge">⏰ 1</span></span><span class="chipbtn">Grid →</span></div>
   <div class="pagebody">

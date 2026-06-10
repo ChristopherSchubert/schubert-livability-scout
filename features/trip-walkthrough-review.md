@@ -90,6 +90,21 @@ their slides; mechanism trails (Lay out 21→26, Solve 27→28, mark-booked
 32→33); tab states; topbar; styled control vocabulary; honest refusal +
 empty states (31); grid pagination honesty (34).
 
+## 2026-06-10 navigation-expert pass (wayfinding · breadcrumbs · hierarchy)
+
+The hierarchy is Atlas → Trips → <trip> → (Plan | Shelf | Days | Book |
+Grid). Fixes: (1) every tripbar now opens with a **Trips ›** crumb — the
+path up is always visible; (2) the Book and Grid pages keep the **constant
+tripbar** (crumb · trip name · tabs · Book/Grid chips) with the current
+page's chip in an active state, replacing the old "← Days" journey-coded
+header — structure never changes, the active state moves; their old header
+meta became in-page titles; (3) badge stays truthful on those pages (⏰2
+on Book, ⏰1 on Grid after Postojna books). Verified holding: topbar
+active state (Trips), within-Plan focus = the window's outlined segment
+(persists 20–27, Bled→Piran), Days view breadcrumb = day-rail + "city ·
+solved" subhead, phone view carries trip · day-N-of-M. **App renamed:
+Livability Scout → Schubert Atlas** across all mockups.
+
 ## Mechanical checks (run before any review handoff)
 
 Per-slide matrix script (in git history, commit 771384e): topbar/tripbar
