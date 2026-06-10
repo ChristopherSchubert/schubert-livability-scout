@@ -206,16 +206,50 @@ all 79 real entries' notes for structure hiding in prose):
   "bring": "swimsuit, towel, dry change",
   "requirements": "fit enough to run ~20 m; passports",
 
-  // MONEY — structured; "380 EUR · cash" in one text box was a schema sin
+  // MONEY — structured; "380 EUR · cash" in one text box was a schema sin.
+  // ONE payment-timing field (the earlier draft had both a `prepaid` bool in
+  // booking and a `payWhen` in cost — same axis, two checkboxes, allowed
+  // nonsense combos). `payment` = when money moves; `cashOnly` = the venue's
+  // method constraint (orthogonal). The Cash Needed rollup derives precisely:
+  // cash to carry = onSite ∧ cashOnly. Prepaid never needs wallet cash.
+  // Orthogonal to `status` too: paragliding is a booked slot paid on site.
   "cost": { "amount": 190, "currency": "EUR", "per": "person | total",
-            "estimate": false, "cashOnly": true, "payWhen": "before | after" },
+            "estimate": false, "payment": "prepaid | onSite", "cashOnly": true },
 
-  "booking": { "confirmation", "prepaid", "cancelBy" },
+  "booking": { "confirmation", "cancelBy" },   // prepaid badge derives from cost.payment
   "coveredBy": "pass:ljubljana-city-card",            // ↓ passes
   "openHours": "…",                                   // Solve soft constraint
   "markers": [ { "type", "value"?, "source"? } ]
 }
 ```
+
+**Transport sub-shape (flights, trains, ferries — owner, 2026-06-10: "flight
+should show, with all the relevant trip detail like when to arrive").** A
+travel entry can carry:
+
+```jsonc
+"transport": { "mode": "flight | train | ferry | drive",
+               "carrier": "LH", "number": "1462",
+               "from": "FRA", "to": "LJU",
+               "departLocal": "20:00", "arriveLocal": "21:30",   // EACH END local
+               "pnr": "…", "seat": "…", "terminal": "…" }
+```
+
+- **Display:** a flight renders like a booked anchor with its logistics
+  surfaced — "LH 1462 · FRA → LJU · be at the airport by 18:00 (T1) · PNR".
+  `arriveBy` carries the check-in lead (intl ≈ 2 h), distinct from departure.
+- **Timezones:** a flight is the one entry that spans zones — both ends are
+  local-to-that-airport and labeled. (The tz model already supports this.)
+- **Solve interplay:** departures are hard fixed-times; Solve auto-generates
+  the *leave-for-the-airport* connective from travel time + `arriveBy` —
+  exactly Janice's hand-built "17:30 leave for airport → 20:00 boarding" row.
+- **Linking ("not sure if there's a way to link to this stuff"):** v1 is
+  zero-API **deep links** auto-built from carrier + number + date —
+  FlightAware (`flightaware.com/live/flight/LH1462`) and a Google
+  `"LH 1462 status"` query — live status one tap away without storing any
+  claim we didn't verify. A live-status API (AeroAPI etc.) is a later,
+  paid upgrade; imported-from-email parsing is out of scope. Never scrape
+  status into stored fields — links point at the live truth instead.
 
 **Passes (trip-level, new).** "Covered by the City Card" appears three times in
 one trip; the Julian Alps Card and Venice day-visitor passes too. A pass is
@@ -435,8 +469,9 @@ entry — workspace rows, grid popover ("Edit →"), tray cards.
 | When | day · time mode (bucket/range/point) · start–end · duration · **tz label ("local · CEST")** |
 | Logistics | **meeting point** · **arrive by** · vendor · place (PlaceRef picker) |
 | Prep | **wear** · **bring** · requirements |
-| Money | amount · currency (select) · **per person/total** · estimate · cash-only · pay before/after |
-| Booking | confirmation · prepaid · cancel-by · **covered by pass** |
+| Money | amount · currency (select) · **per person/total** · estimate · **payment (prepaid / on site)** · cash-only |
+| Booking | confirmation · cancel-by · **covered by pass** (prepaid badge derives from payment) |
+| Transport | *(travel entries)* mode · carrier + number · from/to · depart/arrive (each end local) · PNR · seat · auto status link |
 | Reach | contact **{name · phone · email}** · url |
 
 | Action | Semantics |

@@ -304,15 +304,25 @@ font-size:.82rem;border-radius:100px;padding:.5rem 1.1rem;z-index:90;display:non
         <span class="fld"><label for="ed-per">Per</label><select id="ed-per"><option>total</option><option>person</option></select></span>
       </div>
       <div class="frow">
-        <span class="checkline"><input type="checkbox" id="ed-cash"><label for="ed-cash">Cash only</label></span>
-        <span class="checkline"><input type="checkbox" id="ed-payafter"><label for="ed-payafter">Pay after</label></span>
+        <span class="fld"><label for="ed-payment">Payment — when money moves</label><select id="ed-payment"><option value="onSite">on site (on the day)</option><option value="prepaid">prepaid</option></select></span>
+        <span class="fld" style="flex:0 0 110px;"><label>&nbsp;</label><span class="checkline"><input type="checkbox" id="ed-cash"><label for="ed-cash">Cash only</label></span></span>
       </div>
+      <p style="font-size:.72rem;color:var(--muted);margin:.2rem 0 0;">Cash to carry = on-site ∧ cash-only. Prepaid never needs wallet cash.</p>
     </div>
     <div class="fgroup"><div class="glabel">Booking</div>
+      <div class="frow"><span class="fld"><label for="ed-conf">Confirmation</label><input id="ed-conf"></span></div>
+    </div>
+    <div class="fgroup" id="grp-transport"><div class="glabel">Transport</div>
       <div class="frow">
-        <span class="fld"><label for="ed-conf">Confirmation</label><input id="ed-conf"></span>
-        <span class="fld" style="flex:0 0 92px;"><label>&nbsp;</label><span class="checkline"><input type="checkbox" id="ed-prepaid"><label for="ed-prepaid">Prepaid</label></span></span>
+        <span class="fld"><label for="ed-mode">Mode</label><select id="ed-mode"><option>flight</option><option>train</option><option>ferry</option><option>drive</option></select></span>
+        <span class="fld"><label for="ed-carrier">Carrier + number</label><input id="ed-carrier" placeholder="LH 1462"></span>
       </div>
+      <div class="frow">
+        <span class="fld"><label for="ed-from">From</label><input id="ed-from" placeholder="FRA"></span>
+        <span class="fld"><label for="ed-to">To</label><input id="ed-to" placeholder="LJU"></span>
+        <span class="fld"><label for="ed-pnr">PNR</label><input id="ed-pnr"></span>
+      </div>
+      <p style="font-size:.72rem;color:var(--muted);margin:.2rem 0 0;">Departure/arrival times are each end's local clock. Status link auto-builds from carrier + number + date.</p>
     </div>
     <div class="fgroup"><div class="glabel">Contact</div>
       <div class="frow">
@@ -340,7 +350,7 @@ const ROWS = [
   {cat:"travel",status:"none",machine:true,title:"Drive to the launch field",note:"Auto-inserted travel · 4 min estimate (straight-line × road factor). Adjust the anchors around it and Re-solve.",day:"2026-05-19",start:"05:25",end:"05:30"},
   {cat:"activity",status:"booked",title:"Hot-air balloon (private)",note:"Breakfast and balloon.",day:"2026-05-19",start:"05:30",end:"07:30",
     meet:"In front of Hotel Toplice (pickup ~05:35)",vendor:"Balloon Center Barje",wear:"Sports clothing, sturdy waterproof shoes — morning dew on the field",
-    prepaid:true,conf:"401780164673",phone:"+386 41 664 545",email:"info@bcb.si"},
+    payment:"prepaid",conf:"401780164673",phone:"+386 41 664 545",email:"info@bcb.si"},
   {cat:"travel",status:"none",machine:true,title:"Drive back toward the lake",note:"Auto-inserted travel · 4 min estimate.",day:"2026-05-19",start:"07:30",end:"07:35"},
   {cat:"activity",status:"none",title:"Bled Castle — hike up + tour",note:"Lakeshore path, 30–40 min up — it earns the view.",day:"2026-05-19",start:"07:35",end:"09:35",arrive:"08:00"},
   {cat:"activity",status:"none",machine:true,title:"Rest",note:"Auto-inserted buffer after a heavy item.",day:"2026-05-19",start:"09:35",end:"09:55"},
@@ -348,7 +358,7 @@ const ROWS = [
   {cat:"activity",status:"none",machine:true,title:"Free time",note:"Auto-surfaced free gap.",day:"2026-05-19",start:"13:00",end:"15:55"},
   {cat:"travel",status:"none",machine:true,title:"Walk to the meeting point",note:"Auto-inserted travel · 4 min estimate.",day:"2026-05-19",start:"15:55",end:"16:00"},
   {cat:"activity",status:"booked",title:"Via Ferrata Hvadnik",note:"",day:"2026-05-19",start:"16:00",end:"17:30",
-    meet:"Ljubljanska cesta 1, 4260 Bled — the yellow doors",vendor:"Altitude Activities",conf:"#138953",prepaid:true,pinned:true,
+    meet:"Ljubljanska cesta 1, 4260 Bled — the yellow doors",vendor:"Altitude Activities",conf:"#138953",payment:"prepaid",pinned:true,
     phone:"+386 70 138 811",email:"info@altitude-activities.com"},
 ];
 const KC={activity:"var(--kind-booked)",meal:"var(--kind-meal)",travel:"var(--kind-travel)",stay:"var(--kind-checkin)",errand:"var(--kind-todo)"};
@@ -365,8 +375,9 @@ function openEd(e){
   $("ed-meet").value=e.meet||""; $("ed-vendor").value=e.vendor||"";
   $("ed-wear").value=e.wear||""; $("ed-bring").value=e.bring||"";
   $("ed-amount").value=e.amount??""; $("ed-cur").value=e.cur||"EUR"; $("ed-per").value=e.per||"total";
-  $("ed-cash").checked=!!e.cash; $("ed-payafter").checked=!!e.payafter;
-  $("ed-conf").value=e.conf||""; $("ed-prepaid").checked=!!e.prepaid;
+  $("ed-payment").value=e.payment||"onSite"; $("ed-cash").checked=!!e.cash;
+  $("ed-conf").value=e.conf||"";
+  $("grp-transport").style.display=(e.cat==="travel"&&!e.machine)?"":"none";
   $("ed-cphone").value=e.phone||""; $("ed-cemail").value=e.email||"";
   $("ed-pinned").checked=!!e.pinned;
   // Machine rows: read-only summary — consequences aren't edited, moved, or deleted.
