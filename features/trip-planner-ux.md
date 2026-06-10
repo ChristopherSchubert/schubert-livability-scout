@@ -232,6 +232,12 @@ trip — the Janice-review artifact.
   hand"); (b) **its entry path** as a visible control (＋ Save / 🔍 search /
   ＋ add your own); (c) **per-item lifecycle** — ✎ edit and ✕ remove on every
   card. Collections never just *have* contents.
+- **The commentary-split rule.** In any walkthrough/demo artifact, meta
+  commentary lives ONLY in the context band; the page below renders ONLY what
+  the app would. The line: drag *feedback* ("Bled +1 · Piran −1"), state
+  chips ("provisional", "proposal", "auto-layout paused"), and real warnings
+  ("free cancellation ends May 12") belong to the app; narration ("just
+  dropped", "placed itself", "drag ↔ to trade nights") does not.
 - **The gesture-honesty rule.** Never narrate a gesture the rendered controls
   can't perform. Time changes in the **list** view go through the editor
   (✎ → time fields); drag-to-retime exists only where a time axis is drawn
