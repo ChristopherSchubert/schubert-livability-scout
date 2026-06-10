@@ -238,6 +238,11 @@ trip — the Janice-review artifact.
   chips ("provisional", "proposal", "auto-layout paused"), and real warnings
   ("free cancellation ends May 12") belong to the app; narration ("just
   dropped", "placed itself", "drag ↔ to trade nights") does not.
+- **The state-persistence rule.** Across consecutive renderings of the same
+  page, a control disappears ONLY when the state change explains it (the tray
+  empties because its item was placed; "Lay out" becomes keep/undo while a
+  proposal is pending; a dropzone fills). Cropping a page "for focus" is a
+  continuity bug, not a presentation choice.
 - **The gesture-honesty rule.** Never narrate a gesture the rendered controls
   can't perform. Time changes in the **list** view go through the editor
   (✎ → time fields); drag-to-retime exists only where a time axis is drawn

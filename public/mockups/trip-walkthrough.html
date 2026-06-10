@@ -333,6 +333,11 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
   <div class="pagebody" style="position:relative;">
     <div class="sect">Trips</div>
     <div class="composer">
+      <div class="frow">
+        <span class="fld"><label>Where (big where)</label><input value="Slovenia" style="width:200px"></span>
+        <span class="fld"><label>From — provisional</label><input type="date" value="2026-05-15"></span>
+        <span class="fld"><label>To — provisional</label><input type="date" value="2026-05-25"></span>
+      </div>
       <div class="frow" style="flex-direction:column;align-items:stretch;gap:.35rem;">
         <label style="font-size:.66rem;color:var(--muted);">Travelers</label>
         <div class="travrow" style="border-color:var(--accent);"><b>Janice</b><span class="tchip">🥦 vegetarian <i>✕</i></span><button class="addchip" style="border-color:var(--accent);color:var(--accent);">＋ chip</button><span class="x">✕</span></div>
@@ -459,6 +464,7 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
     <span class="edge r"></span></div>
     <div class="datesrow"><span>Fri 15</span><span>Sun 17</span><span>Tue 19</span><span>Thu 21</span><span>Sat 23</span><span>Mon 25</span></div>
     <p class="dragnote">Bled +1 night · Piran −1</p>
+    <div class="toolrow"><span class="lbl2">On the tray:</span><span class="citychip">⠿ Kranj</span><button class="ctrl">＋ other city…</button></div>
   </div>
 </section>
 
@@ -476,6 +482,7 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
       <span class="legseg pi" style="flex:4">Piran<small>4n</small></span>
     <span class="edge r lock"></span></div>
     <div class="datesrow"><span>Fri 15</span><span>Sun 17</span><span>Tue 19</span><span>Thu 21</span><span>Sat 23</span><span>Mon 25</span></div>
+    <div class="toolrow"><span class="lbl2">On the tray:</span><span class="citychip">⠿ Kranj</span><button class="ctrl">＋ other city…</button></div>
     <div class="sect" style="margin-top:1.3rem;">Transport <button class="ctrl inlinectl">＋ add transport…</button></div>
     <div class="cardrow">
       <div class="mini" style="--k:var(--k-trav)"><b>✈ → FRA → LJU</b> · Fri May 15<small>arrive 9:30 PM local · booked 🔒</small></div>
@@ -489,7 +496,13 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
   <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
     <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
     <span class="spacer"></span><span class="chipbtn">Book</span><span class="chipbtn">Grid →</span></div>
-  <div class="pagebody" style="min-height:430px;"></div>
+  <div class="pagebody" style="min-height:430px;">
+    <div class="sect">Transport <button class="ctrl inlinectl">＋ add transport…</button></div>
+    <div class="cardrow">
+      <div class="mini" style="--k:var(--k-trav)"><b>✈ → FRA → LJU</b> · Fri May 15<small>booked 🔒</small></div>
+      <div class="mini" style="--k:var(--k-trav);border-color:var(--accent);"><b>✈ LJU →</b> · Mon May 25<small>editing…</small></div>
+    </div>
+  </div>
   <div class="overlay"><div class="scrim2"></div>
     <aside class="sheet"><span class="x2">×</span>
       <span class="kl">travel · flight</span><h3>Frankfurt → Ljubljana</h3>
@@ -507,7 +520,7 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
   </div>
 </section>
 
-<section data-phase="Where · locked, not frozen" data-did="with the edges locked, she still drags Kranj into the window — and hovers the lock to see its cause and its exit.">
+<section data-phase="Where · locked, not frozen" data-did="with the edges locked, she drags Kranj in to prove the inside is still editable — then ↶ undoes it; Kranj will end up a stay under the Piran leg instead.">
   <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
   <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
     <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
@@ -525,6 +538,7 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
       <div style="margin-top:.4rem;"><button class="ctrl" style="font-size:.68rem;">open the flight →</button></div>
     </div>
     <p class="dragnote">Kranj +1 night · Piran −1</p>
+    <div class="toolrow"><button class="ctrl">↶ undo</button><span class="lbl2">On the tray:</span><span class="citychip" style="opacity:.5;">⠿ Kranj</span></div>
   </div>
 </section>
 
@@ -537,8 +551,9 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
   <div class="pagebody">
     <div class="sect">The window</div>
     <div class="win" style="height:36px"><span class="edge l lock"></span>
-      <span class="legseg lj" style="flex:2">Ljubljana</span><span class="legseg bl" style="flex:4">Bled</span><span class="legseg pi" style="flex:4">Piran</span>
+      <span class="legseg lj" style="flex:2">Ljubljana<span class="hndl">↔</span></span><span class="legseg bl" style="flex:4">Bled<span class="hndl">↔</span></span><span class="legseg pi" style="flex:4">Piran</span>
     <span class="edge r lock"></span></div>
+    <div class="toolrow" style="margin-top:.3rem;"><span class="lbl2">On the tray:</span><span class="citychip">⠿ Kranj</span><button class="ctrl">＋ other city…</button></div>
     <div class="sect" style="margin-top:.9rem;">Stays</div>
     <div class="staysrow">
       <span class="staybar" style="flex:2"><span class="grip2">⠿</span><b>Union Eurostars</b><small>2 nights</small><span class="hndl">↔</span></span>
@@ -585,7 +600,7 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
   <div class="pagebody">
     <div class="sect">The window</div>
     <div class="win" style="height:36px"><span class="edge l lock"></span>
-      <span class="legseg lj" style="flex:2">Ljubljana</span><span class="legseg bl" style="flex:4">Bled + Soča</span><span class="legseg pi" style="flex:4">Piran + Kranj</span>
+      <span class="legseg lj" style="flex:2">Ljubljana<span class="hndl">↔</span></span><span class="legseg bl" style="flex:4">Bled + Soča<span class="hndl">↔</span></span><span class="legseg pi" style="flex:4">Piran + Kranj</span>
     <span class="edge r lock"></span></div>
     <div class="sect" style="margin-top:.9rem;">Stays <button class="ctrl inlinectl">✂ split a stay…</button></div>
     <div class="staysrow">
@@ -628,7 +643,12 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
     <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
     <span class="spacer"></span><span class="chipbtn">Book <span class="badge">⏰ 1</span></span><span class="chipbtn">Grid →</span></div>
   <div class="pagebody">
-    <div class="sect">Stays</div>
+    <div class="win" style="height:30px;"><span class="edge l lock"></span>
+      <span class="legseg lj" style="flex:2;font-size:.7rem;">Ljubljana<span class="hndl">↔</span></span>
+      <span class="legseg bl" style="flex:4;font-size:.7rem;">Bled<span class="hndl">↔</span></span>
+      <span class="legseg pi" style="flex:4;font-size:.7rem;">Piran</span>
+    <span class="edge r lock"></span></div>
+    <div class="sect" style="margin-top:.9rem;">Stays</div>
     <div class="staysrow">
       <span class="staybar" style="flex:2"><span class="lock">🔒</span><b>Union</b><small>free to May 12</small><span class="hndl warnh">↔</span></span>
       <span class="staybar" style="flex:3"><span class="lock">🔒</span><b>Toplice</b><small>held to arrival</small></span>
@@ -678,7 +698,7 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
   <div class="pagebody">
     <div class="win" style="height:30px;"><span class="edge l lock"></span>
       <span class="legseg lj" style="flex:2;font-size:.7rem;">Ljubljana</span>
-      <span class="legseg bl" style="flex:4;font-size:.7rem;outline:2px solid var(--accent);outline-offset:-2px;">Bled ✓</span>
+      <span class="legseg bl" style="flex:4;font-size:.7rem;outline:2px solid var(--accent);outline-offset:-2px;">Bled ✓<span class="hndl">↔</span></span>
       <span class="legseg pi" style="flex:4;font-size:.7rem;">Piran</span>
     <span class="edge r lock"></span></div>
     <div class="sect" style="margin-top:1rem;">Bled · May 17–20 · Toplice + Hiša Franko</div>
@@ -741,7 +761,15 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
   <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
     <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
     <span class="spacer"></span><span class="chipbtn">Book <span class="badge">⏰ 1</span></span><span class="chipbtn">Grid →</span></div>
-  <div class="pagebody" style="min-height:430px;"></div>
+  <div class="pagebody" style="min-height:430px;">
+    <div class="sect">Bled bucket</div>
+    <div class="cardrow">
+      <div class="mini" style="--k:var(--k-act)"><b>Vintgar Gorge</b></div>
+      <div class="mini" style="--k:var(--k-act)"><b>Bled Castle</b></div>
+      <div class="mini" style="--k:var(--k-meal)"><b>Rustika</b></div>
+      <div class="mini ghost" style="--k:var(--k-act);border-color:var(--accent);"><b>Hot-air balloon</b><small>adding…</small></div>
+    </div>
+  </div>
   <div class="overlay"><div class="scrim2"></div>
     <aside class="sheet"><span class="x2">×</span>
       <span class="kl">activity · booked</span><h3>Hot-air balloon (private)</h3>
@@ -768,9 +796,14 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
   <div class="pagebody" style="min-height:430px;">
     <div class="sect">Bled bucket</div>
     <div class="cardrow">
-      <div class="mini" style="--k:var(--k-meal);border-color:var(--accent);"><span class="iacts"><i>✎</i><i>✕</i></span><span class="grip2">⠿</span><b>Rustika</b><small>~1h</small></div>
-      <div class="mini ghost" style="--k:var(--k-act)"><span class="grip2">⠿</span><b>Toboggan</b><small>~1.5h</small></div>
+      <div class="mini" style="--k:var(--k-act)"><span class="iacts"><i>✎</i><i>✕</i></span><span class="grip2">⠿</span><b>Vintgar Gorge</b><small>2.5h 🔒</small></div>
       <div class="mini" style="--k:var(--k-act)"><span class="iacts"><i>✎</i><i>✕</i></span><span class="grip2">⠿</span><b>Bled Castle</b><small>~2h</small></div>
+      <div class="mini" style="--k:var(--k-act)"><span class="iacts"><i>✎</i><i>✕</i></span><span class="grip2">⠿</span><b>Via Ferrata</b><small>1.5h 🔒</small></div>
+      <div class="mini" style="--k:var(--k-act)"><span class="iacts"><i>✎</i><i>✕</i></span><span class="grip2">⠿</span><b>Canyoning</b><small>2h 🔒</small></div>
+      <div class="mini" style="--k:var(--k-meal);border-color:var(--accent);"><span class="iacts"><i>✎</i><i>✕</i></span><span class="grip2">⠿</span><b>Rustika</b><small>~1h · open in editor</small></div>
+      <div class="mini" style="--k:var(--k-meal)"><span class="iacts"><i>✎</i><i>✕</i></span><span class="grip2">⠿</span><b>Public &amp; Vegan</b><small>closed Mon</small></div>
+      <div class="mini ghost" style="--k:var(--k-act)"><span class="grip2">⠿</span><b>Toboggan</b><small>removing…</small></div>
+      <div class="mini" style="--k:var(--k-act)"><span class="iacts"><i>✎</i><i>✕</i></span><span class="grip2">⠿</span><b>Zipline</b><small>to book ⏰</small></div>
     </div>
   </div>
   <div class="overlay" style="pointer-events:none;"><div></div>
@@ -874,6 +907,7 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
     </div>
     <div class="bucketbox"><div class="bh"><b>Didn't fit — alternates</b></div>
       <div class="cardrow"><div class="mini ghost" style="--k:var(--k-act)"><span class="iacts"><i title="edit">✎</i><i title="remove">✕</i></span><span class="grip2">⠿</span><b>Zipline Dolinka</b><small>3 h · to book ⏰</small></div></div>
+      <div class="toolrow" style="margin-top:.3rem;"><button class="ctrl">Browse suggestions →</button><button class="ctrl">＋ add your own…</button></div>
     </div>
   </div>
 </section>
@@ -897,6 +931,9 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
       <div class="daycol hot"><div class="dh">Wed 20</div>
         <div class="mini" style="--k:var(--k-act);box-shadow:0 8px 20px rgba(13,76,68,.25);"><span class="iacts"><i title="edit">✎</i><i title="remove">✕</i></span><span class="grip2">⠿</span><b>Toboggan</b> <span class="tag pin">📌</span></div>
         <div class="mini" style="--k:var(--k-trav)"><b>→ Soča drive</b></div></div>
+    </div>
+    <div class="bucketbox"><div class="bh"><b>Didn't fit — alternates</b></div>
+      <div class="cardrow"><div class="mini ghost" style="--k:var(--k-act)"><span class="grip2">⠿</span><b>Zipline Dolinka</b><small>3 h · to book ⏰</small></div></div>
     </div>
     <div class="toolrow">
       <span class="paused">Auto-layout paused — manual edits</span>
@@ -964,7 +1001,14 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
   <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25</span>
     <span class="halves"><span>Plan</span><span>Shelf</span><span class="on">Days</span></span>
     <span class="spacer"></span><span class="chipbtn">Book <span class="badge">⏰ 1</span></span><span class="chipbtn">Grid →</span></div>
-  <div class="pagebody" style="min-height:430px;"></div>
+  <div class="pagebody" style="min-height:430px;">
+    <div class="canvas" style="margin:1.1rem 1.4rem;">
+      <div class="chead"><h2>Tuesday, May 19</h2></div>
+      <div class="tlr a" style="--k:var(--k-act)"><span class="t">5:30 – 7:30</span><span class="c"><b>Balloon</b> 🔒</span></div>
+      <div class="tlr a" style="--k:var(--k-meal);background:#faf3e3;"><span class="t">12:00 – 1:00</span><span class="c"><b>Lunch · Rustika</b> <span class="edit-aff">✎</span></span></div>
+      <div class="tlr a" style="--k:var(--k-act)"><span class="t">4:00 – 5:30</span><span class="c"><b>Via Ferrata</b> 🔒</span></div>
+    </div>
+  </div>
   <div class="overlay"><div class="scrim2"></div>
     <aside class="sheet"><span class="x2">×</span>
       <span class="kl">meal · no booking</span><h3>Lunch · Pizzeria Rustika</h3>
@@ -989,7 +1033,7 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
   <div class="dayrail">
     <div class="leg"><span class="legname">Bled</span><div class="chips"><span class="dchip"><span class="dow">Sun</span><span class="dnum">17</span><span class="state"></span></span><span class="dchip"><span class="dow">Mon</span><span class="dnum">18</span><span class="state"></span></span><span class="dchip on"><span class="dow">Tue</span><span class="dnum">19</span><span class="state" style="background:var(--warn)"></span></span><span class="dchip"><span class="dow">Wed</span><span class="dnum">20</span><span class="state"></span></span></div></div>
   </div>
-  <div class="work" style="grid-template-columns:1fr;">
+  <div class="work">
     <div class="canvas">
       <div class="chead"><h2>Tuesday, May 19</h2><span class="spacer"></span><span class="verdict bad">over-packed</span></div>
       <div style="padding:.6rem 1rem 0;"><div class="mini ghost" style="--k:var(--k-act);display:inline-block;box-shadow:0 8px 20px rgba(163,67,31,.25);"><span class="iacts"><i title="edit">✎</i><i title="remove">✕</i></span><span class="grip2">⠿</span><b>Zipline Dolinka</b><small>3 h</small></div></div>
@@ -1000,6 +1044,10 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
       <div class="tlr a" style="--k:var(--k-meal)"><span class="t">12:48</span><span class="c"><b>Lunch · Rustika</b> 📌 <span class="tag rest">reflowed +18 min</span></span></div>
       <div class="tlr a" style="--k:var(--k-act)"><span class="t">4:00</span><span class="c"><b>Via Ferrata</b> 🔒</span></div>
     </div>
+    <aside class="tray"><header><h3>Shelf · Bled</h3><p class="note">drag onto the day</p></header>
+      <div class="tcard" style="--k:var(--k-meal)"><span class="grip2">⠿</span><b>Public &amp; Vegan Kitchen</b><small>veg ✓ patio ✓ · closed Mon</small></div>
+      <p class="note" style="padding:.2rem .8rem .6rem;color:var(--muted);font-size:.66rem;">Zipline Dolinka — on the day ↑</p>
+    </aside>
   </div>
 </section>
 
@@ -1133,7 +1181,11 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
   <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 21–24 selected</span>
     <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
     <span class="spacer"></span><span class="chipbtn">Book <span class="badge">⏰ 1</span></span><span class="chipbtn">Grid →</span></div>
-  <div class="pagebody" style="min-height:430px;"></div>
+  <div class="pagebody" style="min-height:430px;">
+    <div class="sect">May 21 – 24 · a fork</div>
+    <div class="vartabs"><span class="vartab on">Option A — all-in Piran ✓ active</span><button class="ctrl" style="background:#e7f1ee;">＋ new variation…</button></div>
+    <div class="win" style="height:34px"><span class="legseg pi" style="flex:3">Piran<small>3n</small></span></div>
+  </div>
   <div class="overlay"><div class="scrim2"></div>
     <aside class="sheet"><span class="x2">×</span>
       <span class="kl">variation · May 21–24</span><h3>New variation</h3>
