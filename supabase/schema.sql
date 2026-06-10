@@ -137,6 +137,34 @@ create table if not exists user_weights (
   weights jsonb not null default '{}'
 );
 
+-- ── trips (PER-USER) ────────────────────────────────────────────────────────
+-- A first-class multi-city Trip: groups cities + days + entries as one object
+-- (Slovenia = Ljubljana + Bled + Piran under one Trip). The spine of the trip
+-- planner; supersedes the per-city cities.itinerary column (deprecated, not
+-- dropped). jsonb-heavy; round-tripped through lib/trip.js. See migration 0013
+-- and features/trip-planner-components.md.
+--   glance  { driveFrom, lodging, checkIn, diet, travelers[], pets[], theme, weather }
+--   preTrip { limitations[], bookingChecklist[], tips[], sources[] }
+--   legs    [ { cityId, name, arrive, depart, lodging, checkIn } ]
+--   options { directory[], excursions[], alternates[] }
+--   entries [ { id, day, cityId, time, kind, role, title, note, place,
+--             markers[], booking, cost } ]
+create table if not exists trips (
+  id          uuid primary key default gen_random_uuid(),
+  user_id     uuid not null references profiles (id) on delete cascade,
+  name        text not null,
+  theme       text,
+  start_date  date,
+  end_date    date,
+  glance      jsonb default '{}',
+  pre_trip    jsonb default '{}',
+  legs        jsonb default '[]',
+  options     jsonb default '{}',
+  entries     jsonb default '[]',
+  created_at  timestamptz default now(),
+  updated_at  timestamptz default now()
+);
+
 -- ── pois (SHARED, cached) ───────────────────────────────────────────────────
 -- Local cache of social POIs from Google Places (New). OSM coverage was too
 -- thin to measure social life; this is the durable store so Google is hit once
@@ -168,6 +196,7 @@ alter table cities          enable row level security;
 alter table felt_surveys    enable row level security;
 alter table baseline_ratings enable row level security;
 alter table user_weights    enable row level security;
+alter table trips           enable row level security;
 
 -- profiles: everyone signed in can read names; you update only your own.
 create policy "profiles readable by authed" on profiles for select to authenticated using (true);
@@ -192,3 +221,9 @@ create policy "baseline delete own" on baseline_ratings for delete to authentica
 -- user_weights: each user owns their row.
 create policy "weights readable by authed" on user_weights for select to authenticated using (true);
 create policy "weights upsert own" on user_weights for all to authenticated using (user_id = auth.uid()) with check (user_id = auth.uid());
+
+-- trips: readable by both (shared planning), writable only by owner.
+create policy "trips readable by authed" on trips for select to authenticated using (true);
+create policy "trips insert own" on trips for insert to authenticated with check (user_id = auth.uid());
+create policy "trips update own" on trips for update to authenticated using (user_id = auth.uid());
+create policy "trips delete own" on trips for delete to authenticated using (user_id = auth.uid());
