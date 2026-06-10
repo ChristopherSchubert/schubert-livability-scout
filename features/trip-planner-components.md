@@ -356,6 +356,31 @@ A11y: icon + **text label always** (no color-only meaning). Source announced as
   `cancel by <date>` (countdown). Extends `.bkbadge` / `.decide-meta-pill`.
   Never truncate a confirmation code.
 
+### 4.4b `EntryEditor` — the missing piece (added 2026-06-10; the catalog had no editor at all)
+**Problem.** Every entry must be editable where you see it — Janice fixes a
+time, swaps a restaurant, pastes a confirmation code, changes a note.
+**Form.** A side sheet (desktop) / full-screen sheet (mobile) opened from any
+entry — workspace rows, grid popover ("Edit →"), tray cards.
+
+| Field group | Fields |
+|---|---|
+| What | title · kind (6-select) · note |
+| When | day (select) · time mode (bucket / range / point) · start–end · duration |
+| Booking | confirmation · prepaid · cancel-by · cost (amount + currency + cash-only) |
+| Reach | contact · url · place (PlaceRef picker) |
+
+| Action | Semantics |
+|---|---|
+| Save | one `updateTrip` write |
+| **Pin / Unpin** | editing a *solved* time auto-pins; Re-solve flows around pins |
+| Move to day… | re-block to another day (keeps fuzzy time) |
+| Back to Shelf | un-block — returns to the pool, never deletes data |
+| Delete | with undo toast; never silent |
+
+A11y: focus-trapped sheet, Esc closes, labels on every field.
+Solve interplay: any time/duration edit marks the day "edited since solve" —
+the Re-solve button gets a dot; Solve treats pinned entries as hard.
+
 ### 4.5 Views — `DayPlan`, `GridView`, `AgendaView`
 | Component | Extends | Key states |
 |---|---|---|

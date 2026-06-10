@@ -155,6 +155,22 @@ entry = place, directions link, confirmation code, contact. Tomorrow is one
 rail-tap away. *Edge: offline-ish — the day must render from cached data; the
 codes are the thing she actually needs at the trailhead.*
 
+## 5.5 The editing model (added 2026-06-10 — the flows assumed it, nothing defined it)
+
+**Everything is editable where you see it.** Any entry, on any surface, opens
+the same `EntryEditor` sheet: workspace rows (click), grid popover ("Edit →"),
+tray cards (duration/markers before placing). One editor, every door.
+
+- **Edit ↔ Solve contract:** editing a solved entry's time **auto-pins** it
+  (📌); Re-solve reflows everything *around* pins. Any edit marks the day
+  "edited since solve" — the Re-solve button carries a dot until re-run.
+- **Three exits, distinct meanings:** *Back to Shelf* un-blocks (returns to
+  the pool, keeps all data) · *Move to day…* re-blocks elsewhere at fuzzy
+  time · *Delete* removes with an undo toast — never silently.
+- **Machine rows** (travel/buffer/free) aren't edited directly — they're
+  consequences. Adjusting them = pinning neighbors and re-solving; tapping
+  one offers "adjust the anchors around this."
+
 ## 6. What this forces on the mockups (the fix list)
 
 1. **Re-frame mockup 2 as the workspace**: Trip bar + Day rail + one day

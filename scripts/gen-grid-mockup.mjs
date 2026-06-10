@@ -180,7 +180,8 @@ border-radius:10px;box-shadow:0 18px 44px rgba(41,33,19,.22);padding:.9rem 1rem;
 #pop .pnote{font-size:.82rem;color:#2c2823;margin:.5rem 0;}
 #pop .prow{display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;margin-top:.45rem;font-size:.78rem;}
 #pop code{background:var(--panel-strong);border-radius:4px;padding:.08rem .4rem;font-variant-numeric:tabular-nums;}
-#pop .pday{display:inline-block;margin-top:.7rem;font-size:.78rem;font-weight:600;color:var(--accent);text-decoration:none;}
+#pop .pacts{display:flex;gap:1.1rem;margin-top:.7rem;}
+#pop .pday,#pop .pedit{display:inline-block;font-size:.78rem;font-weight:600;color:var(--accent);text-decoration:none;}
 #pop .x{position:absolute;top:.45rem;right:.6rem;border:0;background:none;font-size:1rem;color:var(--muted);cursor:pointer;}
 #scrim{position:fixed;inset:0;z-index:55;display:none;}
 
@@ -227,7 +228,7 @@ ${legSheets}
 <aside id="pop" role="dialog" aria-modal="false" aria-label="Entry details">
 <button class="x" aria-label="Close">×</button>
 <div class="ptime"></div><div class="pkind"></div><h3></h3><p class="pnote"></p><div class="prow"></div>
-<a class="pday" href="#">Open this day in the workspace →</a>
+<div class="pacts"><a class="pedit" href="#">Edit →</a><a class="pday" href="#">Open this day →</a></div>
 </aside>
 
 <script>
@@ -253,6 +254,7 @@ function show(e, ev) {
   if (e.contact) row.append(chip("📞 " + e.contact));
   if (e.url) { const a = document.createElement("a"); a.href = e.url; a.textContent = "link"; a.target = "_blank"; a.rel = "noopener"; row.append(a); }
   pop.querySelector(".pday").href = "trip-workspace.html?day=" + e.day;
+  pop.querySelector(".pedit").href = "trip-workspace.html?day=" + e.day + "&edit=" + e.i;
   const x = Math.min(ev.clientX + 14, innerWidth - 348), y = Math.min(ev.clientY + 14, innerHeight - 240);
   pop.style.left = x + "px"; pop.style.top = Math.max(y, 60) + "px";
   pop.style.display = "block"; scrim.style.display = "block";
