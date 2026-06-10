@@ -246,6 +246,22 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
 .toast2 b{color:#9fc4bb;cursor:pointer;}
 .collapsec{display:flex;align-items:center;gap:.5rem;font-size:.72rem;color:var(--muted);border:1px solid var(--panel-strong);background:var(--panel);border-radius:8px;padding:.32rem .7rem;margin:.5rem 0;cursor:pointer;}
 .collapsec b{color:var(--text);font-weight:600;}
+.cal{position:relative;margin:.2rem 0 .5rem;}
+.mlabel{font-family:var(--fd);font-style:italic;font-size:.8rem;color:var(--muted);margin-bottom:.25rem;}
+.calgrid{display:grid;grid-template-columns:repeat(17,1fr);}
+.cd{text-align:center;font-size:.6rem;color:var(--muted);padding:.12rem 0 .18rem;border-left:1px solid var(--panel-strong);}
+.cd b{display:block;font-size:.78rem;color:var(--text);font-variant-numeric:tabular-nums;font-weight:600;}
+.cd.we{background:#f6f1e2;}
+.cd.out{opacity:.35;}
+.legrow{display:grid;grid-template-columns:repeat(17,1fr);height:40px;margin-top:2px;position:relative;}
+.lseg{display:flex;align-items:center;justify-content:center;font-size:.73rem;font-weight:600;border:1.5px solid var(--border);position:relative;}
+.lseg small{font-weight:400;color:var(--muted);margin-left:.3rem;}
+.lseg.lj{background:#eef2e6;}.lseg.bl{background:#e7f1ee;}.lseg.pi{background:#f3ecdf;}
+.lseg.ghosted2{border-style:dashed;background:var(--panel);}
+.emptyspan{grid-column:4 / span 11;display:flex;align-items:center;justify-content:center;border:1.5px dashed var(--border);border-radius:8px;}
+.edge2{position:absolute;top:-3px;bottom:-3px;width:9px;background:var(--panel-strong);border:1px solid var(--border);border-radius:4px;cursor:ew-resize;z-index:4;}
+.edge2.lock{background:#e7f1ee;}
+.edge2.lock::after{content:"🔒";font-size:.55rem;position:absolute;inset:0;display:flex;align-items:center;justify-content:center;}
 </style></head><body>
 <div class="deck">
   <div class="dhead">
@@ -398,8 +414,13 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
     <span class="spacer"></span><span class="chipbtn">Book</span><span class="chipbtn">Grid →</span></div>
   <div class="pagebody">
     <div class="sect">The window — May 15 → 25 · provisional <button class="ctrl inlinectl">✎ adjust dates</button></div>
-    <div class="win"><span class="edge l" title="drag to shift the start"></span><span class="empty"><span class="dropz">⠿ drop a city here</span></span><span class="edge r" title="drag to shift the end"></span></div>
-    <div class="datesrow"><span>Fri 15</span><span>Sun 17</span><span>Tue 19</span><span>Thu 21</span><span>Sat 23</span><span>Mon 25</span></div>
+    <div class="cal"><div class="mlabel">May 2026</div>
+      <div class="calgrid"><span class="cd out">T<b>12</b></span><span class="cd out">W<b>13</b></span><span class="cd out">T<b>14</b></span><span class="cd">F<b>15</b></span><span class="cd we">S<b>16</b></span><span class="cd we">S<b>17</b></span><span class="cd">M<b>18</b></span><span class="cd">T<b>19</b></span><span class="cd">W<b>20</b></span><span class="cd">T<b>21</b></span><span class="cd">F<b>22</b></span><span class="cd we">S<b>23</b></span><span class="cd we">S<b>24</b></span><span class="cd">M<b>25</b></span><span class="cd out">T<b>26</b></span><span class="cd out">W<b>27</b></span><span class="cd out">T<b>28</b></span></div>
+      <div class="legrow"><span class="emptyspan"><span class="dropz">⠿ drop a city here</span></span>
+        <span class="edge2" style="left:calc(3/17*100% - 4px);"></span>
+        <span class="edge2" style="left:calc(14/17*100% - 5px);"></span>
+      </div>
+    </div>
     <div class="sect" style="margin-top:1.4rem;">Cities from the scout</div>
     <div class="toolrow"><span class="citychip">⠿ Ljubljana</span><span class="citychip">⠿ Bled</span><span class="citychip">⠿ Piran</span><span class="citychip">⠿ Kranj</span><button class="ctrl">＋ other city…</button></div>
   
@@ -416,9 +437,15 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
     <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
     <span class="spacer"></span><span class="chipbtn">Book</span><span class="chipbtn">Grid →</span></div>
   <div class="pagebody" style="position:relative;">
-    <div class="sect">The window — May 15 → 25 · provisional <button class="ctrl inlinectl" style="background:#e7f1ee;">✎ adjust dates</button></div>
-    <div class="win"><span class="edge l"></span><span class="empty"><span class="dropz">⠿ drop a city here</span></span><span class="edge r"></span></div>
-    <div class="pop" style="right:24px;top:64px;width:280px;">
+    <div class="sect">The window · provisional <button class="ctrl" style="background:#e7f1ee;margin-left:.6rem;">✎ adjust dates</button></div>
+    <div class="cal"><div class="mlabel">May 2026</div>
+      <div class="calgrid"><span class="cd out">T<b>12</b></span><span class="cd out">W<b>13</b></span><span class="cd out">T<b>14</b></span><span class="cd">F<b>15</b></span><span class="cd we">S<b>16</b></span><span class="cd we">S<b>17</b></span><span class="cd">M<b>18</b></span><span class="cd">T<b>19</b></span><span class="cd">W<b>20</b></span><span class="cd">T<b>21</b></span><span class="cd">F<b>22</b></span><span class="cd we">S<b>23</b></span><span class="cd we">S<b>24</b></span><span class="cd">M<b>25</b></span><span class="cd out">T<b>26</b></span><span class="cd out">W<b>27</b></span><span class="cd out">T<b>28</b></span></div>
+      <div class="legrow"><span class="emptyspan"><span class="dropz">⠿ drop a city here</span></span>
+        <span class="edge2" style="left:calc(3/17*100% - 4px);"></span>
+        <span class="edge2" style="left:calc(14/17*100% - 5px);"></span>
+      </div>
+    </div>
+    <div class="pop" style="left:140px;top:54px;width:280px;">
       <div class="frow" style="display:flex;gap:.5rem;">
         <span class="fld" style="flex:1;display:flex;flex-direction:column;gap:.12rem;"><label style="font-size:.64rem;color:var(--muted);">From</label><input type="date" value="2026-05-15" style="font-size:.8rem;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:.3rem .45rem;"></span>
         <span class="fld" style="flex:1;display:flex;flex-direction:column;gap:.12rem;"><label style="font-size:.64rem;color:var(--muted);">To</label><input type="date" value="2026-05-25" style="font-size:.8rem;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:.3rem .45rem;"></span>
@@ -444,12 +471,13 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
     <span class="spacer"></span><span class="chipbtn">Book</span><span class="chipbtn">Grid →</span></div>
   <div class="pagebody">
     <div class="sect">The window</div>
-    <div class="win"><span class="edge l"></span>
-      <span class="legseg lj" style="flex:2"><span class="grip2">⠿</span>Ljubljana<small>2n</small><span class="hndl">↔</span></span>
-      <span class="legseg bl" style="flex:4"><span class="grip2">⠿</span>Bled<small>4n</small><span class="hndl">↔</span></span>
-      <span class="legseg pi" style="flex:4"><span class="grip2">⠿</span>Piran<small>4n</small></span>
-    <span class="edge r"></span></div>
-    <div class="datesrow"><span>Fri 15</span><span>Sun 17</span><span>Tue 19</span><span>Thu 21</span><span>Sat 23</span><span>Mon 25</span></div>
+    <div class="cal"><div class="mlabel">May 2026</div>
+      <div class="calgrid"><span class="cd out">T<b>12</b></span><span class="cd out">W<b>13</b></span><span class="cd out">T<b>14</b></span><span class="cd">F<b>15</b></span><span class="cd we">S<b>16</b></span><span class="cd we">S<b>17</b></span><span class="cd">M<b>18</b></span><span class="cd">T<b>19</b></span><span class="cd">W<b>20</b></span><span class="cd">T<b>21</b></span><span class="cd">F<b>22</b></span><span class="cd we">S<b>23</b></span><span class="cd we">S<b>24</b></span><span class="cd">M<b>25</b></span><span class="cd out">T<b>26</b></span><span class="cd out">W<b>27</b></span><span class="cd out">T<b>28</b></span></div>
+      <div class="legrow"><span class="lseg lj" style="grid-column:4/span 2;"><span class="grip2">⠿</span>Ljubljana<small>2n</small><span class="hndl">↔</span></span><span class="lseg bl" style="grid-column:6/span 4;"><span class="grip2">⠿</span>Bled<small>4n</small><span class="hndl">↔</span></span><span class="lseg pi" style="grid-column:10/span 5;"><span class="grip2">⠿</span>Piran<small>4n · fly Mon 25</small></span>
+        <span class="edge2" style="left:calc(3/17*100% - 4px);"></span>
+        <span class="edge2" style="left:calc(14/17*100% - 5px);"></span>
+      </div>
+    </div>
     <div class="toolrow"><span class="lbl2">On the tray:</span><span class="citychip">⠿ Kranj</span><button class="ctrl">＋ other city…</button></div>
   
     <div class="sect" style="margin-top:1.3rem;">Transport <button class="ctrl inlinectl">＋ add transport…</button></div>
@@ -466,11 +494,13 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
     <span class="spacer"></span><span class="chipbtn">Book</span><span class="chipbtn">Grid →</span></div>
   <div class="pagebody" style="position:relative;">
     <div class="sect">The window</div>
-    <div class="win"><span class="edge l"></span>
-      <span class="legseg lj" style="flex:2">Ljubljana<small>2n</small></span>
-      <span class="legseg bl" style="flex:4">Bled<small>4n</small></span>
-      <span class="legseg pi" style="flex:4">Piran<small>4n</small></span>
-    <span class="edge r"></span></div>
+    <div class="cal"><div class="mlabel">May 2026</div>
+      <div class="calgrid"><span class="cd out">T<b>12</b></span><span class="cd out">W<b>13</b></span><span class="cd out">T<b>14</b></span><span class="cd">F<b>15</b></span><span class="cd we">S<b>16</b></span><span class="cd we">S<b>17</b></span><span class="cd">M<b>18</b></span><span class="cd">T<b>19</b></span><span class="cd">W<b>20</b></span><span class="cd">T<b>21</b></span><span class="cd">F<b>22</b></span><span class="cd we">S<b>23</b></span><span class="cd we">S<b>24</b></span><span class="cd">M<b>25</b></span><span class="cd out">T<b>26</b></span><span class="cd out">W<b>27</b></span><span class="cd out">T<b>28</b></span></div>
+      <div class="legrow"><span class="lseg lj" style="grid-column:4/span 2;"><span class="grip2">⠿</span>Ljubljana<small>2n</small><span class="hndl">↔</span></span><span class="lseg bl" style="grid-column:6/span 4;"><span class="grip2">⠿</span>Bled<small>4n</small><span class="hndl">↔</span></span><span class="lseg pi" style="grid-column:10/span 5;"><span class="grip2">⠿</span>Piran<small>4n · fly Mon 25</small></span>
+        <span class="edge2" style="left:calc(3/17*100% - 4px);"></span>
+        <span class="edge2" style="left:calc(14/17*100% - 5px);"></span>
+      </div>
+    </div>
     <div class="toolrow"><span class="lbl2">On the tray:</span><span class="citychip">⠿ Kranj</span><button class="ctrl" style="background:#e7f1ee;">＋ other city…</button></div>
     <div class="pop" style="left:180px;top:150px;width:250px;">
       <input value="trie" style="width:100%;font-family:var(--fu);font-size:.8rem;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:.35rem .5rem;margin-bottom:.4rem;">
@@ -493,12 +523,13 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
     <span class="spacer"></span><span class="chipbtn">Book</span><span class="chipbtn">Grid →</span></div>
   <div class="pagebody">
     <div class="sect">The window</div>
-    <div class="win"><span class="edge l"></span>
-      <span class="legseg lj" style="flex:2">Ljubljana<small>2n</small><span class="hndl">↔</span></span>
-      <span class="legseg bl" style="flex:4.5">Bled<small>4n → 5n</small><span class="hndl hot">↔</span></span>
-      <span class="legseg pi" style="flex:3.5">Piran<small>4n → 3n</small></span>
-    <span class="edge r"></span></div>
-    <div class="datesrow"><span>Fri 15</span><span>Sun 17</span><span>Tue 19</span><span>Thu 21</span><span>Sat 23</span><span>Mon 25</span></div>
+    <div class="cal"><div class="mlabel">May 2026</div>
+      <div class="calgrid"><span class="cd out">T<b>12</b></span><span class="cd out">W<b>13</b></span><span class="cd out">T<b>14</b></span><span class="cd">F<b>15</b></span><span class="cd we">S<b>16</b></span><span class="cd we">S<b>17</b></span><span class="cd">M<b>18</b></span><span class="cd">T<b>19</b></span><span class="cd">W<b>20</b></span><span class="cd">T<b>21</b></span><span class="cd">F<b>22</b></span><span class="cd we">S<b>23</b></span><span class="cd we">S<b>24</b></span><span class="cd">M<b>25</b></span><span class="cd out">T<b>26</b></span><span class="cd out">W<b>27</b></span><span class="cd out">T<b>28</b></span></div>
+      <div class="legrow"><span class="lseg lj" style="grid-column:4/span 2;">Ljubljana<small>2n</small><span class="hndl">↔</span></span><span class="lseg bl" style="grid-column:6/span 5;">Bled<small>4n → 5n</small><span class="hndl hot">↔</span></span><span class="lseg pi" style="grid-column:11/span 4;">Piran<small>→ 3n</small></span>
+        <span class="edge2" style="left:calc(3/17*100% - 4px);"></span>
+        <span class="edge2" style="left:calc(14/17*100% - 5px);"></span>
+      </div>
+    </div>
     <p class="dragnote">Bled +1 night · Piran −1</p>
     <div class="toolrow"><span class="lbl2">On the tray:</span><span class="citychip">⠿ Kranj</span><button class="ctrl">＋ other city…</button></div>
   
@@ -547,12 +578,13 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
     <span class="spacer"></span><span class="chipbtn">Book</span><span class="chipbtn">Grid →</span></div>
   <div class="pagebody">
     <div class="sect">The window</div>
-    <div class="win"><span class="edge l lock"></span>
-      <span class="legseg lj" style="flex:2">Ljubljana<small>2n</small><span class="hndl">↔</span></span>
-      <span class="legseg bl" style="flex:4">Bled<small>4n</small><span class="hndl">↔</span></span>
-      <span class="legseg pi" style="flex:4">Piran<small>4n</small></span>
-    <span class="edge r lock"></span></div>
-    <div class="datesrow"><span>Fri 15</span><span>Sun 17</span><span>Tue 19</span><span>Thu 21</span><span>Sat 23</span><span>Mon 25</span></div>
+    <div class="cal"><div class="mlabel">May 2026</div>
+      <div class="calgrid"><span class="cd out">T<b>12</b></span><span class="cd out">W<b>13</b></span><span class="cd out">T<b>14</b></span><span class="cd">F<b>15</b></span><span class="cd we">S<b>16</b></span><span class="cd we">S<b>17</b></span><span class="cd">M<b>18</b></span><span class="cd">T<b>19</b></span><span class="cd">W<b>20</b></span><span class="cd">T<b>21</b></span><span class="cd">F<b>22</b></span><span class="cd we">S<b>23</b></span><span class="cd we">S<b>24</b></span><span class="cd">M<b>25</b></span><span class="cd out">T<b>26</b></span><span class="cd out">W<b>27</b></span><span class="cd out">T<b>28</b></span></div>
+      <div class="legrow"><span class="lseg lj" style="grid-column:4/span 2;"><span class="grip2">⠿</span>Ljubljana<small>2n</small><span class="hndl">↔</span></span><span class="lseg bl" style="grid-column:6/span 4;"><span class="grip2">⠿</span>Bled<small>4n</small><span class="hndl">↔</span></span><span class="lseg pi" style="grid-column:10/span 5;"><span class="grip2">⠿</span>Piran<small>4n · fly Mon 25</small></span>
+        <span class="edge2 lock" style="left:calc(3/17*100% - 4px);"></span>
+        <span class="edge2 lock" style="left:calc(14/17*100% - 5px);"></span>
+      </div>
+    </div>
     <div class="toolrow"><span class="lbl2">On the tray:</span><span class="citychip">⠿ Kranj</span><button class="ctrl">＋ other city…</button></div>
     <div class="sect" style="margin-top:1.3rem;">Transport <button class="ctrl inlinectl">＋ add transport…</button></div>
     <div class="cardrow">
@@ -571,13 +603,14 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
     <span class="spacer"></span><span class="chipbtn">Book</span><span class="chipbtn">Grid →</span></div>
   <div class="pagebody" style="position:relative;">
     <div class="sect">The window</div>
-    <div class="win"><span class="edge l lock"></span>
-      <span class="legseg lj" style="flex:2">Ljubljana<small>2n</small><span class="hndl">↔</span></span>
-      <span class="legseg bl" style="flex:4">Bled<small>4n</small><span class="hndl">↔</span></span>
-      <span class="legseg pi" style="flex:3">Piran<small>3n</small><span class="hndl">↔</span></span>
-      <span class="legseg" style="flex:1;background:#fffdf6;border:1.5px dashed var(--accent);">Kranj<small>1n</small></span>
-    <span class="edge r lock"></span></div>
-    <div class="pop" style="right:8px;top:118px;width:250px;font-size:.74rem;padding:.55rem .7rem;">
+    <div class="cal"><div class="mlabel">May 2026</div>
+      <div class="calgrid"><span class="cd out">T<b>12</b></span><span class="cd out">W<b>13</b></span><span class="cd out">T<b>14</b></span><span class="cd">F<b>15</b></span><span class="cd we">S<b>16</b></span><span class="cd we">S<b>17</b></span><span class="cd">M<b>18</b></span><span class="cd">T<b>19</b></span><span class="cd">W<b>20</b></span><span class="cd">T<b>21</b></span><span class="cd">F<b>22</b></span><span class="cd we">S<b>23</b></span><span class="cd we">S<b>24</b></span><span class="cd">M<b>25</b></span><span class="cd out">T<b>26</b></span><span class="cd out">W<b>27</b></span><span class="cd out">T<b>28</b></span></div>
+      <div class="legrow"><span class="lseg lj" style="grid-column:4/span 2;">Ljubljana<small>2n</small><span class="hndl">↔</span></span><span class="lseg bl" style="grid-column:6/span 4;">Bled<small>4n</small><span class="hndl">↔</span></span><span class="lseg pi" style="grid-column:10/span 4;">Piran<small>3n</small><span class="hndl">↔</span></span><span class="lseg ghosted2" style="grid-column:14/span 1;">Kranj<small>1n</small></span>
+        <span class="edge2 lock" style="left:calc(3/17*100% - 4px);"></span>
+        <span class="edge2 lock" style="left:calc(14/17*100% - 5px);"></span>
+      </div>
+    </div>
+    <div class="pop" style="right:8px;top:168px;width:250px;font-size:.74rem;padding:.55rem .7rem;">
       🔒 Set by your return flight (May 25). Inside stays editable — to move this edge, <b>change the flight</b>.
       <div style="margin-top:.4rem;"><button class="ctrl" style="font-size:.68rem;">open the flight →</button></div>
     </div>
