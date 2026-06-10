@@ -143,12 +143,27 @@ grid cell, an agenda row, or a directory card.
 
 ```
 Trip
-├── glance     { destination, dates, nights, driveFrom, lodging, checkIn, diet, travelers[], pets[], theme }
-├── preTrip    { limitations[], bookingChecklist[], tips[], sources[] }
+├── glance          { destination, dates, nights, driveFrom, diet, travelers[], pets[], theme }
+├── preTrip         { limitations[], bookingChecklist[], tips[], sources[] }
+├── accommodations  per leg: candidates[] (pre-booking shortlist) + chosen stay   ← the "Stay" track ⭐
+├── reservations[]  unified booking spine — lodging + activities, lead-time + cancel-by  ⭐
 ├── days[] → entries[]                  ← scheduled plan  (GridView | AgendaView)
-├── options    { directory[], excursions[], alternates[] }   ← unscheduled pool
-└── (derived)  cashNeeded, bookingsLedger
+├── options         { directory[], excursions[], alternates[] }   ← the "Do" pool
+└── (derived)       cashNeeded, reservationLedger
 ```
+
+**Accommodation (per leg) — first-class, researched-then-booked early** (added
+after the research synthesis; the artifacts all lead with lodging and book it
+*first*). `{ legId, candidates: [ Stay ], chosenId, status }` where a
+`Stay = { name, place, priceRange, petPolicy, markers[], rating, source,
+booking? }`. Lives in **Gather** (shortlist candidates, filter by pet policy /
+price / location) and graduates to a **Reservation** when booked
+(check-in/out, confirmation, cancellation policy, parking).
+
+**Reservation (the booking spine).** `{ id, kind: lodging|activity, title,
+leadTime?, bookBy?, confirmation?, cancelBy?, prepaid?, cost? }` — one ledger
+over lodging *and* activities, deadline-aware. Lodging reservations are the
+highest-priority (book 4–6 mo ahead). Supersedes the old `bookingsLedger`.
 
 **Entry atom:** `{ id, day, time, kind, title, note, place, markers[], booking, cost, role }`
 — `time` is point | range | fuzzy; each `marker` carries an optional `source`;
@@ -167,9 +182,15 @@ phases (Silverthorne ≈ Gather; Jim Thorpe ≈ Blocked+Solving; Slovenia ≈ So
 
 | Phase | You're doing | Time fidelity | Primary view | Tool does |
 |---|---|---|---|---|
-| **1 · Gather** | brain-dump everything you might do | **none** | `OptionsDirectory`, `ExcursionRadius`, `AlternatesList` (the pool) | collect, attach markers + rough duration + location; suggest from city POIs |
+| **1 · Gather** | two parallel tracks → **Stay:** shortlist + book lodging *first*; **Do:** brain-dump everything you might do | **none** | `StayShortlist` + `AccommodationCard` · `OptionsDirectory`, `ExcursionRadius`, `AlternatesList` | filter stays by pet policy/price; collect activities w/ markers + duration + location; suggest from city POIs; lead-time alerts |
 | **2 · Block** | drag the **big rocks** into days | **fuzzy** ("Sat morning") | `AgendaView` w/ Morning/Afternoon/Evening buckets | warn "day is overstuffed", keep anchors loose |
-| **3 · Solve** | make each day actually feasible | **precise** (clock) | `GridView` (tighten) | **auto-insert travel legs** (drive time from the map), flag no-buffer days, **surface free gaps**, total cash/bookings |
+| **3 · Solve** | *(optional)* make each day actually feasible | **precise** (clock) | `GridView` (tighten) | **auto-insert travel legs** (drive time from the map), flag no-buffer days, **surface free gaps**, total cash/reservations |
+
+> **Two refinements from the research synthesis** ([trip-research-synthesis.md](trip-research-synthesis.md)):
+> (a) Gather is **two tracks** — *Stay* (lodging, booked earliest, its own
+> research→book lifecycle) runs ahead of *Do* (activities). (b) **Solve is
+> optional** — the basecamp archetype (Silverthorne) deliberately stops at loose
+> buckets; the agenda is a legitimate *final* form, not only a waypoint to a grid.
 
 ### What this introduces to the model
 1. **Time fidelity is a first-class progression, not a fixed format.** An entry's
@@ -346,15 +367,21 @@ view swap, same data — not a second model).
 | `TripTips` | `.card` (collapsible) | practical notes |
 | `SourcesList` | `.metric-source` rows | the citation ledger |
 
-### 4.7 Options pool + rollups
+### 4.7 Stay track (lodging — booked first) ⭐
 | Component | Extends | Notes |
 |---|---|---|
-| `OptionsDirectory` | `.city-card` / `.image-research-card` | candidate places as attribute cards (rating, hours, meals, price, `MarkerSet`); drag into a day |
+| `StayShortlist` | `.city-card` grid | per-leg candidate stays *pre-booking*; filter by **pet policy** / price / location; states: shortlisted / chosen / booked |
+| `AccommodationCard` | `.city-card` + `MarkerSet` | one candidate stay: name, `PlaceRef`, price range, pet policy (cited), rating; "book" → graduates to a `Reservation` (check-in/out, confirmation, cancellation policy, parking) |
+
+### 4.8 Do pool + rollups
+| Component | Extends | Notes |
+|---|---|---|
+| `OptionsDirectory` | `.city-card` / `.image-research-card` | candidate activities/dining as attribute cards (rating, hours, meals, price, `MarkerSet`); drag into a day |
 | `ExcursionRadius` | `.benchmark-pill` rows | side-trips grouped by drive-time radius (<1 hr, <3 hr) |
 | `AlternatesList` | `.day-card` (muted) | backup / rainy-day / parallel options off the timeline |
 | `StatusMatrix` | `.climate-legend` / table | activity × attribute → ✅/❌/N-A ("can Cocoa come?") |
 | `CashNeeded` | `.benchmark-pill` | cash-only sum by currency |
-| `BookingsLedger` | `.checklist-card` | confirmations + cancel-by, soonest first |
+| `ReservationLedger` | `.checklist-card` | **lodging + activities** in one ledger: lead-time ("book 4–6 mo ahead"), confirmation, cancel-by countdown, soonest first. Lodging rows rank highest. (supersedes the old `BookingsLedger`) |
 
 ---
 
