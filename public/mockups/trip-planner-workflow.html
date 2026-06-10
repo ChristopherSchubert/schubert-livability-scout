@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trip planner — workflow mockup · Gather → Block → Solve</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#fbf6ea; --panel:#fffdf6; --panel-strong:#f4eddc; --border:#d8ccb8;
+  --text:#1b1814; --ink-soft:#2c2823; --muted:#6b6358; --accent:#0d4c44;
+  --accent-soft:#d2e6e1; --radius:14px; --radius-tight:7px;
+  --shadow:0 10px 30px rgba(41,33,19,.06);
+  --font-display:'Fraunces',Georgia,serif; --font-ui:'Inter Tight',system-ui,sans-serif;
+  --kind-booked:#0d4c44; --kind-meal:#9a5a16; --kind-travel:#2e5482;
+  --kind-checkin:#665285; --kind-todo:#7d5e22; --kind-flexible:#6b6358;
+  --warn:#a3431f;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--font-ui);line-height:1.5;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(rgba(120,100,60,.035) 1px,transparent 1px);background-size:4px 4px;}
+.wrap{max-width:1020px;margin:0 auto;padding:64px 32px 120px;}
+.eyebrow{font-size:.72rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:0 0 .5rem;}
+h1,h2,h3{font-family:var(--font-display);font-weight:500;margin:0;line-height:1.08;}
+.mock-banner{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);
+  border:1px dashed var(--border);border-radius:100px;padding:.35rem .9rem;display:inline-block;}
+.hero h1{font-size:clamp(2.2rem,5vw,3.4rem);margin-top:.4rem;}
+.hero .sub{font-family:var(--font-display);font-size:1.12rem;color:var(--ink-soft);max-width:62ch;margin:.7rem 0 0;}
+.hero .sub em{color:var(--accent);}
+
+/* phase rail */
+.rail{display:flex;gap:.6rem;margin-top:1.8rem;flex-wrap:wrap;}
+.rail .step{display:flex;align-items:center;gap:.55rem;background:var(--panel);border:1px solid var(--border);
+  border-radius:100px;padding:.45rem 1rem;font-size:.85rem;}
+.rail .step b{font-family:var(--font-display);font-size:1rem;}
+.rail .step .n{font-family:var(--font-display);font-style:italic;color:var(--accent);}
+.rail .arrow{color:var(--muted);align-self:center;}
+
+.section{margin-top:84px;}
+.phase-head{display:flex;align-items:baseline;gap:1rem;border-bottom:1px solid var(--border);padding-bottom:.7rem;margin-bottom:1.5rem;}
+.phase-head .num{font-family:var(--font-display);font-style:italic;font-size:2.2rem;color:var(--accent);}
+.phase-head h2{font-size:1.6rem;}
+.phase-head .what{margin-left:auto;font-size:.8rem;color:var(--muted);max-width:34ch;text-align:right;}
+.prov{font-family:var(--font-display);font-style:italic;color:var(--muted);font-size:.9rem;margin:.4rem 0 1.4rem;}
+.prov code{font-family:'Inter Tight';font-style:normal;font-size:.78rem;background:var(--panel-strong);border-radius:4px;padding:.05rem .35rem;}
+
+/* GATHER pool */
+.pool{display:grid;grid-template-columns:repeat(2,1fr);gap:1.2rem;}
+.cat{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;}
+.cat header{background:var(--panel-strong);padding:.6rem 1rem;display:flex;justify-content:space-between;align-items:baseline;}
+.cat header h3{font-size:1.02rem;}
+.cat header .ct{font-size:.72rem;color:var(--muted);}
+.cand{padding:.65rem 1rem;border-top:1px solid var(--panel-strong);}
+.cand .row1{display:flex;justify-content:space-between;gap:.6rem;align-items:baseline;}
+.cand .nm{font-weight:600;font-size:.9rem;}
+.cand .stat{font-size:.74rem;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap;}
+.cand .mks{display:flex;gap:.3rem;flex-wrap:wrap;margin-top:.3rem;}
+.mk{font-size:.68rem;font-weight:500;display:inline-flex;align-items:center;gap:.22rem;
+  background:var(--panel-strong);border:1px solid var(--border);border-radius:100px;padding:.12rem .45rem;color:var(--ink-soft);}
+.mk.cited{border-color:#bcd8d0;background:#e7f1ee;}
+.mk .src{color:var(--muted);font-weight:400;font-style:italic;font-size:.62rem;border-left:1px solid var(--border);padding-left:.25rem;}
+.mk.warnnote{border-color:#dcc3a8;background:#f6ead8;color:var(--warn);}
+.unverified{font-size:.68rem;color:var(--muted);font-style:italic;}
+
+/* BLOCK buckets */
+.day-board{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:1.2rem 1.4rem;}
+.day-board .dt{font-family:var(--font-display);font-size:1.25rem;margin-bottom:.9rem;}
+.bucket{margin-bottom:1rem;}
+.bucket .bl{font-size:.7rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);
+  display:flex;align-items:center;gap:.6rem;margin-bottom:.5rem;}
+.bucket .bl::after{content:"";flex:1;height:1px;background:var(--border);}
+.anchorcard{display:inline-flex;align-items:center;gap:.55rem;background:var(--bg);border:1px solid var(--border);
+  border-left:4px solid var(--k,var(--border));border-radius:var(--radius-tight);padding:.5rem .8rem;margin:0 .5rem .5rem 0;
+  font-size:.86rem;box-shadow:0 2px 6px rgba(41,33,19,.05);cursor:grab;}
+.anchorcard .grip{color:var(--border);font-size:.9rem;letter-spacing:-1px;}
+.anchorcard b{font-weight:600;}
+.fixedpill{font-size:.64rem;font-weight:700;letter-spacing:.06em;background:#e7f1ee;color:var(--accent);
+  border-radius:100px;padding:.12rem .5rem;}
+.fuzzy{font-size:.72rem;color:var(--muted);font-style:italic;}
+.block-note{font-family:var(--font-display);font-style:italic;color:var(--muted);font-size:.92rem;margin-top:.9rem;}
+
+/* SOLVE timeline */
+.solvegrid{display:grid;grid-template-columns:1fr 1fr;gap:1.6rem;align-items:start;}
+.timeline{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;}
+.timeline header{background:var(--panel-strong);padding:.65rem 1rem;display:flex;justify-content:space-between;align-items:center;}
+.timeline header h3{font-size:1rem;}
+.verdict{font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;border-radius:100px;padding:.18rem .6rem;}
+.verdict.ok{background:#e7f1ee;color:var(--accent);}
+.verdict.bad{background:#f6e0d4;color:var(--warn);}
+.tl-row{display:grid;grid-template-columns:88px 1fr;border-top:1px solid var(--panel-strong);}
+.tl-row .tt{font-variant-numeric:tabular-nums;font-size:.76rem;color:var(--muted);padding:.5rem .7rem;border-right:1px solid var(--panel-strong);}
+.tl-row .tc{padding:.45rem .8rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;}
+.tl-row.anchor .tc{font-weight:600;font-size:.86rem;}
+.tl-row.anchor{border-left:4px solid var(--k,var(--border));}
+.tl-row.machine{background:repeating-linear-gradient(135deg,transparent,transparent 7px,rgba(120,100,60,.04) 7px,rgba(120,100,60,.04) 9px);}
+.tl-row.machine .tc{color:var(--ink-soft);font-size:.8rem;}
+.machinetag{font-size:.6rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--kind-travel);
+  border:1px solid #c4d2e2;background:#eaf0f6;border-radius:100px;padding:.08rem .45rem;}
+.machinetag.rest{color:var(--kind-flexible);border-color:var(--border);background:var(--panel-strong);}
+.flagbar{display:flex;gap:.6rem;align-items:flex-start;background:#f6e0d4;border:1px solid #dcb49a;border-radius:var(--radius-tight);
+  padding:.7rem .9rem;margin:.9rem;font-size:.84rem;color:#7c2f12;}
+.flagbar b{font-weight:700;}
+.legend{display:flex;gap:1rem;margin-top:1rem;font-size:.76rem;color:var(--muted);flex-wrap:wrap;}
+.legend .sw{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin-right:.3rem;}
+
+.foot-note{margin-top:90px;border-top:1px solid var(--border);padding-top:1.4rem;font-family:var(--font-display);
+  font-style:italic;color:var(--muted);font-size:.95rem;max-width:70ch;}
+@media(max-width:820px){.pool{grid-template-columns:1fr;}.solvegrid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="mock-banner">Mockup 2 · every value below is real engine output (2026-06-10 runs)</span>
+
+  <header class="hero" style="margin-top:36px;">
+    <p class="eyebrow">Trip planner · the workflow</p>
+    <h1>How a trip gets built</h1>
+    <p class="sub">You do the judgment — <em>gather</em> what looks good, <em>block</em> the big rocks into days. The machine does the labor — <em>solve</em> the logistics into Janice's grid. Nothing on this page is hand-placed: the pool below is a live <code style="font-family:'Inter Tight';font-size:.85rem;">sourcing.js</code> run, the schedules are <code style="font-family:'Inter Tight';font-size:.85rem;">solve.js</code> output, the markers came from the Google fetch.</p>
+    <div class="rail">
+      <span class="step"><span class="n">1</span> <b>Gather</b> <span style="color:var(--muted)">the want-list</span></span>
+      <span class="arrow">→</span>
+      <span class="step"><span class="n">2</span> <b>Block</b> <span style="color:var(--muted)">big rocks, fuzzy days</span></span>
+      <span class="arrow">→</span>
+      <span class="step"><span class="n">3</span> <b>Solve</b> <span style="color:var(--muted)">the machine builds the grid</span></span>
+    </div>
+  </header>
+
+  <!-- ════ 1 · GATHER ════ -->
+  <section class="section">
+    <div class="phase-head">
+      <span class="num">1</span><h2>Gather — the candidate pool</h2>
+      <span class="what">Sourced from the cached Google Places data near Bled. Ranked by rating × review-volume.</span>
+    </div>
+    <p class="prov">114 real candidates near Bled · top of each category shown · markers are <b>cited</b> (chip shows source + fetch date) or honestly absent — never guessed.</p>
+
+    <div class="pool">
+      <div class="cat">
+        <header><h3>Eat &amp; drink</h3><span class="ct">64 candidates</span></header>
+        <div class="cand">
+          <div class="row1"><span class="nm">Pizzeria Rustika</span><span class="stat">★4.7 · 4,819 · 0.77 km</span></div>
+          <div class="mks">
+            <span class="mk cited">🐾 Dog <span class="src">Google · 06-10</span></span>
+            <span class="mk cited">🥦 Veg <span class="src">Google · 06-10</span></span>
+            <span class="mk cited">☂️ Patio <span class="src">Google · 06-10</span></span>
+            <span class="mk cited">🧒 Kids <span class="src">Google · 06-10</span></span>
+            <span class="mk">€€</span>
+          </div>
+        </div>
+        <div class="cand">
+          <div class="row1"><span class="nm">Public &amp; Vegan Kitchen Bled</span><span class="stat">★4.7 · 2,046 · 0.33 km</span></div>
+          <div class="mks">
+            <span class="mk cited">🐾 Dog <span class="src">Google · 06-10</span></span>
+            <span class="mk cited">☂️ Patio <span class="src">Google · 06-10</span></span>
+            <span class="mk cited">♿ Accessible <span class="src">Google · 06-10</span></span>
+            <span class="mk warnnote">📅 Closed Mondays</span>
+          </div>
+        </div>
+        <div class="cand">
+          <div class="row1"><span class="nm">Oštarija Peglez'n</span><span class="stat">★4.5 · 4,513 · 0.45 km</span></div>
+          <div class="mks"><span class="mk">€€</span> <span class="unverified">attributes not fetched — unverified, not assumed</span></div>
+        </div>
+        <div class="cand">
+          <div class="row1"><span class="nm">Confectionery Zima</span><span class="stat">★4.6 · 3,386 · 0.69 km</span></div>
+          <div class="mks"><span class="mk">€€</span> <span class="unverified">unverified</span></div>
+        </div>
+      </div>
+
+      <div class="cat">
+        <header><h3>See &amp; do</h3><span class="ct">19 candidates</span></header>
+        <div class="cand">
+          <div class="row1"><span class="nm">Bled Castle</span><span class="stat">★4.4 · 34,279 · 0.99 km</span></div>
+          <div class="mks">
+            <span class="mk cited">🧒 Kids <span class="src">Google · 06-10</span></span>
+            <span class="mk">⏰ opens 8:00 AM</span>
+          </div>
+        </div>
+        <div class="cand">
+          <div class="row1"><span class="nm">Zipline Dolinka Bled</span><span class="stat">★5.0 · 5,446 · 0.51 km</span></div>
+          <div class="mks"><span class="unverified">unverified</span></div>
+        </div>
+        <div class="cand">
+          <div class="row1"><span class="nm">Blejsko jezero (the lake)</span><span class="stat">★4.8 · 414 · 0.69 km</span></div>
+          <div class="mks"><span class="unverified">unverified</span></div>
+        </div>
+        <div class="cand">
+          <div class="row1"><span class="nm">Straža hill above Lake Bled</span><span class="stat">★4.7 · 1,752 · 1.14 km</span></div>
+          <div class="mks"><span class="unverified">unverified</span></div>
+        </div>
+      </div>
+
+      <div class="cat" style="grid-column:1 / -1;">
+        <header><h3>Stay — the shortlist (booked first)</h3><span class="ct">6 lodging candidates · filter: price · location · pet policy</span></header>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);">
+          <div class="cand" style="border-right:1px solid var(--panel-strong);">
+            <div class="row1"><span class="nm">Hotel Lovec</span><span class="stat">★4.3 · 974 · 0.24 km</span></div>
+            <div class="mks"><span class="mk">shortlisted</span></div>
+          </div>
+          <div class="cand" style="border-right:1px solid var(--panel-strong);">
+            <div class="row1"><span class="nm">Penzion Berc</span><span class="stat">★4.8 · 339 · 0.50 km</span></div>
+            <div class="mks"><span class="mk">shortlisted</span></div>
+          </div>
+          <div class="cand">
+            <div class="row1"><span class="nm">Grand Hotel Toplice</span><span class="stat">lakefront</span></div>
+            <div class="mks"><span class="mk cited">● Booked · PH27710297</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════ 2 · BLOCK ════ -->
+  <section class="section">
+    <div class="phase-head">
+      <span class="num">2</span><h2>Block — big rocks into fuzzy days</h2>
+      <span class="what">Drag from the pool onto a day. No clock yet — the bucket is the fidelity. Booked times are hard pins.</span>
+    </div>
+    <div class="day-board">
+      <div class="dt">Tuesday, May 19 · Bled</div>
+      <div class="bucket">
+        <div class="bl">Morning</div>
+        <span class="anchorcard" style="--k:var(--kind-booked)"><span class="grip">⠿</span> <b>Hot-air balloon (private)</b> <span class="fixedpill">FIXED 05:30</span></span>
+        <span class="anchorcard" style="--k:var(--kind-flexible)"><span class="grip">⠿</span> <b>Bled Castle</b> <span class="fuzzy">~2 hrs, sometime</span></span>
+      </div>
+      <div class="bucket">
+        <div class="bl">Midday</div>
+        <span class="anchorcard" style="--k:var(--kind-meal)"><span class="grip">⠿</span> <b>Pizzeria Rustika</b> <span class="fuzzy">lunch-ish</span></span>
+      </div>
+      <div class="bucket">
+        <div class="bl">Afternoon</div>
+        <span class="anchorcard" style="--k:var(--kind-booked)"><span class="grip">⠿</span> <b>Via Ferrata Hvadnik</b> <span class="fixedpill">FIXED 16:00</span></span>
+      </div>
+      <p class="block-note">Four anchors. That's all the human places — two are hard-pinned by bookings, two float. Everything else on the finished day is the machine's job.</p>
+    </div>
+  </section>
+
+  <!-- ════ 3 · SOLVE ════ -->
+  <section class="section">
+    <div class="phase-head">
+      <span class="num">3</span><h2>Solve — the machine builds the day</h2>
+      <span class="what">Real solve.js output. Hatched rows = machine-inserted logistics. Solid-edge rows = your anchors.</span>
+    </div>
+    <p class="prov">Left: the 4 anchors solved — <b>9 entries out</b>, 5 woven in by the machine. Right: the same day with 3 more anchors piled on — Solve reflows what fits and <b>flags what doesn't</b>, instead of silently cramming.</p>
+
+    <div class="solvegrid">
+      <div class="timeline">
+        <header><h3>Solved · 4 anchors in</h3><span class="verdict ok">feasible</span></header>
+        <div class="tl-row machine"><div class="tt">05:26–05:30</div><div class="tc">Travel <span class="machinetag">machine · 4 min est.</span></div></div>
+        <div class="tl-row anchor" style="--k:var(--kind-booked)"><div class="tt">05:30–07:30</div><div class="tc">Hot-air balloon (private)</div></div>
+        <div class="tl-row machine"><div class="tt">07:30–07:34</div><div class="tc">Travel <span class="machinetag">machine · 4 min est.</span></div></div>
+        <div class="tl-row anchor" style="--k:var(--kind-flexible)"><div class="tt">07:34–09:34</div><div class="tc">Bled Castle (hike + tour)</div></div>
+        <div class="tl-row machine"><div class="tt">09:34–09:54</div><div class="tc">Buffer / rest <span class="machinetag rest">machine</span></div></div>
+        <div class="tl-row anchor" style="--k:var(--kind-meal)"><div class="tt">12:00–13:00</div><div class="tc">Pizzeria Rustika <span class="machinetag rest">placed in lunch window</span></div></div>
+        <div class="tl-row machine"><div class="tt">13:00–15:56</div><div class="tc">Free / open <span class="machinetag rest">machine · surfaced, not hidden</span></div></div>
+        <div class="tl-row machine"><div class="tt">15:56–16:00</div><div class="tc">Travel <span class="machinetag">machine · 4 min est.</span></div></div>
+        <div class="tl-row anchor" style="--k:var(--kind-booked)"><div class="tt">16:00–17:30</div><div class="tc">Via Ferrata Hvadnik</div></div>
+      </div>
+
+      <div class="timeline">
+        <header><h3>Same day + 3 more anchors</h3><span class="verdict bad">over-packed</span></header>
+        <div class="flagbar">⚠️ <span><b>Over-packed:</b> 1 anchor couldn't fit — <b>Zipline Dolinka</b>. Everything else reflowed: Vintgar Gorge took the late morning, lunch slid to 12:48, free time shrank to 2 hrs, the toboggan landed after the via ferrata.</span></div>
+        <div class="tl-row anchor" style="--k:var(--kind-booked)"><div class="tt">05:30–07:30</div><div class="tc">Hot-air balloon (private)</div></div>
+        <div class="tl-row anchor" style="--k:var(--kind-flexible)"><div class="tt">07:34–09:34</div><div class="tc">Bled Castle (hike + tour)</div></div>
+        <div class="tl-row anchor" style="--k:var(--kind-booked)"><div class="tt">09:58–12:28</div><div class="tc">Vintgar Gorge walk</div></div>
+        <div class="tl-row anchor" style="--k:var(--kind-meal)"><div class="tt">12:48–13:48</div><div class="tc">Pizzeria Rustika <span class="machinetag rest">lunch reflowed +48 min</span></div></div>
+        <div class="tl-row machine"><div class="tt">13:48–15:55</div><div class="tc">Free / open <span class="machinetag rest">shrunk to fit</span></div></div>
+        <div class="tl-row anchor" style="--k:var(--kind-booked)"><div class="tt">16:00–17:30</div><div class="tc">Via Ferrata Hvadnik</div></div>
+        <div class="tl-row anchor" style="--k:var(--kind-flexible)"><div class="tt">17:34–19:04</div><div class="tc">Straža hill toboggan</div></div>
+        <div class="tl-row machine"><div class="tt">19:04–19:14</div><div class="tc">Buffer / rest <span class="machinetag rest">machine</span></div></div>
+      </div>
+    </div>
+
+    <div class="legend">
+      <span><span class="sw" style="background:var(--kind-booked)"></span>booked anchor</span>
+      <span><span class="sw" style="background:var(--kind-meal)"></span>meal anchor</span>
+      <span><span class="sw" style="background:var(--kind-flexible)"></span>flexible anchor</span>
+      <span><span class="sw" style="background:repeating-linear-gradient(135deg,#fff,#fff 3px,rgba(120,100,60,.18) 3px,rgba(120,100,60,.18) 5px);border:1px solid var(--border)"></span>machine-inserted (travel · buffer · free)</span>
+    </div>
+  </section>
+
+  <p class="foot-note">Mockup 2 of 2 — the workflow. Companion to <a href="trip-planner.html" style="color:var(--accent)">mockup 1 (the finished trip)</a>. Every candidate, rating, distance, marker, time, and flag on this page came out of <span style="font-family:'Inter Tight';font-style:normal;font-size:.85rem;">lib/sourcing.js</span> and <span style="font-family:'Inter Tight';font-style:normal;font-size:.85rem;">lib/solve.js</span> runs against the live database on 2026-06-10. Travel times are labeled estimates (haversine × road factor) until road routing lands.</p>
+
+</div>
+</body>
+</html>
