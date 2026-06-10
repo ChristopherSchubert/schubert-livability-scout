@@ -171,6 +171,24 @@ tray cards (duration/markers before placing). One editor, every door.
   consequences. Adjusting them = pinning neighbors and re-solving; tapping
   one offers "adjust the anchors around this."
 
+### The editor's control model (2026-06-10 — after "Save/Pin/Delete/Shelf is
+### missing UX rationality"; it was — four controls from three categories
+### posing as peers)
+
+Every control must be exactly one of four things, and each gets its own home:
+
+| Class | Control | Home | Rationale |
+|---|---|---|---|
+| **Field** | all inputs | the form, **autosaved** (debounced) | matches the app-wide PlannerProvider convention; no Save/Cancel pair, no draft state. Footer shows a quiet "Saved ✓" status; the only exit is **Done** (and ×/Esc, which mean the same thing — nothing is ever lost). |
+| **Property** | 📌 *Hold at this time* | a toggle **beside the time fields** | pinned is state, like prepaid — not an exit action. Auto-checks when a solved entry's time is edited. |
+| **Lifecycle move** | *Move to…* (another day · the Shelf) | one select/menu | the same transition family — re-block elsewhere or un-block entirely. Never deletes data. |
+| **Destruction** | *Delete* | alone, visually separated, always with undo | the only irreversible-feeling act gets isolation + a safety net. |
+
+**Context-sensitivity:** machine rows open a read-only summary — no move, no
+delete, no pin (you can't shelve a travel leg; it's a consequence). Their one
+affordance: "adjust the anchors around this." Past days: fields editable
+(notes!), moves disabled.
+
 ## 6. What this forces on the mockups (the fix list)
 
 1. **Re-frame mockup 2 as the workspace**: Trip bar + Day rail + one day

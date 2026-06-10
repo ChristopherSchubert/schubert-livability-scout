@@ -266,7 +266,7 @@ font-size:.82rem;border-radius:100px;padding:.5rem 1.1rem;z-index:90;display:non
 <aside id="editor" role="dialog" aria-modal="true" aria-label="Edit entry">
   <header><span class="kindlbl" id="ed-kindlbl" style="--k:var(--kind-booked)">Booked</span><h2 id="ed-title-h">Edit entry</h2><button class="x" aria-label="Close">×</button></header>
   <div class="body">
-    <p class="pinned-note" id="ed-pinnote">📌 This entry is pinned — Re-solve will flow around it. Changing the time keeps it pinned.</p>
+    <p class="pinned-note" id="ed-machnote">⚙️ Machine entry — a consequence of Solve, not a thing you edit. To change it, adjust the anchors around it and Re-solve. It can't be moved, pinned, or deleted.</p>
     <div class="fgroup"><div class="glabel">What</div>
       <div class="frow"><span class="fld"><label for="ed-title">Title</label><input id="ed-title"></span></div>
       <div class="frow">
@@ -287,6 +287,7 @@ font-size:.82rem;border-radius:100px;padding:.5rem 1.1rem;z-index:90;display:non
         <span class="fld"><label for="ed-arrive">Arrive by — if earlier than start</label><input id="ed-arrive" type="time"></span>
         <span class="fld"></span>
       </div>
+      <div class="frow"><span class="checkline"><input type="checkbox" id="ed-pinned"><label for="ed-pinned">📌 Hold at this time — Re-solve won't move it</label></span></div>
     </div>
     <div class="fgroup"><div class="glabel">Logistics</div>
       <div class="frow"><span class="fld"><label for="ed-meet">Meeting point</label><input id="ed-meet" placeholder="parking behind Teja bar"></span></div>
@@ -321,11 +322,11 @@ font-size:.82rem;border-radius:100px;padding:.5rem 1.1rem;z-index:90;display:non
     </div>
   </div>
   <footer>
-    <button class="btn primary" id="ed-save">Save</button>
-    <button class="btn" id="ed-pin">📌 Pin</button>
-    <button class="btn" id="ed-shelf">Back to Shelf</button>
-    <span class="sep"></span>
     <button class="btn danger" id="ed-del">Delete</button>
+    <span class="sep"></span>
+    <span id="ed-savestate" style="font-size:.74rem;color:var(--muted);">Saved ✓ · autosaves as you type</span>
+    <select id="ed-move" class="btn"><option value="">Move to…</option><option value="2026-05-17">Sun, May 17</option><option value="2026-05-18">Mon, May 18</option><option value="2026-05-20">Wed, May 20</option><option value="shelf">↩ Back to the Shelf</option></select>
+    <button class="btn primary" id="ed-done">Done</button>
   </footer>
 </aside>
 <div id="toast"></div>
@@ -367,8 +368,13 @@ function openEd(e){
   $("ed-cash").checked=!!e.cash; $("ed-payafter").checked=!!e.payafter;
   $("ed-conf").value=e.conf||""; $("ed-prepaid").checked=!!e.prepaid;
   $("ed-cphone").value=e.phone||""; $("ed-cemail").value=e.email||"";
-  $("ed-pinnote").style.display=e.pinned?"block":"none";
-  $("ed-pin").textContent=e.pinned?"📌 Unpin":"📌 Pin";
+  $("ed-pinned").checked=!!e.pinned;
+  // Machine rows: read-only summary — consequences aren't edited, moved, or deleted.
+  $("ed-machnote").style.display=e.machine?"block":"none";
+  ed.querySelectorAll(".body input,.body select,.body textarea").forEach((el)=>el.disabled=!!e.machine);
+  $("ed-move").style.display=e.machine?"none":"";
+  $("ed-del").style.display=e.machine?"none":"";
+  $("ed-savestate").textContent=e.machine?"Read-only — adjust the anchors around it":"Saved ✓ · autosaves as you type";
   ed.style.display="flex";scr.style.display="block";
   $("ed-title").focus();
 }
@@ -383,13 +389,28 @@ document.querySelectorAll(".tl-row").forEach((r,i)=>{
 ed.querySelector(".x").addEventListener("click",closeEd);
 scr.addEventListener("click",closeEd);
 addEventListener("keydown",(e)=>{if(e.key==="Escape")closeEd();});
-$("ed-save").addEventListener("click",()=>{
-  const timeChanged=cur&&($("ed-start").value!==cur.start||$("ed-end").value!==cur.end);
-  closeEd();
-  say(timeChanged?"Saved — time edited, entry pinned 📌 · day marked “edited since solve”":"Saved · day marked “edited since solve”");
+// Autosave: fields persist as you type (debounced) — the app-wide convention.
+// Editing a solved entry's time auto-pins it; the pin is a property toggle.
+let saveT;
+ed.querySelectorAll(".body input,.body select,.body textarea").forEach((el)=>{
+  el.addEventListener("input",()=>{
+    if(cur?.machine)return;
+    $("ed-savestate").textContent="Saving…";
+    if((el.id==="ed-start"||el.id==="ed-end")&&!$("ed-pinned").checked){
+      $("ed-pinned").checked=true;
+      say("Time edited — held at this time 📌 · Re-solve flows around it");
+    }
+    clearTimeout(saveT);
+    saveT=setTimeout(()=>{$("ed-savestate").textContent="Saved ✓ · autosaves as you type";},600);
+  });
 });
-$("ed-pin").addEventListener("click",()=>{cur.pinned=!cur.pinned;closeEd();say(cur.pinned?"Pinned 📌 — Re-solve will flow around it":"Unpinned — Re-solve may move it");});
-$("ed-shelf").addEventListener("click",()=>{closeEd();say("Sent back to the Shelf — data kept, day unblocked");});
+$("ed-done").addEventListener("click",closeEd);
+$("ed-move").addEventListener("change",(e)=>{
+  const v=e.target.value; if(!v)return;
+  e.target.value="";
+  closeEd();
+  say(v==="shelf"?"Back on the Shelf — data kept, day unblocked":"Moved to "+v+" at fuzzy time — re-block it in that day's buckets");
+});
 $("ed-del").addEventListener("click",()=>{closeEd();say("Deleted · Undo");});
 </script>
 
