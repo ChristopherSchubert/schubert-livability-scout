@@ -70,6 +70,7 @@ create table if not exists cities (
   visit_climate      jsonb,                     -- [12] monthly normals
   crowd_season       jsonb,                     -- [12] 0-5
   season_notes       jsonb,                     -- { prime, offSeason } (legacy rows: { charm, truth }, mapped on read)
+  itinerary          jsonb,                      -- { dayStart, dayEnd, entries: [ … ] } hour-by-hour trip grid (see migration 0012)
   drive_hrs_from_pit text,                      -- '4.5' (hours, string) | 'FLY' | null
   created_at         timestamptz not null default now(),
   updated_at         timestamptz not null default now()
@@ -89,6 +90,7 @@ alter table cities add column if not exists crowd_season_source text;
 alter table cities add column if not exists crowd_intensity     int;
 alter table cities add column if not exists nps_unit_code       text;
 alter table cities add column if not exists crowd_raw           jsonb;
+alter table cities add column if not exists itinerary           jsonb;
 alter table cities add column if not exists block_geometries    jsonb default '[]';
 alter table cities add column if not exists eu_lau              jsonb;
 alter table cities add column if not exists planning_order      integer;

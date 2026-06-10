@@ -1,0 +1,12 @@
+-- 0012 — itinerary: an hour-by-hour trip grid per city, parallel to the trip
+-- dates (arrive_date / depart_date) already on the row.
+--
+-- Shape: { dayStart, dayEnd, entries: [ { id, day, start, end, kind, title,
+-- note, confirmation, prepaid, cost: { amount, currency, cashOnly }, cancelBy,
+-- url, contact } ] }. Day columns derive from arrive_date..depart_date — the
+-- itinerary never restates the trip dates. `kind` ∈ booked | flexible | travel
+-- | meal | checkin | todo (the trip-planner color key). Round-tripped through
+-- lib/city-row.js (itinerary ↔ itinerary) + mapPatch in lib/db.js. See
+-- features/trip-itinerary.md. Real data only — entries are transcribed from a
+-- true trip plan, never invented.
+alter table cities add column if not exists itinerary jsonb;
