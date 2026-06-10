@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trip planner — mockup · Slovenia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#fbf6ea; --panel:#fffdf6; --panel-strong:#f4eddc; --border:#d8ccb8;
+  --text:#1b1814; --ink-soft:#2c2823; --muted:#6b6358; --accent:#0d4c44;
+  --accent-soft:#d2e6e1; --radius:14px; --radius-tight:7px;
+  --shadow:0 10px 30px rgba(41,33,19,.06);
+  --font-display:'Fraunces',Georgia,serif; --font-ui:'Inter Tight',system-ui,sans-serif;
+  --kind-booked:#0d4c44; --kind-meal:#9a5a16; --kind-travel:#2e5482;
+  --kind-checkin:#665285; --kind-todo:#7d5e22; --kind-flexible:#6b6358;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--bg); color:var(--text); font-family:var(--font-ui);
+  line-height:1.5; -webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(rgba(120,100,60,.035) 1px,transparent 1px);
+  background-size:4px 4px;
+}
+.wrap{max-width:980px;margin:0 auto;padding:64px 32px 120px;}
+.eyebrow{font-family:var(--font-ui);font-size:.72rem;font-weight:600;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--muted);margin:0 0 .5rem;}
+h1,h2,h3{font-family:var(--font-display);font-weight:500;color:var(--text);margin:0;line-height:1.08;}
+.section{margin-top:72px;}
+.section > .eyebrow{margin-bottom:1rem;}
+.section-head{display:flex;align-items:baseline;justify-content:space-between;gap:1rem;
+  border-bottom:1px solid var(--border);padding-bottom:.6rem;margin-bottom:1.6rem;}
+.section-head h2{font-size:1.45rem;}
+.section-head .meta{font-family:var(--font-ui);font-size:.8rem;color:var(--muted);}
+.rule-note{font-family:var(--font-display);font-style:italic;color:var(--muted);font-size:.95rem;}
+.mock-banner{font-family:var(--font-ui);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--muted);border:1px dashed var(--border);border-radius:100px;padding:.35rem .9rem;display:inline-block;}
+
+.hero .kicker{font-family:var(--font-display);font-style:italic;font-size:1.05rem;color:var(--accent);margin:0 0 .3rem;}
+.hero h1{font-size:clamp(2.6rem,6vw,4.2rem);letter-spacing:-.01em;}
+.hero .sub{font-family:var(--font-display);font-size:1.15rem;color:var(--ink-soft);margin:.6rem 0 0;max-width:48ch;}
+.glance{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);
+  border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-top:2rem;}
+.glance .cell{background:var(--panel);padding:1.1rem 1.2rem;}
+.glance .cell .k{font-size:.68rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);}
+.glance .cell .v{font-family:var(--font-display);font-size:1.15rem;margin-top:.3rem;color:var(--text);}
+.glance .cell .v small{font-family:var(--font-ui);font-size:.8rem;color:var(--muted);display:block;font-weight:400;margin-top:.1rem;}
+.legstrip{display:flex;gap:.5rem;margin-top:1.4rem;flex-wrap:wrap;}
+.legchip{font-family:var(--font-ui);font-size:.82rem;background:var(--panel-strong);border:1px solid var(--border);
+  border-radius:100px;padding:.4rem .9rem;color:var(--ink-soft);}
+.legchip b{font-weight:600;} .legchip span{color:var(--muted);}
+
+.markers{display:flex;gap:.35rem;flex-wrap:wrap;}
+.marker{font-family:var(--font-ui);font-size:.72rem;font-weight:500;display:inline-flex;align-items:center;gap:.28rem;
+  background:var(--panel-strong);border:1px solid var(--border);border-radius:100px;padding:.18rem .5rem;color:var(--ink-soft);}
+.marker.cash{color:var(--kind-todo);border-color:#d8c39a;background:#f7efd9;}
+.marker.prepaid{color:var(--kind-booked);border-color:#bcd8d0;background:#e7f1ee;}
+.marker .src{color:var(--muted);font-weight:400;font-style:italic;border-left:1px solid var(--border);padding-left:.3rem;margin-left:.05rem;}
+
+.stays{display:grid;grid-template-columns:repeat(3,1fr);gap:1.1rem;}
+.stay{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);}
+.stay .ph{height:96px;background:linear-gradient(135deg,#e9dfc7,#d8ccb8);display:flex;align-items:flex-end;padding:.7rem .9rem;}
+.stay .ph .leg{font-family:var(--font-ui);font-size:.66rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;
+  color:#5d5340;background:rgba(255,253,246,.8);border-radius:100px;padding:.2rem .55rem;}
+.stay .body{padding:.95rem 1rem 1.1rem;}
+.stay h3{font-family:var(--font-display);font-size:1.08rem;}
+.stay .loc{font-size:.78rem;color:var(--muted);margin:.15rem 0 .7rem;}
+.stay .row{display:flex;justify-content:space-between;font-size:.8rem;padding:.28rem 0;border-top:1px solid var(--panel-strong);}
+.stay .row .k{color:var(--muted);} .stay .row .v{font-weight:500;}
+.badge{font-family:var(--font-ui);font-size:.68rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+  display:inline-flex;align-items:center;gap:.3rem;border-radius:100px;padding:.22rem .6rem;}
+.badge.booked{background:#e7f1ee;color:var(--accent);}
+.conf{font-family:'Inter Tight';font-size:.74rem;color:var(--ink-soft);background:var(--panel-strong);
+  border-radius:5px;padding:.1rem .4rem;letter-spacing:.02em;}
+
+.cols{display:grid;grid-template-columns:1.45fr 1fr;gap:2.2rem;align-items:start;}
+.ledger{width:100%;border-collapse:collapse;font-size:.84rem;}
+.ledger th{text-align:left;font-family:var(--font-ui);font-size:.66rem;font-weight:600;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--muted);padding:.4rem .5rem;border-bottom:1px solid var(--border);}
+.ledger td{padding:.55rem .5rem;border-bottom:1px solid var(--panel-strong);vertical-align:top;}
+.ledger .ttl{font-weight:500;}
+.ledger .kindtag{font-size:.66rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;}
+.ledger .kindtag.lodging{color:var(--kind-checkin);} .ledger .kindtag.activity{color:var(--kind-booked);}
+.ledger .due{color:var(--kind-todo);font-weight:500;}
+.cashcard{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:1.3rem 1.4rem;box-shadow:var(--shadow);}
+.cashcard .tot{font-family:var(--font-display);font-size:2.6rem;line-height:1;color:var(--text);}
+.cashcard .tot small{font-family:var(--font-ui);font-size:.8rem;color:var(--muted);font-weight:500;letter-spacing:.1em;text-transform:uppercase;display:block;margin-bottom:.3rem;}
+.cashcard .line{display:flex;justify-content:space-between;font-size:.85rem;padding:.4rem 0;border-top:1px solid var(--panel-strong);}
+.cashcard .line:first-of-type{margin-top:1rem;}
+.cashcard .line .amt{font-variant-numeric:tabular-nums;font-weight:500;}
+.cashcard .foot{font-family:var(--font-display);font-style:italic;font-size:.82rem;color:var(--muted);margin-top:1rem;}
+
+.daytitle{display:flex;align-items:baseline;gap:.8rem;margin-bottom:1.2rem;}
+.bucket{font-family:var(--font-ui);font-size:.7rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--muted);margin:1.4rem 0 .7rem;display:flex;align-items:center;gap:.6rem;}
+.bucket::after{content:"";flex:1;height:1px;background:var(--border);}
+.entry{display:grid;grid-template-columns:78px 1fr;background:var(--panel);border:1px solid var(--border);
+  border-left:4px solid var(--k,var(--border));border-radius:var(--radius-tight);margin-bottom:.7rem;overflow:hidden;}
+.entry .time{padding:.85rem .7rem;border-right:1px solid var(--panel-strong);}
+.entry .time .t{font-family:'Inter Tight';font-variant-numeric:tabular-nums;font-weight:600;font-size:.92rem;color:var(--text);}
+.entry .time .t2{font-family:'Inter Tight';font-variant-numeric:tabular-nums;font-size:.72rem;color:var(--muted);}
+.entry .main{padding:.8rem .95rem;}
+.entry .top{display:flex;align-items:flex-start;justify-content:space-between;gap:.8rem;}
+.entry .kindlbl{font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--k,var(--muted));}
+.entry h3{font-family:var(--font-display);font-size:1.12rem;margin:.1rem 0 0;}
+.entry .note{font-size:.82rem;color:var(--ink-soft);margin:.45rem 0 .55rem;max-width:62ch;}
+.entry .foot{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;}
+
+.gridwrap{border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;background:var(--panel);}
+.gridhead{display:grid;grid-template-columns:54px repeat(5,1fr);background:var(--panel-strong);border-bottom:1px solid var(--border);}
+.gridhead .gh{padding:.5rem .6rem;font-family:var(--font-ui);font-size:.7rem;font-weight:600;color:var(--ink-soft);border-left:1px solid var(--border);}
+.gridhead .gh:first-child{border-left:0;}
+.gridhead .gh small{display:block;font-weight:400;color:var(--muted);font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;}
+.gridbody{position:relative;}
+.gridrow{display:grid;grid-template-columns:54px repeat(5,1fr);border-bottom:1px solid var(--panel-strong);height:30px;}
+.gridrow .gt{font-family:'Inter Tight';font-variant-numeric:tabular-nums;font-size:.66rem;color:var(--muted);
+  padding:.15rem .5rem;border-right:1px solid var(--border);}
+.gridrow .gc{border-left:1px solid var(--panel-strong);}
+.gblock{position:absolute;border-radius:5px;padding:.25rem .45rem;font-size:.7rem;line-height:1.15;color:#fff;overflow:hidden;
+  box-shadow:0 1px 3px rgba(0,0,0,.12);}
+.gblock b{font-weight:600;display:block;font-size:.72rem;}
+.gblock .gtime{font-variant-numeric:tabular-nums;opacity:.85;font-size:.62rem;}
+.gcol-note{font-family:var(--font-display);font-style:italic;color:var(--muted);font-size:.85rem;margin-top:1rem;}
+
+.foot-note{margin-top:90px;border-top:1px solid var(--border);padding-top:1.4rem;font-family:var(--font-display);
+  font-style:italic;color:var(--muted);font-size:.92rem;}
+@media(max-width:760px){.glance{grid-template-columns:repeat(2,1fr);}.stays{grid-template-columns:1fr;}.cols{grid-template-columns:1fr;}
+  .gridhead,.gridrow{grid-template-columns:48px repeat(5,1fr);}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="mock-banner">Mockup · for design review · real Slovenia data</span>
+
+  <!-- 1 · GLANCE -->
+  <header class="hero section" style="margin-top:40px;">
+    <p class="kicker">🇸🇮 A trip in three towns</p>
+    <h1>Slovenia</h1>
+    <p class="sub">Ljubljana, Bled &amp; Piran — eleven days of lake light, alpine passes, and the Adriatic, ending with a day in Venice.</p>
+    <div class="glance">
+      <div class="cell"><div class="k">Dates</div><div class="v">May 15–25, 2026<small>10 nights</small></div></div>
+      <div class="cell"><div class="k">Getting there</div><div class="v">Fly via FRA<small>car on arrival</small></div></div>
+      <div class="cell"><div class="k">Diet</div><div class="v">Vegetarian<small>verified throughout</small></div></div>
+      <div class="cell"><div class="k">Travelers</div><div class="v">Janice &amp; Chris</div></div>
+    </div>
+    <div class="legstrip">
+      <span class="legchip"><b>Ljubljana</b> <span>· May 15–16</span></span>
+      <span class="legchip"><b>Bled</b> <span>· May 17–20</span></span>
+      <span class="legchip"><b>Piran</b> <span>· May 21–25</span></span>
+    </div>
+  </header>
+
+  <!-- 2 · STAY -->
+  <section class="section">
+    <p class="eyebrow">The Stay track · booked first</p>
+    <div class="section-head">
+      <h2>Where we're sleeping</h2>
+      <span class="meta">3 of 3 booked · shortlist by pet policy, price, location</span>
+    </div>
+    <div class="stays">
+      <article class="stay">
+        <div class="ph"><span class="leg">Ljubljana · May 15–16</span></div>
+        <div class="body">
+          <h3>Grand Hotel Union Eurostars</h3>
+          <p class="loc">Miklošičeva cesta 1 · old town</p>
+          <div class="row"><span class="k">Check-in / out</span><span class="v">3:00 PM · 12:00</span></div>
+          <div class="row"><span class="k">Confirmation</span><span class="v"><span class="conf">SYN2281-99143</span></span></div>
+          <div class="row"><span class="k">Cancellation</span><span class="v">Free to 5/12</span></div>
+          <div class="row" style="border:0;padding-top:.7rem;"><span class="badge booked">● Booked</span><span class="markers"><span class="marker">🅿️ Garage</span></span></div>
+        </div>
+      </article>
+      <article class="stay">
+        <div class="ph"><span class="leg">Bled · May 17–20</span></div>
+        <div class="body">
+          <h3>Grand Hotel Toplice</h3>
+          <p class="loc">Lakeshore · thermal spa</p>
+          <div class="row"><span class="k">Check-in / out</span><span class="v">2:00 PM · 12:00</span></div>
+          <div class="row"><span class="k">Confirmation</span><span class="v"><span class="conf">PH27710297</span></span></div>
+          <div class="row"><span class="k">Cancellation</span><span class="v">Held to arrival</span></div>
+          <div class="row" style="border:0;padding-top:.7rem;"><span class="badge booked">● Booked</span><span class="markers"><span class="marker">☂️ Lake view</span></span></div>
+        </div>
+      </article>
+      <article class="stay">
+        <div class="ph"><span class="leg">Piran · May 21–25</span></div>
+        <div class="body">
+          <h3>Hotel Piran</h3>
+          <p class="loc">Seafront · Tartini Square</p>
+          <div class="row"><span class="k">Check-in / out</span><span class="v">3:00 PM · 12:00</span></div>
+          <div class="row"><span class="k">Confirmation</span><span class="v"><span class="conf">PH27710036</span></span></div>
+          <div class="row"><span class="k">Cancellation</span><span class="v">2 days prior</span></div>
+          <div class="row" style="border:0;padding-top:.7rem;"><span class="badge booked">● Booked</span><span class="markers"><span class="marker">☂️ Sea view</span></span></div>
+        </div>
+      </article>
+    </div>
+    <p class="rule-note" style="margin-top:1.1rem;">In Gather, these start as shortlisted candidates filtered by pet policy / price / location. Booking one promotes it into the reservation ledger below.</p>
+  </section>
+
+  <!-- 3 · LEDGER + 4 · CASH -->
+  <section class="section">
+    <p class="eyebrow">The booking spine</p>
+    <div class="cols">
+      <div>
+        <div class="section-head"><h2>Reservations</h2><span class="meta">lodging + activities · soonest deadline first</span></div>
+        <table class="ledger">
+          <thead><tr><th>What</th><th>Type</th><th>Confirmation</th><th>Deadline</th></tr></thead>
+          <tbody>
+            <tr><td class="ttl">Grand Hotel Union Eurostars</td><td><span class="kindtag lodging">Lodging</span></td><td><span class="conf">SYN2281-99143</span></td><td class="due">Cancel by 5/12</td></tr>
+            <tr><td class="ttl">Grand Hotel Toplice</td><td><span class="kindtag lodging">Lodging</span></td><td><span class="conf">PH27710297</span></td><td>—</td></tr>
+            <tr><td class="ttl">Hotel Piran</td><td><span class="kindtag lodging">Lodging</span></td><td><span class="conf">PH27710036</span></td><td>2 days prior</td></tr>
+            <tr><td class="ttl">Hot-air balloon · private</td><td><span class="kindtag activity">Activity</span></td><td><span class="conf">401780164673</span></td><td>Prepaid</td></tr>
+            <tr><td class="ttl">Canyoning · Altitude</td><td><span class="kindtag activity">Activity</span></td><td><span class="conf">#138923</span></td><td>Prepaid</td></tr>
+            <tr><td class="ttl">Via Ferrata Hvadnik</td><td><span class="kindtag activity">Activity</span></td><td><span class="conf">#138953</span></td><td>Prepaid</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <div class="section-head"><h2>Cash needed</h2></div>
+        <div class="cashcard">
+          <div class="tot"><small>Euro · cash only</small>€927</div>
+          <div class="line"><span>Paragliding · Flying Bear</span><span class="amt">€380</span></div>
+          <div class="line"><span>Vintage boat · Piran</span><span class="amt">€511</span></div>
+          <div class="line"><span>Pletna boat · Bled Island</span><span class="amt">€36</span></div>
+          <p class="foot">Summed from entries marked 💶 cash-only — never hand-kept. Tips budgeted separately.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 · AGENDA -->
+  <section class="section">
+    <p class="eyebrow">Day plan · Agenda view</p>
+    <div class="section-head"><h2>Tuesday, May 19 · Bled</h2><span class="meta">balloon at dawn → via ferrata · the busiest day</span></div>
+
+    <div class="bucket">Morning</div>
+    <article class="entry" style="--k:var(--kind-booked)">
+      <div class="time"><div class="t">5:30</div><div class="t2">–7:30</div></div>
+      <div class="main">
+        <div class="top"><span class="kindlbl">Booked</span></div>
+        <h3>Hot-air balloon · private</h3>
+        <p class="note">Pickup ~5:35 in front of Hotel Toplice. Sports clothing + sturdy, ideally waterproof shoes — morning dew on the field. Breakfast and balloon.</p>
+        <div class="foot">
+          <span class="badge booked">🔒 Prepaid</span>
+          <span class="conf">401780164673</span>
+          <span class="markers"><span class="marker">📞 info@bcb.si</span></span>
+        </div>
+      </div>
+    </article>
+
+    <div class="bucket">Afternoon</div>
+    <article class="entry" style="--k:var(--kind-meal)">
+      <div class="time"><div class="t">12:30</div><div class="t2">–13:30</div></div>
+      <div class="main">
+        <div class="top"><span class="kindlbl">Meal</span></div>
+        <h3>Lunch · Public &amp; Vegan Kitchen Bled</h3>
+        <p class="note">Plant-based, an easy reset before the afternoon climb.</p>
+        <div class="foot"><span class="markers"><span class="marker">🥦 Vegetarian <span class="src">verified</span></span></span></div>
+      </div>
+    </article>
+    <article class="entry" style="--k:var(--kind-todo)">
+      <div class="time"><div class="t">13:30</div><div class="t2">–16:00</div></div>
+      <div class="main">
+        <div class="top"><span class="kindlbl">To-do</span></div>
+        <h3>Pick up road-trip snacks for tomorrow</h3>
+        <div class="foot"><span class="markers"><span class="marker">free time after</span></span></div>
+      </div>
+    </article>
+    <article class="entry" style="--k:var(--kind-booked)">
+      <div class="time"><div class="t">16:00</div><div class="t2">–17:30</div></div>
+      <div class="main">
+        <div class="top"><span class="kindlbl">Booked</span></div>
+        <h3>Via Ferrata Hvadnik</h3>
+        <p class="note">Meeting point: Ljubljanska cesta 1, 4260 Bled (look for the yellow doors).</p>
+        <div class="foot"><span class="badge booked">🔒 Prepaid</span><span class="conf">#138953</span></div>
+      </div>
+    </article>
+
+    <div class="bucket">Evening</div>
+    <article class="entry" style="--k:var(--kind-meal)">
+      <div class="time"><div class="t">21:00</div><div class="t2">–22:30</div></div>
+      <div class="main">
+        <div class="top"><span class="kindlbl">Meal</span></div>
+        <h3>Room service / eat on the balcony</h3>
+        <div class="foot"><span class="markers"><span class="marker">🥦 Vegetarian</span></span></div>
+      </div>
+    </article>
+  </section>
+
+  <!-- 6 · GRID -->
+  <section class="section">
+    <p class="eyebrow">Day plan · Grid view — the generated output</p>
+    <div class="section-head"><h2>The same day, solved</h2><span class="meta">what Janice builds by hand today — assembled, not typed</span></div>
+    <div class="gridwrap">
+      <div class="gridhead">
+        <div class="gh">&nbsp;</div>
+        <div class="gh">Mon<small>18</small></div>
+        <div class="gh">Tue<small>19</small></div>
+        <div class="gh">Wed<small>20</small></div>
+        <div class="gh">Thu<small>21</small></div>
+        <div class="gh">Fri<small>22</small></div>
+      </div>
+      <div class="gridbody" id="gb">
+        <div class="gblock" style="left:calc(54px + ((100% - 54px)/5)*1 + 3px);width:calc((100% - 54px)/5 - 6px);top:31px;height:118px;background:var(--kind-booked)">
+          <span class="gtime">5:30</span><b>Balloon</b><span style="opacity:.8">private · 🔒</span></div>
+        <div class="gblock" style="left:calc(54px + ((100% - 54px)/5)*1 + 3px);width:calc((100% - 54px)/5 - 6px);top:451px;height:58px;background:var(--kind-meal)">
+          <span class="gtime">12:30</span><b>Lunch</b><span style="opacity:.8">🥦</span></div>
+        <div class="gblock" style="left:calc(54px + ((100% - 54px)/5)*1 + 3px);width:calc((100% - 54px)/5 - 6px);top:511px;height:148px;background:var(--kind-todo)">
+          <span class="gtime">13:30</span><b>Snacks + free</b></div>
+        <div class="gblock" style="left:calc(54px + ((100% - 54px)/5)*1 + 3px);width:calc((100% - 54px)/5 - 6px);top:661px;height:88px;background:var(--kind-booked)">
+          <span class="gtime">16:00</span><b>Via Ferrata</b><span style="opacity:.8">🔒 #138953</span></div>
+        <div class="gblock" style="left:calc(54px + ((100% - 54px)/5)*1 + 3px);width:calc((100% - 54px)/5 - 6px);top:961px;height:88px;background:var(--kind-meal)">
+          <span class="gtime">21:00</span><b>Balcony dinner</b></div>
+        <div class="gblock" style="left:calc(54px + ((100% - 54px)/5)*0 + 3px);width:calc((100% - 54px)/5 - 6px);top:511px;height:88px;background:var(--kind-booked);opacity:.5">
+          <span class="gtime">13:30</span><b>Canyoning</b></div>
+        <div class="gblock" style="left:calc(54px + ((100% - 54px)/5)*2 + 3px);width:calc((100% - 54px)/5 - 6px);top:541px;height:88px;background:var(--kind-booked);opacity:.5">
+          <span class="gtime">14:00</span><b>Paragliding</b><span style="opacity:.8">💶 €380</span></div>
+      </div>
+    </div>
+    <p class="gcol-note">Tuesday is filled; the faded blocks are the booked anchors on neighbouring days. The grid is the <em>result</em> of Gather → Block → Solve — Janice approves and nudges it, she doesn't type it.</p>
+  </section>
+
+  <p class="foot-note">Mockup only — static, real Slovenia data, the project's own tokens (paper/ink, Fraunces + Inter Tight, deep-green accent). Six kind colors and decoupled cited markers as specified. Not wired to anything.</p>
+
+</div>
+<script>
+  // Build the grid's 30-min time rows (05:00 → 22:00). Absolutely-positioned
+  // blocks above are independent of row order, so inserting rows first is fine.
+  (function(){
+    var rows=[];
+    for(var h=5;h<=22;h++){ rows.push(h+':00'); rows.push(h+':30'); }
+    var html=rows.map(function(t){
+      return '<div class="gridrow"><div class="gt">'+t+'</div><div class="gc"></div><div class="gc"></div><div class="gc"></div><div class="gc"></div><div class="gc"></div></div>';
+    }).join('');
+    document.getElementById('gb').insertAdjacentHTML('afterbegin', html);
+  })();
+</script>
+</body>
+</html>
