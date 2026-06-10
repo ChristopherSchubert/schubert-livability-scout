@@ -325,7 +325,7 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
 <div id="fbpanel" role="dialog" aria-label="Slide feedback">
   <div class="fbhead" id="fbhead" title="Drag to move"><b>Feedback</b><span class="fbslideref" id="fbslideref"></span><button class="fbclose" id="fbclose" type="button" title="Close">✕</button></div>
   <textarea id="fbtext" placeholder="What's confusing, wrong, or great about this slide?"></textarea>
-  <div class="fbrow"><button id="fbsave" type="button" disabled>Save feedback</button><span id="fbsaved">Saved ✓</span></div>
+  <div class="fbrow"><button id="fbsave" type="button" disabled>Save feedback</button><span id="fbsaved"></span></div>
   <ul id="fbnotes"></ul>
   <div class="fbfoot"><span id="fbtally">no notes yet</span><span class="spacer"></span><button id="fbcopy" type="button">📋 Copy all</button></div>
 </div>
@@ -1504,6 +1504,23 @@ fbNotes=document.getElementById("fbnotes"),fbRef=document.getElementById("fbslid
 fbCount=document.getElementById("fbcount"),fbTally=document.getElementById("fbtally");
 function fbLoad(){try{return JSON.parse(localStorage.getItem(FBKEY))||[]}catch{return[]}}
 function fbStore(list){localStorage.setItem(FBKEY,JSON.stringify(list));}
+const FBAPI=["/api/walkthrough-feedback","https://schubert-livability-scout.vercel.app/api/walkthrough-feedback"];
+const fbInflight=new Set();
+async function fbSend(note){
+  if(note.sent||fbInflight.has(note.t))return false;
+  fbInflight.add(note.t);
+  try{
+    for(const url of FBAPI){
+      try{
+        const r=await fetch(url,{method:"POST",headers:{"Content-Type":"application/json"},
+          body:JSON.stringify({slide:note.s+1,phase:note.phase,note:note.text})});
+        if(r.ok){fbStore(fbLoad().map(m=>m.t===note.t?{...m,sent:true}:m));fbSync();return true;}
+      }catch{}
+    }
+    return false;
+  }finally{fbInflight.delete(note.t);}
+}
+function fbRetry(){fbLoad().filter(n=>!n.sent).forEach(n=>fbSend(n));}
 function fbSync(){
   const list=fbLoad(),mine=list.filter(n=>n.s===at);
   fbRef.textContent=`slide ${at+1} · ${steps[at].dataset.phase}`;
@@ -1514,23 +1531,29 @@ function fbSync(){
     del.addEventListener("click",()=>{fbStore(fbLoad().filter(m=>m.t!==n.t));fbSync();});
     li.append(tx,del);return li;
   }));
-  const slides=new Set(list.map(n=>n.s));
-  fbTally.textContent=list.length?`${list.length} note${list.length>1?"s":""} on ${slides.size} slide${slides.size>1?"s":""}`:"no notes yet";
+  const slides=new Set(list.map(n=>n.s)),pending=list.filter(n=>!n.sent).length;
+  fbTally.textContent=list.length
+    ?`${list.length} note${list.length>1?"s":""} on ${slides.size} slide${slides.size>1?"s":""}`+(pending?` · ${pending} unsent`:" · all sent ✓")
+    :"no notes yet";
   fbCount.hidden=!list.length;fbCount.textContent=list.length;
   if(list.length)fbBtn.classList.add("quiet");
   [...dots.children].forEach((d,j)=>d.classList.toggle("fb",slides.has(j)));
 }
 fbBtn.addEventListener("click",()=>{
   fbPanel.classList.toggle("open");fbNudge.remove();fbBtn.classList.add("quiet");
-  if(fbPanel.classList.contains("open")){fbSync();fbText.focus();}
+  if(fbPanel.classList.contains("open")){fbSync();fbText.focus();fbRetry();}
 });
 document.getElementById("fbclose").addEventListener("click",()=>fbPanel.classList.remove("open"));
 fbText.addEventListener("input",()=>{fbSave.disabled=!fbText.value.trim();});
-fbSave.addEventListener("click",()=>{
+fbSave.addEventListener("click",async()=>{
   const text=fbText.value.trim();if(!text)return;
-  fbStore([...fbLoad(),{s:at,phase:steps[at].dataset.phase,text,t:Date.now()}]);
+  const note={s:at,phase:steps[at].dataset.phase,text,t:Date.now(),sent:false};
+  fbStore([...fbLoad(),note]);
   fbText.value="";fbSave.disabled=true;fbSync();
-  fbSavedMsg.classList.add("show");setTimeout(()=>fbSavedMsg.classList.remove("show"),1600);
+  fbSavedMsg.textContent="Sending…";fbSavedMsg.classList.add("show");
+  const ok=await fbSend(note);
+  fbSavedMsg.textContent=ok?"Sent to Chris ✓":"Saved here — will retry";
+  setTimeout(()=>fbSavedMsg.classList.remove("show"),2200);
 });
 document.getElementById("fbcopy").addEventListener("click",async(e)=>{
   const list=fbLoad();if(!list.length)return;
@@ -1560,5 +1583,6 @@ fbHead.addEventListener("pointerdown",(e)=>{
 });
 const _go=go;go=function(i){_go(i);fbSync();};
 go(0);
+fbRetry();
 </script>
 </body></html>

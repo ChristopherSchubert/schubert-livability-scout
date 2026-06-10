@@ -57,12 +57,18 @@ GO 32 book page · 33 mark booked · 34 grid · 35 phone — WHAT IF (rewind)
 
 Floating **💬 Feedback** button bottom-right (pulse ring + "spot something?
 tell Chris →" nudge until first use). Opens a small draggable panel (grab
-the dark header) — write a note, **Save feedback**; notes are per-slide,
-persist in `localStorage` (`tw-feedback-v1`), survive reload. Slides with
-notes get a ringed dot in the nav; the panel lists the current slide's
-notes with per-note ✕. **📋 Copy all** puts a plain-text digest on the
-clipboard to paste to Chris. Arrow keys are suppressed while typing;
-Esc closes the panel.
+the dark header) — write a note, **Save feedback**. Each note **submits to
+Chris**: POST `/api/walkthrough-feedback` → Supabase `walkthrough_feedback`
+(migration 0015; RLS = anon insert / authed read). The deck tries
+same-origin first, then the production URL (covers the local static
+preview); failures keep the note in `localStorage` (`tw-feedback-v1`)
+flagged unsent and retry on panel-open and page-load — status line says
+"Sent to Chris ✓" vs "Saved here — will retry", tally shows pending count.
+Slides with notes get a ringed dot in the nav; per-note ✕ removes locally
+(a sent note is already submitted). **📋 Copy all** remains as the manual
+backup. Arrow keys are suppressed while typing; Esc closes the panel.
+Read back the notes with the authed app user or via the pg/Keychain
+script pattern (`scripts/.col.mjs`).
 
 ## Mechanical checks (run before any review handoff)
 

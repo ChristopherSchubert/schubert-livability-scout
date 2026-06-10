@@ -229,3 +229,18 @@ create policy "trips readable by authed" on trips for select to authenticated us
 create policy "trips insert own" on trips for insert to authenticated with check (user_id = auth.uid());
 create policy "trips update own" on trips for update to authenticated using (user_id = auth.uid());
 create policy "trips delete own" on trips for delete to authenticated using (user_id = auth.uid());
+
+-- walkthrough_feedback: notes Janice submits from the trip-walkthrough deck
+-- (a public static page) via /api/walkthrough-feedback. Anonymous insert,
+-- authenticated read.
+create table if not exists walkthrough_feedback (
+  id uuid primary key default gen_random_uuid(),
+  slide int not null,
+  phase text not null default '',
+  note text not null,
+  ua text not null default '',
+  created_at timestamptz not null default now()
+);
+alter table walkthrough_feedback enable row level security;
+create policy walkthrough_feedback_insert on walkthrough_feedback for insert to anon, authenticated with check (true);
+create policy walkthrough_feedback_select on walkthrough_feedback for select to authenticated using (true);
