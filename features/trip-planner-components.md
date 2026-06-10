@@ -438,13 +438,21 @@ its literal label.
 
 ### 4.3 `MarkerSet` — the signature element
 
-> **Trip-level marker relevance (owner, 2026-06-10).** Not every trip cares
-> about every marker — no dog on this trip → 🐾 chips are noise. The trip's
-> `glance.travelers/pets` (+ an explicit override list) derives an **active
-> marker set**; chips outside it are hidden by default across the Shelf and
-> Days (the underlying data is kept, never deleted), with a "show all"
-> toggle. Slovenia (Janice & Chris, no dog, no kids) shows veg/patio/
-> accessible/cash; Jim Thorpe (Cocoa) adds dog.
+> **Trip-level marker relevance — derived from traveler rows (owner,
+> 2026-06-10, revised same day: "travelers shouldn't be a typed comma list").**
+> `trip.travelers[] = { name, kind: person|pet, chips: [veg|dog|kid|…] }` —
+> one structured row per traveler, each carrying its own restriction chips.
+> The trip's **active marker set is the union of those chips**: Cocoa's row
+> is *why* 🐾 lights up on Jim Thorpe; Slovenia has no dog row, so 🐾 hides
+> everywhere (data kept, "show all" escape hatch). No separate diet field —
+> it derives.
+>
+> **Provisional-dates rule (same review): a trip always carries concrete
+> dates.** "Mid-May, ~10 days" cannot lay out a calendar — the composer
+> captures a real provisional range (May 15–25), the window renders from
+> minute one, and **soft means slideable, not absent**: edges drag freely
+> until a booking hardens them. Intent text may *suggest* a range; it is
+> never the stored value.
 **Problem.** Every artifact tags places (dog/veg/kid/patio/cash/prepaid), and
 Jim Thorpe **cites a source for every dog-friendly claim**. Markers + sources
 are first-class — the trip equivalent of a measured metric with provenance.

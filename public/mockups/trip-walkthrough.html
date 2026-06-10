@@ -208,6 +208,12 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
 .composer .fld{display:flex;flex-direction:column;gap:.15rem;}
 .composer label{font-size:.66rem;color:var(--muted);}
 .composer input{font-family:var(--fu);font-size:.85rem;background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:.35rem .55rem;}
+.travrow{display:flex;align-items:center;gap:.55rem;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:.4rem .7rem;margin-bottom:.4rem;font-size:.82rem;max-width:480px;}
+.travrow b{font-weight:600;min-width:70px;}
+.travrow .x{margin-left:auto;color:var(--muted);cursor:pointer;font-size:.8rem;}
+.tchip{font-size:.68rem;font-weight:600;background:#e7f1ee;border:1px solid #bcd8d0;border-radius:100px;padding:.08rem .5rem;color:var(--accent);}
+.tchip i{font-style:normal;color:var(--muted);margin-left:.25rem;cursor:pointer;}
+.addchip{font-size:.68rem;font-weight:700;border:1px dashed var(--border);border-radius:100px;padding:.08rem .5rem;color:var(--muted);cursor:pointer;background:none;}
 .vartabs{display:flex;gap:.4rem;margin:.5rem 0;align-items:center;}
 .vartab{font-size:.76rem;font-weight:600;border:1px solid var(--border);border-radius:100px;padding:.26rem .8rem;color:var(--muted);cursor:pointer;}
 .vartab.on{background:#e7f1ee;color:var(--accent);border-color:#bcd8d0;}
@@ -237,8 +243,8 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
 </div>
 
 <div id="caps" style="display:none">
-<p>It starts with two facts: <b>Slovenia</b>, and <b>roughly ten days in mid-May</b>. The composer asks for nothing else — no cities, no hotels, no commitments.</p>
-<p>The trip opens on its <b>Plan</b> tab. She pins the soft idea to concrete-but-changeable dates — <b>✎ set dates → May 15–25</b> — and gets a stretchable window. Cities wait below.</p>
+<p>It starts with the where and a <b>provisional when</b> — Slovenia, May 15–25, explicitly rough. A calendar can't lay out “mid-May,” so dates are concrete from the first minute; <b>soft means slideable, not absent</b>. Travelers are <b>rows</b>, each carrying their own restriction chips — the trip's marker set derives from them.</p>
+<p>The trip opens on its <b>Plan</b> tab with the provisional window already drawn — May 15–25 came in from the composer. Both edges slide freely (nothing is booked); <b>✎ adjust dates</b> is the value-editor for the same thing. Cities wait below.</p>
 <p>Three cities dropped in rough order — the split is a default, <b>2 · 4 · 4 nights</b>. Kranj stays on the tray. Every bar has its grip; every boundary its handle.</p>
 <p>Zhuzhing: grab the <b>boundary handle</b> and slide — Bled takes a night from Piran. Zero-sum between neighbors; the trip total doesn't move.</p>
 <p>The flights get booked and the window's outer edges <b>lock</b>. The trip can't stretch anymore without real money moving. Inside, still clay.</p>
@@ -262,21 +268,25 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
 <div id="steps" style="display:none">
 
 <!-- ═ 1 · /trips + composer ═ -->
-<section data-phase="Where · the idea" data-did="types Slovenia · mid-May · ~10 days → presses Create trip.">
+<section data-phase="Where · the idea" data-did="types Slovenia, picks provisional May 15–25, adds Janice and Chris as rows with 🥦 chips → presses Create trip.">
   <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
   <div class="pagebody">
     <div class="sect">Trips <button class="ctrl solid inlinectl">＋ New trip</button></div>
     <div class="composer">
       <div class="frow">
-        <span class="fld"><label>Where (big where)</label><input value="Slovenia" style="width:220px"></span>
-        <span class="fld"><label>Roughly when</label><input value="mid-May 2026" style="width:140px"></span>
-        <span class="fld"><label>About how long</label><input value="~10 days" style="width:100px"></span>
+        <span class="fld"><label>Where (big where)</label><input value="Slovenia" style="width:200px"></span>
+        <span class="fld"><label>From — provisional</label><input type="date" value="2026-05-15"></span>
+        <span class="fld"><label>To — provisional</label><input type="date" value="2026-05-25"></span>
+        <span class="fld"><label>&nbsp;</label><span class="lbl2">10 nights · rough is fine — the window slides freely until something books</span></span>
       </div>
-      <div class="frow">
-        <span class="fld"><label>Travelers</label><input value="Janice, Chris" style="width:180px"></span>
-        <span class="fld"><label>Diet</label><input value="vegetarian" style="width:120px"></span>
+      <div class="frow" style="flex-direction:column;align-items:stretch;gap:.35rem;">
+        <label style="font-size:.66rem;color:var(--muted);">Travelers — restriction chips ride with each one</label>
+        <div class="travrow"><b>Janice</b><span class="tchip">🥦 vegetarian <i>✕</i></span><button class="addchip">＋ chip</button><span class="x">✕</span></div>
+        <div class="travrow"><b>Chris</b><span class="tchip">🥦 vegetarian <i>✕</i></span><button class="addchip">＋ chip</button><span class="x">✕</span></div>
+        <div class="toolrow" style="margin-top:0;"><button class="ctrl">＋ traveler</button><button class="ctrl ghosted">＋ pet</button></div>
+        <p class="srcline">the trip's marker set derives from these chips — no dog row on this trip, so 🐾 stays hidden everywhere</p>
       </div>
-      <div class="toolrow"><button class="ctrl solid">Create trip →</button><span class="lbl2">dates stay soft until a flight or stay is booked</span></div>
+      <div class="toolrow"><button class="ctrl solid">Create trip →</button></div>
     </div>
     <div class="tripcard dim"><div><div class="nm">Jim Thorpe</div><div class="legs">Carbon County, PA — May 22–25, 2026</div><div class="meta">Janice &amp; Chris + Cocoa 🐾</div></div><span class="pillgrn" style="background:#f6ead8;color:var(--warn);">⏰ 4 to book</span></div>
     <div class="tripcard dim"><div><div class="nm">New River Gorge</div><div class="legs">Lansing, WV — Nov 11–13</div></div><span class="pillgrn" style="background:var(--panel-strong);color:var(--muted);">went · would return</span></div>
@@ -284,13 +294,13 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
 </section>
 
 <!-- ═ 2 · empty skeleton ═ -->
-<section data-phase="Where · the skeleton" data-did="sets the window to May 15–25 with ✎ set dates (still soft — changeable until something books).">
+<section data-phase="Where · the skeleton" data-did="drags the window\u2019s right edge to test it — it slides freely; nothing booked yet.">
   <nav class="topbar"><span class="brand">Livability Scout</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
-  <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">mid-May · ~10 days · all soft</span>
+  <div class="tripbar"><span class="tname">Slovenia</span><span class="tmeta">May 15–25 · provisional — slides freely</span>
     <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
     <span class="spacer"></span><span class="chipbtn">Book</span><span class="chipbtn">Grid →</span></div>
   <div class="pagebody">
-    <div class="sect">The window — May 15 → 25 · both edges soft <button class="ctrl inlinectl">✎ set dates</button></div>
+    <div class="sect">The window — May 15 → 25 · provisional <button class="ctrl inlinectl">✎ adjust dates</button></div>
     <div class="win"><span class="edge l" title="drag to shift the start"></span><span class="empty"><span class="dropz">⠿ drop a city here</span></span><span class="edge r" title="drag to shift the end"></span></div>
     <div class="datesrow"><span>Fri 15</span><span>Sun 17</span><span>Tue 19</span><span>Thu 21</span><span>Sat 23</span><span>Mon 25</span></div>
     <div class="sect" style="margin-top:1.4rem;">Cities from the scout</div>
