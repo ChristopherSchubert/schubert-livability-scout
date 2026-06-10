@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trip workspace — mockup · Slovenia · Days</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#fbf6ea; --panel:#fffdf6; --panel-strong:#f4eddc; --border:#d8ccb8;
+  --text:#1b1814; --ink-soft:#2c2823; --muted:#6b6358; --accent:#0d4c44;
+  --accent-soft:#d2e6e1; --radius:14px; --radius-tight:7px;
+  --shadow:0 10px 30px rgba(41,33,19,.06);
+  --font-display:'Fraunces',Georgia,serif; --font-ui:'Inter Tight',system-ui,sans-serif;
+  --kind-booked:#0d4c44; --kind-meal:#9a5a16; --kind-travel:#2e5482;
+  --kind-checkin:#665285; --kind-todo:#7d5e22; --kind-flexible:#6b6358;
+  --warn:#a3431f;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--font-ui);line-height:1.5;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(rgba(120,100,60,.035) 1px,transparent 1px);background-size:4px 4px;}
+/* Floor: no functional text below .7rem (11.2px). */
+
+/* ── persistent chrome ── */
+.topbar{background:var(--panel);border-bottom:1px solid var(--border);padding:.55rem 1.6rem;display:flex;gap:1.4rem;align-items:center;font-size:.82rem;}
+.topbar .brand{font-family:var(--font-display);font-weight:600;font-size:1rem;color:var(--accent);}
+.topbar a{color:var(--muted);text-decoration:none;padding:.2rem .1rem;}
+.topbar a.on{color:var(--text);font-weight:600;border-bottom:2px solid var(--accent);}
+
+.tripbar{position:sticky;top:0;z-index:30;background:var(--panel);border-bottom:1px solid var(--border);
+  padding:.7rem 1.6rem;display:flex;align-items:center;gap:1.2rem;box-shadow:0 4px 14px rgba(41,33,19,.05);}
+.tripbar .tname{font-family:var(--font-display);font-size:1.18rem;}
+.tripbar .tmeta{font-size:.78rem;color:var(--muted);}
+.halves{display:flex;border:1px solid var(--border);border-radius:100px;overflow:hidden;margin-left:.6rem;}
+.halves button{font-family:var(--font-ui);font-size:.8rem;font-weight:600;border:0;background:transparent;color:var(--muted);padding:.4rem 1.1rem;cursor:pointer;}
+.halves button.on{background:var(--accent);color:#fff;}
+.tripbar .spacer{flex:1;}
+.chipbtn{font-size:.78rem;font-weight:600;border:1px solid var(--border);background:var(--bg);border-radius:100px;
+  padding:.4rem .95rem;color:var(--ink-soft);cursor:pointer;display:inline-flex;gap:.4rem;align-items:center;}
+.chipbtn .badge{background:#f6e0d4;color:var(--warn);border-radius:100px;font-size:.7rem;padding:.05rem .45rem;font-weight:700;}
+
+.dayrail{position:sticky;top:53px;z-index:20;background:var(--bg);border-bottom:1px solid var(--border);
+  padding:.6rem 1.6rem .55rem;display:flex;gap:1.6rem;align-items:flex-end;overflow-x:auto;}
+.leg{display:flex;flex-direction:column;gap:.3rem;}
+.leg .legname{font-family:var(--font-display);font-style:italic;font-size:.8rem;color:var(--muted);}
+.leg .chips{display:flex;gap:.35rem;}
+.dchip{min-width:44px;text-align:center;border:1px solid var(--border);border-radius:9px;background:var(--panel);
+  padding:.3rem .45rem .25rem;cursor:pointer;position:relative;}
+.dchip .dnum{font-weight:600;font-size:.85rem;font-variant-numeric:tabular-nums;}
+.dchip .dow{display:block;font-size:.7rem;color:var(--muted);}
+.dchip .state{display:block;margin:.2rem auto 0;width:7px;height:7px;border-radius:50%;background:var(--border);}
+.dchip.has .state{background:#b8a36a;}
+.dchip.solved .state{background:var(--accent);}
+.dchip.on{border-color:var(--accent);background:#e7f1ee;box-shadow:0 2px 8px rgba(13,76,68,.12);}
+.dchip.on .dnum{color:var(--accent);}
+
+/* ── workspace body: canvas + tray ── */
+.work{display:grid;grid-template-columns:1fr 330px;gap:1.6rem;max-width:1180px;margin:0 auto;padding:1.6rem;align-items:start;}
+
+.canvas{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;}
+.canvas .chead{display:flex;align-items:center;gap:.9rem;padding:1rem 1.3rem;border-bottom:1px solid var(--border);}
+.canvas .chead h1{font-family:var(--font-display);font-weight:500;font-size:1.45rem;margin:0;}
+.canvas .chead .sub{font-size:.78rem;color:var(--muted);}
+.canvas .chead .spacer{flex:1;}
+.verdict{font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;border-radius:100px;padding:.22rem .7rem;background:#e7f1ee;color:var(--accent);}
+.solvebtn{font-size:.8rem;font-weight:600;border:1px solid var(--accent);background:var(--accent);color:#fff;border-radius:100px;padding:.45rem 1.1rem;cursor:pointer;}
+.solvebtn.ghost{background:transparent;color:var(--accent);}
+
+.tl-row{display:grid;grid-template-columns:96px 1fr;border-top:1px solid var(--panel-strong);}
+.tl-row:first-of-type{border-top:0;}
+.tl-row .tt{font-variant-numeric:tabular-nums;font-size:.78rem;color:var(--muted);padding:.6rem .8rem;border-right:1px solid var(--panel-strong);}
+.tl-row .tc{padding:.55rem 1rem;}
+.tl-row.anchor{border-left:4px solid var(--k,var(--border));}
+.tl-row.anchor .nm{font-weight:600;font-size:.92rem;}
+.kindlbl{font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--k,var(--muted));margin-right:.5rem;}
+.tl-row.machine{background:repeating-linear-gradient(135deg,transparent,transparent 7px,rgba(120,100,60,.045) 7px,rgba(120,100,60,.045) 9px);}
+.tl-row.machine .tc{color:var(--ink-soft);font-size:.84rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;}
+.machinetag{font-size:.7rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--kind-travel);
+  border:1px solid #c4d2e2;background:#eaf0f6;border-radius:100px;padding:.12rem .5rem;}
+.machinetag.rest{color:var(--kind-flexible);border-color:var(--border);background:var(--panel-strong);}
+.anchnote{font-size:.76rem;color:var(--muted);}
+.pinbadge{font-size:.7rem;font-weight:700;color:var(--kind-checkin);border:1px solid #d4cae2;background:#efeaf6;border-radius:100px;padding:.1rem .5rem;letter-spacing:.05em;}
+.bookrow{display:flex;gap:.5rem;align-items:center;margin-top:.25rem;flex-wrap:wrap;}
+.conf{font-size:.74rem;color:var(--ink-soft);background:var(--panel-strong);border-radius:5px;padding:.08rem .4rem;font-variant-numeric:tabular-nums;}
+.prepaid{font-size:.7rem;font-weight:700;background:#e7f1ee;color:var(--accent);border-radius:100px;padding:.1rem .5rem;letter-spacing:.05em;text-transform:uppercase;}
+
+/* ── shelf tray ── */
+.tray{position:sticky;top:130px;background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;}
+.tray header{background:var(--panel-strong);padding:.7rem 1rem;}
+.tray header h2{font-family:var(--font-display);font-weight:500;font-size:1.05rem;margin:0;}
+.tray header .note{font-size:.72rem;color:var(--muted);margin-top:.15rem;}
+.tray .filter{display:flex;gap:.35rem;padding:.6rem 1rem 0;flex-wrap:wrap;}
+.fchip{font-size:.72rem;font-weight:600;border:1px solid var(--border);background:var(--bg);border-radius:100px;padding:.18rem .6rem;color:var(--muted);}
+.fchip.on{background:#e7f1ee;color:var(--accent);border-color:#bcd8d0;}
+.tcard{margin:.6rem .8rem;background:var(--bg);border:1px solid var(--border);border-left:4px solid var(--k,var(--border));
+  border-radius:var(--radius-tight);padding:.55rem .7rem;cursor:grab;box-shadow:0 2px 6px rgba(41,33,19,.05);}
+.tcard .r1{display:flex;justify-content:space-between;align-items:baseline;gap:.5rem;}
+.tcard .nm{font-weight:600;font-size:.86rem;}
+.tcard .grip{color:var(--border);}
+.tcard .meta{font-size:.74rem;color:var(--muted);margin-top:.1rem;}
+.tcard .mks{display:flex;gap:.3rem;flex-wrap:wrap;margin-top:.35rem;}
+.mk{font-size:.72rem;font-weight:500;display:inline-flex;align-items:center;gap:.25rem;
+  background:var(--panel-strong);border:1px solid var(--border);border-radius:100px;padding:.12rem .5rem;color:var(--ink-soft);}
+.mk.cited{border-color:#bcd8d0;background:#e7f1ee;}
+.mk.warnnote{border-color:#dcc3a8;background:#f6ead8;color:var(--warn);}
+.mk abbr{text-decoration:none;border-bottom:1px dotted var(--muted);cursor:help;}
+.tray .more{display:block;text-align:center;font-size:.78rem;color:var(--accent);padding:.6rem 0 .8rem;text-decoration:none;}
+
+.mock-banner{max-width:1180px;margin:1rem auto 0;padding:0 1.6rem;}
+.mock-banner span{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);
+  border:1px dashed var(--border);border-radius:100px;padding:.3rem .8rem;}
+@media(max-width:900px){.work{grid-template-columns:1fr;}.tray{position:static;}}
+</style>
+</head>
+<body>
+
+<!-- app TopBar (Trips joins the existing modes) -->
+<nav class="topbar">
+  <span class="brand">Livability Scout</span>
+  <a href="#">Board</a><a href="#">Planning</a><a class="on" href="#">Trips</a><a href="#">Visited</a>
+</nav>
+
+<!-- TRIP BAR — which trip, which half. Never scrolls away. -->
+<div class="tripbar">
+  <span class="tname">Slovenia</span>
+  <span class="tmeta">May 15–25, 2026 · 10 nights · Janice &amp; Chris</span>
+  <span class="halves"><button>Shelf</button><button class="on">Days</button></span>
+  <span class="spacer"></span>
+  <button class="chipbtn">Book <span class="badge">⏰ 1</span></button>
+  <button class="chipbtn">Grid →</button>
+</div>
+
+<!-- DAY RAIL — which day, what's around it. Fill-state dots = trip-wide progress. -->
+<div class="dayrail">
+  <div class="leg"><span class="legname">Ljubljana</span><div class="chips">
+    <div class="dchip has"><span class="dow">Fri</span><span class="dnum">15</span><span class="state"></span></div>
+    <div class="dchip has"><span class="dow">Sat</span><span class="dnum">16</span><span class="state"></span></div>
+  </div></div>
+  <div class="leg"><span class="legname">Bled</span><div class="chips">
+    <div class="dchip has"><span class="dow">Sun</span><span class="dnum">17</span><span class="state"></span></div>
+    <div class="dchip has"><span class="dow">Mon</span><span class="dnum">18</span><span class="state"></span></div>
+    <div class="dchip on solved"><span class="dow">Tue</span><span class="dnum">19</span><span class="state"></span></div>
+    <div class="dchip has"><span class="dow">Wed</span><span class="dnum">20</span><span class="state"></span></div>
+  </div></div>
+  <div class="leg"><span class="legname">Piran</span><div class="chips">
+    <div class="dchip has"><span class="dow">Thu</span><span class="dnum">21</span><span class="state"></span></div>
+    <div class="dchip has"><span class="dow">Fri</span><span class="dnum">22</span><span class="state"></span></div>
+    <div class="dchip has"><span class="dow">Sat</span><span class="dnum">23</span><span class="state"></span></div>
+    <div class="dchip has"><span class="dow">Sun</span><span class="dnum">24</span><span class="state"></span></div>
+    <div class="dchip has"><span class="dow">Mon</span><span class="dnum">25</span><span class="state"></span></div>
+  </div></div>
+</div>
+
+<div class="mock-banner"><span>Mockup · the trip workspace (Days view) · schedule below is real solve.js output</span></div>
+
+<div class="work">
+
+  <!-- DAY CANVAS — one day at a time; the rail is the overview. -->
+  <main class="canvas">
+    <div class="chead">
+      <h1>Tuesday, May 19</h1>
+      <span class="sub">Bled · solved 2 min ago</span>
+      <span class="spacer"></span>
+      <span class="verdict">Feasible</span>
+      <button class="solvebtn ghost">Re-solve</button>
+    </div>
+
+    <div class="tl-row machine"><div class="tt">5:25 – 5:30</div><div class="tc">Drive to the launch field <span class="machinetag">auto · 4 min est.</span></div></div>
+    <div class="tl-row anchor" style="--k:var(--kind-booked)"><div class="tt">5:30 – 7:30</div><div class="tc">
+      <span class="kindlbl">Booked</span><span class="nm">Hot-air balloon (private)</span>
+      <div class="bookrow"><span class="prepaid">Prepaid</span><span class="conf">401780164673</span><span class="anchnote">pickup at Hotel Toplice · dress warm</span></div>
+    </div></div>
+    <div class="tl-row machine"><div class="tt">7:30 – 7:35</div><div class="tc">Drive back toward the lake <span class="machinetag">auto · 4 min est.</span></div></div>
+    <div class="tl-row anchor" style="--k:var(--kind-flexible)"><div class="tt">7:35 – 9:35</div><div class="tc">
+      <span class="kindlbl">Flexible</span><span class="nm">Bled Castle — hike up + tour</span>
+      <div class="bookrow"><span class="anchnote">opens 8:00 · lakeshore path, 30–40 min up</span></div>
+    </div></div>
+    <div class="tl-row machine"><div class="tt">9:35 – 9:55</div><div class="tc">Rest <span class="machinetag rest">auto</span></div></div>
+    <div class="tl-row anchor" style="--k:var(--kind-meal)"><div class="tt">12:00 – 1:00</div><div class="tc">
+      <span class="kindlbl">Meal</span><span class="nm">Lunch · Pizzeria Rustika</span>
+      <div class="bookrow"><span class="anchnote">in your lunch window · 0.8 km from Hotel Toplice</span></div>
+    </div></div>
+    <div class="tl-row machine"><div class="tt">1:00 – 3:55</div><div class="tc">Open time <span class="machinetag rest">auto</span></div></div>
+    <div class="tl-row machine"><div class="tt">3:55 – 4:00</div><div class="tc">Walk to the meeting point <span class="machinetag">auto · 4 min est.</span></div></div>
+    <div class="tl-row anchor" style="--k:var(--kind-booked)"><div class="tt">4:00 – 5:30</div><div class="tc">
+      <span class="kindlbl">Booked</span><span class="nm">Via Ferrata Hvadnik</span> <span class="pinbadge">📌 pinned</span>
+      <div class="bookrow"><span class="prepaid">Prepaid</span><span class="conf">#138953</span><span class="anchnote">Ljubljanska cesta 1 — the yellow doors</span></div>
+    </div></div>
+  </main>
+
+  <!-- SHELF TRAY — the drag source rides along with the day. -->
+  <aside class="tray">
+    <header>
+      <h2>Shelf · Bled</h2>
+      <p class="note">Drag onto the day · chips filtered for this trip (no dog, no kids — <a href="#" style="color:var(--accent)">show all</a>)</p>
+    </header>
+    <div class="filter">
+      <span class="fchip on">All</span><span class="fchip">Eat</span><span class="fchip">See &amp; do</span><span class="fchip">Veg ✓</span>
+    </div>
+    <div class="tcard" style="--k:var(--kind-flexible)">
+      <div class="r1"><span class="nm">Zipline Dolinka</span><span class="grip">⠿</span></div>
+      <div class="meta">★5.0 (5,446) · 0.5 km from Hotel Toplice · ~3 hrs</div>
+      <div class="mks"><span class="mk">Not verified yet</span></div>
+    </div>
+    <div class="tcard" style="--k:var(--kind-meal)">
+      <div class="r1"><span class="nm">Public &amp; Vegan Kitchen</span><span class="grip">⠿</span></div>
+      <div class="meta">★4.7 (2,046) · 0.3 km from Hotel Toplice</div>
+      <div class="mks">
+        <span class="mk cited"><abbr title="Google Places · fetched 2026-06-10">Veg ✓</abbr></span>
+        <span class="mk cited"><abbr title="Google Places · fetched 2026-06-10">Patio ✓</abbr></span>
+        <span class="mk warnnote">Closed Mondays</span>
+      </div>
+    </div>
+    <div class="tcard" style="--k:var(--kind-meal)">
+      <div class="r1"><span class="nm">Confectionery Zima</span><span class="grip">⠿</span></div>
+      <div class="meta">★4.6 (3,386) · 0.7 km from Hotel Toplice · €€</div>
+      <div class="mks"><span class="mk">Not verified yet</span></div>
+    </div>
+    <div class="tcard" style="--k:var(--kind-flexible)">
+      <div class="r1"><span class="nm">Straža hill toboggan</span><span class="grip">⠿</span></div>
+      <div class="meta">★4.7 (1,752) · 1.1 km from Hotel Toplice · ~1.5 hrs</div>
+      <div class="mks"><span class="mk">Not verified yet</span></div>
+    </div>
+    <a class="more" href="#">Open the full Shelf →</a>
+  </aside>
+
+</div>
+
+</body>
+</html>

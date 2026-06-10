@@ -321,6 +321,14 @@ Tabular figures, `--muted`. A11y: ranges announced "from X to Y"; fuzzy reads
 its literal label.
 
 ### 4.3 `MarkerSet` — the signature element
+
+> **Trip-level marker relevance (owner, 2026-06-10).** Not every trip cares
+> about every marker — no dog on this trip → 🐾 chips are noise. The trip's
+> `glance.travelers/pets` (+ an explicit override list) derives an **active
+> marker set**; chips outside it are hidden by default across the Shelf and
+> Days (the underlying data is kept, never deleted), with a "show all"
+> toggle. Slovenia (Janice & Chris, no dog, no kids) shows veg/patio/
+> accessible/cash; Jim Thorpe (Cocoa) adds dog.
 **Problem.** Every artifact tags places (dog/veg/kid/patio/cash/prepaid), and
 Jim Thorpe **cites a source for every dog-friendly claim**. Markers + sources
 are first-class — the trip equivalent of a measured metric with provenance.
