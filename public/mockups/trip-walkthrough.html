@@ -327,6 +327,10 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
 .srcline{font-size:.66rem;color:var(--muted);font-style:italic;margin:.15rem 0 0;}
 .savebtn{font-size:.64rem;font-weight:700;border:1px solid var(--accent);color:var(--accent);background:none;border-radius:100px;padding:.06rem .5rem;cursor:pointer;margin-top:.25rem;}
 .savebtn.done{border-color:var(--border);color:var(--muted);}
+/* Open the place's Google listing for photos + full reviews (Janice s17:
+   "I POUR over reviews and photos before selecting"). */
+.glink{display:inline-block;margin-top:.25rem;margin-left:.5rem;font-size:.62rem;font-weight:600;color:var(--k-trav);text-decoration:none;border-bottom:1px solid currentColor;white-space:nowrap;}
+.glink:hover{color:var(--accent);}
 .stage{position:relative;}
 
 /* ════ TOUR CURSOR (deck chrome — marks the slide's named action) ════ */
@@ -987,12 +991,12 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
     <aside class="sheet"><span class="x2">×</span>
       <span class="kl">stays · Ljubljana · May 15–17</span><h3>Search hotels</h3>
       <div class="frow"><span class="fld"><input value="old town ljubljana" placeholder="search near the leg…"></span></div>
-      <p class="hint2">from Google Places near Ljubljana old town · ranked by rating × reviews</p>
-      <div class="mini" style="--k:var(--k-stay);margin-bottom:.45rem;"><b>Grand Hotel Union Eurostars</b><small>★4.5 (3,932) · old town · garage</small><br><button class="savebtn done">✓ shortlisted</button></div>
-      <div class="mini" style="--k:var(--k-stay);margin-bottom:.45rem;"><b>Hotel Lev</b><small>★4.4 (1,210)</small><br><button class="savebtn done">✓ shortlisted</button></div>
-      <div class="mini" style="--k:var(--k-stay);margin-bottom:.45rem;"><b>City Hotel</b><small>★4.2 (2,054)</small><br><button class="savebtn done">✓ shortlisted</button></div>
-      <div class="mini" style="--k:var(--k-stay);margin-bottom:.45rem;"><b>Vander Urbani Resort</b><small>★4.3 (612) · riverside · boutique</small><br><button class="savebtn done">✓ shortlisted</button></div>
-      <div class="mini" style="--k:var(--k-stay);margin-bottom:.45rem;"><b>Antiq Palace</b><small>★4.4 (388) · old town</small><br><button class="savebtn done">✓ shortlisted</button></div>
+      <p class="hint2">from Google Places near Ljubljana old town · ranked by rating × reviews · open any for photos &amp; full reviews</p>
+      <div class="mini" style="--k:var(--k-stay);margin-bottom:.45rem;"><b>Grand Hotel Union Eurostars</b><small>★4.5 (3,932) · old town · garage</small><br><button class="savebtn done">✓ shortlisted</button><a class="glink" href="https://www.google.com/maps/search/?api=1&amp;query=Grand%20Hotel%20Union%20Eurostars%20Ljubljana" target="_blank" rel="noopener">↗ photos &amp; reviews</a></div>
+      <div class="mini" style="--k:var(--k-stay);margin-bottom:.45rem;"><b>Hotel Lev</b><small>★4.4 (1,210)</small><br><button class="savebtn done">✓ shortlisted</button><a class="glink" href="https://www.google.com/maps/search/?api=1&amp;query=Hotel%20Lev%20Ljubljana" target="_blank" rel="noopener">↗ photos &amp; reviews</a></div>
+      <div class="mini" style="--k:var(--k-stay);margin-bottom:.45rem;"><b>City Hotel</b><small>★4.2 (2,054)</small><br><button class="savebtn done">✓ shortlisted</button><a class="glink" href="https://www.google.com/maps/search/?api=1&amp;query=City%20Hotel%20Ljubljana" target="_blank" rel="noopener">↗ photos &amp; reviews</a></div>
+      <div class="mini" style="--k:var(--k-stay);margin-bottom:.45rem;"><b>Vander Urbani Resort</b><small>★4.3 (612) · riverside · boutique</small><br><button class="savebtn done">✓ shortlisted</button><a class="glink" href="https://www.google.com/maps/search/?api=1&amp;query=Vander%20Urbani%20Resort%20Ljubljana" target="_blank" rel="noopener">↗ photos &amp; reviews</a></div>
+      <div class="mini" style="--k:var(--k-stay);margin-bottom:.45rem;"><b>Antiq Palace</b><small>★4.4 (388) · old town</small><br><button class="savebtn done">✓ shortlisted</button><a class="glink" href="https://www.google.com/maps/search/?api=1&amp;query=Antiq%20Palace%20Hotel%20Ljubljana" target="_blank" rel="noopener">↗ photos &amp; reviews</a></div>
       <p class="hint2" style="margin-top:.5rem;">not here? <u>＋ add your own…</u> — a B&amp;B no cache knows</p>
     </aside>
   </div>
