@@ -101,7 +101,7 @@ padding:.4rem .65rem;font-size:.78rem;box-shadow:0 2px 6px rgba(41,33,19,.05);}
 .mini b{font-weight:600;}
 .mini small{display:block;color:var(--muted);font-size:.68rem;}
 .mini.ghost{opacity:.5;border-style:dashed;}
-.mini .mk{font-size:.64rem;background:var(--panel-strong);border:1px solid var(--border);border-radius:100px;padding:.04rem .38rem;margin-left:.3rem;}
+.mk{font-size:.64rem;background:var(--panel-strong);border:1px solid var(--border);border-radius:100px;padding:.04rem .38rem;margin-left:.3rem;}
 /* Type icon on item cards, keyed off the existing colour taxonomy so it
    applies everywhere a card appears with no markup churn (Janice s28:
    "a little icon would help distinguish adventure / tour / meal"). */
@@ -109,7 +109,7 @@ padding:.4rem .65rem;font-size:.78rem;box-shadow:0 2px 6px rgba(41,33,19,.05);}
 .mini[style*="--k-meal"] > b::before{content:"🍽 ";font-weight:400;}
 .mini[style*="--k-stay"] > b::before{content:"🛏 ";font-weight:400;}
 .mini[style*="--k-trav"] > b::before{content:"🚐 ";font-weight:400;}
-.mini .mk.ok{background:#e7f1ee;border-color:#bcd8d0;}
+.mk.ok{background:#e7f1ee;border-color:#bcd8d0;}
 .bucketbox{border:1.5px dashed var(--border);border-radius:10px;padding:.7rem .9rem;margin-top:.6rem;background:rgba(255,253,246,.6);}
 .bucketbox .bh{display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;}
 .bucketbox .bh b{font-family:var(--fd);font-size:.95rem;font-weight:500;}
@@ -366,6 +366,11 @@ border:2.5px solid var(--accent);opacity:0;}
 .pop .pi{display:flex;align-items:center;gap:.5rem;font-size:.78rem;padding:.3rem .4rem;border-radius:6px;cursor:pointer;}
 .pop .pi:hover{background:var(--panel-strong);}
 .pop .pi.sel{color:var(--muted);}
+/* Demonstrate what a chip DOES, right where you set it (Janice s2: "why
+   even set chips / what does vegetarian do?"). */
+.pop .pifx{margin-top:.45rem;border-top:1px solid var(--panel-strong);padding:.5rem .4rem .15rem;font-size:.66rem;line-height:1.45;color:var(--muted);cursor:default;}
+.pop .pifx b{color:var(--text);}
+.pop .pifx .mk{font-size:.58rem;}
 .toast2{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);background:#1b1814;color:#fbf6ea;font-size:.76rem;border-radius:100px;padding:.45rem 1rem;z-index:7;}
 .toast2 b{color:#9fc4bb;cursor:pointer;}
 .collapsec{display:flex;align-items:center;gap:.5rem;font-size:.72rem;color:var(--muted);border:1px solid var(--panel-strong);background:var(--panel);border-radius:8px;padding:.32rem .7rem;margin:.5rem 0;cursor:pointer;}
@@ -543,7 +548,7 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
         <div class="travrow"><b>Janice</b><button class="addchip" style="border-color:var(--accent);color:var(--accent);box-shadow:0 0 0 4px rgba(13,76,68,.15);">＋ chip</button><span class="x">✕</span></div>
         <div class="travrow"><b>Chris</b><button class="addchip">＋ chip</button><span class="x">✕</span></div>
         <div class="toolrow" style="margin-top:0;"><button class="ctrl">＋ traveler</button><button class="ctrl ghosted">＋ pet</button></div>
-        <p class="srcline">chips set which marker filters this trip shows</p>
+        <p class="srcline">a chip rides with its traveler and screens every suggestion — 🥦 keeps meals vegetarian, the grid marks them veg ✓</p>
       </div>
       <div class="toolrow"><button class="ctrl solid">Create trip →</button></div>
     </div>
@@ -566,17 +571,18 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
         <div class="travrow" style="border-color:var(--accent);"><b>Janice</b><button class="addchip" style="border-color:var(--accent);color:var(--accent);">＋ chip</button><span class="x">✕</span></div>
         <div class="travrow"><b>Chris</b><button class="addchip">＋ chip</button><span class="x">✕</span></div>
         <div class="toolrow" style="margin-top:0;"><button class="ctrl">＋ traveler</button><button class="ctrl ghosted">＋ pet</button></div>
-        <p class="srcline">chips set which marker filters this trip shows</p>
+        <p class="srcline">a chip rides with its traveler and screens every suggestion — 🥦 keeps meals vegetarian, the grid marks them veg ✓</p>
       </div>
       <div class="toolrow"><button class="ctrl solid">Create trip →</button></div>
     </div>
-    <div class="pop" style="left:330px;top:120px;width:210px;">
+    <div class="pop" style="left:330px;top:120px;width:250px;">
       <div class="pi" style="background:var(--panel-strong);font-weight:600;">🥦 vegetarian</div>
       <div class="pi">🌱 vegan</div>
       <div class="pi">🚫🥜 nut allergy</div>
       <div class="pi">♿ limited mobility</div>
       <div class="pi">🧒 kid</div>
       <div class="pi" style="border-top:1px solid var(--panel-strong);color:var(--accent);font-weight:600;">＋ custom chip…</div>
+      <div class="pifx"><b>🥦 vegetarian</b> isn't just a label — the trip <b>uses</b> it: restaurant suggestions get screened for veg menus, and every meal on the grid is flagged <span class="mk ok">veg ✓</span> (or ⚠ when a place has none). <i>That's</i> why you set one.</div>
     </div>
   </div>
 </section>
@@ -599,7 +605,7 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
         <div class="travrow"><b>Janice</b><span class="tchip">🥦 vegetarian <i>✕</i></span><button class="addchip">＋ chip</button><span class="x">✕</span></div>
         <div class="travrow"><b>Chris</b><span class="tchip">🥦 vegetarian <i>✕</i></span><button class="addchip">＋ chip</button><span class="x">✕</span></div>
         <div class="toolrow" style="margin-top:0;"><button class="ctrl">＋ traveler</button><button class="ctrl ghosted">＋ pet</button></div>
-        <p class="srcline">chips set which marker filters this trip shows</p>
+        <p class="srcline">a chip rides with its traveler and screens every suggestion — 🥦 keeps meals vegetarian, the grid marks them veg ✓</p>
       </div>
       <div class="toolrow"><button class="ctrl solid" style="box-shadow:0 0 0 4px rgba(13,76,68,.18);">Create trip →</button></div>
     </div>
@@ -1291,9 +1297,9 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
       </div>
       <div class="toolrow"><button class="ctrl" style="background:#e7f1ee;">Browse suggestions →</button><button class="ctrl">＋ add your own…</button></div>
     </div>
-    <div class="sect">Suggestions · Bled — from Google Places near Grand Hotel Toplice <button class="ctrl inlinectl">✕ close</button></div>
+    <div class="sect">Suggestions · Bled — from Google Places near Grand Hotel Toplice · <span style="color:var(--accent);font-weight:600;">🥦 meals screened for vegetarian (your chips)</span> <button class="ctrl inlinectl">✕ close</button></div>
     <div class="cardrow">
-      <div class="mini" style="--k:var(--k-meal)"><b>Oštarija Peglez'n</b><small>★4.5 (4,513) · 0.45 km</small><br><button class="savebtn">+ Save to bucket</button></div>
+      <div class="mini" style="--k:var(--k-meal)"><b>Oštarija Peglez'n</b><small>★4.5 (4,513) · 0.45 km</small><span class="mk ok">veg ✓</span><br><button class="savebtn">+ Save to bucket</button></div>
       <div class="mini" style="--k:var(--k-act)"><b>Straža toboggan</b><small>★4.7 (1,752) · 1.1 km</small><br><button class="savebtn done">✓ saved</button></div>
       <div class="mini" style="--k:var(--k-act)"><b>Blejsko jezero walk</b><small>★4.8 (414) · 0.7 km</small><br><button class="savebtn">+ Save to bucket</button></div>
     </div>
