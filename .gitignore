@@ -21,3 +21,6 @@ overpass/db/
 # Large cached source data (re-downloadable; not committed)
 data/
 scripts/.crowd-season-cache*.json
+
+# Test coverage output
+coverage/
