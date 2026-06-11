@@ -24,6 +24,7 @@ export default defineConfig({
         "lib/trip.js": { statements: 95, branches: 80, functions: 90, lines: 95 },
         "lib/solve.js": { statements: 95, branches: 88, functions: 95, lines: 95 },
         "lib/sourcing.js": { statements: 95, branches: 90, functions: 95, lines: 95 },
+        "lib/solve-adapter.js": { statements: 95, branches: 70, functions: 95, lines: 95 },
       },
     },
   },

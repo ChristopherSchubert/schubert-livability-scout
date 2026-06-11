@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "checkJs": true,
+    "allowJs": true,
+    "noEmit": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "target": "es2022",
+    "strict": false,
+    "noImplicitAny": false,
+    "skipLibCheck": true
+  },
+  "//": "Scoped to the trip-planner domain contracts (issue #48). Loose to start (noImplicitAny off); ratchet stricter + widen the include as the baseline clears.",
+  "include": [
+    "lib/trip.js",
+    "lib/solve.js",
+    "lib/solve-adapter.js",
+    "lib/sourcing.js"
+  ]
+}
