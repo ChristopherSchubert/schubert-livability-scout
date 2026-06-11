@@ -13,6 +13,9 @@ import EntryEditor from "./trip/EntryEditor";
 import BookPanel from "./trip/BookPanel";
 import GatherPanel from "./trip/GatherPanel";
 import TripDndContext from "./trip/TripDndContext";
+import DayMap from "./trip/DayMap";
+import TransportSection from "./trip/TransportSection";
+import ErrorBoundary from "./trip/ErrorBoundary";
 import { tripDays } from "../lib/trip";
 
 // New entries need a stable client id so optimistic state + the upsert agree
@@ -68,75 +71,81 @@ export default function TripDetail({ id }) {
   }
 
   return (
-    <div className="trip-ws">
-      <div className="trip-ws-head">
-        <div>
-          <Link href="/trips" className="trip-ws-sub">
-            ← Trips
-          </Link>
-          <h1>{trip.name || "Untitled trip"}</h1>
-          <div className="trip-ws-sub">
-            {trip.startDate} → {trip.endDate}
-            {markers.length ? ` · markers: ${markers.join(", ")}` : ""}
+    <ErrorBoundary>
+      <div className="trip-ws">
+        <div className="trip-ws-head">
+          <div>
+            <Link href="/trips" className="trip-ws-sub">
+              ← Trips
+            </Link>
+            <h1>{trip.name || "Untitled trip"}</h1>
+            <div className="trip-ws-sub">
+              {trip.startDate} → {trip.endDate}
+              {markers.length ? ` · markers: ${markers.join(", ")}` : ""}
+            </div>
           </div>
+          <span className="trip-save" data-status={saveState.status}>
+            {saveState.status === "saving"
+              ? "Saving…"
+              : saveState.status === "saved"
+                ? "Saved"
+                : saveState.status === "error"
+                  ? "Save failed"
+                  : ""}
+          </span>
         </div>
-        <span className="trip-save" data-status={saveState.status}>
-          {saveState.status === "saving"
-            ? "Saving…"
-            : saveState.status === "saved"
-              ? "Saved"
-              : saveState.status === "error"
-                ? "Save failed"
-                : ""}
-        </span>
-      </div>
 
-      <div style={{ display: "flex", gap: "0.5rem", marginBottom: "0.5rem" }}>
-        <button
-          type="button"
-          className="auth-ghost"
-          aria-pressed={view === "agenda"}
-          onClick={() => setView("agenda")}
-        >
-          Agenda
-        </button>
-        <button
-          type="button"
-          className="auth-ghost"
-          aria-pressed={view === "grid"}
-          onClick={() => setView("grid")}
-        >
-          Grid
-        </button>
-      </div>
+        <div style={{ display: "flex", gap: "0.5rem", marginBottom: "0.5rem" }}>
+          <button
+            type="button"
+            className="auth-ghost"
+            aria-pressed={view === "agenda"}
+            onClick={() => setView("agenda")}
+          >
+            Agenda
+          </button>
+          <button
+            type="button"
+            className="auth-ghost"
+            aria-pressed={view === "grid"}
+            onClick={() => setView("grid")}
+          >
+            Grid
+          </button>
+        </div>
 
-      <TripDndContext onDrop={handleDrop}>
-        {view === "agenda" ? (
-          <DayPlan
-            trip={trip}
-            onEditEntry={setEditing}
-            onAddEntry={addEntry}
-            onApplySolve={applySolve}
+        <TripDndContext onDrop={handleDrop}>
+          {view === "agenda" ? (
+            <DayPlan
+              trip={trip}
+              onEditEntry={setEditing}
+              onAddEntry={addEntry}
+              onApplySolve={applySolve}
+            />
+          ) : (
+            <GridView trip={trip} onEditEntry={setEditing} />
+          )}
+        </TripDndContext>
+
+        <TransportSection trip={trip} onEditEntry={setEditing} />
+
+        <DayMap trip={trip} />
+
+        <GatherPanel trip={trip} onAdd={(draft) => addCandidate(draft)} />
+
+        <BookPanel trip={trip} />
+
+        {editing ? (
+          <EntryEditor
+            entry={editing}
+            tripId={id}
+            near={near}
+            onSave={saveEntry}
+            onDelete={(eid) => removeEntry(id, eid)}
+            onClose={() => setEditing(null)}
           />
-        ) : (
-          <GridView trip={trip} onEditEntry={setEditing} />
-        )}
-      </TripDndContext>
-
-      <GatherPanel trip={trip} onAdd={(draft) => addCandidate(draft)} />
-
-      <BookPanel trip={trip} />
-
-      {editing ? (
-        <EntryEditor
-          entry={editing}
-          tripId={id}
-          near={near}
-          onSave={saveEntry}
-          onDelete={(eid) => removeEntry(id, eid)}
-          onClose={() => setEditing(null)}
-        />
-      ) : null}
-    </div>
+        ) : null}
+      </div>
+    </ErrorBoundary>
   );
 }
