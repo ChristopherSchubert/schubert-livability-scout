@@ -47,12 +47,13 @@ export default function VisitWorkspace() {
 
   return (
     <AppShell activeMode="planned">
-      <section className="canvas-header">
+      <section className="canvas-header trip-cal-header">
         <div>
           <p className="page-eyebrow">Planned</p>
           <h1>Planned and active trips</h1>
           <p className="canvas-sub">{!hydrated ? "Loading…" : trips.length === 0 ? "Commit a trip's dates in Planning to lock it in here." : `${trips.length} ${trips.length === 1 ? "trip" : "trips"}, sorted by arrival date.`}</p>
         </div>
+        <Link className="ghost-link trip-cal-toggle" href="/planning/calendar">Calendar view →</Link>
       </section>
 
       {!hydrated ? (
