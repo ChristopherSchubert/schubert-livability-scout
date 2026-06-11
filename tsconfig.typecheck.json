@@ -15,6 +15,7 @@
     "lib/trip.js",
     "lib/solve.js",
     "lib/solve-adapter.js",
-    "lib/sourcing.js"
+    "lib/sourcing.js",
+    "lib/place-resolve.js"
   ]
 }
