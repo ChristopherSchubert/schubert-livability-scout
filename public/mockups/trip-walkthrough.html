@@ -457,6 +457,7 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
 <p><b>＋ other city</b> opens a place search — any city resolves, not just the scout's list.</p>
 <p>Type, and <b>Trieste</b> resolves (it returns in the variations finale). Add it — the city lands on the tray as a chip, ready to drag in.</p>
 <p>Zhuzhing: grab the <b>boundary handle</b> and slide — Bled takes a night from Piran. Zero-sum between neighbors; the trip total doesn't move.</p>
+<p>The <b>Transport</b> section sits empty under the window. Press <b>＋ add transport</b> to open the flight editor.</p>
 <p>＋ add transport opens the <b>transport editor</b>: route, each end's local clock, ticket fields that wait honestly empty until ticketed — and the consequence stated before it happens: <b>booking this locks the trip's end date.</b></p>
 <p>The flights get booked and the window's outer edges <b>lock</b>. The trip can't stretch anymore without real money moving. Inside, still clay.</p>
 <p>Locked is <b>not frozen</b>: the lock holds only the outer edges. Inside, you drop Kranj in and trade nights freely. The lock's tooltip names its cause and its exit — <b>change the return flight and the edge softens</b>. Hardening is always reversible at the price of the thing that caused it.</p>
@@ -782,7 +783,35 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
 </section>
 
 <!-- ═ 5 · flights lock the edges ═ -->
-<section data-phase="Where · the transport editor" data-did="press ＋ add transport on the empty Transport section, fill the outbound with each end's local time, set status booked — then repeat for the return.">
+<section data-phase="Where · add transport" data-did="the Transport section is empty — press ＋ add transport to open the flight editor.">
+  <nav class="topbar"><span class="brand">Schubert Atlas</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="tripbar"><span class="crumb"><b>Trips</b> ›</span><span class="tname">Slovenia</span><span class="tmeta">May 15–25 · 10 nights</span>
+    <div class="halves nav5"><span class="on">Plan</span><span>Shelf</span><span>Days</span><span>Book</span><span>Grid</span></div>
+    <span class="spacer"></span></div>
+  <div class="pagebody" style="min-height:430px;">
+    <div class="sect">The window <button class="ctrl inlinectl">✎ adjust dates</button></div>
+    <div class="cal"><div class="mlabel">May 2026</div>
+      <div class="calgrid"><span class="cd out">T<b>12</b></span><span class="cd out">W<b>13</b></span><span class="cd out">T<b>14</b></span><span class="cd">F<b>15</b></span><span class="cd we">S<b>16</b></span><span class="cd we">S<b>17</b></span><span class="cd">M<b>18</b></span><span class="cd">T<b>19</b></span><span class="cd">W<b>20</b></span><span class="cd">T<b>21</b></span><span class="cd">F<b>22</b></span><span class="cd we">S<b>23</b></span><span class="cd we">S<b>24</b></span><span class="cd">M<b>25</b></span><span class="cd out">T<b>26</b></span><span class="cd out">W<b>27</b></span><span class="cd out">T<b>28</b></span></div>
+      <div class="legrow"><span class="lseg lj" style="grid-column:4/span 2;">Ljubljana<small>2n</small><span class="hndl">↔</span></span><span class="lseg bl" style="grid-column:6/span 4;">Bled<small>4n</small><span class="hndl">↔</span></span><span class="lseg pi" style="grid-column:10/span 5;">Piran<small>4n · fly Mon 25</small></span>
+        <span class="edge2" style="left:calc(3/17*100% - 4px);"></span>
+        <span class="edge2" style="left:calc(14/17*100% - 5px);"></span>
+      </div>
+    </div>
+    <div class="toolrow"><span class="lbl2">On the tray:</span><span class="citychip">⠿ Kranj</span><button class="ctrl">＋ other city…</button></div>
+    <div class="sect" style="margin-top:1.3rem;">▾ Transport <button class="ctrl inlinectl" style="background:#e7f1ee;">＋ add transport…</button></div>
+    <p class="srcline">✈ nothing yet</p>
+    <div class="sect" style="margin-top:1.1rem;">▾ Stays <button class="ctrl inlinectl ghosted">✂ split a stay…</button></div>
+    <div class="staysrow">
+      <span class="staybar empty" style="flex:2;"><button class="ctrl slotbtn">🔍 Search hotels</button><span class="slothint">Ljubljana · or drop one here</span></span>
+      <span class="staybar empty" style="flex:4;"><button class="ctrl slotbtn">🔍 Search hotels</button><span class="slothint">Bled · or drop one here</span></span>
+      <span class="staybar empty" style="flex:4;"><button class="ctrl slotbtn">🔍 Search hotels</button><span class="slothint">Piran · or drop one here</span></span>
+    </div>
+  </div>
+</section>
+
+
+
+<section data-phase="Where · the transport editor" data-did="fill the outbound with each end's local time, set status booked — then repeat for the return.">
   <nav class="topbar"><span class="brand">Schubert Atlas</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
   <div class="tripbar"><span class="crumb"><b>Trips</b> ›</span><span class="tname">Slovenia</span><span class="tmeta">May 15–25 · 10 nights</span>
     <div class="halves nav5"><span class="on">Plan</span><span>Shelf</span><span>Days</span><span>Book</span><span>Grid</span></div>
@@ -2033,7 +2062,8 @@ const TCUR=[
   {f:"＋ other city"},                                          // 9 press other city
   {sel:".pop .pi",nth:0},                                       // 10 search result
   {sel:".hndl",nth:1,mode:"wiggle"},                            // 9 Bled|Piran handle
-  {sheet:true},                                                 // 10 transport editor
+  {f:"＋ add transport"},                                       // pre: press add transport
+  {sheet:true},                                                 // transport editor
   null,                                                         // 11 (save happened)
   {from:{sel:".citychip",nth:0},sel:".lseg",nth:3,mode:"drag"},  // 12 Kranj test
   {f:"🔍 Search hotels"},                                       // pre: press search
