@@ -250,3 +250,33 @@ container, script-after-last-section, captions = sections = She-does lines.
 - Specs: trip-planner-{components,systems,ux}.md + critique + research
   synthesis. Engines real: lib/solve.js · lib/sourcing.js · lib/trip.js
   (Supabase `trips` row = real Slovenia data).
+
+## Janice's review feedback (2026-06-11) — 10 notes, triaged
+
+Janice (the primary user) walked the full deck and left 10 notes via the
+feedback widget (`walkthrough_feedback`, read with
+`scripts/.read-feedback.mjs`). **Headline: strong validation of the
+direction** — *"This is so cool… It's everything I do and will make
+planning so incredibly fun"* (slide 46). The canonical deck flow is
+endorsed by the user it's for; her asks are refinements, not redirections.
+They cluster around three themes — **transparency** (where do things come
+from), **her hotel-research ritual**, and **legibility of the grid/buckets**
+— plus one deck-chrome bug and one collaboration ask.
+
+| # | Slide | Note (paraphrased) | Theme | Disposition |
+|---|---|---|---|---|
+| 1 | 1 Where · idea | No slide-nav arrows on mobile | deck bug | **Fix deck** — visible prev/next + swipe on the walkthrough at phone width |
+| 2 | 2 composer | "What's a chip? why do I need one?" — "restriction chips" not self-explanatory | copy/UX | **Clarify** the chip metaphor + inline help; possibly rename "restriction chips" |
+| 3 | 5 skeleton | How are cities pre-populated — algorithm that knows our prefs, or public-opinion? | transparency | **Surface provenance** on the skeleton (ties to the measured/ranking model) |
+| 4 | 13 transport | Assumes air-only; real trips have trains/uber/private car — or rename to "Flights" if it's just country-entry | product | **Owner call**: model multi-modal transport vs. rename to **Flights**. Cheap interim = rename |
+| 5 | 17 search hotels | Wants to read Google reviews / open the Google listing from the selector — *"I POUR over reviews and photos"* | feature | **Build** — link hotel cards out to Google reviews/photos (Places Details; key already in Keychain). High value to her flow |
+| 6 | 28 bucket | Color-coding is good; add a type **icon** (adventure/tour/meal) too | polish | **Build** — activity-type icons on bucket/strip items |
+| 7 | 42 grid | Wants **every hour** in the gutter, not every 3; zoom toggle, else default hourly | UX | **Adjust** grid time-gutter: default hourly + optional zoom |
+| 8 | 45 compare | Wants a **comments** feature to share the compare view and get Chris's notes | feature | **Shape** — collaboration/comments on variations (the feedback widget is a primitive to build from) |
+| 9 | 46 phone | "Yay!! For the cute :)" | validation | — |
+| 10 | 46 phone | Effusive praise; wants her analysts prototyping this way | validation | — — direction confirmed |
+
+**Genuine owner product-decisions in here (not mine to make):** #4 transport
+modeling vs. "Flights" rename, and #8 scope of a comments/collaboration
+feature. The rest (#1, #5, #6, #7) are clear shippable refinements; #2 and
+#3 are copy/transparency work on the deck.

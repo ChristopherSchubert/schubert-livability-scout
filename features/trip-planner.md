@@ -1,5 +1,16 @@
 # Trip planner — swim-lane year view
 
+> **Not the same "trip planner" as the deck stack.** This is the **live,
+> distinct** cross-city *when-to-go* surface: `TripPlanner.jsx` at
+> `/planning/calendar`, for picking which week to visit each candidate. It
+> is **not** part of, nor superseded by, the per-trip
+> **Plan · Shelf · Days · Book · Grid** flow specced in
+> trip-planner-{[components](trip-planner-components.md),[systems](trip-planner-systems.md),[ux](trip-planner-ux.md)}.md
+> and realized in the walkthrough deck
+> ([trip-walkthrough-review.md](trip-walkthrough-review.md)). The shared
+> "trip-planner" name is a historical collision — they answer different
+> questions (*when to go* vs. *plan the trip you committed to*).
+
 A timeline planner for the **Visit** stage. Each candidate city is a
 horizontal **lane** spanning the year; behind the lane is that city's
 **visit-score** curve (weather vs. crowds), and on top sits a draggable
@@ -92,13 +103,13 @@ re-walk the path.
 
 ---
 
-## Implementation handoff (porting into `/visit/calendar`)
+## Implementation (live at `/planning/calendar`)
 
-The live route + component already exist
-([app/visit/calendar/page.js](../app/visit/calendar/page.js),
-[components/TripCalendar.jsx](../components/TripCalendar.jsx) — the latter
-already has `DEFAULT_DAY_PX / MIN_DAY_PX / MAX_DAY_PX` zoom constants stubbed
-in). Replace/extend that component with the swim-lane model.
+The swim-lane model shipped as
+[components/TripPlanner.jsx](../components/TripPlanner.jsx), mounted by
+[app/planning/calendar/page.js](../app/planning/calendar/page.js)
+(the old `/visit/calendar` route redirects there). It replaced the earlier
+`TripCalendar.jsx` wall-planner draft.
 
 ### Data (already in Supabase — no schema change needed)
 Per city, via `rowToCity` / `cityItem`:
@@ -122,8 +133,7 @@ Per city, via `rowToCity` / `cityItem`:
 2. Helpers: `weeklyTemp/Crowd/etc.` from `visitClimate`/`crowdSeason`.
 
 ### Component shape
-- `TripPlanner.jsx` (rename/replace `TripCalendar.jsx`), mounted by the
-  route inside `AppShell activeMode="visit"`.
+- `TripPlanner.jsx`, mounted by the route inside `AppShell`.
 - **Geometry is CSS-variable driven**: `--day-w` (zoom) + `--pan-x` (offset)
   on a root element; every position is `calc(var(--day-w) * dayIndex)`. This
   is what makes pan/zoom cheap. Year spans `VIEW_START` (Monday on/before

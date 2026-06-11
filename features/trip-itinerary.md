@@ -1,5 +1,16 @@
 # Trip itinerary — design doc / handoff spec
 
+> ⚠️ **SUPERSEDED (2026-06-11).** This single-format hour-grid was replaced
+> by the multi-format component system in
+> [trip-planner-components.md](trip-planner-components.md), whose canonical
+> realization is the **Plan · Shelf · Days · Book · Grid** flow in the
+> walkthrough deck ([public/mockups/trip-walkthrough.html](../public/mockups/trip-walkthrough.html),
+> state doc [trip-walkthrough-review.md](trip-walkthrough-review.md)). Kept
+> for the data-foundation notes (the `itinerary` jsonb column) and the
+> Janice/`Slovenia.xlsx` "definition of done." Build against the deck, not
+> this. Class/route references below were repointed to the live
+> `TripPlanner.jsx` only to avoid dangling links.
+
 > Status: **step 1 (data foundation) shipped; grid not built yet.** This is
 > the spec for the hour-by-hour itinerary surface. Modeled on the real trip
 > planner the owner's partner (Janice) builds in Excel: a time-grid where
@@ -19,7 +30,7 @@ The three existing visit surfaces stop at *which city, which week*:
 
 | Surface | Route | Answers |
 |---|---|---|
-| `TripCalendar` | `/visit/calendar` | which city, which week, how many nights |
+| `TripPlanner` | `/planning/calendar` | which city, which week, how many nights |
 | `VisitWorkspace` | `/visit` | my planned/active trips at a glance |
 | Trip plan (per city) | `/cities/<slug>/plan` → `VisitPlanRoute` | stay zone, lodging, flight — **freeform prose** |
 
@@ -101,7 +112,7 @@ not silently dropped. Cash Needed = `sum(cost.amount where cost.cashOnly)`,
 grouped by currency. Bookings ledger = entries with `confirmation` OR
 `cancelBy`, sorted by `cancelBy` ascending (soonest deadline first).
 
-**Writes** follow the `TripCalendar` discipline: live drag is visual only;
+**Writes** follow the `TripPlanner` discipline: live drag is visual only;
 `updateCity(id, { itinerary })` fires once on `pointerup`/popover-save, so
 Supabase sees one write per gesture, never one per pixel.
 
@@ -123,18 +134,19 @@ A horizontally-scrolling grid inside the plan page, full content width.
 ```
 
 - **Time gutter** — sticky left column, ~56px, `--font-ui` tabular figures,
-  `--muted`. Half-hour rows. Reuse `SLOT_PX` like `TripCalendar`'s `DAY_PX`.
+  `--muted`. Half-hour rows. Drive geometry off a `SLOT_PX` constant the
+  way `TripPlanner` drives the calendar off `DEFAULT_DAY_W` / `--day-w`.
 - **Day header row** — sticky top. Weekday in `--font-display` italic
   (matches the calendar's month labels), date in small-caps Inter Tight
   tabular. The day that is "today" (if the trip is live) gets the deep-green
-  rule treatment from `.trip-cal-today`.
+  rule treatment from `.trip-pl-today`.
 - **Columns** — one per day from `arriveDate` to `departDate` inclusive.
   Min column width ~160px so an entry title is legible; grid scrolls
-  horizontally past ~5 days, same `trip-cal-scroll` pattern.
+  horizontally past ~5 days, same `trip-pl-scroller` pattern.
 - **Entry block** — absolutely positioned within its day column;
   `top = (slotsFromDayStart) × SLOT_PX`, `height = spanSlots × SLOT_PX`.
 
-### Grid constants (mirror `TripCalendar`)
+### Grid constants (mirror `TripPlanner`)
 
 | Constant | Value | Notes |
 |---|---|---|
@@ -196,7 +208,7 @@ of fix — verify, don't assume). Booked/meal/travel/checkin/todo confirmed
 
 | Component | Variant / prop | Notes |
 |---|---|---|
-| `TripItinerary` | `slug` | top-level; reads `cityItem`, derives day columns from dates, owns drag state (one global `pointermove`/`pointerup` in a `useEffect`+ref, exactly like `TripCalendar`) |
+| `TripItinerary` | `slug` | top-level; reads `cityItem`, derives day columns from dates, owns drag state (one global `pointermove`/`pointerup` in a `useEffect`+ref, exactly like `TripPlanner`) |
 | `ItineraryGrid` | — | scroll shell, gutter, day headers, gridlines, today rule |
 | `ItineraryEntry` | `kind` (6), `isDragging`, `compact` | the positioned block; left color spine in `--kind-*`, title + time + kind icons (🔒 prepaid, € cash, ⚑ has-confirmation) |
 | `EntryPopover` | `mode: create \| edit` | form: title, day/start/end, kind selector (the 6 swatches), note (multiline), confirmation, prepaid, cost+currency+cashOnly, cancelBy, url, contact. Save → one `updateCity`. Delete → remove from `entries` |
@@ -217,7 +229,7 @@ Domain helpers belong in `lib/planner-data.js` (the godfile rule):
 | Empty slot | hover | faint `--accent-soft` fill + "+" affordance |
 | Empty slot | click | open `EntryPopover` (create) pre-filled with that day + start time, `end = start + 1 slot`, `kind = flexible` |
 | Empty slot | drag (down) | rubber-band a duration; release opens create popover with that span |
-| Entry | hover | lift shadow (reuse `.trip-cal-bar:hover` box-shadow), reveal top/bottom resize handles + "×" delete |
+| Entry | hover | lift shadow (reuse `.trip-pl-bar:hover` box-shadow), reveal top/bottom resize handles + "×" delete |
 | Entry | click (no drag) | open `EntryPopover` (edit) |
 | Entry | drag body | move within/across day columns; snap to 30-min + day; live-preview only, commit on `pointerup` |
 | Entry | drag top/bottom handle | resize start/end; clamp `end > start`, keep inside `[dayStart,dayEnd]` |
@@ -229,7 +241,7 @@ Domain helpers belong in `lib/planner-data.js` (the godfile rule):
 | Popover | `day` outside trip window | warn "outside trip dates" but allow (orphan), surfaced in header |
 
 Live drag math is `Δpx ÷ SLOT_PX` for time and column hit-testing for day —
-the same model as `commit()` in `TripCalendar.jsx`.
+the same model as `TripPlanner.jsx` (write via `updateCity` on `pointerup`).
 
 ---
 
@@ -253,7 +265,7 @@ model. It's a view swap at the render layer.
 
 - **No trip dates yet** (`arriveDate`/`departDate` empty) — grid can't derive
   columns. Show an empty state: "Set this trip's dates on the calendar to
-  start the itinerary," linking `/visit/calendar`. Don't render an
+  start the itinerary," linking `/planning/calendar`. Don't render an
   open-ended grid.
 - **Single-day trip** — one column; grid still valid.
 - **Long trip (>10 days)** — horizontal scroll; a faint day-count and
@@ -282,7 +294,7 @@ model. It's a view swap at the render layer.
 
 | Element | Trigger | Animation | Duration | Easing |
 |---|---|---|---|---|
-| Entry block | drag start | lift (translateY -1px + shadow), as `.trip-cal-bar.is-dragging` | 120ms | ease-out |
+| Entry block | drag start | lift (translateY -1px + shadow), as `.trip-pl-bar.is-dragging` | 120ms | ease-out |
 | Entry block | commit (pointerup) | settle to snapped position | 140ms | ease-out |
 | Cash/Bookings drawer | open/close | height + opacity slide-down | 180ms | ease-in-out |
 | Legend filter | toggle | non-matching entries fade to 35% | 160ms | ease |
