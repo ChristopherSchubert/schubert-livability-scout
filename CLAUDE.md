@@ -85,9 +85,15 @@ a pattern to copy.
 
 ## App architecture (Next.js app router)
 
-- `lib/planner-data.js` — data model + derived helpers; **the godfile**.
-  Single source of truth for taxonomy, survey, visit-window logic, city
-  factory. Split is the top architecture backlog item.
+- `lib/planner-data.js` — **thin barrel** (2026-06-11, #47). The former
+  godfile is split into focused isomorphic modules, re-exported here so
+  `from "lib/planner-data"` imports are unchanged. Add domain code to the
+  right module, not the barrel: `lib/metrics.js` (taxonomy, scoring,
+  rollups, learned weights), `lib/survey.js` (felt-score), `lib/visit-window.js`,
+  `lib/image-queries.js` (search/image builders), `lib/stages.js` (funnel
+  stages), `lib/city-factory.js` (city() + starterCities seed +
+  normalizeState/defaultState). Scoring core guarded by `test/scoring.test.mjs`
+  (`npm test`).
 - `lib/city-detail-view.js` — `buildCityDetailView`: shapes a `cityItem`
   into the magazine-chapter envelope. Backs the live page + `/api/mockup-data`.
 - `components/PlannerProvider.jsx` — React context. **Supabase is the system
