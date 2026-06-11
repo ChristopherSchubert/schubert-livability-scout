@@ -42,11 +42,21 @@ function EntryRow({ e, onEdit }) {
 }
 
 export default function TripWorkspace({ tripId }) {
-  const { active, hydrated, enterTrip } = useTrips();
+  const { active, hydrated, enterTrip, addEntry } = useTrips();
   const [tab, setTab] = useState("Plan");
   const [editing, setEditing] = useState(null);
 
   useEffect(() => { if (tripId) enterTrip(tripId); }, [tripId]); // eslint-disable-line
+
+  // Create a blank entry on a day, then open it in the editor (addEntry returns
+  // the row with its server-generated id, so the editor can patch it).
+  async function addToDay(date) {
+    const saved = await addEntry(tripId, {
+      day: date, role: "anchor", category: "activity", status: "none",
+      title: "", time: { mode: "range" },
+    });
+    if (saved) setEditing(saved);
+  }
 
   const trip = active && active.id === tripId ? active : null;
   const days = useMemo(() => (trip ? tripDays(trip) : []), [trip]);
@@ -110,7 +120,8 @@ export default function TripWorkspace({ tripId }) {
             const list = byDay[d.date] || [];
             return (
               <section key={d.date} className="tw-day">
-                <div className="tw-day-head"><b>{d.date}</b>{d.legName ? <span className="tw-leg">{d.legName}</span> : null}<span className="tw-count">{list.length}</span></div>
+                <div className="tw-day-head"><b>{d.date}</b>{d.legName ? <span className="tw-leg">{d.legName}</span> : null}<span className="tw-count">{list.length}</span>
+                  <button className="tw-add" onClick={() => addToDay(d.date)} title="Add an entry to this day">＋ add</button></div>
                 {list.length === 0 ? <p className="tw-empty">— open day —</p> : (
                   <ul className="tw-entries">{list.map((e) => <EntryRow key={e.id} e={e} onEdit={setEditing} />)}</ul>
                 )}
