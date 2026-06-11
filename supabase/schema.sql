@@ -143,12 +143,14 @@ create table if not exists user_weights (
 -- planner; supersedes the per-city cities.itinerary column (deprecated, not
 -- dropped). jsonb-heavy; round-tripped through lib/trip.js. See migration 0013
 -- and features/trip-planner-components.md.
---   glance  { driveFrom, lodging, checkIn, diet, travelers[], pets[], theme, weather }
---   preTrip { limitations[], bookingChecklist[], tips[], sources[] }
---   legs    [ { cityId, name, arrive, depart, lodging, checkIn } ]
---   options { directory[], excursions[], alternates[] }
---   entries [ { id, day, cityId, time, kind, role, title, note, place,
---             markers[], booking, cost } ]
+--   glance    { driveFrom, lodging, checkIn, diet, travelers[], pets[], theme, weather }
+--   preTrip   { limitations[], bookingChecklist[], tips[], sources[] }
+--   legs      [ { cityId, name, arrive, depart, lodging, checkIn, candidates[], chosenId, tz } ]
+--   options   { directory[], excursions[], alternates[] }
+--   travelers [ { name, kind: person|pet, chips: [veg|dog|kid|…] } ]   -- migration 0017
+--   passes    [ { id, name, cost, covers? } ]                          -- migration 0017
+-- Entries are NORMALIZED into trip_entries (migration 0016); the `entries`
+-- jsonb column below is the deprecated v1 blob, kept as a migration source.
 create table if not exists trips (
   id          uuid primary key default gen_random_uuid(),
   user_id     uuid not null references profiles (id) on delete cascade,
@@ -160,10 +162,30 @@ create table if not exists trips (
   pre_trip    jsonb default '{}',
   legs        jsonb default '[]',
   options     jsonb default '{}',
+  travelers   jsonb default '[]',
+  passes      jsonb default '[]',
   entries     jsonb default '[]',
   created_at  timestamptz default now(),
   updated_at  timestamptz default now()
 );
+
+-- ── trip_entries (PER-ENTRY) ────────────────────────────────────────────────
+-- One row per trip entry, normalized out of the trips.entries blob so real-time
+-- co-editing gets per-entry patches + conflict isolation (migration 0016).
+-- `payload jsonb` is the v2 entry atom (everything except id/day); `sort` orders
+-- entries within a (trip, day). RLS resolves ownership through the parent trip.
+create table if not exists trip_entries (
+  id          uuid primary key default gen_random_uuid(),
+  trip_id     uuid not null references trips (id) on delete cascade,
+  day         date,
+  payload     jsonb not null default '{}',
+  sort        int default 0,
+  created_at  timestamptz default now(),
+  updated_at  timestamptz default now()
+);
+create index if not exists trip_entries_trip_day_idx on trip_entries (trip_id, day);
+-- trip_entries is a member of the supabase_realtime publication (migration 0016)
+-- so per-entry inserts/updates/deletes emit postgres_changes for the TripProvider.
 
 -- ── pois (SHARED, cached) ───────────────────────────────────────────────────
 -- Local cache of social POIs from Google Places (New). OSM coverage was too
@@ -199,6 +221,7 @@ alter table felt_surveys    enable row level security;
 alter table baseline_ratings enable row level security;
 alter table user_weights    enable row level security;
 alter table trips           enable row level security;
+alter table trip_entries    enable row level security;
 
 -- profiles: everyone signed in can read names; you update only your own.
 create policy "profiles readable by authed" on profiles for select to authenticated using (true);
@@ -229,6 +252,17 @@ create policy "trips readable by authed" on trips for select to authenticated us
 create policy "trips insert own" on trips for insert to authenticated with check (user_id = auth.uid());
 create policy "trips update own" on trips for update to authenticated using (user_id = auth.uid());
 create policy "trips delete own" on trips for delete to authenticated using (user_id = auth.uid());
+
+-- trip_entries: CRUD only if you own the parent trip (ownership via trip_id).
+create policy "trip_entries select own" on trip_entries for select to authenticated
+  using (trip_id in (select id from trips where user_id = auth.uid()));
+create policy "trip_entries insert own" on trip_entries for insert to authenticated
+  with check (trip_id in (select id from trips where user_id = auth.uid()));
+create policy "trip_entries update own" on trip_entries for update to authenticated
+  using (trip_id in (select id from trips where user_id = auth.uid()))
+  with check (trip_id in (select id from trips where user_id = auth.uid()));
+create policy "trip_entries delete own" on trip_entries for delete to authenticated
+  using (trip_id in (select id from trips where user_id = auth.uid()));
 
 -- walkthrough_feedback: notes Janice submits from the trip-walkthrough deck
 -- (a public static page) via /api/walkthrough-feedback. Anonymous insert,
