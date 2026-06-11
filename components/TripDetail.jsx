@@ -11,6 +11,16 @@ import DayPlan from "./trip/DayPlan";
 import GridView from "./trip/GridView";
 import EntryEditor from "./trip/EntryEditor";
 import BookPanel from "./trip/BookPanel";
+import GatherPanel from "./trip/GatherPanel";
+import TripDndContext from "./trip/TripDndContext";
+import { tripDays } from "../lib/trip";
+
+// New entries need a stable client id so optimistic state + the upsert agree
+// (the trip_entries pk is a uuid; a client-minted one round-trips cleanly).
+const newId = () =>
+  globalThis.crypto?.randomUUID
+    ? crypto.randomUUID()
+    : `e_${Date.now()}_${Math.random().toString(36).slice(2)}`;
 
 export default function TripDetail({ id }) {
   const active = useTrip(id);
@@ -39,7 +49,22 @@ export default function TripDetail({ id }) {
   }
   function applySolve(_date, entries) {
     // Persist each solved entry (per-entry writes; the provider debounces).
-    entries.forEach((e) => updateEntry(id, e));
+    entries.forEach((e) => updateEntry(id, { ...e, id: e.id || newId() }));
+  }
+  function saveEntry(e) {
+    updateEntry(id, { ...e, id: e.id || newId(), day: e.day || editing?.day });
+  }
+  // Gather "+ Add" / a pool→day drop lands a candidate on a day as an anchor.
+  function addCandidate(entryDraft, day) {
+    const targetDay = day || tripDays(trip)[0]?.date || trip.startDate;
+    updateEntry(id, { ...entryDraft, id: newId(), day: targetDay });
+  }
+  function handleDrop({ active, over }) {
+    if (!active || !over) return;
+    if (active.type === "pool" && over.type === "day") addCandidate(active.entry, over.day);
+    else if (active.type === "entry" && over.type === "day" && active.entry?.id) {
+      updateEntry(id, { id: active.entry.id, day: over.day }); // move to another day
+    }
   }
 
   return (
@@ -85,16 +110,20 @@ export default function TripDetail({ id }) {
         </button>
       </div>
 
-      {view === "agenda" ? (
-        <DayPlan
-          trip={trip}
-          onEditEntry={setEditing}
-          onAddEntry={addEntry}
-          onApplySolve={applySolve}
-        />
-      ) : (
-        <GridView trip={trip} onEditEntry={setEditing} />
-      )}
+      <TripDndContext onDrop={handleDrop}>
+        {view === "agenda" ? (
+          <DayPlan
+            trip={trip}
+            onEditEntry={setEditing}
+            onAddEntry={addEntry}
+            onApplySolve={applySolve}
+          />
+        ) : (
+          <GridView trip={trip} onEditEntry={setEditing} />
+        )}
+      </TripDndContext>
+
+      <GatherPanel trip={trip} onAdd={(draft) => addCandidate(draft)} />
 
       <BookPanel trip={trip} />
 
@@ -103,7 +132,7 @@ export default function TripDetail({ id }) {
           entry={editing}
           tripId={id}
           near={near}
-          onSave={(e) => updateEntry(id, { ...e, day: e.day || editing.day })}
+          onSave={saveEntry}
           onDelete={(eid) => removeEntry(id, eid)}
           onClose={() => setEditing(null)}
         />
