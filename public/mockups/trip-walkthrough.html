@@ -299,6 +299,19 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
 .vartab{font-size:.76rem;font-weight:600;border:1px solid var(--border);border-radius:100px;padding:.26rem .8rem;color:var(--muted);cursor:pointer;}
 .vartab.on{background:#e7f1ee;color:var(--accent);border-color:#bcd8d0;}
 .decideby{font-size:.74rem;color:var(--warn);font-weight:600;margin-top:.45rem;}
+/* Comments / share-with-Chris on the compare view (Janice s45: "share this
+   view and see your comments on what you like vs. not"). */
+.vshare{font-size:.66rem;font-weight:600;color:var(--accent);background:#e7f1ee;border:1px solid #bcd8d0;border-radius:100px;padding:.08rem .55rem;margin-left:.5rem;}
+.cmts{margin-top:1rem;border-top:1px solid var(--border);padding-top:.7rem;}
+.cmts h4{font-size:.68rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin:0 0 .55rem;font-weight:700;}
+.cmt{display:flex;gap:.5rem;margin-bottom:.55rem;font-size:.74rem;line-height:1.42;}
+.cmt .av{flex:0 0 auto;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:.64rem;font-weight:700;color:#fff;}
+.cmt .av.c{background:var(--k-trav);}
+.cmt .av.j{background:var(--accent);}
+.cmt .who{font-weight:700;}
+.cmt .re{font-size:.6rem;color:var(--muted);background:var(--panel-strong);border:1px solid var(--border);border-radius:100px;padding:.02rem .4rem;margin:0 .15rem 0 .35rem;white-space:nowrap;}
+.cmtadd{display:flex;gap:.5rem;align-items:center;margin-top:.5rem;}
+.cmtadd input{flex:1;font:inherit;font-size:.72rem;border:1px solid var(--border);border-radius:100px;padding:.32rem .75rem;background:var(--panel);}
 .vartab .vdot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:.35rem;vertical-align:middle;}
 .varcols{display:flex;gap:.9rem;margin-top:.5rem;}
 .varcol{flex:1;border:1px solid var(--border);border-radius:11px;background:var(--panel);overflow:hidden;}
@@ -516,7 +529,7 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
 <p>The payoff: the grid <b>prints itself</b>, one leg per page. Every block placed, every drive auto-timed and inserted (→ 4 min to the launch field), every lock, cash tag, and pin carried over from the plan. Page through the legs; what Janice used to hand-type, now generated — and bookable from paper.</p>
 <p>＋ new variation opens the <b>fork composer</b>: name it, start blank or copy the current plan — and the decide-by rule is stated up front, derived from whatever cancellation deadlines end up inside.</p>
 <p>The fork lives <b>inside the plan</b>, not in a separate doc: tabs switch the last three days between Option A (all-in Piran, active) and Option B (three towns). The active one fills the page; <b>compare side by side</b> opens both at once.</p>
-<p>Two futures, column by column — <b>differences highlighted</b>: one base vs three towns, a Venice day vs an Istrian crawl, minimal driving vs two borders. Neither is deleted; both hold only refundable bookings, and whichever stays unpicked by <b>May 19</b> releases itself. They’d later cancel Piran for Trieste — and wish they hadn’t.</p>
+<p>Two futures, column by column — <b>differences highlighted</b>: one base vs three towns, a Venice day vs an Istrian crawl, minimal driving vs two borders. Neither is deleted; both hold only refundable bookings, and whichever stays unpicked by <b>May 19</b> releases itself. And it isn't a solo call — the view is <b>shared with Chris</b>, so his comments on what he likes (and doesn't) sit right under the columns. They’d later cancel Piran for Trieste — and wish they hadn’t.</p>
 <p>The whole trip in your pocket — <b>no separate "mobile app."</b> Plan stacks one leg per row, <b>Today</b> lands on the next thing with Directions and Call, Book keeps its countdowns and cash, and the grid deals one day per swipe. Same data, one column.</p>
 </div>
 
@@ -1972,13 +1985,13 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
     <div class="toolrow" style="margin-top:.6rem;"><span class="tchip" style="background:#e7f1ee;border-color:#bcd8d0;color:var(--accent);">active · refundable</span><button class="ctrl">make B active</button><button class="ctrl solid" style="box-shadow:0 0 0 4px rgba(13,76,68,.18);">⊟ compare side by side</button></div>
     <p class="decideby">⏰ decide by May 19 · set by Hotel Piran’s free-cancellation deadline — both options hold only refundable bookings until then</p>
   </div>
-</section><section data-phase="What if (rewind · pre-trip) · compare side by side" data-did="read the two futures column by column — the differences highlighted — and leave both alive for the road.">
+</section><section data-phase="What if (rewind · pre-trip) · compare side by side" data-did="read the two futures column by column, share the view with Chris, and weigh his comments on each — both stay alive for the road.">
   <nav class="topbar"><span class="brand">Schubert Atlas</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
   <div class="tripbar"><span class="crumb"><b>Trips</b> ›</span><span class="tname">Slovenia</span><span class="tmeta">May 15–25 · 10 nights</span>
     <div class="halves nav5"><span class="on">Plan</span><span>Shelf</span><span>Days</span><span>Book <i class="hbadge">⏰ 1</i></span><span>Grid</span></div>
     <span class="spacer"></span></div>
   <div class="pagebody">
-    <div class="sect">May 21 – 24 · compare <button class="ctrl inlinectl">✕ close compare</button></div>
+    <div class="sect">May 21 – 24 · compare <span class="vshare">🔗 shared with Chris · 💬 3</span> <button class="ctrl inlinectl">✕ close compare</button></div>
     <div class="varcols">
       <div class="varcol win2">
         <div class="vch"><span class="vdot" style="background:var(--accent);width:8px;height:8px;border-radius:50%;display:inline-block;"></span><b>Option A</b> <small style="color:var(--muted);">all-in Piran</small><span class="vstate act">active</span></div>
@@ -2010,6 +2023,13 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
       </div>
     </div>
     <p class="decideby">⏰ decide by May 19 · whichever stays unpicked releases its refundable holds automatically</p>
+    <div class="cmts">
+      <h4>💬 Comments · shared with Chris</h4>
+      <div class="cmt"><span class="av c">C</span><div class="body"><span class="who">Chris</span><span class="re">re: Option B</span>👍 Trieste cafés + three countries sold me — <b>but</b> 👎 a 3×-km, two-border drive on getaway morning is rough. Worth it?</div></div>
+      <div class="cmt"><span class="av c">C</span><div class="body"><span class="who">Chris</span><span class="re">re: Option A</span>👎 the €511 Venice catamaran eats a whole day. Drop it and A gets a lot easier to love.</div></div>
+      <div class="cmt"><span class="av j">J</span><div class="body"><span class="who">Janice</span> leaning A for the calm 🙂 — but can we steal B's Trieste night somehow?</div></div>
+      <div class="cmtadd"><span class="av j">J</span><input placeholder="add a comment for Chris…"><button class="ctrl">Post</button></div>
+    </div>
   </div>
 </section>
 

@@ -272,11 +272,13 @@ from), **her hotel-research ritual**, and **legibility of the grid/buckets**
 | 5 | 17 search hotels | Wants to read Google reviews / open the Google listing from the selector — *"I POUR over reviews and photos"* | feature | ✅ **Deck done (2026-06-11)** — each hotel result card now carries a "↗ photos & reviews" link that opens its Google Maps listing in a new tab; hint line notes it. *Real-app follow-on:* surface Places Details (photos/review snippets) inline in the live selector rather than bouncing out (key already in Keychain) |
 | 6 | 28 bucket | Color-coding is good; add a type **icon** (adventure/tour/meal) too | polish | ✅ **Done (2026-06-11)** — CSS-only type icons keyed off the existing `--k` colour (🥾 activity · 🍽 meal · 🛏 stay · 🚐 travel), so they apply to every card instance with no markup churn. *Note:* the data taxonomy has no "tour" type distinct from "activity" — splitting adventure vs. tour needs a marker-taxonomy decision (see open item below) |
 | 7 | 42 grid | Wants **every hour** in the gutter, not every 3; zoom toggle, else default hourly | UX | ✅ **Done (2026-06-11)** — defaulted the grid time-gutter to hourly labels (6a–9p) with 3-hour major gridlines anchoring the fainter hourly ones. Zoom toggle deferred (her stated fallback was "default to every hour") |
-| 8 | 45 compare | Wants a **comments** feature to share the compare view and get Chris's notes | feature | **Shape** — collaboration/comments on variations (the feedback widget is a primitive to build from) |
+| 8 | 45 compare | Wants a **comments** feature to share the compare view and get Chris's notes | feature | ✅ **Done (2026-06-11)** — added a share-with-Chris state + a comments thread under the two columns: each comment is avatar-tagged (Chris/Janice), labelled `re: Option A/B`, carries 👍/👎 leans on what he likes vs. not, with an "add a comment" composer. Caption woven to introduce it. *Real-app follow-on:* persist comments (extend the `walkthrough_feedback` primitive) + a real share link |
 | 9 | 46 phone | "Yay!! For the cute :)" | validation | — |
 | 10 | 46 phone | Effusive praise; wants her analysts prototyping this way | validation | — — direction confirmed |
 
-**Status (2026-06-11):** owner direction was "trust her feedback." Shipped:
-#1, #2, #3, #5, #6, #7, and #4 (resolved as the Flights rename). Remaining:
-#8 (comments/collaboration on the compare view) — the one with real scope
-latitude.
+**Status (2026-06-11):** owner direction was "trust her feedback." **All 8
+actionable notes shipped** (#9/#10 were praise) — #1 mobile nav, #2 chip
+demonstration, #3 city provenance, #4 Flights rename, #5 hotel reviews link,
+#6 card type-icons, #7 hourly grid, #8 compare comments. Each has a real-app
+follow-on noted in its row where the deck affordance stands in for live
+integration (Places Details inline, persisted comments, etc.).
