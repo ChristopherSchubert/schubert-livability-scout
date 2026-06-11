@@ -13,6 +13,7 @@ import {
   kindToV2,
   rowToTrip,
   tripToRow,
+  tripPatchToRow,
   rowToEntry,
   entryToRow,
   ENTRY_CATEGORIES,
@@ -256,6 +257,16 @@ describe("row <-> object mapping", () => {
   });
   it("tripToRow omits entries (they live in trip_entries)", () => {
     expect(tripToRow({ name: "X", entries: [{ id: "e" }] })).not.toHaveProperty("entries");
+  });
+  it("tripPatchToRow maps known frame keys to snake columns, drops unknown, omits entries", () => {
+    const row = tripPatchToRow({
+      name: "X",
+      startDate: "2026-05-18",
+      travelers: [{ name: "C" }],
+      entries: [{ id: "e" }],
+      bogus: 1,
+    });
+    expect(row).toEqual({ name: "X", start_date: "2026-05-18", travelers: [{ name: "C" }] });
   });
   it("entry round-trips id/day/sort as columns, rest as payload", () => {
     const row = {

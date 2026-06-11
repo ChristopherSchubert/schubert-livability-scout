@@ -31,6 +31,7 @@ import {
   reorderEntries as dbReorderEntries,
   subscribeTrip,
 } from "../lib/db";
+import { isOwnEcho, mergeEntryChange } from "../lib/trip-merge";
 import { useAuth } from "./AuthGate";
 
 const TripContext = createContext(null);
@@ -96,26 +97,16 @@ export function TripProvider({ children }) {
         if (cancelled) return;
         setActive({ trip, entries: trip.entries || [] });
         unsub.current = subscribeTrip(id, (change) => {
-          // Own-echo suppression (#36): skip a change we caused.
-          if (change.table === "trip_entries" && change.id) {
-            const sentAt = pendingEntries.current.get(change.id);
-            if (sentAt && change.eventType !== "DELETE") return; // our in-flight write echoing back
-          }
+          // Own-echo suppression (#36) via the pure merge module (#42).
+          if (isOwnEcho(change, pendingEntries.current)) return;
           setActive((cur) => {
             if (!cur || cur.trip.id !== id) return cur;
             if (change.table === "trips" && change.trip) {
               return { ...cur, trip: { ...change.trip, entries: cur.entries } };
             }
             if (change.table === "trip_entries") {
-              if (change.eventType === "DELETE") {
-                return { ...cur, entries: cur.entries.filter((e) => e.id !== change.id) };
-              }
-              const e = change.entry;
-              if (!e) return cur;
-              const i = cur.entries.findIndex((x) => x.id === e.id);
-              const entries =
-                i === -1 ? [...cur.entries, e] : cur.entries.map((x) => (x.id === e.id ? e : x));
-              return { ...cur, entries };
+              const entries = mergeEntryChange(cur.entries, change, pendingEntries.current);
+              return entries === cur.entries ? cur : { ...cur, entries };
             }
             return cur;
           });
