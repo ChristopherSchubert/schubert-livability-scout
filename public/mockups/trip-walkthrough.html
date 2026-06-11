@@ -446,9 +446,11 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
 <p>＋ add transport opens the <b>transport editor</b>: route, each end's local clock, ticket fields that wait honestly empty until ticketed — and the consequence stated before it happens: <b>booking this locks the trip's end date.</b></p>
 <p>The flights get booked and the window's outer edges <b>lock</b>. The trip can't stretch anymore without real money moving. Inside, still clay.</p>
 <p>Locked is <b>not frozen</b>: the lock holds only the outer edges. Inside, you drop Kranj in and trade nights freely. The lock's tooltip names its cause and its exit — <b>change the return flight and the edge softens</b>. Hardening is always reversible at the price of the thing that caused it.</p>
+<p>Each empty stay slot offers <b>🔍 Search hotels</b> (or a drop). Press Ljubljana's — it searches that one leg.</p>
 <p>Transport done, you <b>fold it closed (▸)</b> — and with the dates settled, the big calendar compacts to a strip (✎ adjust dates still opens it). Every empty stay slot has carried its <b>🔍 search</b> since the cities landed — pressing Ljubljana's runs a place search scoped to that leg, and you <b>shortlist all five results</b>: the candidate strip on the next page is exactly these five. Add-your-own covers places no cache knows.</p>
 <p>The shortlist from the search now sits under Ljubljana as the <b>candidate strip</b> (each card: ✎ · ✕). You drag Union onto the city — it becomes a bar spanning the leg's nights.</p>
 <p>The same search-and-drop, twice more (a drop retires its candidate strip): <b>Toplice</b> for Bled, <b>Hotel Piran</b> for Piran. Three cities, three bars — every night housed, nothing split yet.</p>
+<p>Stays aren't 1:1 with cities — a single leg can hold two hotels. <b>✂ split a stay</b> cuts one in two; press it on Toplice.</p>
 <p>✂ split a stay asks one question — <b>after which night?</b> — and the split leaves an honest open slot (“night of May 20 — drop a stay”) rather than silently stretching a neighbor. Hiša Franko lands in that slot next.</p>
 <p>Stays aren't 1:1 with cities: <b>Hiša Franko</b> — added by hand, the splurge — takes the open night. The same split-and-drop later hands the last night to <b>Brdo</b>, near the airport.</p>
 <p>The stay bar's click opens the <b>stay editor</b> — this is where booking actually happens: status to <b>booked</b>, confirmation pasted, the free-cancellation date captured once and reused everywhere (the bar's resistance, the Book page's countdown, the ⏰ badge).</p>
@@ -459,6 +461,7 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
 <p>The ✎ on any card opens the same editor (duration and hours live here; cited markers are read-only). ✕ removes — <b>with an Undo toast, never silently</b>. You undo it; the toboggan survives.</p>
 <p>You already know another answer: <b>lunch at Rustika on balloon day</b>. You drag it from the bucket straight onto Tue — manual placement works at any stage, and it lands <b>pinned</b>.</p>
 <p>Some days are for nothing: May 22 gets the <b>🪶 keep-it-light</b> toggle. The layout engine must leave it nearly empty. Recovery is a feature.</p>
+<p>Back on Bled, the bucket holds seven undated items plus the two pins — <b>enough to lay out</b>. Press <b>Lay out Bled →</b>.</p>
 <p><b>“Lay out Bled.”</b> The machine deals all seven undated items around the two pins — closed-Mondays respected (Public &amp; Vegan lands Sunday), the drive day kept light. <b>The zipline doesn't fit and becomes an alternate, not a casualty.</b></p>
 <p>You drag the toboggan from Monday onto Wednesday — pair it with the drive day. The instant a human edits, <b>auto-layout pauses</b> — and waits for the explicit “re-lay out around my pins.”</p>
 <p>Tuesday looks right — <b>Solve</b>. The Days view: the machine sequenced by geography, inserted the drives, dropped lunch in its window, surfaced the free gap, assigned the clock.</p>
@@ -872,6 +875,32 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
 </section>
 
 <!-- ═ 6 · stay strip + shelf ═ -->
+<section data-phase="Stays · the empty slots" data-did="fold ▸ Transport closed — each empty stay slot offers 🔍 Search hotels; press Ljubljana's.">
+  <nav class="topbar"><span class="brand">Schubert Atlas</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="tripbar"><span class="crumb"><b>Trips</b> ›</span><span class="tname">Slovenia</span><span class="tmeta">May 15–25 · 10 nights</span>
+    <div class="halves nav5"><span class="on">Plan</span><span>Shelf</span><span>Days</span><span>Book</span><span>Grid</span></div>
+    <span class="spacer"></span></div>
+  <div class="pagebody" style="min-height:430px;">
+    <div class="sect">The window <button class="ctrl inlinectl">✎ adjust dates</button></div>
+    <div class="win" style="height:30px;margin-bottom:.9rem;"><span class="edge l lock"></span>
+      <span class="legseg lj" style="flex:2;font-size:.7rem;">Ljubljana</span>
+      <span class="legseg bl" style="flex:4;font-size:.7rem;">Bled</span>
+      <span class="legseg pi" style="flex:4;font-size:.7rem;">Piran</span>
+    <span class="edge r lock"></span></div>
+    
+    <div class="collapsec">▸ <b>Transport</b> · 2 booked ✈</div>
+    <div class="sect" style="margin-top:1.1rem;">▾ Stays <button class="ctrl inlinectl ghosted">✂ split a stay…</button></div>
+    <div class="staysrow">
+      <span class="staybar empty" style="flex:2;outline:2px solid var(--accent);outline-offset:1px;"><button class="ctrl slotbtn">🔍 Search hotels</button><span class="slothint">Ljubljana · or drop one here</span></span>
+      <span class="staybar empty" style="flex:4;"><button class="ctrl slotbtn">🔍 Search hotels</button><span class="slothint">Bled · or drop one here</span></span>
+      <span class="staybar empty" style="flex:4;"><button class="ctrl slotbtn">🔍 Search hotels</button><span class="slothint">Piran · or drop one here</span></span>
+    </div>
+  </div>
+</section>
+
+<!-- ═ 7 · splitting stays ═ -->
+
+
 <section data-phase="Stays · 🔍 search hotels" data-did="fold ▸ Transport closed, press 🔍 Search hotels on Ljubljana's empty stay slot — and shortlist all five results.">
   <nav class="topbar"><span class="brand">Schubert Atlas</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
   <div class="tripbar"><span class="crumb"><b>Trips</b> ›</span><span class="tname">Slovenia</span><span class="tmeta">May 15–25 · 10 nights</span>
@@ -888,7 +917,7 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
     <div class="collapsec">▸ <b>Transport</b> · 2 booked ✈</div>
     <div class="sect" style="margin-top:1.1rem;">▾ Stays <button class="ctrl inlinectl ghosted">✂ split a stay…</button></div>
     <div class="staysrow">
-      <span class="staybar" style="flex:2;border-style:dashed;border-color:var(--accent);justify-content:center;"><span class="dropz">drop a hotel on Ljubljana · 🔍 search</span></span>
+      <span class="staybar empty" style="flex:2;outline:2px solid var(--accent);outline-offset:1px;"><button class="ctrl slotbtn">🔍 Search hotels</button><span class="slothint">Ljubljana · searching…</span></span>
       <span class="staybar empty" style="flex:4;"><button class="ctrl slotbtn">🔍 Search hotels</button><span class="slothint">Bled · or drop one here</span></span>
       <span class="staybar empty" style="flex:4;"><button class="ctrl slotbtn">🔍 Search hotels</button><span class="slothint">Piran · or drop one here</span></span>
     </div>
@@ -961,6 +990,31 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
     </div>
   </div>
 </section>
+
+<section data-phase="Stays · before the split" data-did="stays needn't match cities 1:1 — press ✂ split a stay on Toplice.">
+  <nav class="topbar"><span class="brand">Schubert Atlas</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="tripbar"><span class="crumb"><b>Trips</b> ›</span><span class="tname">Slovenia</span><span class="tmeta">May 15–25 · 10 nights</span>
+    <div class="halves nav5"><span class="on">Plan</span><span>Shelf</span><span>Days</span><span>Book</span><span>Grid</span></div>
+    <span class="spacer"></span></div>
+  <div class="pagebody" style="position:relative;">
+    <div class="sect">The window <button class="ctrl inlinectl">✎ adjust dates</button></div>
+    <div class="win" style="height:30px;margin-bottom:.9rem;"><span class="edge l lock"></span>
+      <span class="legseg lj" style="flex:2;font-size:.7rem;">Ljubljana</span>
+      <span class="legseg bl" style="flex:4;font-size:.7rem;">Bled</span>
+      <span class="legseg pi" style="flex:4;font-size:.7rem;">Piran</span>
+    <span class="edge r lock"></span></div>
+    
+    <div class="collapsec">▸ <b>Transport</b> · 2 booked ✈</div>
+    <div class="sect" style="margin-top:1.1rem;">▾ Stays <button class="ctrl inlinectl" style="background:#e7f1ee;">✂ split a stay…</button></div>
+    <div class="staysrow">
+      <span class="staybar" style="flex:2"><b>Union</b><small>2n</small></span>
+      <span class="staybar" style="flex:4;border-color:var(--accent);"><b>Toplice</b><small>4n</small></span>
+      <span class="staybar" style="flex:4"><b>Hotel Piran</b><small>4n</small></span>
+    </div>
+    </div>
+</section>
+
+
 
 <section data-phase="Stays · ✂ split a stay" data-did="press ✂ split a stay on Toplice and pick the night — the split creates an open slot to drop a stay into.">
   <nav class="topbar"><span class="brand">Schubert Atlas</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
@@ -1345,6 +1399,47 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
 </section>
 
 <!-- ═ 12 · lay out deals ═ -->
+<section data-phase="Lay out · ready to deal" data-did="back on Bled, the bucket has enough to lay out — press Lay out Bled →.">
+  <nav class="topbar"><span class="brand">Schubert Atlas</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="tripbar"><span class="crumb"><b>Trips</b> ›</span><span class="tname">Slovenia</span><span class="tmeta">May 15–25 · 10 nights</span>
+    <div class="halves nav5"><span class="on">Plan</span><span>Shelf</span><span>Days</span><span>Book <i class="hbadge">⏰ 2</i></span><span>Grid</span></div>
+    <span class="spacer"></span></div>
+  <div class="pagebody">
+    <div class="sect">The window <button class="ctrl inlinectl">✎ adjust dates</button></div>
+    <div class="win" style="height:30px;margin-bottom:.9rem;"><span class="edge l lock"></span>
+      <span class="legseg lj" style="flex:2;font-size:.7rem;">Ljubljana</span>
+      <span class="legseg bl" style="flex:4;font-size:.7rem;outline:2px solid var(--accent);outline-offset:-2px;">Bled</span>
+      <span class="legseg pi" style="flex:4;font-size:.7rem;">Piran</span>
+    <span class="edge r lock"></span></div>
+    
+    <div class="collapsec">▸ <b>Transport</b> · 2 booked ✈</div>
+    <div class="collapsec">▸ <b>Stays</b> · 5 booked 🔒</div>
+    <div class="sect" style="margin-top:1.1rem;">Bled · May 17–20 · Toplice + Hiša Franko</div>
+    <div class="daycols">
+      <div class="daycol"><div class="dh">Sun 17 <small>arrive</small></div><div class="dropz" style="width:100%;justify-content:center;">drop here</div><div class="cap"><i style="width:0%"></i></div></div>
+      <div class="daycol"><div class="dh">Mon 18</div><div class="dropz" style="width:100%;justify-content:center;">drop here</div><div class="cap"><i style="width:0%"></i></div></div>
+      <div class="daycol hot"><div class="dh">Tue 19</div>
+        <div class="mini" style="--k:var(--k-act)"><b>Balloon</b> <span class="tag pin">📌 auto</span></div>
+        <div class="mini" style="--k:var(--k-meal);box-shadow:0 8px 20px rgba(13,76,68,.25);"><span class="iacts"><i title="edit">✎</i><i title="remove">✕</i></span><span class="grip2">⠿</span><b>Rustika</b> <span class="tag pin">📌 pinned</span><small>lunch</small></div>
+        <div class="cap"><i style="width:38%"></i></div></div>
+      <div class="daycol"><div class="dh">Wed 20 <small>→ Soča</small></div><div class="dropz" style="width:100%;justify-content:center;">drop here</div><div class="cap"><i style="width:0%"></i></div></div>
+    </div>
+    <div class="bucketbox"><div class="bh"><b>Bled bucket</b><span class="ready">7 left · ~15 h</span><button class="layout-btn" style="box-shadow:0 0 0 4px rgba(13,76,68,.18);">Lay out Bled →</button></div>
+      <div class="cardrow">
+        <div class="mini" style="--k:var(--k-act)"><span class="iacts"><i title="edit">✎</i><i title="remove">✕</i></span><span class="grip2">⠿</span><b>Vintgar Gorge</b></div>
+        <div class="mini" style="--k:var(--k-act)"><span class="iacts"><i title="edit">✎</i><i title="remove">✕</i></span><span class="grip2">⠿</span><b>Bled Castle</b></div>
+        <div class="mini" style="--k:var(--k-act)"><span class="iacts"><i title="edit">✎</i><i title="remove">✕</i></span><span class="grip2">⠿</span><b>Via Ferrata</b></div>
+        <div class="mini" style="--k:var(--k-act)"><span class="iacts"><i title="edit">✎</i><i title="remove">✕</i></span><span class="grip2">⠿</span><b>Canyoning</b></div>
+        <div class="mini" style="--k:var(--k-meal)"><span class="iacts"><i title="edit">✎</i><i title="remove">✕</i></span><span class="grip2">⠿</span><b>Public &amp; Vegan</b></div>
+        <div class="mini" style="--k:var(--k-act)"><span class="iacts"><i title="edit">✎</i><i title="remove">✕</i></span><span class="grip2">⠿</span><b>Toboggan</b></div>
+        <div class="mini" style="--k:var(--k-act)"><span class="iacts"><i title="edit">✎</i><i title="remove">✕</i></span><span class="grip2">⠿</span><b>Zipline</b></div>
+      </div>
+      <div class="toolrow"><button class="ctrl">Browse suggestions →</button><button class="ctrl">＋ add your own…</button></div>
+    </div>
+  </div>
+
+</section>
+
 <section data-phase="Lay out · the machine deals" data-did="back on Bled (one click on its segment), press Lay out Bled → review the proposal.">
   <nav class="topbar"><span class="brand">Schubert Atlas</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
   <div class="tripbar"><span class="crumb"><b>Trips</b> ›</span><span class="tname">Slovenia</span><span class="tmeta">May 15–25 · 10 nights</span>
@@ -1948,10 +2043,12 @@ const TCUR=[
   {sheet:true},                                                 // 10 transport editor
   null,                                                         // 11 (save happened)
   {from:{sel:".citychip",nth:0},sel:".lseg",nth:3,mode:"drag"},  // 12 Kranj test
-  {f:"✓ shortlisted"},                                          // 13
+  {f:"🔍 Search hotels"},                                       // pre: press search
+  {f:"✓ shortlisted"},                                          // shortlist result
   {from:{f:"Union Eurostars"},f:"Union",mode:"drag"},           // 14 strip → bar
   null,                                                         // 15 (narrated repeats)
-  {f:"night 3 · May 19"},                                       // 16 split pick
+  {f:"✂ split a stay"},                                         // pre: press split
+  {f:"night 3 · May 19"},                                       // split pick
   {f:"H. Franko"},                                              // 17 splurge slot
   {sheet:true},                                                 // 18 stay editor
   {sel:".staysrow .hndl",nth:0,mode:"wiggle"},                  // 19 tests Union ↔
@@ -1961,7 +2058,8 @@ const TCUR=[
   {sheet:true},                                                 // 23 Done closes
   {from:{sel:".bucketbox",nth:0},f:"Rustika",mode:"drag"},      // 24 bucket → Tue
   {f:"🪶 light · on"},                                          // 25
-  {sel:".legseg.bl",nth:0},                                     // 26 click its segment
+  {f:"Lay out Bled →"},                                         // pre: press lay out
+  {sel:".legseg.bl",nth:0},                                     // proposal
   {from:{f:"Mon 18"},f:"Toboggan",mode:"drag"},                 // 27 pair with drive day
   null,                                                         // 28 (Solve happened)
   {input:"12:30"},                                              // 29 types the time

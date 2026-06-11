@@ -216,6 +216,25 @@ data). Mobile slides (35 day-of, 39 gallery) are iPhone-15 frames; empty
 stay slots carry an obvious "🔍 Search hotels" button; card ✎/✕ are 20px
 bordered buttons.
 
+## Press pre-slides + nav unification + realistic phones (2026-06-10 pm)
+
+Owner pass. (1) Book and Grid were separate right-side chips while
+Plan/Shelf/Days were a centered control — merged into ONE five-tab strip
+(Plan·Shelf·Days·Book·Grid, Book keeps its ⏰ badge). (2) The Days-view
+canvas jumped 37px when the entry editor opened — slide had an extra
+.pagebody wrapper + canvas margin; neutralized so it's pinned across
+solve/edit/re-solve. (3) Mobile (day-of + gallery) rebuilt at true
+iPhone-15 logical resolution (390×853) with real status bar, dynamic
+island, tab bar, home indicator, then scaled into a holder — reads like a
+real screenshot. (4) Press pre-slides added before the three result panels
+that appeared with no trigger shown: "the empty slots" → search sheet;
+"before the split" → split picker; "ready to deal" → lay-out proposal.
+Other flagged slides left as-is: drags self-justify via their trail,
+nav-clicks put the cursor on the control (like slide 1). Deck is 44 slides.
+GOTCHA when splitting a section by replacing its `data-phase=... data-did=...`
+prefix: don't include the trailing `>` in the replacement — the section
+tag's own `>` remains and you get a stray `>>` rendered at the page top.
+
 ## Mechanical checks (run before any review handoff)
 
 Per-slide matrix script (in git history, commit 771384e): topbar/tripbar
