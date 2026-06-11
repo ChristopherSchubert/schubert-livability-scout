@@ -1,0 +1,4 @@
+#!/bin/sh
+# Pre-commit: format + lint staged files (issue #52). Enable once with:
+#   git config core.hooksPath .githooks   (also run by `npm run prepare`)
+npx --no-install lint-staged

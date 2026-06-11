@@ -2,7 +2,13 @@
 // features/trip-planner-systems.md §1–2). The discipline under test: markers
 // are HONESTLY derived (absent/false → no marker, never a guessed ✅).
 import { describe, it, expect } from "vitest";
-import { categorize, confidenceScore, deriveMarkers, openingHours, buildPool } from "../lib/sourcing.js";
+import {
+  categorize,
+  confidenceScore,
+  deriveMarkers,
+  openingHours,
+  buildPool,
+} from "../lib/sourcing.js";
 
 describe("categorize", () => {
   it("maps each primaryType family", () => {
@@ -37,13 +43,20 @@ describe("deriveMarkers — honest provenance", () => {
   });
   it("derives attribute markers from a fetched blob, each cited with the date", () => {
     const m = deriveMarkers({
-      attributes: { allowsDogs: true, servesVegetarianFood: true, goodForChildren: true,
-        outdoorSeating: true, accessibilityOptions: { wheelchairAccessibleEntrance: true },
-        paymentOptions: { acceptsCashOnly: true } },
+      attributes: {
+        allowsDogs: true,
+        servesVegetarianFood: true,
+        goodForChildren: true,
+        outdoorSeating: true,
+        accessibilityOptions: { wheelchairAccessibleEntrance: true },
+        paymentOptions: { acceptsCashOnly: true },
+      },
       attributes_fetched_at: "2026-06-08T00:00:00Z",
     });
     const types = m.map((x) => x.type);
-    expect(types).toEqual(expect.arrayContaining(["dog", "veg", "kid", "patio", "accessible", "cashOnly"]));
+    expect(types).toEqual(
+      expect.arrayContaining(["dog", "veg", "kid", "patio", "accessible", "cashOnly"])
+    );
     expect(m.find((x) => x.type === "dog").source).toBe("Google Places · 2026-06-08");
   });
   it("yields NO marker when an attribute is false or absent (never a guessed ✅)", () => {
@@ -59,15 +72,34 @@ describe("deriveMarkers — honest provenance", () => {
 
 describe("openingHours", () => {
   it("returns weekday descriptions when present, null otherwise", () => {
-    expect(openingHours({ attributes: { regularOpeningHours: { weekdayDescriptions: ["Mon: 9–5"] } } })).toEqual(["Mon: 9–5"]);
+    expect(
+      openingHours({ attributes: { regularOpeningHours: { weekdayDescriptions: ["Mon: 9–5"] } } })
+    ).toEqual(["Mon: 9–5"]);
     expect(openingHours({})).toBe(null);
   });
 });
 
 describe("buildPool", () => {
   const raw = [
-    { place_id: "a", name: "Cafe", primary_type: "cafe", lat: 46.37, lon: 14.11, rating: 4.8, user_rating_count: 900, formatted_address: "Main St" },
-    { place_id: "b", name: "Shop", primary_type: "store", lat: 46.38, lon: 14.12, rating: 4.2, user_rating_count: 20 },
+    {
+      place_id: "a",
+      name: "Cafe",
+      primary_type: "cafe",
+      lat: 46.37,
+      lon: 14.11,
+      rating: 4.8,
+      user_rating_count: 900,
+      formatted_address: "Main St",
+    },
+    {
+      place_id: "b",
+      name: "Shop",
+      primary_type: "store",
+      lat: 46.38,
+      lon: 14.12,
+      rating: 4.2,
+      user_rating_count: 20,
+    },
   ];
   it("shapes pois into pool candidates ranked by score desc", () => {
     const pool = buildPool(raw, { origin: { lat: 46.37, lon: 14.11 } });

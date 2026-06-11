@@ -1,0 +1,37 @@
+# CI gate (issue #45). Runs on every PR + pushes to main: install → lint →
+# test (with coverage thresholds) → build. Keeps `main` green and makes the
+# trip-planner work reviewable against an objective bar.
+#
+# typecheck (issue #48) joins as a step once the JSDoc/checkJs baseline on the
+# domain contracts is clean. E2E (#44) joins once a browser is available to the
+# runner (the Playwright browser download is blocked in the dev sandbox, not in
+# GitHub-hosted runners — so #44 can live here even though it can't run locally).
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Lint
+        run: npm run lint
+      - name: Test + coverage
+        run: npm run coverage
+      - name: Build
+        run: npm run build
+        env:
+          # Build-time placeholders — the app reads Supabase at runtime, so a
+          # production build only needs these to be present, not valid. Real
+          # secrets live in the Vercel dashboard (CLAUDE.md, deployment.md).
+          NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: placeholder-anon-key
