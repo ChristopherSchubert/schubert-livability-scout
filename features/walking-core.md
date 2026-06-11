@@ -254,10 +254,20 @@ explanation that makes them legible stays here. See
 - **#4 — Re-run [`fit_weights.py`](../scripts/fit_weights.py)** to
   absorb the new metric scale (`_n` integer counts → `_score` weighted
   floats) into the calibrate weights stored in `user_weights`.
-- **#5 — Piran's `daily_needs_score = 0`**: Google Places didn't
-  categorize Piran's old-town grocers under our `daily` bucket. Audit
-  + decide whether to broaden the bucket or cross-reference OSM where
-  Places returns 0.
+- **#5 — Piran's `daily_needs_score = 0`** ✅ RESOLVED (2026-06-11). Root
+  cause was *not* categorization — it was the **fetch**. `.fetch-pois.mjs`
+  requested only `market`/`liquor_store` from the daily set inside one
+  shared 20-per-tile `searchNearby`, and restaurants/cafes/tourist POIs
+  filled every tile's 20 before grocers were reached. A direct Google probe
+  found Piran *does* have a supermarket (103 m), the Tržnica market (82 m),
+  a pharmacy (50 m), a butcher (53 m) and grocers <60 m. Fix: a **dedicated
+  daily-needs `searchNearby` pass per tile** (`DAILY_TYPES` in
+  `.fetch-pois.mjs`). After re-fetch + re-measure: Piran 0 → **13.1**, Davis
+  WV 0 → 1.5 (genuinely sparse, now honest). Allison Park stays ~0 (the
+  owner's residential pin — correct). **Open follow-up:** the daily pass was
+  missing for *every* city, so non-zero daily scores are likely understated
+  too — a full re-fetch + re-measure would make cross-city daily comparison
+  consistent (Google API spend; pending owner go-ahead).
 - **#6 — Refresh off-center boundaries after recenter**: the 2026-06-08
   recenter pass moved `jim-thorpe-pa`, `litchfield-ct`, and `sewickley-pa`,
   whose approximate `stay_zone_boundary` polygons no longer center on the

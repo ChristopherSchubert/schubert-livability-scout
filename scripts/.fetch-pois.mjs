@@ -63,11 +63,18 @@ const GOOGLE_TYPES = [
   "gift_shop", "jewelry_store", "shoe_store", "florist", "liquor_store", "market",
   "museum", "tourist_attraction", "performing_arts_theater", "movie_theater",
 ];
+// Daily-needs types get their OWN searchNearby pass per tile. The shared
+// GOOGLE_TYPES request is dominated by restaurants/cafes/tourist POIs, and the
+// 20-per-tile cap crowded grocers out entirely — Piran's old town has a
+// supermarket, market, pharmacy and butcher all <110 m from center, yet
+// daily_needs_score read 0 (#5). These all carry a `daily` category in
+// lib/measurers/walking-core.js CATEGORY_BY_TYPE.
+const DAILY_TYPES = ["grocery_store", "supermarket", "convenience_store", "drugstore", "pharmacy", "butcher_shop", "market"];
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-async function googleNearby(lat, lon, radius) {
+async function googleNearby(lat, lon, radius, types = GOOGLE_TYPES) {
   const body = JSON.stringify({
-    includedTypes: GOOGLE_TYPES, maxResultCount: 20,
+    includedTypes: types, maxResultCount: 20,
     locationRestriction: { circle: { center: { latitude: lat, longitude: lon }, radius } },
   });
   let lastErr;
@@ -111,7 +118,11 @@ async function fetchCity(client, city) {
   for (let dy = -RADIUS_M; dy <= RADIUS_M; dy += TILE_STEP) {
     for (let dx = -RADIUS_M; dx <= RADIUS_M; dx += TILE_STEP) {
       if (Math.hypot(dx, dy) > RADIUS_M + TILE_R) continue;
-      const places = await googleNearby(lat + dy / mPerLat, lon + dx / mPerLon, TILE_R);
+      const tLat = lat + dy / mPerLat, tLon = lon + dx / mPerLon;
+      const places = [
+        ...await googleNearby(tLat, tLon, TILE_R),
+        ...await googleNearby(tLat, tLon, TILE_R, DAILY_TYPES),
+      ];
       for (const p of places) {
         if (!p.id || !p.location) continue;
         if (haversine(lat, lon, p.location.latitude, p.location.longitude) > RADIUS_M) continue;
