@@ -198,6 +198,24 @@ regret it). Deck is 39 slides. Note: keep new markup in the deck's literal-
 char convention (▸ · → 🔒), not HTML entities — the section auditor's
 continuity check compares text and entities read as false changes.
 
+## Press / result splits + voice (2026-06-10)
+
+The tour cursor exposed slides that showed a trigger button AND its own
+popup at once with the cursor on the (covered) trigger — press and result
+conflated. Split each into two beats: slide 6 "press ✎ adjust dates"
+(cursor on button, no popover) → 7 "the date fields" (popover, cursor on
+Done); and "press ＋ other city" (cursor on button, no dropdown) → "search
+a city" (dropdown with Trieste, cursor on the result). Deck is now 41
+slides — renumbered. (Drags are exempt: a cursor resting at a drag
+destination near a popup is fine because the dashed trail shows motion.)
+
+Voice: the deck narrates the reviewer in second person — "She does:" → "You",
+all did-lines and captions converted. Janice is the reviewer, not an in-app
+character (she remains a trip traveler in the composer rows, which is real
+data). Mobile slides (35 day-of, 39 gallery) are iPhone-15 frames; empty
+stay slots carry an obvious "🔍 Search hotels" button; card ✎/✕ are 20px
+bordered buttons.
+
 ## Mechanical checks (run before any review handoff)
 
 Per-slide matrix script (in git history, commit 771384e): topbar/tripbar

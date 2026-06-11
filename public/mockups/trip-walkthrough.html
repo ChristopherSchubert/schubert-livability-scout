@@ -414,9 +414,11 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
 <p>The picker opens — the same marker taxonomy used everywhere in the app, plus custom. You pick 🥦 for Janice, then for Chris. A chip added here follows its traveler onto every screen of the trip.</p>
 <p>The composer is complete — where, provisional dates, two chipped travelers. <b>Create trip</b> is all that's left, and the next screen is the trip itself.</p>
 <p>The trip opens on its <b>Plan</b> tab with the provisional window already drawn — May 15–25 came in from the composer. Both edges slide freely (nothing is booked); <b>✎ adjust dates</b> is the value-editor for the same thing. Cities wait below.</p>
-<p>✎ adjust dates opens the <b>value editor for the same thing the edges drag</b> — fields and handles always agree. Until something books, both stay free.</p>
+<p>The window’s dates edit two ways that always agree: drag the edges, or press <b>✎ adjust dates</b> for the same values as fields.</p>
+<p>The <b>From</b> and <b>To</b> fields hold exactly what the edges drag — change either, they stay in sync. Until something books, both stay free; <b>Done</b> puts the editor away.</p>
 <p>Three cities dropped in rough order — the split is a default, <b>2 · 4 · 4 nights</b>. Kranj stays on the tray. Every bar has its grip; every boundary its handle — and each city lands with its empty stay slot below (🔍 search lives there).</p>
-<p>＋ other city opens a <b>place search</b> — any city resolves, not just the scout's list. (Trieste enters the story here; it returns in the variations finale.) An added city lands on the tray as a chip, ready to drag in.</p>
+<p><b>＋ other city</b> opens a place search — any city resolves, not just the scout's list.</p>
+<p>Type, and <b>Trieste</b> resolves (it returns in the variations finale). Add it — the city lands on the tray as a chip, ready to drag in.</p>
 <p>Zhuzhing: grab the <b>boundary handle</b> and slide — Bled takes a night from Piran. Zero-sum between neighbors; the trip total doesn't move.</p>
 <p>＋ add transport opens the <b>transport editor</b>: route, each end's local clock, ticket fields that wait honestly empty until ticketed — and the consequence stated before it happens: <b>booking this locks the trip's end date.</b></p>
 <p>The flights get booked and the window's outer edges <b>lock</b>. The trip can't stretch anymore without real money moving. Inside, still clay.</p>
@@ -566,7 +568,32 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
   </div>
 </section>
 
-<section data-phase="Where · adjusting the dates" data-did="open ✎ adjust dates — the same values the edges drag, as fields — and Done puts it away.">
+<section data-phase="Where · adjusting the dates" data-did="press ✎ adjust dates — the value-editor for the dates, same values the edges drag.">
+  <nav class="topbar"><span class="brand">Schubert Atlas</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="tripbar"><span class="crumb"><b>Trips</b> ›</span><span class="tname">Slovenia</span><span class="tmeta">May 15–25 · 10 nights</span>
+    <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
+    <span class="spacer"></span><span class="chipbtn">Book</span><span class="chipbtn">Grid →</span></div>
+  <div class="pagebody" style="position:relative;">
+    <div class="sect">The window <button class="ctrl inlinectl" style="background:#e7f1ee;">✎ adjust dates</button></div>
+    <div class="cal"><div class="mlabel">May 2026</div>
+      <div class="calgrid"><span class="cd out">T<b>12</b></span><span class="cd out">W<b>13</b></span><span class="cd out">T<b>14</b></span><span class="cd">F<b>15</b></span><span class="cd we">S<b>16</b></span><span class="cd we">S<b>17</b></span><span class="cd">M<b>18</b></span><span class="cd">T<b>19</b></span><span class="cd">W<b>20</b></span><span class="cd">T<b>21</b></span><span class="cd">F<b>22</b></span><span class="cd we">S<b>23</b></span><span class="cd we">S<b>24</b></span><span class="cd">M<b>25</b></span><span class="cd out">T<b>26</b></span><span class="cd out">W<b>27</b></span><span class="cd out">T<b>28</b></span></div>
+      <div class="legrow"><span class="emptyspan"><span class="dropz">⠿ drop a city here</span></span>
+        <span class="edge2" style="left:calc(3/17*100% - 4px);"></span>
+        <span class="edge2" style="left:calc(14/17*100% - 5px);"></span>
+      </div>
+    </div>
+    <div class="sect" style="margin-top:1.4rem;">Cities from the scout</div>
+    <div class="toolrow"><span class="citychip">⠿ Ljubljana</span><span class="citychip">⠿ Bled</span><span class="citychip">⠿ Piran</span><span class="citychip">⠿ Kranj</span><button class="ctrl">＋ other city…</button></div>
+  
+    <div class="sect" style="margin-top:1.3rem;">▾ Transport <button class="ctrl inlinectl">＋ add transport…</button></div>
+    <p class="srcline">✈ nothing yet</p>
+    <div class="sect" style="margin-top:1.1rem;">▾ Stays <button class="ctrl inlinectl ghosted">✂ split a stay…</button></div>
+    <p class="srcline">stays live under each city — add cities, then drop hotels</p>
+  </div>
+</section>
+
+<!-- ═ 3 · cities land ═ -->
+<section data-phase="Where · the date fields" data-did="the From and To fields hold what the edges drag — change either, they stay in sync; Done puts it away.">
   <nav class="topbar"><span class="brand">Schubert Atlas</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
   <div class="tripbar"><span class="crumb"><b>Trips</b> ›</span><span class="tname">Slovenia</span><span class="tmeta">May 15–25 · 10 nights</span>
     <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
@@ -626,7 +653,34 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
   </div>
 </section>
 
-<section data-phase="Where · ＋ other city" data-did="press ＋ other city and type — any place works, not just the scout's list.">
+<section data-phase="Where · ＋ other city" data-did="press ＋ other city — open a place search for any city, not just the scout's list.">
+  <nav class="topbar"><span class="brand">Schubert Atlas</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="tripbar"><span class="crumb"><b>Trips</b> ›</span><span class="tname">Slovenia</span><span class="tmeta">May 15–25 · 10 nights</span>
+    <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
+    <span class="spacer"></span><span class="chipbtn">Book</span><span class="chipbtn">Grid →</span></div>
+  <div class="pagebody" style="position:relative;">
+    <div class="sect">The window <button class="ctrl inlinectl">✎ adjust dates</button></div>
+    <div class="cal"><div class="mlabel">May 2026</div>
+      <div class="calgrid"><span class="cd out">T<b>12</b></span><span class="cd out">W<b>13</b></span><span class="cd out">T<b>14</b></span><span class="cd">F<b>15</b></span><span class="cd we">S<b>16</b></span><span class="cd we">S<b>17</b></span><span class="cd">M<b>18</b></span><span class="cd">T<b>19</b></span><span class="cd">W<b>20</b></span><span class="cd">T<b>21</b></span><span class="cd">F<b>22</b></span><span class="cd we">S<b>23</b></span><span class="cd we">S<b>24</b></span><span class="cd">M<b>25</b></span><span class="cd out">T<b>26</b></span><span class="cd out">W<b>27</b></span><span class="cd out">T<b>28</b></span></div>
+      <div class="legrow"><span class="lseg lj" style="grid-column:4/span 2;"><span class="grip2">⠿</span>Ljubljana<small>2n</small><span class="hndl">↔</span></span><span class="lseg bl" style="grid-column:6/span 4;"><span class="grip2">⠿</span>Bled<small>4n</small><span class="hndl">↔</span></span><span class="lseg pi" style="grid-column:10/span 5;"><span class="grip2">⠿</span>Piran<small>4n · fly Mon 25</small></span>
+        <span class="edge2" style="left:calc(3/17*100% - 4px);"></span>
+        <span class="edge2" style="left:calc(14/17*100% - 5px);"></span>
+      </div>
+    </div>
+    <div class="toolrow"><span class="lbl2">On the tray:</span><span class="citychip">⠿ Kranj</span><button class="ctrl" style="background:#e7f1ee;">＋ other city…</button></div>
+    <div class="sect" style="margin-top:1.3rem;">▾ Transport <button class="ctrl inlinectl">＋ add transport…</button></div>
+    <p class="srcline">✈ nothing yet</p>
+    <div class="sect" style="margin-top:1.1rem;">▾ Stays <button class="ctrl inlinectl ghosted">✂ split a stay…</button></div>
+    <div class="staysrow">
+      <span class="staybar empty" style="flex:2;"><button class="ctrl slotbtn">🔍 Search hotels</button><span class="slothint">Ljubljana · or drop one here</span></span>
+      <span class="staybar empty" style="flex:4;"><button class="ctrl slotbtn">🔍 Search hotels</button><span class="slothint">Bled · or drop one here</span></span>
+      <span class="staybar empty" style="flex:4;"><button class="ctrl slotbtn">🔍 Search hotels</button><span class="slothint">Piran · or drop one here</span></span>
+    </div>
+  </div>
+</section>
+
+<!-- ═ 4 · trading nights ═ -->
+<section data-phase="Where · searching a city" data-did="type, and Trieste resolves — add it, and it lands on the tray as a chip ready to drag in.">
   <nav class="topbar"><span class="brand">Schubert Atlas</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
   <div class="tripbar"><span class="crumb"><b>Trips</b> ›</span><span class="tname">Slovenia</span><span class="tmeta">May 15–25 · 10 nights</span>
     <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
@@ -1858,9 +1912,11 @@ const TCUR=[
   {f:"🥦 vegetarian"},                                          // 3
   {f:"Create trip →"},                                         // 4
   {sel:".edge2",nth:1,mode:"wiggle"},                           // 5 right edge
-  {f:"✎ adjust dates"},                                        // 6
+  {f:"✎ adjust dates"},                                        // 6 press dates
+  {f:"Done"},                                                  // 7 date fields
   {from:{sel:".citychip",nth:0},sel:".lseg",nth:2,mode:"drag"},  // 7 tray → window
-  {f:"＋ other city…"},                                         // 8
+  {f:"＋ other city"},                                          // 9 press other city
+  {sel:".pop .pi",nth:0},                                       // 10 search result
   {sel:".hndl",nth:1,mode:"wiggle"},                            // 9 Bled|Piran handle
   {sheet:true},                                                 // 10 transport editor
   null,                                                         // 11 (save happened)
