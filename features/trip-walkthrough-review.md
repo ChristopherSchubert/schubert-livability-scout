@@ -267,7 +267,7 @@ from), **her hotel-research ritual**, and **legibility of the grid/buckets**
 |---|---|---|---|---|
 | 1 | 1 Where · idea | No slide-nav arrows on mobile | deck bug | ✅ **Done (2026-06-11)** — `@media(max-width:640px)` hides the 46-dot strip (it was overflowing the navbar and shoving the arrows off-screen), makes Back/Next full-width 44px tap targets; added horizontal touch-swipe over the stage |
 | 2 | 2–3 composer | "What's a chip? why do I need one? what does vegetarian *do*?" | copy/UX | ✅ **Done (2026-06-11)** — owner steer: *demonstrate the effect in the UI*, don't just explain. The chip picker now shows an effect footer ("🥦 isn't just a label — the trip *uses* it: restaurant suggestions screened for veg menus, every meal flagged veg ✓… that's why you set one"); downstream the meal-suggestions tray header reads "🥦 meals screened for vegetarian (your chips)" and meal cards carry veg ✓. Composer caption tightened from vague to concrete |
-| 3 | 5 skeleton | How are cities pre-populated — algorithm that knows our prefs, or public-opinion? | transparency | **Surface provenance** on the skeleton (ties to the measured/ranking model) |
+| 3 | 5 skeleton | How are cities pre-populated — algorithm that knows our prefs, or public-opinion? | transparency | ✅ **Done (2026-06-11)** — added a provenance line under "Cities from the scout" that dispels both of her guesses: they're *your own scouted places near the destination (from the Atlas)* — not a preference algorithm, not a popularity list; ＋ other city adds anything unscouted. On all 3 full-tray slides |
 | 4 | 12–13 transport | Assumes air-only; real trips have trains/uber/private car — or rename to "Flights" if it's just country-entry | product | ✅ **Done (2026-06-11)** — owner said trust her read: renamed the **Transport** section to **Flights** across all 41 spots (the section only models air; inter-city drives already live auto-timed in the Grid). Tour-cursor target + phone mockup updated to match. Multi-modal modeling left as a future option if a non-fly trip needs it |
 | 5 | 17 search hotels | Wants to read Google reviews / open the Google listing from the selector — *"I POUR over reviews and photos"* | feature | ✅ **Deck done (2026-06-11)** — each hotel result card now carries a "↗ photos & reviews" link that opens its Google Maps listing in a new tab; hint line notes it. *Real-app follow-on:* surface Places Details (photos/review snippets) inline in the live selector rather than bouncing out (key already in Keychain) |
 | 6 | 28 bucket | Color-coding is good; add a type **icon** (adventure/tour/meal) too | polish | ✅ **Done (2026-06-11)** — CSS-only type icons keyed off the existing `--k` colour (🥾 activity · 🍽 meal · 🛏 stay · 🚐 travel), so they apply to every card instance with no markup churn. *Note:* the data taxonomy has no "tour" type distinct from "activity" — splitting adventure vs. tour needs a marker-taxonomy decision (see open item below) |
@@ -277,6 +277,6 @@ from), **her hotel-research ritual**, and **legibility of the grid/buckets**
 | 10 | 46 phone | Effusive praise; wants her analysts prototyping this way | validation | — — direction confirmed |
 
 **Status (2026-06-11):** owner direction was "trust her feedback." Shipped:
-#1, #2, #5, #6, #7, and #4 (resolved as the Flights rename). Remaining: #3
-(city provenance on the skeleton) and #8 (comments/collaboration on the
-compare view) — #8 is the one with real scope latitude.
+#1, #2, #3, #5, #6, #7, and #4 (resolved as the Flights rename). Remaining:
+#8 (comments/collaboration on the compare view) — the one with real scope
+latitude.
