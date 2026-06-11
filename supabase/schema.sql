@@ -158,12 +158,30 @@ create table if not exists trips (
   end_date    date,
   glance      jsonb default '{}',
   pre_trip    jsonb default '{}',
-  legs        jsonb default '[]',
+  legs        jsonb default '[]',           -- accommodations live here per-leg (leg.candidates[] + leg.chosenId)
   options     jsonb default '{}',
-  entries     jsonb default '[]',
+  entries     jsonb default '[]',           -- v1 blob; superseded by trip_entries (0016), kept as a migration source
+  travelers   jsonb not null default '[]',  -- [ { name, kind: person|pet, chips[] } ] — union of chips = active marker set (0017)
+  passes      jsonb not null default '[]',  -- [ { id, name, cost, covers? } ] — referenced by entries via coveredBy (0017)
   created_at  timestamptz default now(),
   updated_at  timestamptz default now()
 );
+
+-- ── trip_entries (one row per entry; supersedes the trips.entries blob) ──────
+-- Normalized so real-time co-editing patches a single entry, not the whole
+-- array. payload jsonb = the v2 entry atom (everything except id/day). RLS:
+-- owner of the parent trip only; in the supabase_realtime publication. See
+-- migration 0016 + features/trip-planner-components.md §3.
+create table if not exists trip_entries (
+  id          uuid primary key default gen_random_uuid(),
+  trip_id     uuid not null references trips (id) on delete cascade,
+  day         date,
+  payload     jsonb not null default '{}',
+  sort        int  not null default 0,
+  created_at  timestamptz not null default now(),
+  updated_at  timestamptz not null default now()
+);
+create index if not exists trip_entries_trip_day_idx on trip_entries (trip_id, day);
 
 -- ── pois (SHARED, cached) ───────────────────────────────────────────────────
 -- Local cache of social POIs from Google Places (New). OSM coverage was too
