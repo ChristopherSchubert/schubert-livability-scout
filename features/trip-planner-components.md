@@ -1,11 +1,26 @@
 # Trip planner — component system (design-system spec, for review before building)
 
-> Status: **proposal — do not build yet.** Supersedes the single-format
-> hour-grid in [trip-itinerary.md](trip-itinerary.md). Produced with the
-> `design-system` skill (audit → extend), grounded in five real trip artifacts
-> (Slovenia, New River Gorge, Gettysburg, Silverthorne, Jim Thorpe) **and** in
-> Livability Scout's existing tokens/components — so this *extends* the system
-> rather than inventing beside it.
+> Status: **building (epic #7).** Supersedes the single-format hour-grid in
+> [trip-itinerary.md](trip-itinerary.md). Produced with the `design-system`
+> skill (audit → extend), grounded in five real trip artifacts (Slovenia, New
+> River Gorge, Gettysburg, Silverthorne, Jim Thorpe) **and** in Livability
+> Scout's existing tokens/components — so this *extends* the system rather than
+> inventing beside it.
+
+> **Phase 0 implementation status** (the model layer this spec describes):
+> - **#8 — `trip_entries` table** (one row per entry, RLS + real-time):
+>   `supabase/migrations/0016_trip_entries.sql`, mirrored in `schema.sql`.
+> - **#9 — `travelers` + `passes` columns**:
+>   `supabase/migrations/0017_trip_travelers_passes.sql`.
+> - **#10 — `lib/trip.js` → entry-atom v2**: the §3 taxonomy
+>   (`category`×`status`), `cashNeeded` (onSite ∧ cashOnly = €927),
+>   `reservationLedger`, `bookingChecklist`, `markerUnion`, transport
+>   deep-links, and the `trip_entries` row mappers. Proven by
+>   `scripts/.prove-trip-v2.mjs`.
+>
+> Migrations are **written, not yet applied** (no Supabase access in the build
+> environment) — apply by hand in the SQL editor. The db layer (#11),
+> `TripProvider` (#12), and the Slovenia v1→v2 migration (#14) are next.
 
 ## Decisions locked (2026-06-09 review)
 

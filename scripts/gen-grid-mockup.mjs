@@ -15,7 +15,9 @@
 import { Client } from "pg";
 import { execFileSync } from "node:child_process";
 import { writeFile } from "node:fs/promises";
-import { rowToTrip, tripDays, cashNeeded, bookingsLedger } from "../lib/trip.js";
+// NOTE: reads the v1 Slovenia blob; cash/booking output firms up once the trip
+// migrates to the v2 atom (issue #14). reservationLedger supersedes bookingsLedger.
+import { rowToTrip, tripDays, cashNeeded, reservationLedger } from "../lib/trip.js";
 
 const PX_PER_MIN = 1.05;
 const DAY_START = 5 * 60, DAY_END = 23.5 * 60;
@@ -101,7 +103,7 @@ const cash = cashNeeded(trip);
 const cashRows = trip.entries.filter((e) => e.cost?.cashOnly)
   .map((e) => `<tr><td>${esc(e.title)}</td><td class="num">${e.cost.amount} ${e.cost.currency}</td></tr>`).join("");
 const cashTotal = Object.entries(cash).map(([cur, amt]) => `${amt} ${cur}`).join(" + ");
-const ledgerRows = bookingsLedger(trip)
+const ledgerRows = reservationLedger(trip)
   .map((e) => `<tr><td>${esc(e.title)}</td><td><code>${esc(e.booking.confirmation || "—")}</code></td><td>${e.booking.prepaid ? "prepaid" : ""}</td></tr>`).join("");
 
 const stamp = new Date().toISOString().slice(0, 16).replace("T", " ");
