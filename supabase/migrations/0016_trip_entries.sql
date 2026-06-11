@@ -26,12 +26,16 @@ create index if not exists trip_entries_trip_day_idx on trip_entries (trip_id, d
 
 alter table trip_entries enable row level security;
 
--- A user can CRUD an entry iff they own its trip. Drop-then-create so the
--- migration is re-runnable (Postgres has no `create policy if not exists`).
+-- READ: any authed user (both travelers — Janice + Chris co-view a trip), to
+-- match the trips table's `select ... using (true)`. Owner-only-read would
+-- leave a co-traveler seeing a trip frame with no entries. WRITE: owner only
+-- (co-edit write-sharing is the harder real-time problem, tracked separately).
+-- Drop-then-create so the migration is re-runnable (no `create policy if not
+-- exists` in Postgres).
 drop policy if exists "trip_entries readable by authed" on trip_entries;
 create policy "trip_entries readable by authed" on trip_entries
   for select to authenticated
-  using (trip_id in (select id from trips where user_id = auth.uid()));
+  using (true);
 
 drop policy if exists "trip_entries insert own" on trip_entries;
 create policy "trip_entries insert own" on trip_entries

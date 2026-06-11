@@ -1,5 +1,6 @@
 import "./globals.css";
 import "./workspace.css";
+import "./trips.css";
 import "./trip-planner.css";
 import "./city-detail.css";
 import AuthGate from "../components/AuthGate";
