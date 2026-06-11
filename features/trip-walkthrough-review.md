@@ -50,10 +50,13 @@ GATHER 20 window-as-nav → empty bucket · 21 suggestions + saves ·
 pin (Rustika) · 25 keep-it-light + caves errand — LAY OUT 26 the deal
 (alternates residue) · 27 human takes the wheel (auto pauses) — CLOCK
 28 solve day · 29 entry editor · 30 pinned result · 31 over-pack honesty —
-GO 32 book page · 33 mark booked · 34 grid · 35 phone (full day-of screen:
-faded done rows, NEXT card, tab bar) — WHAT IF (rewind) 36 fork composer ·
-37 variations — 38 mobile gallery (aside): Plan / Book / Grid as phone
-frames, same data one column.
+GO 32 book page · 33 mark booked · 34 grid (leg-paged: Ljubljana/Bled/Piran
+pages, legend, auto-timed drive connectors, times/locks/cash/pins; Bled leg
+shown in full) · 35 phone (full day-of screen) — WHAT IF (rewind) 36 fork
+composer · 37 variations (active option A shown inline, tabs, compare
+control) · 38 compare side by side (A vs B two columns, differences
+highlighted, make-active) — 39 mobile gallery (aside): Plan / Book / Grid
+as phone frames, same data one column.
 
 ## Janice's feedback widget (deck chrome, not part of the app mockup)
 
@@ -176,6 +179,24 @@ drag-and-drops (tray→window, strip→bar, bucket→day, shelf→day). Spec
 lives in the TCUR array (one entry per slide; null = no action shown,
 e.g. result-only slides); targets resolve by text/selector against the
 rendered stage and fail silent. Honors prefers-reduced-motion.
+
+## Grid + variations build-out (2026-06-10)
+
+The grid (34) and fork (36–37) were stubs; both fleshed to deck standard.
+Grid: leg-paged like print ("one leg per page" → Ljubljana/Bled/Piran page
+tabs, page 2 of 3), a category legend, the Bled leg rendered in full across
+4 day-columns with real data, auto-timed drive connectors (dashed → blocks:
+"→ launch · 4 min" from the solved Tue 19), time labels, and 🔒/💶/📌
+markers — blocks positioned to the time gutter (6a = gbody 52,
+16.67px/hr). Variations: 37 now shows the active Option A inline (Piran 3n,
+4-day strip, Venice catamaran) with A/B tabs and a REAL "compare side by
+side" control (was ghosted); new slide 38 is the side-by-side payoff — two
+columns (A all-in Piran / B Trieste·Piran·Rovinj), aligned rows with the
+genuine differences amber-highlighted, per-column make-active, decide-by
+May 19, and the honest post-trip note (they'd cancel Piran for Trieste and
+regret it). Deck is 39 slides. Note: keep new markup in the deck's literal-
+char convention (▸ · → 🔒), not HTML entities — the section auditor's
+continuity check compares text and entities read as false changes.
 
 ## Mechanical checks (run before any review handoff)
 

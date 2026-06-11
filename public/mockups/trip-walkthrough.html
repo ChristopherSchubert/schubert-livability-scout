@@ -188,6 +188,20 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
 .gb b{font-weight:600;display:block;font-size:.62rem;}
 .gb.cn{background:repeating-linear-gradient(135deg,var(--panel),var(--panel) 5px,rgba(120,100,60,.05) 5px,rgba(120,100,60,.05) 7px);}
 .gb.cn b{font-weight:400;color:var(--muted);}
+.gb .gt{color:var(--muted);font-weight:400;font-size:.56rem;display:block;}
+.gb.gtv{border-style:dashed;background:repeating-linear-gradient(135deg,rgba(46,84,130,.07),rgba(46,84,130,.07) 4px,transparent 4px,transparent 8px);}
+.gb.gtv b{font-weight:400;color:var(--k-trav);font-size:.58rem;}
+.gb .gm{float:right;font-size:.58rem;}
+.glegend{display:flex;gap:.9rem;flex-wrap:wrap;font-size:.64rem;color:var(--muted);margin:.55rem 0 .2rem;align-items:center;}
+.glegend span{display:inline-flex;align-items:center;gap:.32rem;}
+.glegend i{width:16px;height:9px;border-radius:2px;border:1px solid var(--border);border-left:3px solid var(--kc);background:var(--panel);}
+.glegend i.dash{border-style:dashed;}
+.gpages{display:flex;align-items:stretch;gap:.45rem;margin:.5rem 0 0;}
+.gpage{border:1px solid var(--border);border-radius:8px;padding:.3rem .8rem;cursor:pointer;background:var(--panel);font-size:.72rem;font-weight:600;color:var(--muted);line-height:1.25;}
+.gpage.on{background:var(--accent);color:#fff;border-color:var(--accent);}
+.gpage small{display:block;font-size:.6rem;font-weight:400;opacity:.85;}
+.gpage.spacer{border:0;background:none;flex:1;cursor:default;padding:0;}
+.gpagenote{font-size:.66rem;color:var(--muted);align-self:center;}
 
 /* phone */
 .phonewrap{display:flex;justify-content:center;padding:1.4rem 0;}
@@ -233,6 +247,25 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
 .vartab{font-size:.76rem;font-weight:600;border:1px solid var(--border);border-radius:100px;padding:.26rem .8rem;color:var(--muted);cursor:pointer;}
 .vartab.on{background:#e7f1ee;color:var(--accent);border-color:#bcd8d0;}
 .decideby{font-size:.74rem;color:var(--warn);font-weight:600;margin-top:.45rem;}
+.vartab .vdot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:.35rem;vertical-align:middle;}
+.varcols{display:flex;gap:.9rem;margin-top:.5rem;}
+.varcol{flex:1;border:1px solid var(--border);border-radius:11px;background:var(--panel);overflow:hidden;}
+.varcol.win2{border-color:var(--accent);box-shadow:0 8px 22px rgba(13,76,68,.12);}
+.varcol .vch{padding:.5rem .7rem;border-bottom:1px solid var(--border);display:flex;align-items:baseline;gap:.4rem;background:var(--panel-strong);}
+.varcol.win2 .vch{background:#e7f1ee;}
+.varcol .vch b{font-family:var(--fd);font-weight:500;font-size:.96rem;}
+.varcol .vch .vstate{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-left:auto;border-radius:100px;padding:.1rem .5rem;}
+.varcol .vch .vstate.act{background:var(--accent);color:#fff;}
+.varcol .vch .vstate.dorm{background:var(--panel);color:var(--muted);border:1px solid var(--border);}
+.varbody{padding:.55rem .7rem;}
+.varrow{display:flex;gap:.5rem;font-size:.72rem;padding:.3rem 0;border-bottom:1px dashed var(--border);}
+.varrow:last-child{border-bottom:0;}
+.varrow .vk{flex:0 0 64px;color:var(--muted);font-size:.64rem;text-transform:uppercase;letter-spacing:.05em;padding-top:.1rem;}
+.varrow .vv{flex:1;}
+.varrow .vv small{color:var(--muted);}
+.varrow.diff .vv{background:#fbf0e2;border-radius:5px;padding:.06rem .3rem;margin:-.06rem -.3rem;}
+.varfoot{padding:.5rem .7rem;border-top:1px solid var(--border);display:flex;align-items:center;gap:.5rem;background:var(--panel);}
+.varfoot .ctrl{font-size:.7rem;}
 .iacts{position:absolute;top:2px;right:4px;display:flex;gap:5px;font-size:.6rem;color:var(--muted);background:rgba(255,253,246,.85);border-radius:5px;padding:0 2px;}
 .iacts i{font-style:normal;cursor:pointer;}
 .iacts i:hover{color:var(--accent);}
@@ -399,10 +432,11 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
 <p>She tries the zipline on Tuesday anyway. The machine reflows — and <b>refuses to lie</b>: it names what can't fit and offers the next day instead of silently cramming.</p>
 <p>The <b>Book</b> page kept itself: to-books with lead times, cancel-bys counting down, cash = on-site ∧ cash-only = <b>€927</b>, passes remembered. Nothing hand-kept.</p>
 <p>“Mark booked…” opens the booking sheet: confirmation, date, money. The consequence chain is stated and automatic — <b>dated → placed on Sun 24, booked → off the Needs-action list, on-site cost → into the cash tally.</b></p>
-<p>The payoff: <b>the grid prints itself.</b> Every block computed from the plan, logistics one click deep, one leg per page on paper. The artifact Janice used to type — now output.</p>
+<p>The payoff: the grid <b>prints itself</b>, one leg per page. Every block placed, every drive auto-timed and inserted (→ 4 min to the launch field), every lock, cash tag, and pin carried over from the plan. Page through the legs; what Janice used to hand-type, now generated — and bookable from paper.</p>
 <p>Day-of, the phone lands on <b>today</b>: next-up leads with Directions and Call, the confirmation code one thumb away, finished things faded.</p>
 <p>＋ new variation opens the <b>fork composer</b>: name it, start blank or copy the current plan — and the decide-by rule is stated up front, derived from whatever cancellation deadlines end up inside.</p>
-<p>The real story: they cancelled Piran betting on Trieste — and regretted it. <b>Variations</b> keep both futures alive on the same 3 days, each holding refundable bookings, with a <b>decide-by inherited from the cancellation deadlines</b>.</p>
+<p>The fork lives <b>inside the plan</b>, not in a separate doc: tabs switch the last three days between Option A (all-in Piran, active) and Option B (three towns). The active one fills the page; <b>compare side by side</b> opens both at once.</p>
+<p>Two futures, column by column — <b>differences highlighted</b>: one base vs three towns, a Venice day vs an Istrian crawl, minimal driving vs two borders. Neither is deleted; both hold only refundable bookings, and whichever stays unpicked by <b>May 19</b> releases itself. They’d later cancel Piran for Trieste — and wish they hadn’t.</p>
 <p>The same trip on her phone — no separate "mobile app." The Plan window stacks to one leg per row, Book keeps its countdowns and cash, and the grid deals one day per swipe. Everything stays one column of the same data.</p>
 </div>
 
@@ -1497,49 +1531,61 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
 </section>
 
 <!-- ═ 18 · the grid ═ -->
-<section data-phase="Before you go · the grid, generated" data-did="presses Grid → in the trip bar.">
+<section data-phase="Before you go · the grid, generated" data-did="presses Grid → in the trip bar — the hand-typed spreadsheet, now generated one leg per page.">
   <nav class="topbar"><span class="brand">Schubert Atlas</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
   <div class="tripbar"><span class="crumb"><b>Trips</b> ›</span><span class="tname">Slovenia</span><span class="tmeta">May 15–25 · 10 nights</span><div class="halves"><span>Plan</span><span>Shelf</span><span>Days</span></div><span class="spacer"></span><span class="chipbtn">Book <span class="badge">⏰ 1</span></span><span class="chipbtn onpage">Grid →</span></div>
   <div class="pagebody">
-    <h2 style="font-family:var(--fd);font-weight:500;font-size:1.15rem;margin:0 0 .9rem;display:flex;align-items:baseline;gap:.6rem;">The grid <small style="font-size:.74rem;color:var(--muted);font-family:var(--fu);">11 days · 79 entries · generated from the trip</small><span style="flex:1"></span><button class="ctrl">🖨 print — one leg per page</button></h2>
-    <div class="lbl2" style="margin-bottom:.4rem;">May 17–22 · 5 more days →</div>
+    <h2 style="font-family:var(--fd);font-weight:500;font-size:1.15rem;margin:0 0 .2rem;display:flex;align-items:baseline;gap:.6rem;">The grid <small style="font-size:.74rem;color:var(--muted);font-family:var(--fu);">11 days · 79 entries · every block, drive, and lock computed from the plan</small><span style="flex:1"></span><button class="ctrl">🖨 print · one leg per page</button></h2>
+    <div class="gpages">
+      <div class="gpage">Ljubljana<small>2 days · Fri–Sat</small></div>
+      <div class="gpage on">Bled<small>4 days · Sun–Wed</small></div>
+      <div class="gpage">Piran<small>5 days · Thu–Mon</small></div>
+      <div class="gpage spacer"></div>
+      <span class="gpagenote">page 2 of 3 · each prints to one sheet</span>
+    </div>
+    <div class="glegend">
+      <span><i style="--kc:var(--accent)"></i>activity</span>
+      <span><i style="--kc:var(--k-meal)"></i>meal</span>
+      <span><i class="dash" style="--kc:var(--k-trav)"></i>drive · auto-timed</span>
+      <span><i style="--kc:var(--k-stay)"></i>stay</span>
+      <span><i style="--kc:var(--k-flex)"></i>free / light</span>
+      <span style="margin-left:auto;">🔒 booked · 💶 cash · &#128204; pinned</span>
+    </div>
     <div class="gwrap">
-      <div class="ggut" style="height:380px;"><span style="top:100px">6a</span><span style="top:150px">9a</span><span style="top:200px">12p</span><span style="top:250px">3p</span><span style="top:300px">6p</span><span style="top:350px">9p</span></div>
+      <div class="ggut" style="height:380px;"><span style="top:92px">6a</span><span style="top:142px">9a</span><span style="top:192px">12p</span><span style="top:242px">3p</span><span style="top:292px">6p</span><span style="top:342px">9p</span></div>
       <div class="gfield">
-        <div class="ghead2">
-          <div><span class="lg">Bled</span>Sun 17</div><div>Mon 18</div><div>Tue 19</div><div>Wed 20</div><div><span class="lg">Piran</span>Thu 21</div><div>Fri 22</div>
+        <div class="ghead2" style="grid-template-columns:repeat(4,1fr);">
+          <div><span class="lg">arrive</span>Sun 17</div><div>Mon 18</div><div><span class="lg">balloon day</span>Tue 19</div><div><span class="lg">→ Soča</span>Wed 20</div>
         </div>
-        <div class="gbody2">
-          <div class="gline" style="top:60px"></div><div class="gline" style="top:110px"></div><div class="gline" style="top:160px"></div><div class="gline" style="top:210px"></div><div class="gline" style="top:260px"></div><div class="gline" style="top:310px"></div>
-          <div class="gv" style="left:16.66%"></div><div class="gv" style="left:33.33%"></div><div class="gv" style="left:50%"></div><div class="gv" style="left:66.66%"></div><div class="gv" style="left:83.33%"></div>
-          <div class="gb" style="--kc:var(--k-trav);left:.4%;width:15.5%;top:96px;height:26px"><b>Drive → Vintgar</b></div>
-          <div class="gb" style="--kc:var(--k-act);left:.4%;width:15.5%;top:128px;height:44px"><b>Vintgar Gorge</b>11:00 🔒</div>
-          <div class="gb cn" style="--kc:var(--k-stay);left:.4%;width:15.5%;top:196px;height:22px"><b>Check in · Toplice</b></div>
-          <div class="gb" style="--kc:var(--k-act);left:.4%;width:15.5%;top:226px;height:30px"><b>Pletna boat</b>💶</div>
-          <div class="gb" style="--kc:var(--k-meal);left:.4%;width:15.5%;top:282px;height:26px"><b>Julijana</b></div>
-          <div class="gb" style="--kc:var(--k-act);left:17%;width:15.5%;top:118px;height:38px"><b>Castle hike</b></div>
-          <div class="gb" style="--kc:var(--k-act);left:17%;width:15.5%;top:176px;height:42px"><b>Canyoning</b>🔒</div>
-          <div class="gb" style="--kc:var(--k-meal);left:17%;width:15.5%;top:276px;height:26px"><b>Old Cellar</b></div>
-          <div class="gb" style="--kc:var(--k-act);left:33.7%;width:15.5%;top:18px;height:40px"><b>Balloon</b>5:30 🔒</div>
-          <div class="gb" style="--kc:var(--k-act);left:33.7%;width:15.5%;top:70px;height:38px"><b>Castle</b></div>
-          <div class="gb" style="--kc:var(--k-meal);left:33.7%;width:15.5%;top:160px;height:24px"><b>Rustika</b></div>
-          <div class="gb cn" style="--kc:var(--k-flex);left:33.7%;width:15.5%;top:190px;height:40px"><b>Free</b></div>
-          <div class="gb" style="--kc:var(--k-act);left:33.7%;width:15.5%;top:236px;height:34px"><b>Via Ferrata</b>🔒</div>
-          <div class="gb" style="--kc:var(--k-trav);left:50.4%;width:15.5%;top:106px;height:48px"><b>Vršič Pass drive</b></div>
-          <div class="gb" style="--kc:var(--k-act);left:50.4%;width:15.5%;top:186px;height:36px"><b>Paragliding</b>💶 €380</div>
-          <div class="gb" style="--kc:var(--k-meal);left:50.4%;width:15.5%;top:268px;height:30px"><b>Hiša Franko</b>🔒</div>
-          <div class="gb" style="--kc:var(--k-trav);left:67%;width:15.5%;top:96px;height:44px"><b>Drive → Piran</b></div>
-          <div class="gb" style="--kc:var(--k-act);left:67%;width:15.5%;top:206px;height:34px"><b>Vintage boat</b>💶 €511</div>
-          <div class="gb cn" style="--kc:var(--k-flex);left:83.7%;width:15.5%;top:120px;height:90px"><b>🪶 light day</b>Istria · strolls</div>
-          <div class="gb" style="--kc:var(--k-meal);left:83.7%;width:15.5%;top:268px;height:26px"><b>Heaven 99</b></div>
+        <div class="gbody2" style="height:340px;">
+          <div class="gline" style="top:52px"></div><div class="gline" style="top:102px"></div><div class="gline" style="top:152px"></div><div class="gline" style="top:202px"></div><div class="gline" style="top:252px"></div><div class="gline" style="top:302px"></div>
+          <div class="gv" style="left:25%"></div><div class="gv" style="left:50%"></div><div class="gv" style="left:75%"></div>
+          <div class="gb gtv" style="--kc:var(--k-trav);left:0.5%;width:23.5%;top:113.2px;height:11px"><b>→ Vintgar · 18 min</b></div>
+          <div class="gb" style="--kc:var(--accent);left:0.5%;width:23.5%;top:118.7px;height:42px"><b>Vintgar Gorge</b><span class="gt">10:00 – 12:30 🔒</span></div>
+          <div class="gb" style="--kc:var(--k-meal);left:0.5%;width:23.5%;top:164.5px;height:17px"><b>Lunch · Public &amp; Vegan</b><span class="gt">12:45 · veg ✓</span></div>
+          <div class="gb cn" style="--kc:var(--k-stay);left:0.5%;width:23.5%;top:190.3px;height:15px"><b>Check in · Toplice</b></div>
+          <div class="gb" style="--kc:var(--accent);left:0.5%;width:23.5%;top:207.0px;height:23px"><b>Pletna boat</b><span class="gt">3:20 <span class="gm">💶</span></span></div>
+          <div class="gb" style="--kc:var(--k-meal);left:0.5%;width:23.5%;top:268.7px;height:23px"><b>Dinner · Gostilna Murka</b><span class="gt">7:00</span></div>
+          <div class="gb" style="--kc:var(--accent);left:25.5%;width:23.5%;top:118.7px;height:33px"><b>Canyoning</b><span class="gt">10:00 – 12:00 🔒</span></div>
+          <div class="gb" style="--kc:var(--k-meal);left:25.5%;width:23.5%;top:168.7px;height:17px"><b>Lunch · Vegan Bled</b><span class="gt">1:00</span></div>
+          <div class="gb" style="--kc:var(--accent);left:25.5%;width:23.5%;top:210.3px;height:23px"><b>Straža toboggan</b><span class="gt">3:30 <span class="gm">💶</span></span></div>
+          <div class="gb" style="--kc:var(--k-meal);left:25.5%;width:23.5%;top:268.7px;height:23px"><b>Dinner · Old Cellar</b><span class="gt">7:00</span></div>
+          <div class="gb gtv" style="--kc:var(--k-trav);left:50.5%;width:23.5%;top:38px;height:10px"><b>→ launch · 4 min</b></div>
+          <div class="gb" style="--kc:var(--accent);left:50.5%;width:23.5%;top:50px;height:33px"><b>Balloon (private)</b><span class="gt">5:30 – 7:30 🔒</span></div>
+          <div class="gb gtv" style="--kc:var(--k-trav);left:50.5%;width:23.5%;top:86px;height:9px"><b>→ lake · 4 min</b></div>
+          <div class="gb" style="--kc:var(--accent);left:50.5%;width:23.5%;top:97px;height:36px"><b>Bled Castle — hike</b><span class="gt">7:35 – 9:35</span></div>
+          <div class="gb" style="--kc:var(--k-meal);left:50.5%;width:23.5%;top:152.0px;height:17px"><b>Lunch · Rustika</b><span class="gt">12:00 <span class="gm">&#128204;</span></span></div>
+          <div class="gb cn" style="--kc:var(--k-flex);left:50.5%;width:23.5%;top:168.7px;height:48px"><b>Free time</b></div>
+          <div class="gb" style="--kc:var(--accent);left:50.5%;width:23.5%;top:218.7px;height:25px"><b>Via Ferrata Hvadnik</b><span class="gt">4:00 – 5:30 🔒</span></div>
+          <div class="gb gtv" style="--kc:var(--k-trav);left:75.5%;width:23.5%;top:118.7px;height:25px"><b>→ Vršič Pass · 1h 20</b><span class="gt">checkout · scenic</span></div>
+          <div class="gb" style="--kc:var(--accent);left:75.5%;width:23.5%;top:168.7px;height:25px"><b>Paragliding · Soča</b><span class="gt">1:00 <span class="gm">💶 €380</span></span></div>
+          <div class="gb cn" style="--kc:var(--k-stay);left:75.5%;width:23.5%;top:235.3px;height:15px"><b>Check in · Hiša Franko</b></div>
+          <div class="gb" style="--kc:var(--k-meal);left:75.5%;width:23.5%;top:277.0px;height:25px"><b>Dinner · Hiša Franko</b><span class="gt">7:30 · the splurge 🔒</span></div>
         </div>
       </div>
     </div>
   </div>
-</section>
-
-<!-- ═ 19 · day-of phone ═ -->
-<section data-phase="On the trip" data-did="opens the trip on her phone on May 19 — it lands on today, half the day already behind her.">
+</section><section data-phase="On the trip" data-did="opens the trip on her phone on May 19 — it lands on today, half the day already behind her.">
   <nav class="topbar"><span class="brand">Schubert Atlas</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
   <div class="phonewrap"><div class="ph" style="width:300px;">
     <div class="phh"><span style="font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;">Slovenia · day 5 of 11 · Bled</span><br><b>Tuesday, May 19</b></div>
@@ -1585,7 +1631,7 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
       <footer><span style="flex:1"></span><button class="ctrl solid">Create variation</button></footer>
     </aside>
   </div>
-</section><section data-phase="What if (rewind · pre-trip) · variations" data-did="hops between A and B with the tabs — and sees the deadline the fork lives under.">
+</section><section data-phase="What if (rewind · pre-trip) · variations" data-did="hops to Option A’s tab — its plan fills the page — then presses compare side by side.">
   <nav class="topbar"><span class="brand">Schubert Atlas</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
   <div class="tripbar"><span class="crumb"><b>Trips</b> ›</span><span class="tname">Slovenia</span><span class="tmeta">May 15–25 · 10 nights</span>
     <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
@@ -1599,20 +1645,60 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
     <span class="edge r lock"></span></div>
     <div class="collapsec">▸ <b>Transport</b> · 2 booked ✈</div>
     <div class="collapsec">▸ <b>Stays</b> · 5 booked 🔒</div>
-    <div class="sect">May 21 – 24 · a fork</div>
+    <div class="sect">May 21 – 24 · a fork <span class="lbl2" style="margin-left:.4rem;font-weight:400;text-transform:none;letter-spacing:0;">two plans for the last three days — pick on the ground</span></div>
     <div class="vartabs">
-      <span class="vartab on">Option A — all-in Piran ✓ active</span>
-      <span class="vartab">Option B — Trieste · Piran · Rovinj</span>
+      <span class="vartab on"><span class="vdot" style="background:var(--accent)"></span>Option A — all-in Piran ✓ active</span>
+      <span class="vartab"><span class="vdot" style="background:var(--k-trav)"></span>Option B — Trieste · Piran · Rovinj</span>
       <button class="ctrl">＋ new variation…</button>
     </div>
-    <div class="win" style="height:38px"><span class="legseg pi" style="flex:3">Piran<small>3n · Hotel Piran 🔒 free-cancel 2d prior</small></span></div>
-    <div class="staysrow" style="opacity:.45;">
-      <span class="staybar" style="flex:1"><b>Trieste</b><small>1n</small></span>
-      <span class="staybar" style="flex:1"><b>Piran</b><small>1n</small></span>
-      <span class="staybar" style="flex:1"><b>Rovinj</b><small>1n</small></span>
+    <div class="win" style="height:32px;outline:2px solid var(--accent);outline-offset:2px;margin-top:.2rem;"><span class="legseg pi" style="flex:1">Piran<small>3 nights · Hotel Piran 🔒 free-cancel 2d prior</small></span></div>
+    <div class="daycols">
+      <div class="daycol"><div class="dh">Thu 21 <small>arrive</small></div><div class="mini" style="--k:var(--accent)">Old town + sea walls</div></div>
+      <div class="daycol"><div class="dh">Fri 22 <small>🪶 light</small></div><div class="mini" style="--k:var(--k-flex)">Istria strolls</div></div>
+      <div class="daycol"><div class="dh">Sat 23</div><div class="mini" style="--k:var(--k-act)">Catamaran → Venice <span class="tag">💶 €511</span></div></div>
+      <div class="daycol"><div class="dh">Sun 24 <small>→ Brdo</small></div><div class="mini" style="--k:var(--k-stay)">Drive to Brdo · near airport</div></div>
     </div>
-    <div class="toolrow" style="opacity:.8;"><span class="tchip" style="background:var(--panel-strong);border-color:var(--border);color:var(--muted);">dormant · refundable</span><button class="ctrl">make B active</button><button class="ctrl ghosted">compare side by side</button></div>
-    <p class="decideby">⏰ decide by May 19 · set by Hotel Piran's free-cancellation deadline</p>
+    <div class="toolrow" style="margin-top:.6rem;"><span class="tchip" style="background:#e7f1ee;border-color:#bcd8d0;color:var(--accent);">active · refundable</span><button class="ctrl">make B active</button><button class="ctrl solid" style="box-shadow:0 0 0 4px rgba(13,76,68,.18);">⊟ compare side by side</button></div>
+    <p class="decideby">⏰ decide by May 19 · set by Hotel Piran’s free-cancellation deadline — both options hold only refundable bookings until then</p>
+  </div>
+</section><section data-phase="What if (rewind · pre-trip) · compare side by side" data-did="reads the two futures column by column — the differences highlighted — and leaves both alive for the road.">
+  <nav class="topbar"><span class="brand">Schubert Atlas</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
+  <div class="tripbar"><span class="crumb"><b>Trips</b> ›</span><span class="tname">Slovenia</span><span class="tmeta">May 15–25 · 10 nights</span>
+    <span class="halves"><span class="on">Plan</span><span>Shelf</span><span>Days</span></span>
+    <span class="spacer"></span><span class="chipbtn">Book <span class="badge">⏰ 1</span></span><span class="chipbtn">Grid →</span></div>
+  <div class="pagebody">
+    <div class="sect">May 21 – 24 · compare <button class="ctrl inlinectl">✕ close compare</button></div>
+    <div class="varcols">
+      <div class="varcol win2">
+        <div class="vch"><span class="vdot" style="background:var(--accent);width:8px;height:8px;border-radius:50%;display:inline-block;"></span><b>Option A</b> <small style="color:var(--muted);">all-in Piran</small><span class="vstate act">active</span></div>
+        <div class="varbody">
+          <div class="varrow"><span class="vk">Towns</span><span class="vv">Piran <small>— 3 nights, one base</small></span></div>
+          <div class="varrow diff"><span class="vk">Stays</span><span class="vv">Hotel Piran 🔒 <small>booked · free-cancel 2d prior</small></span></div>
+          <div class="varrow"><span class="vk">Thu 21</span><span class="vv">Arrive · old town + sea walls</span></div>
+          <div class="varrow"><span class="vk">Fri 22</span><span class="vv">🪶 light day · Istria strolls</span></div>
+          <div class="varrow diff"><span class="vk">Sat 23</span><span class="vv">Catamaran day-trip → Venice <small>💶 €511</small></span></div>
+          <div class="varrow"><span class="vk">Sun 24</span><span class="vv">Short drive → Brdo, near the airport</span></div>
+          <div class="varrow diff"><span class="vk">Driving</span><span class="vv">Minimal — one base, boats out</span></div>
+          <div class="varrow"><span class="vk">Trade</span><span class="vv"><i>Settle in; less seen, more felt.</i></span></div>
+        </div>
+        <div class="varfoot"><span class="tchip" style="background:#e7f1ee;border-color:#bcd8d0;color:var(--accent);">active</span><span style="flex:1"></span><span class="hint2">€511 cash · 1 refundable</span></div>
+      </div>
+      <div class="varcol">
+        <div class="vch"><span class="vdot" style="background:var(--k-trav);width:8px;height:8px;border-radius:50%;display:inline-block;"></span><b>Option B</b> <small style="color:var(--muted);">Trieste · Piran · Rovinj</small><span class="vstate dorm">dormant</span></div>
+        <div class="varbody">
+          <div class="varrow"><span class="vk">Towns</span><span class="vv">Trieste · Piran · Rovinj <small>— 1 night each, 3 countries</small></span></div>
+          <div class="varrow diff"><span class="vk">Stays</span><span class="vv">3 holds <small>· all refundable, none committed</small></span></div>
+          <div class="varrow"><span class="vk">Thu 21</span><span class="vv">Trieste · Habsburg cafés, Miramare</span></div>
+          <div class="varrow"><span class="vk">Fri 22</span><span class="vv">→ Piran · one night on the point</span></div>
+          <div class="varrow diff"><span class="vk">Sat 23</span><span class="vv">→ Rovinj · Istrian coast (Croatia)</span></div>
+          <div class="varrow"><span class="vk">Sun 24</span><span class="vv">Rovinj morning → long drive to airport</span></div>
+          <div class="varrow diff"><span class="vk">Driving</span><span class="vv">2 border crossings · ~3× the km</span></div>
+          <div class="varrow"><span class="vk">Trade</span><span class="vv"><i>Three towns; more seen, more moving.</i></span></div>
+        </div>
+        <div class="varfoot"><button class="ctrl">make B active</button><span style="flex:1"></span><span class="hint2">3 refundable holds</span></div>
+      </div>
+    </div>
+    <p class="decideby">⏰ decide by May 19 · whichever stays unpicked releases its refundable holds automatically</p>
   </div>
 </section>
 
@@ -1818,8 +1904,9 @@ const TCUR=[
   {sel:".chipbtn.onpage",nth:0},                                // 34 Grid chip
   null,                                                         // 35 phone
   {sheet:true},                                                 // 36 fork composer
-  {f:"Option B"},                                               // 37 hops tabs
-  null,                                                         // 38 mobile gallery (aside)
+  {f:"compare side by side"},                                   // 37 opens compare
+  {f:"make B active"},                                          // 38 compare side by side
+  null,                                                         // 39 mobile gallery (aside)
 ];
 function tcFind(spec){
   if(!spec)return null;
