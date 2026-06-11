@@ -102,6 +102,13 @@ padding:.4rem .65rem;font-size:.78rem;box-shadow:0 2px 6px rgba(41,33,19,.05);}
 .mini small{display:block;color:var(--muted);font-size:.68rem;}
 .mini.ghost{opacity:.5;border-style:dashed;}
 .mini .mk{font-size:.64rem;background:var(--panel-strong);border:1px solid var(--border);border-radius:100px;padding:.04rem .38rem;margin-left:.3rem;}
+/* Type icon on item cards, keyed off the existing colour taxonomy so it
+   applies everywhere a card appears with no markup churn (Janice s28:
+   "a little icon would help distinguish adventure / tour / meal"). */
+.mini[style*="--k-act"] > b::before{content:"🥾 ";font-weight:400;}
+.mini[style*="--k-meal"] > b::before{content:"🍽 ";font-weight:400;}
+.mini[style*="--k-stay"] > b::before{content:"🛏 ";font-weight:400;}
+.mini[style*="--k-trav"] > b::before{content:"🚐 ";font-weight:400;}
 .mini .mk.ok{background:#e7f1ee;border-color:#bcd8d0;}
 .bucketbox{border:1.5px dashed var(--border);border-radius:10px;padding:.7rem .9rem;margin-top:.6rem;background:rgba(255,253,246,.6);}
 .bucketbox .bh{display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;}
@@ -188,6 +195,7 @@ border-radius:7px;padding:.42rem .55rem;font-size:.76rem;cursor:grab;}
 .ghead2 .lg{font-family:var(--fd);font-style:italic;color:var(--muted);font-size:.66rem;display:block;font-weight:400;}
 .gbody2{position:relative;height:340px;}
 .gline{position:absolute;left:0;right:0;height:1px;background:var(--panel-strong);}
+.gline.maj{background:var(--border);}/* 3-hour majors anchor the hourly grid (Janice s42) */
 .gv{position:absolute;top:0;bottom:0;width:1px;background:var(--panel-strong);}
 .gb{position:absolute;border:1px solid var(--border);border-left:3px solid var(--kc,var(--border));border-radius:4px;background:var(--panel);
 font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
@@ -415,6 +423,14 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
 #fbpanel .fbfoot .spacer{flex:1}
 #fbcopy{font-size:.72rem;font-weight:700;border:1px solid var(--accent);color:var(--accent);background:var(--panel);border-radius:100px;padding:.22rem .7rem;cursor:pointer;}
 .dots i.fb{box-shadow:0 0 0 2px rgba(163,67,31,.45);}
+/* Mobile (Janice s1): 46 dots overflowed the navbar and pushed the arrows
+   off-screen. Drop the dot strip on phones, make Back/Next full-width tap
+   targets, and add swipe. Progress still reads in the header counter. */
+@media (max-width:640px){
+  .navbar{gap:.5rem;padding:.55rem .7rem env(safe-area-inset-bottom,.55rem);}
+  .navbar .dots,.navbar .hintkey{display:none;}
+  .navbar .nbtn{flex:1;min-height:44px;font-size:1rem;padding:.55rem 0;text-align:center;}
+}
 </style></head><body>
 <div class="deck">
   <div class="dhead">
@@ -1849,13 +1865,13 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
       <span style="margin-left:auto;">🔒 booked · 💶 cash · 📌 pinned</span>
     </div>
     <div class="gwrap">
-      <div class="ggut" style="height:380px;"><span style="top:92px">6a</span><span style="top:142px">9a</span><span style="top:192px">12p</span><span style="top:242px">3p</span><span style="top:292px">6p</span><span style="top:342px">9p</span></div>
+      <div class="ggut" style="height:380px;"><span style="top:92px">6a</span><span style="top:108.7px">7a</span><span style="top:125.3px">8a</span><span style="top:142px">9a</span><span style="top:158.7px">10a</span><span style="top:175.3px">11a</span><span style="top:192px">12p</span><span style="top:208.7px">1p</span><span style="top:225.3px">2p</span><span style="top:242px">3p</span><span style="top:258.7px">4p</span><span style="top:275.3px">5p</span><span style="top:292px">6p</span><span style="top:308.7px">7p</span><span style="top:325.3px">8p</span><span style="top:342px">9p</span></div>
       <div class="gfield">
         <div class="ghead2" style="grid-template-columns:repeat(4,1fr);">
           <div><span class="lg">arrive</span>Sun 17</div><div>Mon 18</div><div><span class="lg">balloon day</span>Tue 19</div><div><span class="lg">→ Soča</span>Wed 20</div>
         </div>
         <div class="gbody2" style="height:340px;">
-          <div class="gline" style="top:52px"></div><div class="gline" style="top:102px"></div><div class="gline" style="top:152px"></div><div class="gline" style="top:202px"></div><div class="gline" style="top:252px"></div><div class="gline" style="top:302px"></div>
+          <div class="gline maj" style="top:52px"></div><div class="gline" style="top:68.7px"></div><div class="gline" style="top:85.3px"></div><div class="gline maj" style="top:102px"></div><div class="gline" style="top:118.7px"></div><div class="gline" style="top:135.3px"></div><div class="gline maj" style="top:152px"></div><div class="gline" style="top:168.7px"></div><div class="gline" style="top:185.3px"></div><div class="gline maj" style="top:202px"></div><div class="gline" style="top:218.7px"></div><div class="gline" style="top:235.3px"></div><div class="gline maj" style="top:252px"></div><div class="gline" style="top:268.7px"></div><div class="gline" style="top:285.3px"></div><div class="gline maj" style="top:302px"></div>
           <div class="gv" style="left:25%"></div><div class="gv" style="left:50%"></div><div class="gv" style="left:75%"></div>
           <div class="gb gtv" style="--kc:var(--k-trav);left:0.5%;width:23.5%;top:113.2px;height:11px"><b>→ Vintgar · 18 min</b></div>
           <div class="gb" style="--kc:var(--accent);left:0.5%;width:23.5%;top:118.7px;height:42px"><b>Vintgar Gorge</b><span class="gt">10:00 – 12:30 🔒</span></div>
@@ -2027,6 +2043,17 @@ addEventListener("keydown",(e)=>{
   if(e.key==="ArrowLeft")go(at-1);
   if(e.key==="Escape")fbPanel.classList.remove("open");
 });
+/* Touch swipe — mobile slide nav (Janice s1). Horizontal swipe over the
+   stage moves slides; the threshold + horizontal-dominance check keeps it
+   from hijacking a page's own vertical/inner scroll. */
+let _tsx=null,_tsy=null;
+stage.addEventListener("touchstart",(e)=>{const t=e.changedTouches[0];_tsx=t.clientX;_tsy=t.clientY;},{passive:true});
+stage.addEventListener("touchend",(e)=>{
+  if(_tsx==null)return;
+  const t=e.changedTouches[0],dx=t.clientX-_tsx,dy=t.clientY-_tsy;
+  if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)*1.5)go(dx<0?at+1:at-1);
+  _tsx=_tsy=null;
+},{passive:true});
 
 /* ── feedback widget (deck chrome, not part of the app mockup) ── */
 const FBKEY="tw-feedback-v1";
