@@ -93,8 +93,11 @@ display:flex;align-items:center;gap:.35rem;padding:0 .55rem;font-size:.73rem;mar
 
 /* cards, buckets, day strips */
 .cardrow{display:flex;gap:.55rem;flex-wrap:wrap;margin:.5rem 0 0;}
+.cardrow .mini{flex:1 1 150px;min-width:150px;max-width:230px;}
 .mini{position:relative;background:var(--panel);border:1px solid var(--border);border-left:4px solid var(--k,var(--border));border-radius:7px;
 padding:.4rem .65rem;font-size:.78rem;box-shadow:0 2px 6px rgba(41,33,19,.05);}
+.mini:has(.iacts){padding-right:2.9rem;}
+.mini b{overflow-wrap:anywhere;}
 .mini b{font-weight:600;}
 .mini small{display:block;color:var(--muted);font-size:.68rem;}
 .mini.ghost{opacity:.5;border-style:dashed;}
@@ -296,8 +299,8 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
 .varrow.diff .vv{background:#fbf0e2;border-radius:5px;padding:.06rem .3rem;margin:-.06rem -.3rem;}
 .varfoot{padding:.5rem .7rem;border-top:1px solid var(--border);display:flex;align-items:center;gap:.5rem;background:var(--panel);}
 .varfoot .ctrl{font-size:.7rem;}
-.iacts{position:absolute;top:3px;right:4px;display:flex;gap:4px;}
-.iacts i{font-style:normal;cursor:pointer;font-size:.74rem;line-height:1;width:20px;height:20px;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:5px;background:var(--panel);color:#6b6358;box-shadow:0 1px 2px rgba(41,33,19,.08);}
+.iacts{position:absolute;top:3px;right:4px;display:flex;gap:3px;}
+.iacts i{font-style:normal;cursor:pointer;font-size:.66rem;line-height:1;width:18px;height:18px;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:5px;background:var(--panel);color:#6b6358;box-shadow:0 1px 2px rgba(41,33,19,.08);}
 .iacts i:hover{color:var(--accent);border-color:var(--accent);background:#e7f1ee;}
 .staybar.empty{flex-direction:column;justify-content:center;gap:.22rem;height:auto;min-height:48px;border:1.5px dashed var(--border);border-left:1.5px dashed var(--border);background:rgba(210,230,225,.16);padding:.4rem;}
 .slotbtn{font-size:.72rem;font-weight:700;padding:.32rem .75rem;}
