@@ -246,3 +246,30 @@
     transition: none;
   }
 }
+
+/* ── mobile (issue #35): GridView → AgendaView is a view-swap; here the
+   workspace + side sheet go full-bleed and the editor sheet becomes a bottom
+   sheet on phones. Same data, phone ergonomics. ───────────────────────────── */
+@media (max-width: 640px) {
+  .trip-ws {
+    padding: 0.85rem;
+  }
+  .trip-grid {
+    grid-template-columns: 1fr;
+  }
+  .entry-sheet {
+    top: auto;
+    width: 100vw;
+    max-height: 88vh;
+    border-left: none;
+    border-top: 1px solid var(--border);
+    border-radius: 14px 14px 0 0;
+  }
+  .entry-row {
+    grid-template-columns: 1fr;
+  }
+  /* The grid is a desk instrument; on a phone the agenda is the default. */
+  .grid-scroll {
+    font-size: 0.8rem;
+  }
+}

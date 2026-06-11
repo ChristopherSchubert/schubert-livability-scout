@@ -24,3 +24,7 @@ scripts/.crowd-season-cache*.json
 
 # Test coverage output
 coverage/
+
+# Playwright
+test-results/
+playwright-report/
