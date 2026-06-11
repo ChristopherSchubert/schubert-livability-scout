@@ -206,34 +206,54 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
 .gpage.spacer{border:0;background:none;flex:1;cursor:default;padding:0;}
 .gpagenote{font-size:.66rem;color:var(--muted);align-self:center;}
 
-/* phone */
-.phonewrap{display:flex;justify-content:center;padding:1.4rem 0;}
-.ph{width:264px;border:10px solid #14110d;border-radius:44px;background:#14110d;overflow:hidden;position:relative;box-shadow:0 16px 40px rgba(27,24,20,.34);}
-.phscreen{background:var(--bg);border-radius:34px;overflow:hidden;}
-.phisland{position:absolute;top:13px;left:50%;transform:translateX(-50%);width:84px;height:22px;background:#000;border-radius:13px;z-index:10;}
-.phstat{display:flex;justify-content:space-between;align-items:center;padding:.5rem .95rem .1rem;font-size:.62rem;font-weight:700;color:var(--text);}
-.phstat .r{letter-spacing:.06em;}
-.phhome{height:5px;width:108px;background:#1b1814;border-radius:3px;margin:.45rem auto .5rem;opacity:.32;}
-.ph .phh{background:var(--panel);border-bottom:1px solid var(--border);padding:.5rem .85rem .55rem;}
-.ph .phh b{font-family:var(--fd);font-weight:500;}
-.ph .bd{padding:.6rem .7rem;}
-.nextcard{border:1px solid var(--accent);border-left:4px solid var(--k-meal);border-radius:9px;padding:.45rem .55rem;box-shadow:0 6px 18px rgba(13,76,68,.15);font-size:.74rem;background:var(--panel);}
-.ph .prow{display:flex;gap:.5rem;align-items:baseline;font-size:.72rem;padding:.32rem .2rem;border-bottom:1px dashed var(--border);}
-.ph .prow.done{opacity:.42;}
-.ph .prow .t{color:var(--muted);font-variant-numeric:tabular-nums;flex:0 0 44px;}
-.ph .prow small{color:var(--muted);}
-.phtabs{display:flex;border-top:1px solid var(--border);background:var(--panel);}
-.phtabs span{flex:1;text-align:center;font-size:.62rem;font-weight:600;color:var(--muted);padding:.42rem 0;}
-.phtabs span.on{color:var(--accent);font-weight:700;}
-.phgal{display:flex;gap:1rem;justify-content:center;align-items:flex-start;padding:1.1rem 0;flex-wrap:wrap;}
-.phgal .ph{width:228px;border-width:8px;border-radius:38px;}
-.phgal .phscreen{border-radius:30px;}
-.phgal .phisland{width:70px;height:18px;top:11px;}
-.phgal .gl{text-align:center;font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.5rem;}
-.bigbtns{display:flex;gap:.3rem;margin-top:.35rem;}
-.bigbtns span{flex:1;text-align:center;font-size:.66rem;font-weight:700;border-radius:7px;padding:.35rem .2rem;cursor:pointer;}
-.bigbtns .d{background:var(--accent);color:#fff;}
-.bigbtns .c{background:var(--panel-strong);}
+/* phone — built at true iPhone-15 logical resolution (390×853), scaled into a holder */
+.phonewrap{display:flex;justify-content:center;padding:.5rem 0 1rem;}
+.phgal{display:flex;gap:1.3rem;justify-content:center;align-items:flex-start;padding:.3rem 0 1rem;flex-wrap:wrap;}
+.phgal .gl{text-align:center;font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.45rem;}
+.phholder{position:relative;}
+.phonewrap .phholder{width:227px;height:496px;}
+.phonewrap .ph{transform:scale(.582);}
+.phgal .phholder{width:203px;height:444px;}
+.phgal .ph{transform:scale(.52);}
+.ph{position:absolute;top:0;left:0;width:390px;height:853px;transform-origin:top left;
+  background:#0c0c0e;border-radius:62px;padding:13px;box-shadow:0 24px 60px rgba(20,17,13,.42),0 0 0 2px #2c2c30;}
+.phscreen{position:relative;width:100%;height:100%;background:var(--bg);border-radius:50px;overflow:hidden;display:flex;flex-direction:column;}
+.phisland{position:absolute;top:12px;left:50%;transform:translateX(-50%);width:122px;height:35px;background:#000;border-radius:19px;z-index:20;}
+.phstat{display:flex;justify-content:space-between;align-items:center;padding:15px 32px 7px;font-size:16px;font-weight:600;color:var(--text);flex:0 0 auto;}
+.phstat .r{display:flex;gap:7px;align-items:center;font-size:15px;}
+.phnav{padding:6px 22px 12px;border-bottom:1px solid var(--border);background:var(--panel);flex:0 0 auto;}
+.phnav .sub{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.09em;}
+.phnav .ttl{font-family:var(--fd);font-weight:500;font-size:27px;line-height:1.12;}
+.phnav .ttl small{font-family:var(--fu);font-size:14px;font-weight:400;color:var(--muted);}
+.phbody{flex:1 1 auto;overflow:hidden;padding:4px 20px;}
+.phrow{display:flex;gap:13px;align-items:baseline;font-size:16px;padding:12px 2px;border-bottom:1px solid var(--border);}
+.phrow.done{opacity:.4;}
+.phrow .t{color:var(--muted);font-variant-numeric:tabular-nums;flex:0 0 60px;font-size:15px;}
+.phrow .v{flex:1;}
+.phrow b{font-weight:600;}
+.phrow small{color:var(--muted);font-size:13px;}
+.phrow .ic{flex:0 0 26px;font-size:18px;text-align:center;}
+.phnext{border:1px solid var(--accent);border-left:5px solid var(--k-meal);border-radius:15px;padding:14px 16px;margin:11px 0;background:var(--panel);box-shadow:0 8px 24px rgba(13,76,68,.14);}
+.phnext .lbl{font-size:12px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.07em;}
+.phnext .nm{font-family:var(--fd);font-size:20px;font-weight:500;margin:3px 0 1px;}
+.phnext .meta{font-size:14px;color:var(--muted);}
+.phnext .acts{display:flex;gap:9px;margin-top:12px;}
+.phnext .acts span{flex:1;text-align:center;font-size:15px;font-weight:600;border-radius:12px;padding:12px 0;}
+.phnext .acts .go{background:var(--accent);color:#fff;}
+.phnext .acts .call{background:var(--panel-strong);color:var(--text);}
+.phnote{font-size:13px;color:var(--muted);font-style:italic;padding:10px 2px 0;}
+.phtabs{display:flex;border-top:1px solid var(--border);background:var(--panel);padding-bottom:8px;flex:0 0 auto;}
+.phtabs span{flex:1;text-align:center;font-size:11px;font-weight:600;color:var(--muted);padding:9px 0 4px;}
+.phtabs span.on{color:var(--accent);}
+.phtabs span i{display:block;font-style:normal;font-size:18px;margin-bottom:3px;line-height:1;}
+.phhome{position:absolute;bottom:9px;left:50%;transform:translateX(-50%);width:134px;height:5px;background:#1b1814;border-radius:3px;opacity:.34;z-index:20;}
+.phconf{font-variant-numeric:tabular-nums;background:var(--panel-strong);border-radius:5px;padding:1px 5px;font-size:13px;}
+.phstat .phsig{display:inline-flex;align-items:flex-end;gap:2px;height:11px;}
+.phstat .phsig i{width:3px;background:var(--text);border-radius:1px;}
+.phstat .phsig i:nth-child(1){height:5px}.phstat .phsig i:nth-child(2){height:7px}.phstat .phsig i:nth-child(3){height:9px}.phstat .phsig i:nth-child(4){height:11px}
+.phbatt{display:inline-block;width:25px;height:12px;border:1.4px solid var(--text);border-radius:3px;position:relative;opacity:.9;}
+.phbatt::after{content:"";position:absolute;left:1.6px;top:1.6px;bottom:1.6px;width:72%;background:var(--text);border-radius:1px;}
+.phbatt::before{content:"";position:absolute;right:-3px;top:3.5px;height:5px;width:2px;background:var(--text);border-radius:0 2px 2px 0;}
 
 /* trips list + variations */
 .tripcard{display:grid;grid-template-columns:1fr auto;gap:.3rem .8rem;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:.85rem 1.1rem;margin-bottom:.7rem;}
@@ -1654,24 +1674,28 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
   </div>
 </section><section data-phase="On the trip" data-did="open the trip on your phone on May 19 — it lands on today, half the day already behind you.">
   <nav class="topbar"><span class="brand">Schubert Atlas</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
-  <div class="phonewrap"><div class="ph" style="width:300px;">
+  <div class="phonewrap"><div class="phholder"><div class="ph">
     <div class="phisland"></div>
     <div class="phscreen">
-      <div class="phstat"><span>9:41</span><span class="r">●●● 📶 🔋</span></div>
-      <div class="phh"><span style="font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;">Slovenia · day 5 of 11 · Bled</span><br><b style="font-size:1.15rem;">Tuesday, May 19</b></div>
-      <div class="bd">
-        <div class="prow done"><span class="t">5:30</span><span>Hot-air balloon ✓</span></div>
-        <div class="prow done"><span class="t">7:35</span><span>Bled Castle — hike + tour ✓</span></div>
-        <div class="nextcard" style="margin:.45rem 0;"><span style="font-size:.58rem;font-weight:700;color:var(--accent);text-transform:uppercase;">Next · in 20 min</span><br><b>Lunch · Pizzeria Rustika</b><br><span style="color:var(--muted);">0.8 km — an 11-min walk · veg ✓</span>
-          <div class="bigbtns"><span class="d">📍 Directions</span><span class="c">📞 Call</span></div></div>
-        <div class="prow"><span class="t">1:00</span><span>Free time <small>auto</small></span></div>
-        <div class="prow"><span class="t">4:00</span><span>Via Ferrata Hvadnik 🔒 <small><span class="conf">#138953</span></small> <span style="color:var(--accent);font-weight:700;font-size:.64rem;">copy</span></span></div>
-        <p style="font-size:.6rem;color:var(--muted);margin:.5rem 0 0;font-style:italic;">finished things fade · next-up leads with the two buttons you need</p>
+      <div class="phstat"><span>9:41</span><span class="r"><span class="phsig"><i></i><i></i><i></i><i></i></span> <span style="font-size:13px;font-weight:700;">5G</span> <span class="phbatt"></span></span></div>
+      <div class="phnav"><div class="sub">Slovenia · Day 5 of 11 · Bled</div><div class="ttl">Tuesday, May 19</div></div>
+      <div class="phbody">
+        <div class="phrow done"><span class="t">5:30</span><span class="v">Hot-air balloon</span><span class="ic">✓</span></div>
+        <div class="phrow done"><span class="t">7:35</span><span class="v">Bled Castle — hike + tour</span><span class="ic">✓</span></div>
+        <div class="phnext">
+          <div class="lbl">Next · in 20 min</div>
+          <div class="nm">Lunch · Pizzeria Rustika</div>
+          <div class="meta">0.8 km — an 11-min walk · veg ✓</div>
+          <div class="acts"><span class="go">📍 Directions</span><span class="call">📞 Call</span></div>
+        </div>
+        <div class="phrow"><span class="t">1:00</span><span class="v">Free time <small>auto</small></span></div>
+        <div class="phrow"><span class="t">4:00</span><span class="v">Via Ferrata Hvadnik 🔒 <span class="phconf">#138953</span></span></div>
+        <div class="phnote">Finished items fade · next-up leads with the two buttons you need.</div>
       </div>
-      <div class="phtabs"><span>Plan</span><span>Days</span><span>Book</span><span class="on">Today</span></div>
-      <div class="phhome"></div>
+      <div class="phtabs"><span><i>◷</i>Plan</span><span><i>▤</i>Days</span><span><i>✓</i>Book</span><span class="on"><i>◉</i>Today</span></div>
     </div>
-  </div></div>
+    <div class="phhome"></div>
+  </div></div></div>
 </section><section data-phase="What if (rewind · pre-trip) · creating the variation" data-did="select May 21–24, press ＋ new variation, name option B, start from a blank skeleton.">
   <nav class="topbar"><span class="brand">Schubert Atlas</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
   <div class="tripbar"><span class="crumb"><b>Trips</b> ›</span><span class="tname">Slovenia</span><span class="tmeta">May 15–25 · 10 nights</span>
@@ -1777,9 +1801,9 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
 <section data-phase="On the phone (aside) · the other pages" data-did="flip through Plan, Book, and the Grid on your phone — same trip, one column.">
   <nav class="topbar"><span class="brand">Schubert Atlas</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
   <div class="phgal">
-    <div><div class="gl">Plan</div><div class="ph"><div class="phisland"></div><div class="phscreen"><div class="phstat"><span>9:41</span><span class="r">●●● 📶 🔋</span></div><div class="phh"><b>Slovenia</b> <span style="font-size:.6rem;color:var(--muted);">May 15–25 · 10 nights</span></div><div class="bd"><div class="collapsec" style="font-size:.64rem;margin:.1rem 0 .35rem;">▸ <b>Transport</b> · 2 booked ✈</div><div class="prow"><span class="t">15–17</span><span><b>Ljubljana</b> <small>Union 🔒</small></span></div><div class="prow"><span class="t">17–20</span><span><b>Bled</b> <small>Toplice + H. Franko 🔒</small></span></div><div class="prow"><span class="t">21–25</span><span><b>Piran</b> <small>Hotel Piran + Brdo 🔒</small></span></div><p style="font-size:.58rem;color:var(--muted);margin:.4rem 0 0;font-style:italic;">the window stacks — one leg per row</p></div><div class="phtabs"><span class="on">Plan</span><span>Days</span><span>Book</span><span>Today</span></div><div class="phhome"></div></div></div></div>
-    <div><div class="gl">Book</div><div class="ph"><div class="phisland"></div><div class="phscreen"><div class="phstat"><span>9:41</span><span class="r">●●● 📶 🔋</span></div><div class="phh"><b>Book</b> <span style="font-size:.6rem;color:var(--muted);">2 need action</span></div><div class="bd"><div class="prow"><span class="t">⏰</span><span><b>Hotel Union</b> <small>cancel by May 12</small></span></div><div class="prow"><span class="t">⏰</span><span><b>Postojna Cave</b> <small>to book · ~€49</small></span></div><div class="prow"><span class="t">💶</span><span><b>Cash to carry</b> <small>€927</small></span></div><div class="prow"><span class="t">🎫</span><span><b>Ljubljana Card</b> <small>buy May 16</small></span></div><p style="font-size:.58rem;color:var(--muted);margin:.4rem 0 0;font-style:italic;">countdowns and cash, pocket-size</p></div><div class="phtabs"><span>Plan</span><span>Days</span><span class="on">Book</span><span>Today</span></div><div class="phhome"></div></div></div></div>
-    <div><div class="gl">The grid</div><div class="ph"><div class="phisland"></div><div class="phscreen"><div class="phstat"><span>9:41</span><span class="r">●●● 📶 🔋</span></div><div class="phh"><b>Tue, May 19</b> <span style="font-size:.6rem;color:var(--muted);">Bled · solved</span></div><div class="bd"><div class="prow"><span class="t">5:30</span><span>Balloon 🔒</span></div><div class="prow"><span class="t">7:35</span><span>Bled Castle — hike</span></div><div class="prow"><span class="t">12:00</span><span>Lunch · Rustika 📌</span></div><div class="prow"><span class="t">4:00</span><span>Via Ferrata 🔒</span></div><p style="font-size:.58rem;color:var(--muted);margin:.4rem 0 0;font-style:italic;">swipe → Wed 20 · one day per swipe</p></div><div class="phtabs"><span>Plan</span><span class="on">Days</span><span>Book</span><span>Today</span></div><div class="phhome"></div></div></div></div>
+    <div><div class="gl">Plan</div><div class="phholder"><div class="ph"><div class="phisland"></div><div class="phscreen"><div class="phstat"><span>9:41</span><span class="r"><span class="phsig"><i></i><i></i><i></i><i></i></span> <span style="font-size:13px;font-weight:700;">5G</span> <span class="phbatt"></span></span></div><div class="phnav"><div class="sub">Trips · Slovenia</div><div class="ttl">May 15–25</div></div><div class="phbody"><div class="phrow"><span class="t">✈</span><span class="v"><b>Transport</b> <small>2 booked</small></span></div><div class="phrow"><span class="t">15–17</span><span class="v"><b>Ljubljana</b> <small>Union 🔒</small></span></div><div class="phrow"><span class="t">17–20</span><span class="v"><b>Bled</b> <small>Toplice · H. Franko 🔒</small></span></div><div class="phrow"><span class="t">21–25</span><span class="v"><b>Piran</b> <small>Hotel Piran · Brdo 🔒</small></span></div><div class="phnote">The window stacks — one leg per row.</div></div><div class="phtabs"><span class="on"><i>◷</i>Plan</span><span><i>▤</i>Days</span><span><i>✓</i>Book</span><span><i>◉</i>Today</span></div></div><div class="phhome"></div></div></div></div>
+    <div><div class="gl">Book</div><div class="phholder"><div class="ph"><div class="phisland"></div><div class="phscreen"><div class="phstat"><span>9:41</span><span class="r"><span class="phsig"><i></i><i></i><i></i><i></i></span> <span style="font-size:13px;font-weight:700;">5G</span> <span class="phbatt"></span></span></div><div class="phnav"><div class="sub">Slovenia · reservations</div><div class="ttl">Book</div></div><div class="phbody"><div class="phrow"><span class="ic">⏰</span><span class="v"><b>Hotel Union</b> <small>cancel by May 12</small></span></div><div class="phrow"><span class="ic">⏰</span><span class="v"><b>Postojna Cave</b> <small>to book · ~€49</small></span></div><div class="phrow"><span class="ic">💶</span><span class="v"><b>Cash to carry</b> <small>€927</small></span></div><div class="phrow"><span class="ic">🎫</span><span class="v"><b>Ljubljana Card</b> <small>buy May 16</small></span></div><div class="phnote">Countdowns and cash, pocket-size.</div></div><div class="phtabs"><span><i>◷</i>Plan</span><span><i>▤</i>Days</span><span class="on"><i>✓</i>Book</span><span><i>◉</i>Today</span></div></div><div class="phhome"></div></div></div></div>
+    <div><div class="gl">The grid</div><div class="phholder"><div class="ph"><div class="phisland"></div><div class="phscreen"><div class="phstat"><span>9:41</span><span class="r"><span class="phsig"><i></i><i></i><i></i><i></i></span> <span style="font-size:13px;font-weight:700;">5G</span> <span class="phbatt"></span></span></div><div class="phnav"><div class="sub">Bled · solved</div><div class="ttl">Tue, May 19</div></div><div class="phbody"><div class="phrow"><span class="t">5:30</span><span class="v">Balloon 🔒</span></div><div class="phrow"><span class="t">7:35</span><span class="v">Bled Castle — hike</span></div><div class="phrow"><span class="t">12:00</span><span class="v">Lunch · Rustika 📌</span></div><div class="phrow"><span class="t">4:00</span><span class="v">Via Ferrata 🔒</span></div><div class="phnote">Swipe → Wed 20 · one day per swipe.</div></div><div class="phtabs"><span><i>◷</i>Plan</span><span class="on"><i>▤</i>Days</span><span><i>✓</i>Book</span><span><i>◉</i>Today</span></div></div><div class="phhome"></div></div></div></div>
   </div>
 </section>
 
