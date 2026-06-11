@@ -4,6 +4,7 @@ import "./trip-planner.css";
 import "./city-detail.css";
 import AuthGate from "../components/AuthGate";
 import { PlannerProvider } from "../components/PlannerProvider";
+import { TripProvider } from "../components/TripProvider";
 import { readImageManifest } from "../lib/image-manifest";
 
 export const metadata = {
@@ -40,7 +41,9 @@ export default async function RootLayout({ children }) {
       <body>
         <AuthGate>
           <PlannerProvider initialManifest={initialManifest}>
-            {children}
+            <TripProvider>
+              {children}
+            </TripProvider>
           </PlannerProvider>
         </AuthGate>
       </body>
