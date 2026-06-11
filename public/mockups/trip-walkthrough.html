@@ -216,8 +216,8 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
 .phholder{position:relative;}
 .phonewrap .phholder{width:227px;height:496px;}
 .phonewrap .ph{transform:scale(.582);}
-.phgal .phholder{width:203px;height:444px;}
-.phgal .ph{transform:scale(.52);}
+.phgal .phholder{width:195px;height:427px;}
+.phgal .ph{transform:scale(.50);}
 .ph{position:absolute;top:0;left:0;width:390px;height:853px;transform-origin:top left;
   background:#0c0c0e;border-radius:62px;padding:13px;box-shadow:0 24px 60px rgba(20,17,13,.42),0 0 0 2px #2c2c30;}
 .phscreen{position:relative;width:100%;height:100%;background:var(--bg);border-radius:50px;overflow:hidden;display:flex;flex-direction:column;}
@@ -257,6 +257,17 @@ font-size:.6rem;line-height:1.2;padding:1px 4px;overflow:hidden;cursor:pointer;}
 .phbatt{display:inline-block;width:25px;height:12px;border:1.4px solid var(--text);border-radius:3px;position:relative;opacity:.9;}
 .phbatt::after{content:"";position:absolute;left:1.6px;top:1.6px;bottom:1.6px;width:72%;background:var(--text);border-radius:1px;}
 .phbatt::before{content:"";position:absolute;right:-3px;top:3.5px;height:5px;width:2px;background:var(--text);border-radius:0 2px 2px 0;}
+.phsec{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);padding:13px 2px 3px;}
+.phcard{display:flex;align-items:center;gap:11px;padding:12px 2px;border-bottom:1px solid var(--border);font-size:16px;}
+.phcard .lead{flex:1;min-width:0;}
+.phcard b{font-weight:600;}
+.phcard .lead small{display:block;color:var(--muted);font-size:13px;margin-top:1px;}
+.phcard .chev{color:#b9ad99;font-size:17px;flex:0 0 auto;}
+.phcard .lpill{flex:0 0 auto;font-size:12px;background:var(--panel-strong);border-radius:100px;padding:2px 9px;color:var(--muted);font-variant-numeric:tabular-nums;}
+.phcard .lpill.warn{background:#f6e0d4;color:var(--warn);font-weight:700;}
+.phmoney{display:flex;justify-content:space-between;font-size:16px;padding:11px 2px;border-bottom:1px solid var(--border);}
+.phmoney b{font-weight:600;}
+.phgal .gl{margin-bottom:.4rem;}
 
 /* trips list + variations */
 .tripcard{display:grid;grid-template-columns:1fr auto;gap:.3rem .8rem;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:.85rem 1.1rem;margin-bottom:.7rem;}
@@ -474,11 +485,10 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
 <p>The <b>Book</b> page kept itself: to-books with lead times, cancel-bys counting down, cash = on-site ∧ cash-only = <b>€927</b>, passes remembered. Nothing hand-kept.</p>
 <p>“Mark booked…” opens the booking sheet: confirmation, date, money. The consequence chain is stated and automatic — <b>dated → placed on Sun 24, booked → off the Needs-action list, on-site cost → into the cash tally.</b></p>
 <p>The payoff: the grid <b>prints itself</b>, one leg per page. Every block placed, every drive auto-timed and inserted (→ 4 min to the launch field), every lock, cash tag, and pin carried over from the plan. Page through the legs; what Janice used to hand-type, now generated — and bookable from paper.</p>
-<p>Day-of, the phone lands on <b>today</b>: next-up leads with Directions and Call, the confirmation code one thumb away, finished things faded.</p>
 <p>＋ new variation opens the <b>fork composer</b>: name it, start blank or copy the current plan — and the decide-by rule is stated up front, derived from whatever cancellation deadlines end up inside.</p>
 <p>The fork lives <b>inside the plan</b>, not in a separate doc: tabs switch the last three days between Option A (all-in Piran, active) and Option B (three towns). The active one fills the page; <b>compare side by side</b> opens both at once.</p>
 <p>Two futures, column by column — <b>differences highlighted</b>: one base vs three towns, a Venice day vs an Istrian crawl, minimal driving vs two borders. Neither is deleted; both hold only refundable bookings, and whichever stays unpicked by <b>May 19</b> releases itself. They’d later cancel Piran for Trieste — and wish they hadn’t.</p>
-<p>The same trip on your phone — no separate "mobile app." The Plan window stacks to one leg per row, Book keeps its countdowns and cash, and the grid deals one day per swipe. Everything stays one column of the same data.</p>
+<p>The whole trip in your pocket — <b>no separate "mobile app."</b> Plan stacks one leg per row, <b>Today</b> lands on the next thing with Directions and Call, Book keeps its countdowns and cash, and the grid deals one day per swipe. Same data, one column.</p>
 </div>
 
 <div id="steps" style="display:none">
@@ -1770,30 +1780,6 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
       </div>
     </div>
   </div>
-</section><section data-phase="On the trip" data-did="open the trip on your phone on May 19 — it lands on today, half the day already behind you.">
-  <nav class="topbar"><span class="brand">Schubert Atlas</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
-  <div class="phonewrap"><div class="phholder"><div class="ph">
-    <div class="phisland"></div>
-    <div class="phscreen">
-      <div class="phstat"><span>9:41</span><span class="r"><span class="phsig"><i></i><i></i><i></i><i></i></span> <span style="font-size:13px;font-weight:700;">5G</span> <span class="phbatt"></span></span></div>
-      <div class="phnav"><div class="sub">Slovenia · Day 5 of 11 · Bled</div><div class="ttl">Tuesday, May 19</div></div>
-      <div class="phbody">
-        <div class="phrow done"><span class="t">5:30</span><span class="v">Hot-air balloon</span><span class="ic">✓</span></div>
-        <div class="phrow done"><span class="t">7:35</span><span class="v">Bled Castle — hike + tour</span><span class="ic">✓</span></div>
-        <div class="phnext">
-          <div class="lbl">Next · in 20 min</div>
-          <div class="nm">Lunch · Pizzeria Rustika</div>
-          <div class="meta">0.8 km — an 11-min walk · veg ✓</div>
-          <div class="acts"><span class="go">📍 Directions</span><span class="call">📞 Call</span></div>
-        </div>
-        <div class="phrow"><span class="t">1:00</span><span class="v">Free time <small>auto</small></span></div>
-        <div class="phrow"><span class="t">4:00</span><span class="v">Via Ferrata Hvadnik 🔒 <span class="phconf">#138953</span></span></div>
-        <div class="phnote">Finished items fade · next-up leads with the two buttons you need.</div>
-      </div>
-      <div class="phtabs"><span><i>◷</i>Plan</span><span><i>▤</i>Days</span><span><i>✓</i>Book</span><span class="on"><i>◉</i>Today</span></div>
-    </div>
-    <div class="phhome"></div>
-  </div></div></div>
 </section><section data-phase="What if (rewind · pre-trip) · creating the variation" data-did="select May 21–24, press ＋ new variation, name option B, start from a blank skeleton.">
   <nav class="topbar"><span class="brand">Schubert Atlas</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
   <div class="tripbar"><span class="crumb"><b>Trips</b> ›</span><span class="tname">Slovenia</span><span class="tmeta">May 15–25 · 10 nights</span>
@@ -1896,12 +1882,13 @@ font-size:.82rem;color:var(--text);padding:.55rem .65rem;min-height:74px;resize:
   </div>
 </section>
 
-<section data-phase="On the phone (aside) · the other pages" data-did="flip through Plan, Book, and the Grid on your phone — same trip, one column.">
+<section data-phase="On the phone (aside) · the whole trip, pocket-size" data-did="flip through Plan, Today, Book, and the Grid on your phone — same trip, one column.">
   <nav class="topbar"><span class="brand">Schubert Atlas</span><a>Board</a><a>Planning</a><a class="on">Trips</a><a>Visited</a></nav>
   <div class="phgal">
-    <div><div class="gl">Plan</div><div class="phholder"><div class="ph"><div class="phisland"></div><div class="phscreen"><div class="phstat"><span>9:41</span><span class="r"><span class="phsig"><i></i><i></i><i></i><i></i></span> <span style="font-size:13px;font-weight:700;">5G</span> <span class="phbatt"></span></span></div><div class="phnav"><div class="sub">Trips · Slovenia</div><div class="ttl">May 15–25</div></div><div class="phbody"><div class="phrow"><span class="t">✈</span><span class="v"><b>Transport</b> <small>2 booked</small></span></div><div class="phrow"><span class="t">15–17</span><span class="v"><b>Ljubljana</b> <small>Union 🔒</small></span></div><div class="phrow"><span class="t">17–20</span><span class="v"><b>Bled</b> <small>Toplice · H. Franko 🔒</small></span></div><div class="phrow"><span class="t">21–25</span><span class="v"><b>Piran</b> <small>Hotel Piran · Brdo 🔒</small></span></div><div class="phnote">The window stacks — one leg per row.</div></div><div class="phtabs"><span class="on"><i>◷</i>Plan</span><span><i>▤</i>Days</span><span><i>✓</i>Book</span><span><i>◉</i>Today</span></div></div><div class="phhome"></div></div></div></div>
-    <div><div class="gl">Book</div><div class="phholder"><div class="ph"><div class="phisland"></div><div class="phscreen"><div class="phstat"><span>9:41</span><span class="r"><span class="phsig"><i></i><i></i><i></i><i></i></span> <span style="font-size:13px;font-weight:700;">5G</span> <span class="phbatt"></span></span></div><div class="phnav"><div class="sub">Slovenia · reservations</div><div class="ttl">Book</div></div><div class="phbody"><div class="phrow"><span class="ic">⏰</span><span class="v"><b>Hotel Union</b> <small>cancel by May 12</small></span></div><div class="phrow"><span class="ic">⏰</span><span class="v"><b>Postojna Cave</b> <small>to book · ~€49</small></span></div><div class="phrow"><span class="ic">💶</span><span class="v"><b>Cash to carry</b> <small>€927</small></span></div><div class="phrow"><span class="ic">🎫</span><span class="v"><b>Ljubljana Card</b> <small>buy May 16</small></span></div><div class="phnote">Countdowns and cash, pocket-size.</div></div><div class="phtabs"><span><i>◷</i>Plan</span><span><i>▤</i>Days</span><span class="on"><i>✓</i>Book</span><span><i>◉</i>Today</span></div></div><div class="phhome"></div></div></div></div>
-    <div><div class="gl">The grid</div><div class="phholder"><div class="ph"><div class="phisland"></div><div class="phscreen"><div class="phstat"><span>9:41</span><span class="r"><span class="phsig"><i></i><i></i><i></i><i></i></span> <span style="font-size:13px;font-weight:700;">5G</span> <span class="phbatt"></span></span></div><div class="phnav"><div class="sub">Bled · solved</div><div class="ttl">Tue, May 19</div></div><div class="phbody"><div class="phrow"><span class="t">5:30</span><span class="v">Balloon 🔒</span></div><div class="phrow"><span class="t">7:35</span><span class="v">Bled Castle — hike</span></div><div class="phrow"><span class="t">12:00</span><span class="v">Lunch · Rustika 📌</span></div><div class="phrow"><span class="t">4:00</span><span class="v">Via Ferrata 🔒</span></div><div class="phnote">Swipe → Wed 20 · one day per swipe.</div></div><div class="phtabs"><span><i>◷</i>Plan</span><span class="on"><i>▤</i>Days</span><span><i>✓</i>Book</span><span><i>◉</i>Today</span></div></div><div class="phhome"></div></div></div></div>
+    <div><div class="gl">Plan</div><div class="phholder"><div class="ph"><div class="phisland"></div><div class="phscreen"><div class="phstat"><span>9:41</span><span class="r"><span class="phsig"><i></i><i></i><i></i><i></i></span> <span style="font-size:13px;font-weight:700;">5G</span> <span class="phbatt"></span></span></div><div class="phnav"><div class="sub">Trips · Slovenia</div><div class="ttl">Slovenia</div></div><div class="phbody"><div class="phcard"><span class="ic">✈</span><span class="lead"><b>Transport</b><small>2 flights booked</small></span><span class="chev">›</span></div><div class="phsec">Stays · per leg</div><div class="phcard"><span class="lead"><b>Ljubljana</b><small>May 15–17 · Union 🔒</small></span><span class="lpill">2n</span><span class="chev">›</span></div><div class="phcard"><span class="lead"><b>Bled</b><small>May 17–20 · Toplice · H. Franko 🔒</small></span><span class="lpill">3n</span><span class="chev">›</span></div><div class="phcard"><span class="lead"><b>Piran</b><small>May 21–24 · Hotel Piran · Brdo 🔒</small></span><span class="lpill">3n</span><span class="chev">›</span></div><div class="phnote">The window stacks — tap a leg for its days and stays.</div></div><div class="phtabs"><span class="on"><i>◷</i>Plan</span><span><i>▤</i>Days</span><span><i>✓</i>Book</span><span><i>◉</i>Today</span></div></div><div class="phhome"></div></div></div></div>
+    <div><div class="gl">Today</div><div class="phholder"><div class="ph"><div class="phisland"></div><div class="phscreen"><div class="phstat"><span>9:41</span><span class="r"><span class="phsig"><i></i><i></i><i></i><i></i></span> <span style="font-size:13px;font-weight:700;">5G</span> <span class="phbatt"></span></span></div><div class="phnav"><div class="sub">Day 5 of 11 · Bled</div><div class="ttl">Tuesday, May 19</div></div><div class="phbody"><div class="phrow done"><span class="t">5:30</span><span class="v">Hot-air balloon</span><span class="ic">✓</span></div><div class="phrow done"><span class="t">7:35</span><span class="v">Bled Castle — hike</span><span class="ic">✓</span></div><div class="phnext"><div class="lbl">Next · in 20 min</div><div class="nm">Lunch · Rustika</div><div class="meta">0.8 km — 11-min walk · veg ✓</div><div class="acts"><span class="go">📍 Directions</span><span class="call">📞 Call</span></div></div><div class="phrow"><span class="t">4:00</span><span class="v">Via Ferrata 🔒 <span class="phconf">#138953</span></span></div></div><div class="phtabs"><span><i>◷</i>Plan</span><span><i>▤</i>Days</span><span><i>✓</i>Book</span><span class="on"><i>◉</i>Today</span></div></div><div class="phhome"></div></div></div></div>
+    <div><div class="gl">Book</div><div class="phholder"><div class="ph"><div class="phisland"></div><div class="phscreen"><div class="phstat"><span>9:41</span><span class="r"><span class="phsig"><i></i><i></i><i></i><i></i></span> <span style="font-size:13px;font-weight:700;">5G</span> <span class="phbatt"></span></span></div><div class="phnav"><div class="sub">Slovenia · reservations</div><div class="ttl">Book</div></div><div class="phbody"><div class="phsec">Needs action</div><div class="phcard"><span class="lead"><b>Hotel Union</b><small>free cancellation ends</small></span><span class="lpill warn">May 12</span></div><div class="phcard"><span class="lead"><b>Postojna Cave</b><small>combo ~€49</small></span><span class="lpill warn">to book</span></div><div class="phsec">Cash to carry</div><div class="phmoney"><b>On-site, cash only</b><b>€927</b></div><div class="phsec">Passes</div><div class="phcard"><span class="lead"><b>Ljubljana Card</b><small>funicular · cruise · museums</small></span><span class="lpill">May 16</span></div></div><div class="phtabs"><span><i>◷</i>Plan</span><span><i>▤</i>Days</span><span class="on"><i>✓</i>Book</span><span><i>◉</i>Today</span></div></div><div class="phhome"></div></div></div></div>
+    <div><div class="gl">The grid</div><div class="phholder"><div class="ph"><div class="phisland"></div><div class="phscreen"><div class="phstat"><span>9:41</span><span class="r"><span class="phsig"><i></i><i></i><i></i><i></i></span> <span style="font-size:13px;font-weight:700;">5G</span> <span class="phbatt"></span></span></div><div class="phnav"><div class="sub">Bled · solved just now</div><div class="ttl">Tue, May 19</div></div><div class="phbody"><div class="phrow"><span class="t">5:30</span><span class="v">Balloon (private) 🔒</span></div><div class="phrow"><span class="t">7:35</span><span class="v">Bled Castle — hike</span></div><div class="phrow"><span class="t">12:00</span><span class="v">Lunch · Rustika 📌</span></div><div class="phrow"><span class="t">4:00</span><span class="v">Via Ferrata 🔒</span></div><div class="phnote">Swipe → Wed 20 · one day per swipe.</div></div><div class="phtabs"><span><i>◷</i>Plan</span><span class="on"><i>▤</i>Days</span><span><i>✓</i>Book</span><span><i>◉</i>Today</span></div></div><div class="phhome"></div></div></div></div>
   </div>
 </section>
 
@@ -2071,7 +2058,6 @@ const TCUR=[
   {sel:".halves span.on",nth:0},                              // 34 Book tab
   {sheet:true},                                                 // 33 booking sheet
   {sel:".halves span.on",nth:0},                              // 36 Grid tab
-  null,                                                         // 35 phone
   {sheet:true},                                                 // 36 fork composer
   {f:"compare side by side"},                                   // 37 opens compare
   {f:"make B active"},                                          // 38 compare side by side
