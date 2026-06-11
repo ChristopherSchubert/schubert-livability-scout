@@ -15,6 +15,8 @@ import GatherPanel from "./trip/GatherPanel";
 import TripDndContext from "./trip/TripDndContext";
 import DayMap from "./trip/DayMap";
 import TransportSection from "./trip/TransportSection";
+import TripWindow from "./trip/TripWindow";
+import StaySection from "./trip/StaySection";
 import ErrorBoundary from "./trip/ErrorBoundary";
 import { tripDays } from "../lib/trip";
 
@@ -27,7 +29,7 @@ const newId = () =>
 
 export default function TripDetail({ id }) {
   const active = useTrip(id);
-  const { hydrated, saveState, updateEntry, removeEntry } = useTrips();
+  const { hydrated, saveState, updateEntry, removeEntry, updateTrip } = useTrips();
   const [editing, setEditing] = useState(null); // entry being edited (or a new draft)
   const [view, setView] = useState("agenda");
 
@@ -114,6 +116,8 @@ export default function TripDetail({ id }) {
           </button>
         </div>
 
+        <TripWindow trip={trip} onUpdate={(patch) => updateTrip(id, patch)} />
+
         <TripDndContext onDrop={handleDrop}>
           {view === "agenda" ? (
             <DayPlan
@@ -126,6 +130,8 @@ export default function TripDetail({ id }) {
             <GridView trip={trip} onEditEntry={setEditing} />
           )}
         </TripDndContext>
+
+        <StaySection trip={trip} onUpdate={(patch) => updateTrip(id, patch)} />
 
         <TransportSection trip={trip} onEditEntry={setEditing} />
 
