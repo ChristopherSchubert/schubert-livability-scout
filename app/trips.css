@@ -1,0 +1,248 @@
+/* Trip planner — design tokens + scaffolding (issue #16).
+   Extends the existing warm palette (app/globals.css) rather than inventing
+   beside it; values from features/trip-planner-components.md §2. The `.trip-ws`
+   namespace scopes everything so it never leaks into the rest of the app. */
+
+:root {
+  /* Entry-kind / category hues — text targeted ≥ WCAG AA 4.5:1 on --bg.
+     (Verify on real content per §2; these are the spec's targeted values.) */
+  --kind-booked: #0d4c44; /* activity / booked — product green */
+  --kind-activity: #0d4c44;
+  --kind-meal: #9a5a16; /* amber, darkened to clear AA */
+  --kind-travel: #2e5482; /* slate */
+  --kind-checkin: #665285; /* stay — plum, darkened */
+  --kind-stay: #665285;
+  --kind-todo: #7d5e22; /* errand — ochre */
+  --kind-errand: #7d5e22;
+  --kind-flexible: var(--muted);
+
+  --kind-booked-fill: #0d4c441f;
+  --kind-meal-fill: #9a5a161f;
+  --kind-travel-fill: #2e54821f;
+  --kind-stay-fill: #6652851f;
+  --kind-errand-fill: #7d5e221f;
+
+  --radius-tight: 6px;
+
+  /* Motion tokens, named from the observed values (§2). */
+  --motion-fast: 120ms ease-out;
+  --motion-base: 160ms ease-out;
+  --motion-color: 200ms ease;
+  --motion-expand: 280ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── workspace shell ─────────────────────────────────────────────────────── */
+.trip-ws {
+  font-family: var(--font-ui, "Inter Tight", system-ui, sans-serif);
+  color: var(--text);
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+.trip-ws h1,
+.trip-ws h2 {
+  font-family: var(--font-display, "Fraunces", Georgia, serif);
+  font-weight: 500;
+}
+.trip-ws-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+.trip-ws-sub {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+/* save-state pip (mirrors PlannerProvider saveState) */
+.trip-save {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+.trip-save[data-status="saving"] {
+  color: var(--kind-todo);
+}
+.trip-save[data-status="error"] {
+  color: #a8341f;
+}
+
+/* ── trips index cards ───────────────────────────────────────────────────── */
+.trip-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 0.85rem;
+}
+.trip-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius, 14px);
+  background: var(--panel, #fffdf6);
+  padding: 1rem;
+  transition:
+    box-shadow var(--motion-fast),
+    transform var(--motion-fast);
+}
+.trip-card:hover {
+  box-shadow: 0 6px 20px #0000000f;
+  transform: translateY(-1px);
+}
+.trip-card-dates {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+/* ── entry card (atom) ───────────────────────────────────────────────────── */
+.entry-card {
+  position: relative;
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--spine, var(--muted));
+  border-radius: var(--radius-tight);
+  background: var(--fill, transparent);
+  padding: 0.5rem 0.7rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+.entry-card[data-density="compact"] {
+  padding: 0.35rem 0.5rem;
+  font-size: 0.85rem;
+}
+.entry-card-title {
+  font-weight: 500;
+}
+.entry-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+/* ── chips: TimeChip, BookingBadge, MarkerSet ────────────────────────────── */
+.time-chip,
+.booking-badge,
+.marker-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  border-radius: 999px;
+  padding: 0.05rem 0.45rem;
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  border: 1px solid var(--border);
+  background: var(--panel-strong, #f4eddc);
+}
+.booking-badge[data-status="booked"] {
+  color: var(--kind-booked);
+  border-color: var(--kind-booked);
+}
+.booking-badge[data-status="toBook"] {
+  color: var(--kind-todo);
+  border-color: var(--kind-todo);
+}
+.marker-chip[data-attr="cashOnly"] {
+  color: var(--kind-todo);
+}
+.marker-chip[data-attr="prepaid"] {
+  color: var(--kind-booked);
+}
+.marker-uncited::after {
+  content: "·";
+  color: var(--muted);
+  opacity: 0.6;
+}
+.marker-set {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+/* ── agenda / day plan ───────────────────────────────────────────────────── */
+.day-section {
+  margin: 1rem 0;
+}
+.day-section-head {
+  font-family: var(--font-display, serif);
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.3rem;
+  margin-bottom: 0.5rem;
+}
+.day-bucket {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  margin: 0.5rem 0 0.25rem;
+}
+.day-flag {
+  background: #fbe7d8;
+  border: 1px solid var(--kind-todo);
+  color: #6a4a12;
+  border-radius: var(--radius-tight);
+  padding: 0.3rem 0.6rem;
+  font-size: 0.8rem;
+  margin: 0.4rem 0;
+}
+.entry-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+/* ── editor side sheet ───────────────────────────────────────────────────── */
+.entry-sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  background: #00000022;
+  z-index: 40;
+}
+.entry-sheet {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(440px, 92vw);
+  background: var(--panel, #fffdf6);
+  border-left: 1px solid var(--border);
+  box-shadow: -8px 0 30px #00000018;
+  z-index: 41;
+  overflow-y: auto;
+  padding: 1.2rem;
+  transition: transform var(--motion-expand);
+}
+.entry-sheet h2 {
+  margin-top: 0;
+}
+.entry-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  margin-bottom: 0.7rem;
+}
+.entry-field > span {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+.entry-field input,
+.entry-field select,
+.entry-field textarea {
+  font: inherit;
+  padding: 0.4rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-tight);
+  background: var(--bg, #fbf6ea);
+}
+.entry-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trip-card,
+  .entry-sheet {
+    transition: none;
+  }
+}

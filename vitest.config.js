@@ -6,6 +6,9 @@ import { defineConfig } from "vitest/config";
 // Coverage targets the domain engines the trip planner rests on (≥95%, #41);
 // React components/routes come online as they're built (#43).
 export default defineConfig({
+  // Automatic JSX runtime (React 19) so component tests don't need a React
+  // import in scope — matches how Next compiles JSX.
+  esbuild: { jsx: "automatic" },
   test: {
     environment: "node",
     globals: true,
