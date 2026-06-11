@@ -6,7 +6,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useTrip, useTrips } from "./TripProvider";
-import { markerUnion } from "../lib/trip";
+import { markerUnion, cashNeeded, reservationLedger } from "../lib/trip";
 import DayPlan from "./trip/DayPlan";
 import GridView from "./trip/GridView";
 import EntryEditor from "./trip/EntryEditor";
@@ -38,6 +38,12 @@ export default function TripDetail({ id }) {
 
   const trip = { ...active.trip, entries: active.entries };
   const markers = markerUnion(trip);
+  // a11y live region (#38): a one-line summary screen readers announce on change.
+  const cash =
+    Object.entries(cashNeeded(trip))
+      .map(([c, a]) => `${a} ${c}`)
+      .join(", ") || "none";
+  const liveSummary = `Trip ${trip.name || "untitled"}: ${trip.entries.length} entries, cash to carry ${cash}, ${reservationLedger(trip).length} reservations.`;
   // Lodging pin near the editor's place search = first leg's stay, if any.
   const near = (trip.legs || [])[0]?.lodging
     ? { lat: trip.legs[0].lodging.lat, lon: trip.legs[0].lodging.lon }
@@ -75,6 +81,9 @@ export default function TripDetail({ id }) {
   return (
     <ErrorBoundary>
       <div className="trip-ws">
+        <p className="sr-only" role="status" aria-live="polite">
+          {liveSummary}
+        </p>
         <div className="trip-ws-head">
           <div>
             <Link href="/trips" className="trip-ws-sub">
