@@ -78,3 +78,46 @@
 .ee-spacer { flex: 1; }
 .ee-danger { border: 1px solid #dcb49a; color: #a3431f; background: var(--panel); border-radius: 100px; padding: .35rem .9rem; cursor: pointer; }
 .ee-done { border: 1px solid var(--accent); background: var(--accent); color: #fff; border-radius: 100px; padding: .35rem 1.1rem; cursor: pointer; font-weight: 600; }
+
+/* Tab strip (Plan · Days · Book · Shelf · Grid) */
+.tw-tabs { display: flex; gap: 1.4rem; border-bottom: 1px solid var(--border); margin: 0 0 1.2rem; }
+.tw-tab { font-family: var(--font-ui); font-size: .82rem; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); background: none; border: 0; border-bottom: 2px solid transparent; padding: .5rem 0; cursor: pointer; display: inline-flex; align-items: center; gap: .4rem; }
+.tw-tab:hover { color: var(--text); }
+.tw-tab.on { color: var(--text); border-bottom-color: var(--accent); }
+.tw-badge { font-style: normal; font-size: .64rem; background: #fbf0e2; color: #8a5a16; border-radius: 100px; padding: 0 .4rem; }
+
+/* Plan tab: window + stays */
+.tw-sec-label { font-family: var(--font-ui); font-size: .68rem; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); margin: 1.1rem 0 .5rem; }
+.tw-plan .tw-sec-label:first-child { margin-top: 0; }
+.tw-stays { list-style: none; margin: 0; padding: 0; }
+.tw-stay { display: flex; align-items: baseline; gap: .8rem; padding: .5rem .2rem; border-bottom: 1px dashed var(--border); }
+.tw-stay b { font-family: var(--font-display); font-size: 1rem; flex: 0 0 9rem; }
+.tw-stay-h { margin-left: auto; font-size: .85rem; color: var(--text); }
+
+/* TripWindow — date ribbon + leg segments */
+.twn { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; background: var(--panel); }
+.twn-ribbon { display: grid; border-bottom: 1px solid var(--border); }
+.twn-cell { text-align: center; padding: .35rem .1rem; border-left: 1px solid var(--border); font-family: var(--font-ui); }
+.twn-cell:first-child { border-left: 0; }
+.twn-cell.we { background: #faf4e6; }
+.twn-mo { display: block; font-family: var(--font-display); font-style: italic; font-size: .64rem; color: var(--muted); height: .9em; }
+.twn-dow { display: block; font-size: .58rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+.twn-day { display: block; font-size: .9rem; font-variant-numeric: tabular-nums; font-weight: 600; }
+.twn-legs { display: grid; padding: .4rem .15rem; gap: 3px; min-height: 2rem; }
+.twn-leg { display: flex; align-items: center; justify-content: center; gap: .25rem; font-size: .76rem; font-weight: 600; color: #fff; background: var(--leg, var(--accent)); border-radius: 6px; padding: .2rem .4rem; white-space: nowrap; overflow: hidden; }
+.twn-leg small { font-weight: 400; opacity: .8; }
+
+/* Book tab */
+.bk { display: flex; flex-direction: column; gap: 1.6rem; }
+.bk-h { font-family: var(--font-display); font-size: 1.1rem; font-weight: 500; margin: 0 0 .3rem; display: flex; align-items: baseline; gap: .6rem; }
+.bk-big { font-size: 1.4rem; color: var(--accent); }
+.bk-count { font-family: var(--font-ui); font-size: .8rem; color: var(--muted); }
+.bk-note { color: var(--muted); font-size: .82rem; margin: 0; }
+.bk-ledger, .bk-passes { list-style: none; margin: .4rem 0 0; padding: 0; }
+.bk-row { display: flex; align-items: baseline; gap: 1rem; padding: .45rem .2rem; border-bottom: 1px dashed var(--border); font-size: .88rem; }
+.bk-row .bk-title { flex: 1; }
+.bk-row .bk-title em { font-style: normal; color: var(--muted); }
+.bk-deadline { color: #8a5a16; font-size: .78rem; }
+.bk-conf { font-family: var(--font-ui); font-size: .76rem; color: var(--muted); }
+.bk-passes li { padding: .3rem .2rem; border-bottom: 1px dashed var(--border); font-size: .9rem; }
+.tw-stub { color: var(--muted); font-style: italic; padding: 2rem .2rem; }
