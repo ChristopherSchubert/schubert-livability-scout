@@ -124,3 +124,22 @@
 
 .tw-add { font-family: var(--font-ui); font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--accent); background: none; border: 1px solid var(--border); border-radius: 100px; padding: .1rem .55rem; margin-left: .6rem; cursor: pointer; }
 .tw-add:hover { border-color: var(--accent); }
+
+/* GatherBucket — per-leg pois-cache suggestions */
+.tw-stay { flex-direction: column; align-items: stretch; gap: .5rem; }
+.tw-stay-top { display: flex; align-items: baseline; gap: .8rem; }
+.tw-stay-top b { font-family: var(--font-display); font-size: 1rem; flex: 0 0 9rem; }
+.tw-stay-top .tw-stay-h { margin-left: auto; }
+.gb-trigger { align-self: flex-start; font-family: var(--font-ui); font-size: .74rem; font-weight: 600; color: var(--accent); background: #e7f1ee; border: 1px solid #bcd8d0; border-radius: 100px; padding: .2rem .7rem; cursor: pointer; }
+.gb-trigger:disabled { color: var(--muted); background: var(--panel); border-color: var(--border); cursor: default; }
+.gb-trigger em { font-style: normal; color: var(--muted); }
+.gb-busy { color: var(--muted); font-size: .82rem; font-style: italic; margin: .3rem 0; }
+.gb-cards { display: flex; flex-wrap: wrap; gap: .55rem; margin: .2rem 0 .4rem; }
+.gb-card { flex: 1 1 200px; min-width: 200px; max-width: 280px; border: 1px solid var(--border); border-left: 3px solid var(--border); border-radius: 8px; background: var(--panel); padding: .5rem .6rem; display: flex; flex-direction: column; gap: .15rem; }
+.gb-card.cat-meal { border-left-color: #9a5a16; }
+.gb-card.cat-activity { border-left-color: #0d4c44; }
+.gb-card.cat-errand { border-left-color: #6b6358; }
+.gb-card b { font-weight: 600; font-size: .86rem; }
+.gb-card small { color: var(--muted); font-size: .72rem; }
+.gb-save { align-self: flex-start; margin-top: .25rem; font-size: .7rem; font-weight: 700; color: var(--accent); background: none; border: 1px solid var(--accent); border-radius: 100px; padding: .08rem .55rem; cursor: pointer; }
+.gb-save.done, .gb-save:disabled { color: var(--muted); border-color: var(--border); cursor: default; }

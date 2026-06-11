@@ -11,6 +11,7 @@ import { tripDays, entriesByDay, cashNeeded, bookingsLedger, MARKER_TYPES } from
 import EntryEditor from "./EntryEditor";
 import TripWindow from "./TripWindow";
 import BookView from "./BookView";
+import GatherBucket from "./GatherBucket";
 
 const TABS = ["Plan", "Days", "Book", "Shelf", "Grid"];
 const CAT_ICON = { travel: "🚆", meal: "🍴", activity: "🥾", stay: "🛏", errand: "🧾" };
@@ -104,9 +105,12 @@ export default function TripWorkspace({ tripId }) {
               const stay = trip.entries.find((e) => e.category === "stay" && (byDay[leg.arrive] || []).includes(e));
               return (
                 <li key={leg.cityId || leg.name} className="tw-stay">
-                  <b>{leg.name?.replace(/,.*$/, "")}</b>
-                  <span className="tw-meta">{leg.arrive} – {leg.depart}</span>
-                  <span className="tw-stay-h">{stay ? stay.title.replace(/^Check in\s*—?\s*/i, "") : "— no stay —"}</span>
+                  <div className="tw-stay-top">
+                    <b>{leg.name?.replace(/,.*$/, "")}</b>
+                    <span className="tw-meta">{leg.arrive} – {leg.depart}</span>
+                    <span className="tw-stay-h">{stay ? stay.title.replace(/^Check in\s*—?\s*/i, "") : "— no stay —"}</span>
+                  </div>
+                  <GatherBucket trip={trip} leg={leg} />
                 </li>
               );
             })}
