@@ -2,6 +2,13 @@
 
 > Status: **proposal — do not build yet.** Supersedes the single-format
 > hour-grid in [trip-itinerary.md](trip-itinerary.md). Produced with the
+>
+> ⚠️ **Stale class refs (2026-06-11):** this doc's `.trip-cal-*` "grid genes"
+> references point to the **removed** `TripCalendar.jsx` draft. The live grid
+> to reuse is the walkthrough deck's Grid (`.ggut` / `.gline` / `.gb` in
+> [public/mockups/trip-walkthrough.html](../public/mockups/trip-walkthrough.html));
+> the live swim-lane planner uses `.trip-pl-*`. Read `.trip-cal-*` below as
+> "the deck's grid scaffolding," not a live class.
 > `design-system` skill (audit → extend), grounded in five real trip artifacts
 > (Slovenia, New River Gorge, Gettysburg, Silverthorne, Jim Thorpe) **and** in
 > Livability Scout's existing tokens/components — so this *extends* the system
