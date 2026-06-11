@@ -9,6 +9,7 @@ import {
   transportDeepLinks,
   entriesByDay,
   tripDays,
+  legTzChanges,
   kindToV2,
   rowToTrip,
   tripToRow,
@@ -206,6 +207,25 @@ describe("tripDays", () => {
   });
   it("returns [] for an invalid range", () => {
     expect(tripDays({ startDate: "2026-05-20", endDate: "2026-05-18" })).toEqual([]);
+  });
+});
+
+describe("legTzChanges (timezone spike #37)", () => {
+  it("flags the leg-boundary day where the zone changes", () => {
+    const usTrip = {
+      startDate: "2026-09-01",
+      endDate: "2026-09-04",
+      legs: [
+        { name: "New York", arrive: "2026-09-01", depart: "2026-09-02", tz: "America/New_York" },
+        { name: "Denver", arrive: "2026-09-03", depart: "2026-09-04", tz: "America/Denver" },
+      ],
+    };
+    expect(legTzChanges(usTrip)).toEqual([
+      { date: "2026-09-03", from: "America/New_York", to: "America/Denver" },
+    ]);
+  });
+  it("returns [] for a single-zone trip (Slovenia)", () => {
+    expect(legTzChanges(trip)).toEqual([]);
   });
 });
 
