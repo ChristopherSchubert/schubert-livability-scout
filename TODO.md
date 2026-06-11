@@ -87,8 +87,9 @@ RI, Essex CT, Lewes DE, Litchfield CT, Mystic CT, New Castle DE, Newport
 RI, Northampton MA, Old Town Alexandria VA) got rewritten in the matching
 two-paragraph form (geography/fabric → case + honest tradeoff + "you'd
 be testing…"). All 78 candidate cities now sit in the 800–1600 char band;
-the remaining short whys belong to the 9 calibration/benchmark places
-(Pittsburgh-area controls + Slovenia originals), which is intentional.
+the remaining short whys belong to the 9 reference places (the owner's
+Pittsburgh-area home + familiar nearby towns, plus the Slovenia originals),
+which is intentional.
 
 ## 6. Repository design analysis
 

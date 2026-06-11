@@ -97,7 +97,7 @@ Grouped. The first group is the one conventional walkability scores miss and is 
 
 **Action:** get the owner to fill `your_ratings.csv` with as many places he's actually spent time in as possible (anywhere — US, Europe, places that did nothing, places that hit), each with a 0–10 "feeling" score. Target ≥ ~8–10 ratings before treating learned weights as meaningful; the script's leave-one-out R² will tell you when it's predictive. **Do not invent ratings on his behalf** — collect them.
 
-Also useful as controls (places with a known directional read, to sanity-check, not to fabricate): Sewickley, Oakmont, Verona, Allison Park (his own car-dependent suburb — should score low). Only include these if the owner confirms his reaction; otherwise leave them as unrated test rows.
+Also useful as reference places (familiar to the owner, with a known directional read to sanity-check against — not to fabricate): Sewickley, Oakmont, Verona, Allison Park (the owner's home). Only include these if the owner confirms his reaction; otherwise leave them as unrated test rows.
 
 ---
 

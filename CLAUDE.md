@@ -23,6 +23,18 @@ incident: Bled / Ljubljana / Piran). `osmMetrics()` in `lib/measure.js`
 rejects these now. Every new Overpass-backed measurer must do the same —
 real cities have streets; zero of those means the query lied.
 
+**Corollary 3 — no place is "set up to look bad."** Describe and measure
+every place by what it honestly is, never as a deliberate bad example. Ban
+this framing from code, docs, comments, and prose: "set up to look bad,"
+"low/bottom anchor," "calibration floor," "the unwalkable baseline,"
+"scores low by design," "the place to leave," "control." Allison Park is
+the **owner's home** and the familiar reference each candidate is compared
+against — its low walkable-POI count is the honest reading of a residential
+pin, not a designed feature and not a verdict on the place. Same rule for
+the other reference places (Pittsburgh-area + Slovenia): neutral,
+place-first language only. (2026-06-07: the owner pushed back hard on the
+"by design / low anchor" framing — do not reintroduce it.)
+
 ## ⛔ Overpass: local Docker only, no public fallback
 
 We run our own Overpass at `http://localhost:12345/api/interpreter` with
@@ -65,8 +77,11 @@ a pattern to copy.
    baselines on the Baseline tab. 5 felt axes ≪ 20 metrics on purpose:
    humans honestly distinguish a handful, not twenty. Machines do the rest.
 3. **Visit window** — `visitClimate` (NOAA normals), `crowdSeason`,
-   `seasonNotes`. `cityVisitWindow()` computes a **Charm** trip (comfortable
-   + crowds thinned) and a **Truth** trip (coldest month). Pass both.
+   `seasonNotes`. `cityVisitWindow()` computes a **Prime** trip (comfortable
+   weather, crowds thinned) and an **Off-season** trip (coldest month — the
+   January test made literal). Pass both. (Do **not** reintroduce the old
+   "Charm"/"Truth" names for these — the owner dislikes that wording;
+   2026-06-09.)
 
 ## App architecture (Next.js app router)
 

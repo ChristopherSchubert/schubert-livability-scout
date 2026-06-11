@@ -2,8 +2,10 @@
 
 The "always show the delta vs home" UX pattern from the mockup. Every
 metric and chart shows the candidate's number *alongside* Allison Park's,
-plus the difference. Allison Park is the owner's home — the calibration
-floor (its felt-Slovenia score sits at 0).
+plus the difference. Allison Park is the owner's home — the familiar
+reference every candidate is compared against. On the 0–10 Slovenia survey
+it sits at the "feels like home, not like a Slovenian lakeside town" end of
+the scale — the natural reference point, not a verdict on the place.
 
 The idea: a candidate's absolute number means little ("9 hours of January
 daylight") until you see what it actually feels like compared to a place
@@ -12,21 +14,22 @@ through the only ground truth the owner has.
 
 ## How it works today
 
-- **Allison Park as anchor**: defined as a baseline reference in
+- **Allison Park as the home reference**: defined as a baseline reference in
   [lib/planner-data.js](../lib/planner-data.js) (`baselineReferences`)
-  and used as the bottom anchor on the felt-score scale (value 0 on the
-  Slovenia survey, value 1 on the setting prospect label).
-- **Calibrate page** uses Allison Park's measured score as the floor of the
-  ranking.
+  and used as the home end of the felt-score scale (value 0 on the
+  Slovenia survey = "as familiar as home," value 1 on the setting prospect
+  label).
+- **Calibrate page** shows Allison Park's measured score as the home
+  reference line in the ranking.
 - **Baseline page** (`/baseline` →
   [components/Baseline.jsx](../components/Baseline.jsx)) lets the owner
   rate Allison Park (and the other reference places) from memory — this
-  is what makes it usable as a comparison anchor.
+  is what makes it usable as the home comparison reference.
 
 ## Status
 
-- **Felt-score anchor**: live. The Slovenia 0–10 survey treats Allison
-  Park as the floor.
+- **Felt-score home reference**: live. The Slovenia 0–10 survey anchors its
+  familiar-home end at Allison Park.
 - **"Delta vs Allison Park" visual pattern**: only in the mockup. The
   live city detail page does not show side-by-side or delta visuals.
 
