@@ -311,3 +311,18 @@
 .tw-grip:hover, .tw-grip:focus-visible { opacity: 1; color: var(--accent, #0d4c44); }
 .tw-grip:active { cursor: grabbing; }
 .tw-entry { user-select: none; }
+
+/* ── Days date rail + mobile "Today" focus (#35) ── */
+.tw-daynav { display: flex; gap: .4rem; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: .5rem; margin-bottom: .6rem; }
+.tw-daychip { flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; gap: .1rem; min-width: 2.7rem; border: 1px solid var(--border); background: var(--panel); border-radius: 9px; padding: .3rem .35rem; cursor: pointer; font-family: var(--font-ui); }
+.tw-daychip small { font-size: .74rem; font-variant-numeric: tabular-nums; color: var(--text); }
+.tw-daychip i { font-style: normal; font-size: .6rem; min-height: .7rem; color: var(--muted); }
+.tw-daychip.on { border-color: var(--accent); background: #e7f1ee; }
+.tw-daychip.on small { color: var(--accent); font-weight: 700; }
+.tw-daychip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* Desktop: the rail is a jump-nav; every day stays visible. Phone: focus one. */
+@media (max-width: 640px) {
+  .tw-daynav { position: sticky; top: var(--app-header-h, 0); z-index: 5; background: var(--bg); padding-top: .4rem; }
+  .tw-day:not(.focus) { display: none; }
+}

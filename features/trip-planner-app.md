@@ -141,3 +141,13 @@ a sortable item (the grip carries the listeners; the row body stays
 click-to-edit). Note: the Days agenda sorts timed entries by clock time, so
 drag-reorder is visible for untimed (bucket) entries; timed entries keep their
 chronological order by design.
+
+## Mobile day-focus / "Today" view (#35)
+
+The Days panel carries a horizontal **date rail** (one chip per day, with the
+day's entry count). On desktop it's a jump-nav — click a chip to smooth-scroll
+to that day; every day stays visible. On a phone (≤640px) the rail sticks under
+the header and the panel shows **one day at a time** (the deck's "Today" view):
+`.tw-day:not(.focus){display:none}`. Focus state is in-panel UI (`focusDay`),
+not navigation — defaults to the first day. Completes the responsive work #35
+began (the earlier commit shipped the responsive CSS for the other surfaces).

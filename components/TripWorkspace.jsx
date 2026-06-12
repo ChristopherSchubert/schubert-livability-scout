@@ -31,6 +31,10 @@ export default function TripWorkspace({ tripId, activeTab = "plan" }) {
   const tab = activeTab;
   const [editing, setEditing] = useState(null);
   const [solveMsg, setSolveMsg] = useState(null);
+  // Which day is in focus. On a phone the Days panel shows ONE day at a time
+  // (the deck's "Today" view, #35) chosen from the date rail; on desktop the
+  // rail is a jump-nav and every day stays visible. null → first day.
+  const [focusDay, setFocusDay] = useState(null);
 
   // Create a blank entry on a day, then open it in the editor (addEntry returns
   // the row with its server-generated id, so the editor can patch it).
@@ -141,10 +145,23 @@ export default function TripWorkspace({ tripId, activeTab = "plan" }) {
 
       {tab === "days" ? (
         <div className="tw-days">
+          <nav className="tw-daynav" aria-label="Jump to day">
+            {days.map((d) => {
+              const on = (focusDay || days[0]?.date) === d.date;
+              return (
+                <button key={d.date} className={`tw-daychip${on ? " on" : ""}`} aria-current={on ? "true" : undefined}
+                        onClick={() => { setFocusDay(d.date); document.getElementById(`day-${d.date}`)?.scrollIntoView({ behavior: "smooth", block: "start" }); }}>
+                  <small>{d.date.slice(5, 7)}/{d.date.slice(8)}</small>
+                  <i>{(byDay[d.date] || []).length || ""}</i>
+                </button>
+              );
+            })}
+          </nav>
           {days.map((d) => {
             const list = byDay[d.date] || [];
+            const focused = (focusDay || days[0]?.date) === d.date;
             return (
-              <section key={d.date} className="tw-day">
+              <section key={d.date} id={`day-${d.date}`} className={`tw-day${focused ? " focus" : ""}`}>
                 <div className="tw-day-head"><b>{d.date}</b>{d.legName ? <span className="tw-leg">{d.legName}</span> : null}<span className="tw-count">{list.length}</span>
                   <button className="tw-solve" onClick={() => solveOneDay(d.date)} title="Lay out this day on the clock" disabled={!list.length}>⚡ solve</button>
                   <button className="tw-add" onClick={() => addToDay(d.date)} title="Add an entry to this day">＋ add</button>
