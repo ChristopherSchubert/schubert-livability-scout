@@ -10,7 +10,8 @@
 -- writes via direct Postgres (the `postgres` role bypasses RLS), so the
 -- fetch-pois / measure scripts are unaffected. Idempotent.
 --
--- NOT YET APPLIED — apply via the pg/Keychain path used for 0016/0017.
+-- APPLIED 2026-06-12 (owner-approved). Verified: rls=true + one SELECT policy
+-- on each cache table; reads OK (18,390 pois); anon/authenticated writes denied.
 do $$
 declare t text;
 begin

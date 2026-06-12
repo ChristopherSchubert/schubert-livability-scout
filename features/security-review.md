@@ -27,9 +27,10 @@ Google re-fetch; poisoning → corrupted scores/suggestions.
 — enable RLS + a `select using (true)` policy (reads stay open; the data is
 public place/geocode data). No write policy → anon/authenticated writes are
 blocked. The measurement pipeline writes via the `postgres` role (bypasses RLS),
-so fetch-pois / measure scripts are unaffected. **Status: written, apply pending
-owner OK** (live-DB schema change — classifier-gated). Apply with the same
-pg/Keychain path used for 0016/0017.
+so fetch-pois / measure scripts are unaffected. **Status: ✅ APPLIED to
+production 2026-06-12** (owner-approved). Verified: all three cache tables show
+`rls=true` with exactly one `SELECT` policy; reads still return (18,390 pois
+rows); anon/authenticated writes are now denied (no write policy).
 
 ## Other checks — OK
 
@@ -48,7 +49,7 @@ pg/Keychain path used for 0016/0017.
   are ever added.
 
 ## Follow-ups
-- **Apply 0018** (the one open item).
+- ~~Apply 0018~~ ✅ applied 2026-06-12.
 - Add a periodic re-fetch guard so a (now-blocked) bad write can't silently
   persist.
 - Consider revoking the unused `TRUNCATE`/`REFERENCES` grants on the caches as
