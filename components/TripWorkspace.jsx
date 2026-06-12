@@ -1,11 +1,12 @@
 "use client";
 
-// The trip page (/trips/[id]) — the real v2 trip from trip_entries, with the
-// deck's tab IA: Plan · Days · Book · Shelf · Grid. Plan = the window + stays;
-// Days = the day-by-day agenda; Book = derived reservations/cash. Shelf/Grid
-// are stubs (Phase 1/2 follow-ups). Click any entry to edit in the EntryEditor.
-import { useEffect, useMemo, useState } from "react";
-import Link from "next/link";
+// The trip workspace body (/trips/[id]/[tab]) — the real v2 trip from
+// trip_entries. The deck's IA (Plan · Days · Book · Shelf · Grid · Map · Frame)
+// is URL-per-view: `activeTab` comes from the route, the top nav + sub-tabs live
+// in AppShell (see TripWorkspaceRoute), and this renders ONE panel. No in-page
+// tab state — switching views is navigation (project convention, #15). Click any
+// entry to edit in the EntryEditor.
+import { useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import { useTrips } from "./TripProvider";
 import { tripDays, entriesByDay, cashNeeded, bookingsLedger } from "../lib/trip";
@@ -19,7 +20,6 @@ import TripFrame from "./TripFrame";
 import { solveTripDay } from "../lib/solve-adapter";
 
 const TripMap = dynamic(() => import("./TripMapInner"), { ssr: false, loading: () => <p className="tw-stub">loading map…</p> });
-const TABS = ["Plan", "Days", "Book", "Shelf", "Grid", "Map", "Frame"];
 
 function money(map) {
   return Object.entries(map || {}).map(([c, n]) => `${c === "EUR" ? "€" : c + " "}${n}`).join(" · ") || "—";
@@ -42,13 +42,11 @@ function EntryRow({ e, onEdit }) {
   );
 }
 
-export default function TripWorkspace({ tripId }) {
-  const { active, hydrated, enterTrip, addEntry, updateEntry } = useTrips();
-  const [tab, setTab] = useState("Plan");
+export default function TripWorkspace({ tripId, activeTab = "plan" }) {
+  const { active, hydrated, addEntry, updateEntry } = useTrips();
+  const tab = activeTab;
   const [editing, setEditing] = useState(null);
   const [solveMsg, setSolveMsg] = useState(null);
-
-  useEffect(() => { if (tripId) enterTrip(tripId); }, [tripId]); // eslint-disable-line
 
   // Create a blank entry on a day, then open it in the editor (addEntry returns
   // the row with its server-generated id, so the editor can patch it).
@@ -96,15 +94,13 @@ export default function TripWorkspace({ tripId }) {
   const cash = useMemo(() => (trip ? cashNeeded(trip) : {}), [trip]);
   const bookings = useMemo(() => (trip ? bookingsLedger(trip) : []), [trip]);
 
-  if (!hydrated || !trip) {
-    return <main className="tw-wrap"><p className="tw-loading">{hydrated ? "Trip not found." : "Loading trip…"}</p></main>;
+  if (!trip) {
+    return <div className="tw-wrap"><p className="tw-loading">{hydrated ? "Trip not found." : "Loading trip…"}</p></div>;
   }
 
   return (
-    <main className="tw-wrap">
-      <header className="tw-head">
-        <p className="tw-crumb"><Link href="/trips">Trips</Link> ›</p>
-        <h1>{trip.name}</h1>
+    <div className="tw-wrap">
+      <div className="tw-summary">
         <p className="tw-meta">{trip.startDate} – {trip.endDate} · {trip.legs?.length || 0} legs · {trip.entries.length} entries</p>
         <div className="tw-frame">
           {(trip.travelers || []).map((t) => (
@@ -116,20 +112,10 @@ export default function TripWorkspace({ tripId }) {
           <span className="tw-cash">💶 cash needed: <b>{money(cash)}</b></span>
           <span className="tw-book">⏰ {bookings.length} with a deadline / confirmation</span>
         </div>
-      </header>
+      </div>
 
-      <nav className="tw-tabs" role="tablist" aria-label="Trip views">
-        {TABS.map((t) => (
-          <button key={t} className={`tw-tab${tab === t ? " on" : ""}`} onClick={() => setTab(t)}
-                  role="tab" aria-selected={tab === t} aria-controls="tw-panel">
-            {t}{t === "Book" && bookings.length ? <i className="tw-badge">{bookings.length}</i> : null}
-            {t === "Shelf" && pool.length ? <i className="tw-badge">{pool.length}</i> : null}
-          </button>
-        ))}
-      </nav>
-
-      <div id="tw-panel" role="tabpanel" tabIndex={-1}>
-      {tab === "Plan" ? (
+      <div id="tw-panel">
+      {tab === "plan" ? (
         <div className="tw-plan">
           <div className="tw-sec-label">The window</div>
           <TripWindow trip={trip} />
@@ -169,7 +155,7 @@ export default function TripWorkspace({ tripId }) {
         </div>
       ) : null}
 
-      {tab === "Days" ? (
+      {tab === "days" ? (
         <div className="tw-days">
           {days.map((d) => {
             const list = byDay[d.date] || [];
@@ -191,8 +177,8 @@ export default function TripWorkspace({ tripId }) {
         </div>
       ) : null}
 
-      {tab === "Book" ? <BookView trip={trip} /> : null}
-      {tab === "Shelf" ? (
+      {tab === "book" ? <BookView trip={trip} /> : null}
+      {tab === "shelf" ? (
         <div className="sh">
           <div className="tw-shelf-head">
             <p className="tw-sec-label">The shelf — gathered candidates, not yet on a day. Lay them out, or open to edit.</p>
@@ -218,12 +204,12 @@ export default function TripWorkspace({ tripId }) {
           )}
         </div>
       ) : null}
-      {tab === "Grid" ? <TripGrid trip={trip} onEdit={setEditing} /> : null}
-      {tab === "Map" ? <div className="tw-map"><TripMap trip={trip} /></div> : null}
-      {tab === "Frame" ? <TripFrame trip={trip} /> : null}
+      {tab === "grid" ? <TripGrid trip={trip} onEdit={setEditing} /> : null}
+      {tab === "map" ? <div className="tw-map"><TripMap trip={trip} /></div> : null}
+      {tab === "frame" ? <TripFrame trip={trip} /> : null}
       </div>
 
       {editing ? <EntryEditor tripId={tripId} entry={editing} onClose={() => setEditing(null)} /> : null}
-    </main>
+    </div>
   );
 }

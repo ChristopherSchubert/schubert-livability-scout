@@ -217,9 +217,6 @@
 /* ── Mobile / responsive (#35 — phone layouts for the trip surfaces) ── */
 @media (max-width: 640px) {
   .tw-wrap { padding: 1rem .8rem 4rem; }
-  .tw-head h1 { font-size: clamp(1.4rem, 7vw, 1.9rem); }
-  .tw-tabs { gap: .9rem; overflow-x: auto; -webkit-overflow-scrolling: touch; }
-  .tw-tab { white-space: nowrap; }
   .tw-rollups { gap: .6rem; flex-direction: column; }
   /* entry rows: let the title wrap, keep time + tags readable */
   .tw-entry { flex-wrap: wrap; }
@@ -251,9 +248,9 @@
 /* ── Print: the Grid is the printable artifact (#29). Drop all app chrome,
       let the grid fill the page, force the category colours through. ── */
 @media print {
-  .tw-tabs, .tw-frame, .tw-rollups, .tw-crumb, .tg-print { display: none !important; }
+  .sticky-header, .tw-summary, .tg-print { display: none !important; }
+  .canvas { margin: 0 !important; }
   .tw-wrap { padding: 0; max-width: none; }
-  .tw-head { margin-bottom: .4rem; border: none; }
   .tg-scroll { overflow: visible !important; }
   .tg { transform: none !important; }
   .tg-block, .tg-chip { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
@@ -302,3 +299,9 @@
 }
 #tw-panel:focus { outline: none; }
 .tw-entry[role="button"], .tw-flight[role="button"], .tw-stay-h[role="button"], .sh-title[role="button"] { cursor: pointer; }
+
+/* ── Trip workspace now lives inside AppShell (#15): summary band + trip
+      context strip name. The crumb/title moved to the AppShell context strip. ── */
+.tw-summary { border-bottom: 1px solid var(--border); padding-bottom: .8rem; margin-bottom: 1.1rem; }
+.tw-summary .tw-meta { margin-top: 0; }
+.trip-context-name { font-family: var(--font-display); font-weight: 500; border: none; background: none; padding: 0; }

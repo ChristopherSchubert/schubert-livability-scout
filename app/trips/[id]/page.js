@@ -1,6 +1,7 @@
-import TripWorkspace from "../../../components/TripWorkspace";
-export const metadata = { title: "Trip — Schubert Atlas" };
-export default async function TripPage({ params }) {
+import { redirect } from "next/navigation";
+// A bare /trips/[id] resolves to its first view — every trip view is its own
+// URL (project convention; no in-page tab state).
+export default async function TripIndexPage({ params }) {
   const { id } = await params;
-  return <TripWorkspace tripId={id} />;
+  redirect(`/trips/${id}/plan`);
 }

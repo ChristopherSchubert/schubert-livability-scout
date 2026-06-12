@@ -16,6 +16,7 @@ const NAV_MODES = [
   { id: "visited",  href: "/visited",  label: "Visited",  help: "Back from a trip, awaiting the survey.", stageId: "visited" },
   { id: "assessed", href: "/assessed", label: "Assessed", help: "Archive of verdicts you've made.", stageId: "assessed" },
   { id: "baseline", href: "/baseline", label: "Baseline", help: "Rate places you already know — the answer key.", stageId: null },
+  { id: "trips",    href: "/trips",    label: "Trips",    help: "Multi-city trips — plan, solve, book.", stageId: null },
 ];
 
 // Used by city context strip to know which workflow mode owns each stage.
@@ -97,8 +98,9 @@ export function modeForCity(cityItem) {
 // `activeMode` is the top-nav prop ("board" | "planning" | "planned" |
 // "visited" | "assessed" | "baseline"). We still accept the older
 // `activeStage` name from existing callers and treat it the same way.
-export default function AppShell({ activeMode, activeStage, cityItem, cityNav, children }) {
+export default function AppShell({ activeMode, activeStage, cityItem, cityNav, tripItem, tripNav, children }) {
   const mode = activeMode || activeStage;
+  const hasContext = !!(cityItem || tripItem);
   const headerRef = useRef(null);
   const [condensed, setCondensed] = useState(false);
 
@@ -154,12 +156,13 @@ export default function AppShell({ activeMode, activeStage, cityItem, cityNav, c
           city pages; `nav-condensed` hides the brand row on scroll-down. */}
       <div
         ref={headerRef}
-        className={`sticky-header${cityItem ? " has-city" : ""}${condensed ? " nav-condensed" : ""}`}
+        className={`sticky-header${cityItem ? " has-city" : ""}${tripItem ? " has-trip" : ""}${condensed ? " nav-condensed" : ""}`}
       >
         <TopBar activeMode={mode} />
         {cityItem ? <CityContextStrip cityItem={cityItem} cityNav={cityNav} /> : null}
+        {tripItem ? <TripContextStrip tripItem={tripItem} tripNav={tripNav} /> : null}
       </div>
-      <main className={`canvas${cityItem ? " has-context" : ""}`}>{children}</main>
+      <main className={`canvas${hasContext ? " has-context" : ""}`}>{children}</main>
     </div>
   );
 }
@@ -304,6 +307,51 @@ function CityContextStrip({ cityItem, cityNav }) {
       ) : null}
     </div>
   );
+}
+
+// Trip context strip — the per-trip sub-nav, parallel to CityContextStrip but
+// for /trips/[id]/*. Back arrow → the trips index, the trip name, then the
+// Plan·Days·Book·Shelf·Grid·Map·Frame sub-tabs (each its own URL). Reuses the
+// city-context CSS so the chrome matches the rest of the app.
+function TripContextStrip({ tripItem, tripNav }) {
+  const navRef = useRef(null);
+  useTabNav(navRef, ".city-context-tab.active", tripNav);
+  return (
+    <div className="city-context stage-board trip-context">
+      <div className="city-context-left">
+        <Link href="/trips" className="city-context-back" aria-label="All trips">←</Link>
+        <div className="city-context-text">
+          <span className="city-context-stage">Trip</span>
+          <span className="city-context-name trip-context-name">{tripItem.name || "Untitled trip"}</span>
+        </div>
+      </div>
+      {tripNav?.length ? (
+        <nav className="city-context-nav" ref={navRef} aria-label="Trip views">
+          {tripNav.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`city-context-tab${item.active ? " active" : ""}`}
+              aria-current={item.active ? "page" : undefined}
+            >
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+      ) : null}
+    </div>
+  );
+}
+
+// The five-from-the-deck plus the Map + Frame surfaces, each a real URL.
+export const TRIP_TABS = ["plan", "days", "book", "shelf", "grid", "map", "frame"];
+export function defaultTripNav(trip, active) {
+  const label = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+  return TRIP_TABS.map((slug) => ({
+    href: `/trips/${trip.id}/${slug}`,
+    label: label(slug),
+    active: active === slug,
+  }));
 }
 
 export function defaultCityNav(cityItem, activeMode) {

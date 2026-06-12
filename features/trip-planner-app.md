@@ -100,3 +100,29 @@ Four panels, all from `lib/trip-frame.js` (pure, unit-tested in
   (Google Places cache, hand-entered costs, booking records, NOAA when fetched).
 
 `components/TripFrame.jsx` renders it; `markerUnion()` powers the marker strip.
+
+## AppShell integration + URL-per-view (#15)
+
+The workspace is no longer a standalone island — it's a first-class app mode.
+`AppShell` gained a **Trips** entry in `NAV_MODES` and a `TripContextStrip`
+(parallel to `CityContextStrip`): back-arrow → `/trips`, the trip name, then the
+Plan·Days·Book·Shelf·Grid·Map·Frame sub-tabs. Every view is its own URL
+(`/trips/[id]/[tab]`); there is **no in-page tab state** — switching views is
+navigation (project convention).
+
+- `app/trips/[id]/[tab]/page.js` — one-line RSC, validates `tab`, renders
+  `<TripWorkspaceRoute id activeTab>`. `app/trips/[id]/page.js` redirects to
+  `…/plan`.
+- `components/TripWorkspaceRoute.jsx` — `"use client"`: reads the trip from
+  `useTrips()`, handles loading/not-found, wraps `<TripWorkspace>` in
+  `<AppShell activeMode="trips" tripItem tripNav={defaultTripNav(...)}>`.
+- `TripWorkspace` is now panel-only: takes `activeTab`, renders one panel + a
+  compact summary band (no nav, no nested `<main>`).
+- `defaultTripNav(trip, active)` / `TRIP_TABS` live in `AppShell` for the strip;
+  the server route defines its own `TRIP_TABS` (importing a plain value from a
+  `"use client"` module into a server component yields a client-ref proxy, not
+  the array — a real gotcha hit during the build).
+
+Verified in-browser: Trips highlights in the top nav, the strip shows the
+active sub-tab, sub-tab clicks change the URL and panel without losing the
+loaded trip, and bare `/trips/[id]` redirects to `…/plan`.
