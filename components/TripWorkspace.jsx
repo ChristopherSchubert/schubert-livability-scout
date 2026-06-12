@@ -27,7 +27,9 @@ function money(map) {
 
 function EntryRow({ e, onEdit }) {
   return (
-    <li className={`tw-entry cat-${e.category || "activity"}`} onClick={() => onEdit(e)} title="Edit entry">
+    <li className={`tw-entry cat-${e.category || "activity"}`} onClick={() => onEdit(e)}
+        role="button" tabIndex={0} aria-label={`Edit ${e.title || "entry"}`} title="Edit entry"
+        onKeyDown={(ev) => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); onEdit(e); } }}>
       <TimeChip entry={e} />
       <CatIcon cat={e.category} />
       <span className="tw-title">{e.title}{e.place ? <em className="tw-place"> · {e.place.name}</em> : null}</span>
@@ -116,15 +118,17 @@ export default function TripWorkspace({ tripId }) {
         </div>
       </header>
 
-      <nav className="tw-tabs">
+      <nav className="tw-tabs" role="tablist" aria-label="Trip views">
         {TABS.map((t) => (
-          <button key={t} className={`tw-tab${tab === t ? " on" : ""}`} onClick={() => setTab(t)}>
+          <button key={t} className={`tw-tab${tab === t ? " on" : ""}`} onClick={() => setTab(t)}
+                  role="tab" aria-selected={tab === t} aria-controls="tw-panel">
             {t}{t === "Book" && bookings.length ? <i className="tw-badge">{bookings.length}</i> : null}
             {t === "Shelf" && pool.length ? <i className="tw-badge">{pool.length}</i> : null}
           </button>
         ))}
       </nav>
 
+      <div id="tw-panel" role="tabpanel" tabIndex={-1}>
       {tab === "Plan" ? (
         <div className="tw-plan">
           <div className="tw-sec-label">The window</div>
@@ -132,7 +136,9 @@ export default function TripWorkspace({ tripId }) {
           <div className="tw-sec-label">Flights &amp; transport</div>
           <ul className="tw-stays">
             {flights.map((e) => (
-              <li key={e.id} className="tw-flight" onClick={() => setEditing(e)}>
+              <li key={e.id} className="tw-flight" onClick={() => setEditing(e)}
+                  role="button" tabIndex={0} aria-label={`Edit ${e.title}`}
+                  onKeyDown={(ev) => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); setEditing(e); } }}>
                 <span className="tw-ico">✈</span>
                 <b>{e.title}</b>
                 <span className="tw-meta">{e.day}{e.time?.start ? ` · ${e.time.start}` : ""}</span>
@@ -150,7 +156,9 @@ export default function TripWorkspace({ tripId }) {
                   <div className="tw-stay-top">
                     <b>{leg.name?.replace(/,.*$/, "")}</b>
                     <span className="tw-meta">{leg.arrive} – {leg.depart}</span>
-                    <span className="tw-stay-h tw-clickable" onClick={() => (stay ? setEditing(stay) : addStay(leg))}>
+                    <span className="tw-stay-h tw-clickable" onClick={() => (stay ? setEditing(stay) : addStay(leg))}
+                          role="button" tabIndex={0} aria-label={stay ? `Edit stay ${stay.title}` : `Add stay in ${leg.name}`}
+                          onKeyDown={(ev) => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); stay ? setEditing(stay) : addStay(leg); } }}>
                       {stay ? stay.title.replace(/^Check in\s*—?\s*/i, "") : "＋ add stay"}</span>
                   </div>
                   <GatherBucket trip={trip} leg={leg} />
@@ -170,7 +178,7 @@ export default function TripWorkspace({ tripId }) {
                 <div className="tw-day-head"><b>{d.date}</b>{d.legName ? <span className="tw-leg">{d.legName}</span> : null}<span className="tw-count">{list.length}</span>
                   <button className="tw-solve" onClick={() => solveOneDay(d.date)} title="Lay out this day on the clock" disabled={!list.length}>⚡ solve</button>
                   <button className="tw-add" onClick={() => addToDay(d.date)} title="Add an entry to this day">＋ add</button>
-                  {solveMsg && solveMsg.date === d.date ? <span className="tw-solvemsg">laid out {solveMsg.placed}{solveMsg.flags.length ? ` · ${solveMsg.flags.length} flag(s)` : " · fits"}</span> : null}</div>
+                  {solveMsg && solveMsg.date === d.date ? <span className="tw-solvemsg" role="status" aria-live="polite">laid out {solveMsg.placed}{solveMsg.flags.length ? ` · ${solveMsg.flags.length} flag(s)` : " · fits"}</span> : null}</div>
                 {solveMsg && solveMsg.date === d.date && solveMsg.flags.length ? (
                   <ul className="tw-flags">{solveMsg.flags.map((f, i) => <li key={i}>⚠ {f}</li>)}</ul>
                 ) : null}
@@ -195,7 +203,9 @@ export default function TripWorkspace({ tripId }) {
               {pool.map((e) => (
                 <li key={e.id} className={`sh-item cat-${e.category || "activity"}`}>
                   <span className="tw-ico">{CAT_ICON[e.category] || "•"}</span>
-                  <span className="sh-title" onClick={() => setEditing(e)}>{e.title}{e.place ? <em> · {e.place.name}</em> : null}</span>
+                  <span className="sh-title" onClick={() => setEditing(e)}
+                        role="button" tabIndex={0} aria-label={`Edit ${e.title}`}
+                        onKeyDown={(ev) => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); setEditing(e); } }}>{e.title}{e.place ? <em> · {e.place.name}</em> : null}</span>
                   <span className="sh-actions">
                     {days.map((d) => (
                       <button key={d.date} className="sh-place" title={`Place on ${d.date}`}
@@ -211,6 +221,7 @@ export default function TripWorkspace({ tripId }) {
       {tab === "Grid" ? <TripGrid trip={trip} onEdit={setEditing} /> : null}
       {tab === "Map" ? <div className="tw-map"><TripMap trip={trip} /></div> : null}
       {tab === "Frame" ? <TripFrame trip={trip} /> : null}
+      </div>
 
       {editing ? <EntryEditor tripId={tripId} entry={editing} onClose={() => setEditing(null)} /> : null}
     </main>

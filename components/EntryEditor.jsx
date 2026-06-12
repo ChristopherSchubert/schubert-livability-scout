@@ -19,6 +19,12 @@ export default function EntryEditor({ tripId, entry, onClose }) {
 
   useEffect(() => { setDraft(entry); }, [entry.id]); // eslint-disable-line
   useEffect(() => { firstRef.current?.focus(); }, []);
+  // Escape closes the sheet (WCAG: dismissible without the mouse). #38
+  useEffect(() => {
+    const onKey = (e) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
 
   // Patch the draft locally + push a debounced write (id-keyed) to Supabase.
   function patch(fields) {
@@ -58,7 +64,7 @@ export default function EntryEditor({ tripId, entry, onClose }) {
   const t = draft.time || {};
   return (
     <div className="ee-scrim" onClick={onClose}>
-      <aside className="ee-sheet" onClick={(e) => e.stopPropagation()} role="dialog" aria-label="Edit entry">
+      <aside className="ee-sheet" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-label="Edit entry">
         <header className="ee-head">
           <input ref={firstRef} className="ee-title" value={draft.title || ""} placeholder="Untitled"
                  onChange={(e) => patch({ title: e.target.value })} />

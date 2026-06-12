@@ -293,3 +293,12 @@
 .tf-src-note { color: var(--ink-soft, #9a948a); }
 .tf-footnote { margin: .9rem 0 0; font-size: .76rem; font-style: italic; color: var(--ink-soft, #9a948a); }
 @media (max-width: 640px) { .tf { grid-template-columns: 1fr; } }
+
+/* ── Accessibility (#38): visible keyboard focus on the interactive rows ── */
+.tw-entry:focus-visible, .tw-flight:focus-visible, .tw-stay-h:focus-visible,
+.sh-title:focus-visible, .tw-tab:focus-visible, .tf-box:focus-visible,
+.tg-block:focus-visible, .tg-chip:focus-visible {
+  outline: 2px solid var(--accent, #0d4c44); outline-offset: 2px; border-radius: 4px;
+}
+#tw-panel:focus { outline: none; }
+.tw-entry[role="button"], .tw-flight[role="button"], .tw-stay-h[role="button"], .sh-title[role="button"] { cursor: pointer; }
