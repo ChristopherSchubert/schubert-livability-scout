@@ -305,3 +305,9 @@
 .tw-summary { border-bottom: 1px solid var(--border); padding-bottom: .8rem; margin-bottom: 1.1rem; }
 .tw-summary .tw-meta { margin-top: 0; }
 .trip-context-name { font-family: var(--font-display); font-weight: 500; border: none; background: none; padding: 0; }
+
+/* ── Drag-to-reorder grip (#17, @dnd-kit) ── */
+.tw-grip { border: none; background: none; cursor: grab; color: var(--muted, #9a948a); font-size: 1rem; line-height: 1; padding: 0 .3rem 0 0; touch-action: none; opacity: .5; align-self: center; }
+.tw-grip:hover, .tw-grip:focus-visible { opacity: 1; color: var(--accent, #0d4c44); }
+.tw-grip:active { cursor: grabbing; }
+.tw-entry { user-select: none; }

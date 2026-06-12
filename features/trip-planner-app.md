@@ -126,3 +126,18 @@ navigation (project convention).
 Verified in-browser: Trips highlights in the top nav, the strip shows the
 active sub-tab, sub-tab clicks change the URL and panel without losing the
 loaded trip, and bare `/trips/[id]` redirects to `…/plan`.
+
+## Drag-to-reorder (#17, @dnd-kit)
+
+The drag foundation the epic locked on @dnd-kit. Within a day, drag an entry's
+grip (⠿) to reorder it; the order persists via `TripProvider.reorder` →
+`reorderEntries` (sort = index). `components/DayEntries.jsx` wraps the day's
+list in a `DndContext` + `SortableContext` with **two sensors**: a PointerSensor
+(mouse/touch, 4px activation so a plain click still opens the editor) and a
+**KeyboardSensor** (Tab to the grip, Space to lift, arrows to move, Space to
+drop) — the latter also delivers the keyboard drag the a11y pass (#38) deferred.
+`EntryRow` was extracted to its own module so it renders both statically and as
+a sortable item (the grip carries the listeners; the row body stays
+click-to-edit). Note: the Days agenda sorts timed entries by clock time, so
+drag-reorder is visible for untimed (bucket) entries; timed entries keep their
+chronological order by design.

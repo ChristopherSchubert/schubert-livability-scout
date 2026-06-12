@@ -10,7 +10,8 @@ import { useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import { useTrips } from "./TripProvider";
 import { tripDays, entriesByDay, cashNeeded, bookingsLedger } from "../lib/trip";
-import { CAT_ICON, CatIcon, TimeChip, BookingBadge, CostTag, MarkerSet, entryTimeText } from "./atoms";
+import { CAT_ICON } from "./atoms";
+import DayEntries from "./DayEntries";
 import EntryEditor from "./EntryEditor";
 import TripWindow from "./TripWindow";
 import BookView from "./BookView";
@@ -25,25 +26,8 @@ function money(map) {
   return Object.entries(map || {}).map(([c, n]) => `${c === "EUR" ? "€" : c + " "}${n}`).join(" · ") || "—";
 }
 
-function EntryRow({ e, onEdit }) {
-  return (
-    <li className={`tw-entry cat-${e.category || "activity"}`} onClick={() => onEdit(e)}
-        role="button" tabIndex={0} aria-label={`Edit ${e.title || "entry"}`} title="Edit entry"
-        onKeyDown={(ev) => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); onEdit(e); } }}>
-      <TimeChip entry={e} />
-      <CatIcon cat={e.category} />
-      <span className="tw-title">{e.title}{e.place ? <em className="tw-place"> · {e.place.name}</em> : null}</span>
-      <span className="tw-tags">
-        <BookingBadge status={e.status} />
-        <CostTag cost={e.cost} />
-        <MarkerSet markers={e.markers} />
-      </span>
-    </li>
-  );
-}
-
 export default function TripWorkspace({ tripId, activeTab = "plan" }) {
-  const { active, hydrated, addEntry, updateEntry } = useTrips();
+  const { active, hydrated, addEntry, updateEntry, reorder } = useTrips();
   const tab = activeTab;
   const [editing, setEditing] = useState(null);
   const [solveMsg, setSolveMsg] = useState(null);
@@ -169,7 +153,7 @@ export default function TripWorkspace({ tripId, activeTab = "plan" }) {
                   <ul className="tw-flags">{solveMsg.flags.map((f, i) => <li key={i}>⚠ {f}</li>)}</ul>
                 ) : null}
                 {list.length === 0 ? <p className="tw-empty">— open day —</p> : (
-                  <ul className="tw-entries">{list.map((e) => <EntryRow key={e.id} e={e} onEdit={setEditing} />)}</ul>
+                  <DayEntries tripId={tripId} day={d.date} list={list} onEdit={setEditing} onReorder={reorder} />
                 )}
               </section>
             );
