@@ -62,9 +62,11 @@ export default function GatherBucket({ trip, leg }) {
 
   async function save(p) {
     setSaved((s) => ({ ...s, [p.place_id]: "saving" }));
+    // Saved candidates land UNDATED on the Shelf (the pool) — gather first,
+    // lay out onto days later (Solve / place). The deck's Gather → Lay out flow.
     const e = await addEntry(trip.id, {
-      day: leg.arrive, role: "anchor", category: catFor(p.primary_type), status: "none",
-      title: p.name, time: { mode: "bucket", bucket: "flex" },
+      day: null, role: "anchor", category: catFor(p.primary_type), status: "none",
+      title: p.name, time: { mode: "bucket", bucket: "flex" }, legHint: leg.cityId || null,
       place: { placeId: p.place_id, name: p.name, lat: p.lat, lon: p.lon },
     });
     setSaved((s) => ({ ...s, [p.place_id]: e ? "saved" : "err" }));

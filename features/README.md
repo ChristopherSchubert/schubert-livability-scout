@@ -54,6 +54,7 @@ The deck's design stack (specs feeding the canonical mockup):
 
 | Doc | Role | Status |
 |---|---|---|
+| [trip-planner-app.md](trip-planner-app.md) | **The live /trips feature** — Plan·Days·Book·Shelf·Grid + Solve, on real data | shipped 2026-06-11 |
 | [trip-walkthrough-review.md](trip-walkthrough-review.md) | State doc for the 44-slide deck + **Janice's 2026-06-11 review feedback (triaged)** | canonical |
 | [trip-planner-ux.md](trip-planner-ux.md) | UX / IA / navigation (the Plan·Shelf·Days·Book·Grid mental model) | spec |
 | [trip-planner-components.md](trip-planner-components.md) | Component system; **supersedes** trip-itinerary.md | spec — do not build yet |

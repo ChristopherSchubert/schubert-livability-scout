@@ -84,6 +84,7 @@ export default function TripWorkspace({ tripId }) {
   const trip = active && active.id === tripId ? active : null;
   const days = useMemo(() => (trip ? tripDays(trip) : []), [trip]);
   const byDay = useMemo(() => (trip ? entriesByDay(trip) : {}), [trip]);
+  const pool = useMemo(() => (trip ? trip.entries.filter((e) => !e.day) : []), [trip]);
   const cash = useMemo(() => (trip ? cashNeeded(trip) : {}), [trip]);
   const bookings = useMemo(() => (trip ? bookingsLedger(trip) : []), [trip]);
 
@@ -113,6 +114,7 @@ export default function TripWorkspace({ tripId }) {
         {TABS.map((t) => (
           <button key={t} className={`tw-tab${tab === t ? " on" : ""}`} onClick={() => setTab(t)}>
             {t}{t === "Book" && bookings.length ? <i className="tw-badge">{bookings.length}</i> : null}
+            {t === "Shelf" && pool.length ? <i className="tw-badge">{pool.length}</i> : null}
           </button>
         ))}
       </nav>
@@ -160,7 +162,27 @@ export default function TripWorkspace({ tripId }) {
       ) : null}
 
       {tab === "Book" ? <BookView trip={trip} /> : null}
-      {tab === "Shelf" ? <p className="tw-stub">Shelf — the trip-wide pool + alternates. Coming next (#26).</p> : null}
+      {tab === "Shelf" ? (
+        <div className="sh">
+          <p className="tw-sec-label">The shelf — gathered candidates, not yet on a day. Lay them out, or open to edit.</p>
+          {pool.length === 0 ? <p className="tw-stub">Nothing on the shelf. Gather suggestions on the Plan tab.</p> : (
+            <ul className="sh-list">
+              {pool.map((e) => (
+                <li key={e.id} className={`sh-item cat-${e.category || "activity"}`}>
+                  <span className="tw-ico">{CAT_ICON[e.category] || "•"}</span>
+                  <span className="sh-title" onClick={() => setEditing(e)}>{e.title}{e.place ? <em> · {e.place.name}</em> : null}</span>
+                  <span className="sh-actions">
+                    {days.map((d) => (
+                      <button key={d.date} className="sh-place" title={`Place on ${d.date}`}
+                              onClick={() => updateEntry(trip.id, { ...e, day: d.date })}>{d.date.slice(5)}</button>
+                    ))}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      ) : null}
       {tab === "Grid" ? <TripGrid trip={trip} onEdit={setEditing} /> : null}
 
       {editing ? <EntryEditor tripId={tripId} entry={editing} onClose={() => setEditing(null)} /> : null}

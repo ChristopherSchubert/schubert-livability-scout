@@ -190,3 +190,16 @@
 .tw-solve { font-family: var(--font-ui); font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: #8a5a16; background: #fbf0e2; border: 1px solid #dcc49a; border-radius: 100px; padding: .1rem .55rem; margin-left: .6rem; cursor: pointer; }
 .tw-solve:disabled { opacity: .4; cursor: default; }
 .tw-solvemsg { margin-left: .5rem; font-family: var(--font-ui); font-size: .72rem; color: var(--accent); }
+
+/* Shelf — the gathered pool */
+.sh-list { list-style: none; margin: .6rem 0 0; padding: 0; }
+.sh-item { display: flex; align-items: center; gap: .55rem; padding: .5rem .4rem; border-bottom: 1px dashed var(--border); border-left: 3px solid var(--border); }
+.sh-item.cat-meal { border-left-color: #9a5a16; }
+.sh-item.cat-activity { border-left-color: #0d4c44; }
+.sh-item.cat-errand { border-left-color: #6b6358; }
+.sh-title { flex: 1; font-size: .9rem; cursor: pointer; }
+.sh-title:hover { color: var(--accent); }
+.sh-title em { font-style: normal; color: var(--muted); font-size: .8rem; }
+.sh-actions { display: flex; flex-wrap: wrap; gap: .25rem; }
+.sh-place { font-family: var(--font-ui); font-size: .66rem; font-variant-numeric: tabular-nums; color: var(--accent); background: #e7f1ee; border: 1px solid #bcd8d0; border-radius: 6px; padding: .08rem .35rem; cursor: pointer; }
+.sh-place:hover { background: var(--accent); color: #fff; }
