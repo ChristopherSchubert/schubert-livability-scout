@@ -47,8 +47,10 @@ Two separate things share the "trip" name; don't conflate them:
   experience for a trip you've committed to (sourcing → solve → book). The
   **canonical artifact is the walkthrough deck**
   ([public/mockups/trip-walkthrough.html](../public/mockups/trip-walkthrough.html));
-  build against it, not the older standalone mockups. UI is still mockup;
-  the engines (`lib/solve.js` · `lib/sourcing.js` · `lib/trip.js`) are real.
+  build against it, not the older standalone mockups. **Now built and live at
+  `/trips`** — see [trip-planner-app.md](trip-planner-app.md) (the core flow:
+  create → gather → solve → Days/Grid → Book). Engines `lib/solve.js` ·
+  `lib/sourcing.js` · `lib/trip.js` are real.
 
 The deck's design stack (specs feeding the canonical mockup):
 
