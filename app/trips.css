@@ -103,7 +103,12 @@
 .twn-mo { display: block; font-family: var(--font-display); font-style: italic; font-size: .64rem; color: var(--muted); height: .9em; }
 .twn-dow { display: block; font-size: .58rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
 .twn-day { display: block; font-size: .9rem; font-variant-numeric: tabular-nums; font-weight: 600; }
-.twn-legs { display: grid; padding: .4rem .15rem; gap: 3px; min-height: 2rem; }
+.twn-legs { display: grid; padding: .4rem .15rem; gap: 3px; min-height: 2rem; position: relative; }
+/* Draggable leg boundary (#22): a thin grip on the grid line between two legs */
+.twn-bound { position: absolute; top: .2rem; bottom: .2rem; width: 16px; transform: translateX(-50%); background: none; border: none; padding: 0; cursor: ew-resize; z-index: 4; display: flex; align-items: center; justify-content: center; touch-action: none; }
+.twn-bound-grip { width: 3px; height: 70%; background: var(--text); border-radius: 2px; opacity: .35; transition: opacity .12s, background .12s; }
+.twn-bound:hover .twn-bound-grip, .twn-bound.dragging .twn-bound-grip, .twn-bound:focus-visible .twn-bound-grip { opacity: .95; background: var(--accent); width: 4px; }
+.twn-bound:focus-visible { outline: none; }
 .twn-leg { display: flex; align-items: center; justify-content: center; gap: .25rem; font-size: .76rem; font-weight: 600; color: #fff; background: var(--leg, var(--accent)); border-radius: 6px; padding: .2rem .4rem; white-space: nowrap; overflow: hidden; }
 .twn-leg small { font-weight: 400; opacity: .8; }
 

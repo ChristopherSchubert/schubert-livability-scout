@@ -151,3 +151,20 @@ the header and the panel shows **one day at a time** (the deck's "Today" view):
 `.tw-day:not(.focus){display:none}`. Focus state is in-panel UI (`focusDay`),
 not navigation — defaults to the first day. Completes the responsive work #35
 began (the earlier commit shipped the responsive CSS for the other surfaces).
+
+## TripWindow — draggable leg boundaries (#22)
+
+The Plan tab's calendar strip is now interactive. The boundary between two
+date-adjacent legs is a draggable handle (`components/TripWindow.jsx`): drag it
+(PointerSensor, 3px activation) or focus it and press ←/→ to move days from one
+leg to its neighbour. The trip's start/end stay fixed and only the two touching
+legs change `arrive`/`depart` — **no cascade**. Moves snap to whole days
+(1 cell = 1 day, measured off the legs-row width) and clamp so neither leg drops
+below one day. A live preview re-renders the segments during the drag;
+`onDragEnd` (or the arrow nudge) persists the adjusted `legs` via
+`TripProvider.updateTripFrame`. Unblocks #34 (variations over a forked range).
+
+Verified in-browser on the Slovenia trip: 2 handles between Ljubljana/Bled/Piran;
+a pointer drag previewed then committed Bled 4n→6n / Piran 5n→3n; the keyboard
+nudge moved one day and clamped Ljubljana at its 1-day floor; reload confirmed
+the canonical trip untouched (the dev user can't write — RLS owner-only).
