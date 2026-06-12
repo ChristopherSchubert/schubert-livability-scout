@@ -12,6 +12,7 @@ import EntryEditor from "./EntryEditor";
 import TripWindow from "./TripWindow";
 import BookView from "./BookView";
 import GatherBucket from "./GatherBucket";
+import TripGrid from "./TripGrid";
 
 const TABS = ["Plan", "Days", "Book", "Shelf", "Grid"];
 const CAT_ICON = { travel: "🚆", meal: "🍴", activity: "🥾", stay: "🛏", errand: "🧾" };
@@ -137,7 +138,7 @@ export default function TripWorkspace({ tripId }) {
 
       {tab === "Book" ? <BookView trip={trip} /> : null}
       {tab === "Shelf" ? <p className="tw-stub">Shelf — the trip-wide pool + alternates. Coming next (#26).</p> : null}
-      {tab === "Grid" ? <p className="tw-stub">Grid — the generated printable grid, one leg per page. Phase 2 (#29).</p> : null}
+      {tab === "Grid" ? <TripGrid trip={trip} onEdit={setEditing} /> : null}
 
       {editing ? <EntryEditor tripId={tripId} entry={editing} onClose={() => setEditing(null)} /> : null}
     </main>
