@@ -7,9 +7,9 @@
 // block to edit. Horizontal scroll for long trips.
 import { useMemo } from "react";
 import { tripDays, entriesByDay } from "../lib/trip";
+import { CAT_COLOR } from "./atoms";
 
 const HOUR_START = 6, HOUR_END = 24, PX = 42; // px per hour
-const CAT_COLOR = { meal: "#9a5a16", activity: "#0d4c44", travel: "#2e5482", stay: "#665285", errand: "#6b6358" };
 
 function toMin(hhmm) {
   if (!hhmm || typeof hhmm !== "string") return null;

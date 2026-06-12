@@ -8,8 +8,7 @@ import { MapContainer, TileLayer, CircleMarker, Polyline, Tooltip, useMap } from
 import "leaflet/dist/leaflet.css";
 import { useMemo } from "react";
 import { tripDays, entriesByDay } from "../lib/trip";
-
-const CAT_COLOR = { meal: "#9a5a16", activity: "#0d4c44", travel: "#2e5482", stay: "#665285", errand: "#6b6358" };
+import { CAT_COLOR } from "./atoms";
 
 function FitBounds({ points }) {
   const map = useMap();

@@ -9,6 +9,7 @@ import { useState } from "react";
 import { useTrips } from "./TripProvider";
 import { usePlanner } from "./PlannerProvider";
 import { getSupabase } from "../lib/supabase";
+import { CAT_ICON } from "./atoms";
 
 // Google primary_type → v2 category (the buckets a suggestion can become).
 const TYPE_CAT = {
@@ -21,7 +22,6 @@ function catFor(t) {
   if (typeof t === "string" && t.endsWith("_restaurant")) return "meal";
   return "activity";
 }
-const CAT_ICON = { meal: "🍴", activity: "🥾", errand: "🧾", stay: "🛏", travel: "🚆" };
 
 export default function GatherBucket({ trip, leg }) {
   const { addEntry } = useTrips();

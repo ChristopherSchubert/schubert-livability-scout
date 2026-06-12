@@ -8,7 +8,8 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { useTrips } from "./TripProvider";
-import { tripDays, entriesByDay, cashNeeded, bookingsLedger, MARKER_TYPES } from "../lib/trip";
+import { tripDays, entriesByDay, cashNeeded, bookingsLedger } from "../lib/trip";
+import { CAT_ICON, CatIcon, TimeChip, BookingBadge, CostTag, MarkerSet, entryTimeText } from "./atoms";
 import EntryEditor from "./EntryEditor";
 import TripWindow from "./TripWindow";
 import BookView from "./BookView";
@@ -18,29 +19,21 @@ import { solveTripDay } from "../lib/solve-adapter";
 
 const TripMap = dynamic(() => import("./TripMapInner"), { ssr: false, loading: () => <p className="tw-stub">loading map…</p> });
 const TABS = ["Plan", "Days", "Book", "Shelf", "Grid", "Map"];
-const CAT_ICON = { travel: "🚆", meal: "🍴", activity: "🥾", stay: "🛏", errand: "🧾" };
-const STATUS_LABEL = { booked: "booked", reserved: "held", toBook: "to book", none: "" };
 
 function money(map) {
   return Object.entries(map || {}).map(([c, n]) => `${c === "EUR" ? "€" : c + " "}${n}`).join(" · ") || "—";
-}
-function entryTime(e) {
-  const t = e.time || {};
-  if (t.mode === "range" && t.start) return t.end ? `${t.start}–${t.end}` : t.start;
-  if (t.mode === "point" && t.at) return t.at;
-  return "";
 }
 
 function EntryRow({ e, onEdit }) {
   return (
     <li className={`tw-entry cat-${e.category || "activity"}`} onClick={() => onEdit(e)} title="Edit entry">
-      <span className="tw-t">{entryTime(e)}</span>
-      <span className="tw-ico">{CAT_ICON[e.category] || "•"}</span>
+      <TimeChip entry={e} />
+      <CatIcon cat={e.category} />
       <span className="tw-title">{e.title}{e.place ? <em className="tw-place"> · {e.place.name}</em> : null}</span>
       <span className="tw-tags">
-        {e.status && e.status !== "none" ? <span className={`tw-status s-${e.status}`}>{STATUS_LABEL[e.status] || e.status}</span> : null}
-        {e.cost?.amount != null ? <span className="tw-cost">{e.cost.cashOnly ? "💶 " : ""}{e.cost.currency === "EUR" ? "€" : e.cost.currency + " "}{e.cost.amount}</span> : null}
-        {(e.markers || []).map((m, i) => <span key={i} className="tw-marker" title={MARKER_TYPES?.[m.type]?.label || m.type}>{MARKER_TYPES?.[m.type]?.icon || "🔖"}</span>)}
+        <BookingBadge status={e.status} />
+        <CostTag cost={e.cost} />
+        <MarkerSet markers={e.markers} />
       </span>
     </li>
   );
