@@ -241,3 +241,22 @@
   .sh-item { flex-wrap: wrap; }
   .sh-actions { margin-left: 2rem; }
 }
+
+/* ── Grid toolbar + caption (#29) ── */
+.tg-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin: 0 0 .6rem; }
+.tg-cap { font-size: .82rem; color: var(--ink-soft, #6b6358); font-variant: small-caps; letter-spacing: .04em; }
+.tg-print { border: 1px solid var(--rule, #d9d2c5); background: #fff; border-radius: 7px; padding: .28rem .7rem; font-size: .82rem; cursor: pointer; }
+.tg-print:hover { background: #f6f2ea; }
+
+/* ── Print: the Grid is the printable artifact (#29). Drop all app chrome,
+      let the grid fill the page, force the category colours through. ── */
+@media print {
+  .tw-tabs, .tw-frame, .tw-rollups, .tw-crumb, .tg-print { display: none !important; }
+  .tw-wrap { padding: 0; max-width: none; }
+  .tw-head { margin-bottom: .4rem; border: none; }
+  .tg-scroll { overflow: visible !important; }
+  .tg { transform: none !important; }
+  .tg-block, .tg-chip { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .tg-col { break-inside: avoid; }
+  @page { size: landscape; margin: 1cm; }
+}

@@ -37,6 +37,10 @@ export default function TripGrid({ trip, onEdit }) {
 
   return (
     <div className="tg-scroll">
+      <div className="tg-toolbar">
+        <span className="tg-cap">{trip.name} · {trip.startDate} – {trip.endDate}</span>
+        <button className="tg-print" onClick={() => window.print()} title="Print this grid">🖨 print</button>
+      </div>
       <div className="tg">
         <div className="tg-gutter" style={{ height: bodyH + 28 }}>
           <div className="tg-corner" />
