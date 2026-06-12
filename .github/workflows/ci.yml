@@ -1,0 +1,28 @@
+name: CI
+
+# Gate every push + PR on the unit tests and a production build. Lint is run
+# non-blocking (no eslint config committed yet). Secrets aren't needed: the app
+# reads Supabase keys at runtime in the browser; the build only needs the
+# NEXT_PUBLIC_* names to exist, so placeholders are fine here.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Unit tests
+        run: npm test
+      - name: Build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: placeholder-anon-key
+        run: npm run build
