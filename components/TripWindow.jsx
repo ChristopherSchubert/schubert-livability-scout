@@ -10,11 +10,11 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { DndContext, PointerSensor, useSensor, useSensors, useDraggable } from "@dnd-kit/core";
 import { tripDays } from "../lib/trip";
+import { addDays, daysBetween as between, legBoundaries, shiftLegBoundary } from "../lib/trip-window";
 import { useTrips } from "./TripProvider";
 
 const LEG_COLORS = ["#0d4c44", "#2e5482", "#9a5a16", "#665285", "#6b6358"];
 const DOW = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
-const DAY_MS = 86400000;
 
 function dayNum(ymd) { return ymd ? ymd.slice(8, 10) : ""; }
 function monthLabel(ymd) {
@@ -22,10 +22,6 @@ function monthLabel(ymd) {
   return new Date(ymd + "T00:00:00").toLocaleDateString("en-US", { month: "short" });
 }
 function dow(ymd) { return ymd ? DOW[new Date(ymd + "T00:00:00").getDay()] : ""; }
-function parse(ymd) { const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(ymd || ""); return m ? new Date(+m[1], +m[2] - 1, +m[3]) : null; }
-function fmt(d) { return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; }
-function addDays(ymd, n) { const d = parse(ymd); if (!d) return ymd; return fmt(new Date(d.getTime() + n * DAY_MS)); }
-function between(a, b) { const x = parse(a), y = parse(b); return x && y ? Math.round((y - x) / DAY_MS) : 0; }
 
 // One draggable boundary handle, positioned on the grid line before `colIdx`.
 function BoundaryHandle({ id, colIdx, cellW, label, onNudge }) {
@@ -83,25 +79,12 @@ export default function TripWindow({ trip }) {
     }));
   }, [baseLegs, trip?.startDate]);
 
-  // Apply a day-shift to a boundary: clamp so neither touching leg < 1 day,
-  // move days from one leg to the other, persist. Returns the clamped shift.
+  // Apply a day-shift to a boundary (clamp + day math live in lib/trip-window).
+  // On commit, persist the rebalanced legs. Returns the clamped shift.
   function shiftBoundary(boundaryIdx, rawShift, commit) {
-    const i = boundaryIdx;
-    const left = baseLegs[i], right = baseLegs[i + 1];
-    if (!left || !right) return 0;
-    if (addDays(left.depart, 1) !== right.arrive) return 0; // only adjacent legs
-    const leftSpan = between(left.arrive, left.depart) + 1;
-    const rightSpan = between(right.arrive, right.depart) + 1;
-    const s = Math.max(-(leftSpan - 1), Math.min(rightSpan - 1, rawShift));
-    if (commit && s !== 0) {
-      const legs = baseLegs.map((l, k) => {
-        if (k === i) return { ...l, depart: addDays(l.depart, s) };
-        if (k === i + 1) return { ...l, arrive: addDays(l.arrive, s) };
-        return l;
-      });
-      updateTripFrame(trip.id, { legs });
-    }
-    return s;
+    const { legs, shift } = shiftLegBoundary(baseLegs, boundaryIdx, rawShift);
+    if (commit && shift !== 0) updateTripFrame(trip.id, { legs });
+    return shift;
   }
 
   if (!cols) return null;
@@ -115,12 +98,9 @@ export default function TripWindow({ trip }) {
   }
 
   // Adjacent-leg boundaries get a handle (at the right leg's start column).
-  const boundaries = [];
-  for (let i = 0; i < baseLegs.length - 1; i++) {
-    if (addDays(baseLegs[i].depart, 1) === baseLegs[i + 1].arrive) {
-      boundaries.push({ i, colIdx: segments[i + 1].startIdx + (preview?.boundary === i ? preview.shift : 0) });
-    }
-  }
+  const boundaries = legBoundaries(baseLegs).map((i) => ({
+    i, colIdx: segments[i + 1].startIdx + (preview?.boundary === i ? preview.shift : 0),
+  }));
 
   function onDragMove(ev) {
     if (!cellW) return;
