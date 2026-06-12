@@ -187,3 +187,34 @@ The trip surfaces are keyboard- and screen-reader-navigable:
   the placed stops (in trip order, with day + place) is the text alternative.
 - **Contrast:** the category palette passes WCAG AA — white-on-leg-colour ranges
   5.46–9.84:1, status badges 5.25–8.53:1 (verified).
+
+## Variations / forks — the "what-if" tab (#34)
+
+Fork a stretch of the trip into two futures and keep both alive until you
+decide. The model is additive (a no-op on every existing trip):
+`trip.options.forks = [{ id, name, range, choices:[A,B], activeChoiceId }]`, and
+an entry may carry `option:{forkId, choiceId}` (omitted ⇒ a base entry, always
+shown). Pure core in `lib/trip-variations.js` (`activeEntries`, `forkForDay`,
+`choiceCounts`, `forkDecideBy`, `entriesForChoice`, `setActiveChoice`),
+unit-tested in `test/trip-variations.test.mjs`.
+
+- **Fork composer** (`components/TripVariations.jsx`, the **Forks** tab): name +
+  from/to over the trip's days → creates the fork and tags the in-range base
+  entries to Option A, leaving Option B blank.
+- **Switch:** clicking a choice card sets `activeChoiceId`; the whole workspace
+  follows because `TripWorkspace` feeds the read panels a **variation-filtered
+  `vtrip`** (`activeEntries`) — Days/Grid/Map/Book/Frame + the rollups all show
+  the live option. Entries added on a forked day inherit the live choice.
+- **decide-by:** the earliest cancellation deadline across either option, shown
+  as a countdown (turns urgent ≤7 days).
+- **Compare:** a side-by-side A vs B column list, the live one ringed.
+
+Verified in-browser on the Slovenia trip: forking 05-21–05-25 tagged 36 entries
+to Option A; switching to the blank Option B dropped those days to 0 while the
+base days were untouched; switching back restored them; the compare showed both
+columns. (Optimistic-only on the dev user — RLS owner-only — so the canonical
+trip stayed clean on reload.)
+
+Deferred follow-up: **auto-release of refundable holds** when an option loses —
+that's a background automation (a scheduled job watching `decide-by`), out of
+scope for the UI build; tracked for later.

@@ -10,8 +10,10 @@ import { useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import { useTrips } from "./TripProvider";
 import { tripDays, entriesByDay, cashNeeded, bookingsLedger } from "../lib/trip";
+import { activeEntries, forkForDay } from "../lib/trip-variations";
 import { CAT_ICON } from "./atoms";
 import DayEntries from "./DayEntries";
+import TripVariations from "./TripVariations";
 import EntryEditor from "./EntryEditor";
 import TripWindow from "./TripWindow";
 import BookView from "./BookView";
@@ -39,9 +41,13 @@ export default function TripWorkspace({ tripId, activeTab = "plan" }) {
   // Create a blank entry on a day, then open it in the editor (addEntry returns
   // the row with its server-generated id, so the editor can patch it).
   async function addToDay(date) {
+    // If this day sits inside a fork, tag the new entry to the fork's live
+    // choice — so entries added while Option B is active build Option B (#34).
+    const fork = forkForDay(trip, date);
+    const option = fork ? { forkId: fork.id, choiceId: fork.activeChoiceId } : undefined;
     const saved = await addEntry(tripId, {
       day: date, role: "anchor", category: "activity", status: "none",
-      title: "", time: { mode: "range" },
+      title: "", time: { mode: "range" }, ...(option ? { option } : {}),
     });
     if (saved) setEditing(saved);
   }
@@ -75,12 +81,17 @@ export default function TripWorkspace({ tripId, activeTab = "plan" }) {
   const addOwn = () => addAndEdit({ day: null, category: "activity" });
 
   const trip = active && active.id === tripId ? active : null;
+  // The variation-filtered view: base entries + the live choice of each fork
+  // (#34). Identical to `trip` when there are no forks, so existing trips are
+  // unaffected. The read panels + rollups consume this; `trip` keeps the full
+  // frame (legs, travelers, every fork's entries) for the Forks tab + editing.
+  const vtrip = useMemo(() => (trip ? { ...trip, entries: activeEntries(trip) } : null), [trip]);
   const days = useMemo(() => (trip ? tripDays(trip) : []), [trip]);
-  const byDay = useMemo(() => (trip ? entriesByDay(trip) : {}), [trip]);
-  const pool = useMemo(() => (trip ? trip.entries.filter((e) => !e.day) : []), [trip]);
-  const flights = useMemo(() => (trip ? trip.entries.filter((e) => e.category === "travel" && (e.status === "booked" || e.booking?.confirmation)) : []), [trip]);
-  const cash = useMemo(() => (trip ? cashNeeded(trip) : {}), [trip]);
-  const bookings = useMemo(() => (trip ? bookingsLedger(trip) : []), [trip]);
+  const byDay = useMemo(() => (vtrip ? entriesByDay(vtrip) : {}), [vtrip]);
+  const pool = useMemo(() => (vtrip ? vtrip.entries.filter((e) => !e.day) : []), [vtrip]);
+  const flights = useMemo(() => (vtrip ? vtrip.entries.filter((e) => e.category === "travel" && (e.status === "booked" || e.booking?.confirmation)) : []), [vtrip]);
+  const cash = useMemo(() => (vtrip ? cashNeeded(vtrip) : {}), [vtrip]);
+  const bookings = useMemo(() => (vtrip ? bookingsLedger(vtrip) : []), [vtrip]);
 
   if (!trip) {
     return <div className="tw-wrap"><p className="tw-loading">{hydrated ? "Trip not found." : "Loading trip…"}</p></div>;
@@ -178,7 +189,7 @@ export default function TripWorkspace({ tripId, activeTab = "plan" }) {
         </div>
       ) : null}
 
-      {tab === "book" ? <BookView trip={trip} /> : null}
+      {tab === "book" ? <BookView trip={vtrip} /> : null}
       {tab === "shelf" ? (
         <div className="sh">
           <div className="tw-shelf-head">
@@ -205,9 +216,10 @@ export default function TripWorkspace({ tripId, activeTab = "plan" }) {
           )}
         </div>
       ) : null}
-      {tab === "grid" ? <TripGrid trip={trip} onEdit={setEditing} /> : null}
-      {tab === "map" ? <div className="tw-map"><TripMap trip={trip} /></div> : null}
-      {tab === "frame" ? <TripFrame trip={trip} /> : null}
+      {tab === "grid" ? <TripGrid trip={vtrip} onEdit={setEditing} /> : null}
+      {tab === "map" ? <div className="tw-map"><TripMap trip={vtrip} /></div> : null}
+      {tab === "frame" ? <TripFrame trip={vtrip} /> : null}
+      {tab === "forks" ? <TripVariations trip={trip} /> : null}
       </div>
 
       {editing ? <EntryEditor tripId={tripId} entry={editing} onClose={() => setEditing(null)} /> : null}

@@ -344,7 +344,7 @@ function TripContextStrip({ tripItem, tripNav }) {
 }
 
 // The five-from-the-deck plus the Map + Frame surfaces, each a real URL.
-export const TRIP_TABS = ["plan", "days", "book", "shelf", "grid", "map", "frame"];
+export const TRIP_TABS = ["plan", "days", "book", "shelf", "grid", "map", "frame", "forks"];
 export function defaultTripNav(trip, active) {
   const label = (s) => s.charAt(0).toUpperCase() + s.slice(1);
   return TRIP_TABS.map((slug) => ({
