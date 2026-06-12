@@ -168,3 +168,22 @@ Verified in-browser on the Slovenia trip: 2 handles between Ljubljana/Bled/Piran
 a pointer drag previewed then committed Bled 4n→6n / Piran 5n→3n; the keyboard
 nudge moved one day and clamped Ljubljana at its 1-day floor; reload confirmed
 the canonical trip untouched (the dev user can't write — RLS owner-only).
+
+## Accessibility (#38)
+
+The trip surfaces are keyboard- and screen-reader-navigable:
+- **Nav:** Trips views are real links (URL-per-view) with `aria-current`; the
+  context strip and rails are labelled `nav`s.
+- **Rows:** every clickable non-button (entry/flight/stay/shelf rows) is
+  `role=button` + `tabIndex` + `aria-label`, activates on Enter/Space, and has a
+  visible `:focus-visible` outline.
+- **Editor:** EntryEditor is `role=dialog aria-modal`, closes on Escape, focuses
+  its first field.
+- **Drag:** DayEntries reorder + the TripWindow boundary handles both work from
+  the keyboard (arrow keys); the Solve result is an `aria-live` status region.
+- **Grid:** the grid is a labelled `role=group`; every block carries an
+  `aria-label` with its time (e.g. "Land in Frankfurt, 14:00–14:30").
+- **Map:** leaflet pins aren't exposed to AT, so an `.sr-only` ordered list of
+  the placed stops (in trip order, with day + place) is the text alternative.
+- **Contrast:** the category palette passes WCAG AA — white-on-leg-colour ranges
+  5.46–9.84:1, status badges 5.25–8.53:1 (verified).

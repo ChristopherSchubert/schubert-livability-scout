@@ -35,7 +35,15 @@ export default function TripMapInner({ trip }) {
   }
 
   return (
-    <MapContainer center={points[0]} zoom={13} scrollWheelZoom style={{ height: 540, width: "100%", borderRadius: 10 }}>
+    <>
+      {/* Leaflet pins aren't exposed to screen readers — give an equivalent
+          text list of the placed stops in trip order (#38). */}
+      <ol className="sr-only" aria-label="Placed stops in order">
+        {placed.map((e, i) => (
+          <li key={e.id}>{i + 1}. {e.title}{e.day ? ` — ${e.day}` : ""}{e.place?.name ? ` — ${e.place.name}` : ""}</li>
+        ))}
+      </ol>
+      <MapContainer center={points[0]} zoom={13} scrollWheelZoom aria-label="Map of placed trip stops" style={{ height: 540, width: "100%", borderRadius: 10 }}>
       <TileLayer
         url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
         attribution='&copy; OpenStreetMap &copy; CARTO' />
@@ -47,6 +55,7 @@ export default function TripMapInner({ trip }) {
           <Tooltip>{`${i + 1}. ${e.title}`}{e.day ? ` · ${e.day.slice(5)}` : ""}</Tooltip>
         </CircleMarker>
       ))}
-    </MapContainer>
+      </MapContainer>
+    </>
   );
 }

@@ -25,6 +25,7 @@ function span(e) {
   return { start, end: end && end > start ? end : start + 45 };
 }
 const fmtHr = (h) => (h === 0 || h === 24 ? "12a" : h < 12 ? `${h}a` : h === 12 ? "12p" : `${h - 12}p`);
+const fmtClock = (m) => `${String(Math.floor(m / 60)).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`;
 
 export default function TripGrid({ trip, onEdit }) {
   const days = useMemo(() => (trip ? tripDays(trip) : []), [trip]);
@@ -36,7 +37,7 @@ export default function TripGrid({ trip, onEdit }) {
   if (!days.length) return <p className="tw-stub">No days yet.</p>;
 
   return (
-    <div className="tg-scroll">
+    <div className="tg-scroll" role="group" aria-label="Trip schedule grid — days as columns, entries placed by time">
       <div className="tg-toolbar">
         <span className="tg-cap">{trip.name} · {trip.startDate} – {trip.endDate}</span>
         <button className="tg-print" onClick={() => window.print()} title="Print this grid">🖨 print</button>
@@ -66,7 +67,8 @@ export default function TripGrid({ trip, onEdit }) {
                   if (top < -PX || top > bodyH) return null;
                   return (
                     <button key={e.id} className="tg-block" onClick={() => onEdit(e)}
-                            style={{ top, height, "--c": CAT_COLOR[e.category] || "#6b6358" }} title={e.title}>
+                            style={{ top, height, "--c": CAT_COLOR[e.category] || "#6b6358" }} title={e.title}
+                            aria-label={`${e.title}, ${fmtClock(s.start)}–${fmtClock(s.end)}${e.place ? `, ${e.place.name}` : ""}`}>
                       <b>{e.title}</b>
                       {height > 30 && e.place ? <small>{e.place.name}</small> : null}
                     </button>
