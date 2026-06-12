@@ -186,3 +186,7 @@
 .tg-block:hover { box-shadow: 0 2px 6px rgba(41,33,19,.18); z-index: 2; }
 .tg-block b { display: block; font-size: .64rem; font-weight: 600; line-height: 1.15; overflow: hidden; }
 .tg-block small { display: block; font-size: .58rem; color: var(--muted); overflow: hidden; }
+
+.tw-solve { font-family: var(--font-ui); font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: #8a5a16; background: #fbf0e2; border: 1px solid #dcc49a; border-radius: 100px; padding: .1rem .55rem; margin-left: .6rem; cursor: pointer; }
+.tw-solve:disabled { opacity: .4; cursor: default; }
+.tw-solvemsg { margin-left: .5rem; font-family: var(--font-ui); font-size: .72rem; color: var(--accent); }

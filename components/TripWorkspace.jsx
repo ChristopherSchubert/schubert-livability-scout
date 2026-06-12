@@ -13,6 +13,7 @@ import TripWindow from "./TripWindow";
 import BookView from "./BookView";
 import GatherBucket from "./GatherBucket";
 import TripGrid from "./TripGrid";
+import { solveTripDay } from "../lib/solve-adapter";
 
 const TABS = ["Plan", "Days", "Book", "Shelf", "Grid"];
 const CAT_ICON = { travel: "🚆", meal: "🍴", activity: "🥾", stay: "🛏", errand: "🧾" };
@@ -44,9 +45,10 @@ function EntryRow({ e, onEdit }) {
 }
 
 export default function TripWorkspace({ tripId }) {
-  const { active, hydrated, enterTrip, addEntry } = useTrips();
+  const { active, hydrated, enterTrip, addEntry, updateEntry } = useTrips();
   const [tab, setTab] = useState("Plan");
   const [editing, setEditing] = useState(null);
+  const [solveMsg, setSolveMsg] = useState(null);
 
   useEffect(() => { if (tripId) enterTrip(tripId); }, [tripId]); // eslint-disable-line
 
@@ -58,6 +60,25 @@ export default function TripWorkspace({ tripId }) {
       title: "", time: { mode: "range" },
     });
     if (saved) setEditing(saved);
+  }
+
+  // Solve a day: lay its placeable entries into a clocked, travel-aware schedule
+  // (lib/solve-adapter → solveDay). Booked entries stay pinned; the rest get
+  // times. Lodging = the leg's stay (for travel-to/from-base legs).
+  function solveOneDay(date) {
+    const list = byDay[date] || [];
+    if (!list.length) return;
+    const leg = (trip.legs || []).find((l) => l.arrive <= date && date <= l.depart);
+    const stayE = trip.entries.find((e) => e.category === "stay" && e.place?.lat != null && leg && e.day >= leg.arrive && e.day <= leg.depart);
+    const lodging = stayE?.place ? { lat: stayE.place.lat, lon: stayE.place.lon, name: stayE.place.name } : null;
+    const { times, flags } = solveTripDay(list, { lodging });
+    let placed = 0;
+    for (const e of list) {
+      const t = times[e.id];
+      if (t) { updateEntry(trip.id, { ...e, time: { mode: "range", start: t.start, end: t.end } }); placed++; }
+    }
+    setSolveMsg({ date, placed, flags });
+    setTimeout(() => setSolveMsg(null), 6000);
   }
 
   const trip = active && active.id === tripId ? active : null;
@@ -126,7 +147,9 @@ export default function TripWorkspace({ tripId }) {
             return (
               <section key={d.date} className="tw-day">
                 <div className="tw-day-head"><b>{d.date}</b>{d.legName ? <span className="tw-leg">{d.legName}</span> : null}<span className="tw-count">{list.length}</span>
-                  <button className="tw-add" onClick={() => addToDay(d.date)} title="Add an entry to this day">＋ add</button></div>
+                  <button className="tw-solve" onClick={() => solveOneDay(d.date)} title="Lay out this day on the clock" disabled={!list.length}>⚡ solve</button>
+                  <button className="tw-add" onClick={() => addToDay(d.date)} title="Add an entry to this day">＋ add</button>
+                  {solveMsg && solveMsg.date === d.date ? <span className="tw-solvemsg">laid out {solveMsg.placed}{solveMsg.flags.length ? ` · ${solveMsg.flags.length} flag(s)` : ""}</span> : null}</div>
                 {list.length === 0 ? <p className="tw-empty">— open day —</p> : (
                   <ul className="tw-entries">{list.map((e) => <EntryRow key={e.id} e={e} onEdit={setEditing} />)}</ul>
                 )}
