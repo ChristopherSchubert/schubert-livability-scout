@@ -153,7 +153,10 @@ export default function TripWorkspace({ tripId }) {
                 <div className="tw-day-head"><b>{d.date}</b>{d.legName ? <span className="tw-leg">{d.legName}</span> : null}<span className="tw-count">{list.length}</span>
                   <button className="tw-solve" onClick={() => solveOneDay(d.date)} title="Lay out this day on the clock" disabled={!list.length}>⚡ solve</button>
                   <button className="tw-add" onClick={() => addToDay(d.date)} title="Add an entry to this day">＋ add</button>
-                  {solveMsg && solveMsg.date === d.date ? <span className="tw-solvemsg">laid out {solveMsg.placed}{solveMsg.flags.length ? ` · ${solveMsg.flags.length} flag(s)` : ""}</span> : null}</div>
+                  {solveMsg && solveMsg.date === d.date ? <span className="tw-solvemsg">laid out {solveMsg.placed}{solveMsg.flags.length ? ` · ${solveMsg.flags.length} flag(s)` : " · fits"}</span> : null}</div>
+                {solveMsg && solveMsg.date === d.date && solveMsg.flags.length ? (
+                  <ul className="tw-flags">{solveMsg.flags.map((f, i) => <li key={i}>⚠ {f}</li>)}</ul>
+                ) : null}
                 {list.length === 0 ? <p className="tw-empty">— open day —</p> : (
                   <ul className="tw-entries">{list.map((e) => <EntryRow key={e.id} e={e} onEdit={setEditing} />)}</ul>
                 )}

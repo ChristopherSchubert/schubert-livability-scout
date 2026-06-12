@@ -203,3 +203,6 @@
 .sh-actions { display: flex; flex-wrap: wrap; gap: .25rem; }
 .sh-place { font-family: var(--font-ui); font-size: .66rem; font-variant-numeric: tabular-nums; color: var(--accent); background: #e7f1ee; border: 1px solid #bcd8d0; border-radius: 6px; padding: .08rem .35rem; cursor: pointer; }
 .sh-place:hover { background: var(--accent); color: #fff; }
+
+.tw-flags { list-style: none; margin: .3rem 0 .5rem; padding: .4rem .7rem; background: #f6e0d4; border: 1px solid #dcb49a; border-radius: 7px; }
+.tw-flags li { font-size: .78rem; color: #7c2f12; }
