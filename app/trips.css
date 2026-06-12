@@ -213,3 +213,31 @@
 .tw-clickable { cursor: pointer; }
 .tw-clickable:hover { color: var(--accent); }
 .tw-shelf-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }
+
+/* ── Mobile / responsive (#35 — phone layouts for the trip surfaces) ── */
+@media (max-width: 640px) {
+  .tw-wrap { padding: 1rem .8rem 4rem; }
+  .tw-head h1 { font-size: clamp(1.4rem, 7vw, 1.9rem); }
+  .tw-tabs { gap: .9rem; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .tw-tab { white-space: nowrap; }
+  .tw-rollups { gap: .6rem; flex-direction: column; }
+  /* entry rows: let the title wrap, keep time + tags readable */
+  .tw-entry { flex-wrap: wrap; }
+  .tw-t { flex-basis: 3.6rem; }
+  .tw-title { flex: 1 1 60%; }
+  .tw-tags { margin-left: 3.6rem; }
+  /* plan: stack stay meta */
+  .tw-stay-top { flex-wrap: wrap; gap: .3rem .8rem; }
+  .tw-stay-top b, .tw-stay-top .tw-stay-h { flex-basis: 100%; margin-left: 0; }
+  .twn-day { font-size: .8rem; }
+  .twn-dow, .twn-mo { font-size: .52rem; }
+  /* editor + composer go full-bleed */
+  .ee-sheet { width: 100%; }
+  .tc-sheet { width: 96%; padding: 1rem; }
+  .tc-dates { flex-direction: column; }
+  .tc-trav { gap: .35rem; }
+  /* the grid + map keep their own horizontal scroll / fixed height */
+  .tw-map .leaflet-container { height: 60vh !important; }
+  .sh-item { flex-wrap: wrap; }
+  .sh-actions { margin-left: 2rem; }
+}
