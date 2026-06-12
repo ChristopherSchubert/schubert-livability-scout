@@ -27,3 +27,26 @@ so the reorder/leg-shift *math* is covered by the pure suites and the full drag
 gesture belongs to the E2E layer (#44, Playwright). Components that pull a
 context use `vi.mock("../../components/TripProvider", …)`; `test/components/setup.js`
 loads the jest-dom matchers.
+
+## E2E critical path — Playwright (#44)
+
+`npm run test:e2e` → `playwright test` (config: `playwright.config.js`, spec:
+`e2e/`). One critical-path test drives a real headless Chromium against the dev
+server (reused if already up): **dev sign-in → compose a trip → add + name an
+entry → solve the day → Book renders → clean up.**
+
+- **Auth:** clicks the AuthGate "Dev sign-in" button (the prod-disabled
+  `/api/dev-login` mints a real session).
+- **RLS:** the test creates a *new* trip, so the dev-login user **owns** it and
+  every write passes RLS (the seeded Slovenia trip is owned by someone else and
+  is read-only to that user).
+- **Self-cleanup:** at the end it deletes the trip it made via an owner-scoped
+  Supabase REST call (token from `/api/dev-login`; `trip_entries` cascades), so
+  runs leave no residue. The Supabase URL/key come from `.env.local`
+  (read in the config); without them the cleanup step is skipped.
+
+Not wired into the default `npm test` / CI: the E2E needs a running dev server +
+the chromium binary (`npx playwright install chromium`) + the dev-login
+credentials, so it's a separate, explicitly-run script. Pointer **drag** (the
+one interaction jsdom can't cover for #43) is exercised here through the real
+browser.

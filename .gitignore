@@ -21,3 +21,9 @@ overpass/db/
 # Large cached source data (re-downloadable; not committed)
 data/
 scripts/.crowd-season-cache*.json
+
+# Playwright E2E artifacts (#44)
+/test-results/
+/playwright-report/
+/blob-report/
+/.playwright/
