@@ -143,3 +143,26 @@
 .gb-card small { color: var(--muted); font-size: .72rem; }
 .gb-save { align-self: flex-start; margin-top: .25rem; font-size: .7rem; font-weight: 700; color: var(--accent); background: none; border: 1px solid var(--accent); border-radius: 100px; padding: .08rem .55rem; cursor: pointer; }
 .gb-save.done, .gb-save:disabled { color: var(--muted); border-color: var(--border); cursor: default; }
+
+/* TripsIndex header + composer */
+.tw-index-head { display: flex; align-items: flex-end; justify-content: space-between; }
+.tc-scrim { position: fixed; inset: 0; background: rgba(41,33,19,.32); z-index: 200; display: flex; align-items: flex-start; justify-content: center; padding-top: 6vh; }
+.tc-sheet { width: min(540px, 94%); background: var(--bg); border-radius: 14px; box-shadow: 0 24px 60px rgba(41,33,19,.3); padding: 1.3rem 1.4rem; display: flex; flex-direction: column; gap: 1rem; }
+.tc-head { display: flex; align-items: center; justify-content: space-between; }
+.tc-head h2 { font-family: var(--font-display); font-size: 1.4rem; margin: 0; }
+.tc-field { display: flex; flex-direction: column; gap: .25rem; }
+.tc-field > span { font-family: var(--font-ui); font-size: .68rem; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); }
+.tc-field > span em { font-style: normal; text-transform: none; letter-spacing: 0; }
+.tc-field input { font: inherit; font-size: .95rem; border: 1px solid var(--border); border-radius: 8px; padding: .45rem .6rem; background: var(--panel); }
+.tc-dates { display: flex; gap: .8rem; }
+.tc-dates .tc-field { flex: 1; }
+.tc-label { font-family: var(--font-ui); font-size: .68rem; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); }
+.tc-label em { font-style: normal; text-transform: none; letter-spacing: 0; }
+.tc-travs { display: flex; flex-direction: column; gap: .55rem; }
+.tc-trav { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; }
+.tc-trav select { appearance: auto; border: 1px solid var(--border); border-radius: 8px; padding: .35rem; background: var(--panel); }
+.tc-trav input { flex: 0 0 8rem; font: inherit; border: 1px solid var(--border); border-radius: 8px; padding: .35rem .5rem; background: var(--panel); }
+.tc-chips { display: flex; flex-wrap: wrap; gap: .3rem; }
+.tc-chip { font-size: .7rem; font-weight: 600; color: var(--muted); background: var(--panel); border: 1px solid var(--border); border-radius: 100px; padding: .12rem .55rem; cursor: pointer; }
+.tc-chip.on { background: #e7f1ee; border-color: #bcd8d0; color: var(--accent); }
+.tc-foot { display: flex; align-items: center; gap: .6rem; margin-top: .4rem; }
