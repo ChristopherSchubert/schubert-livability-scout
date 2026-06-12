@@ -79,3 +79,24 @@ design source of truth.
   window selection.
 - **Runtime** — mirror Keychain `google-places-api-key` → `.env.local` + Vercel
   as `GOOGLE_PLACES_API_KEY` for the live place picker.
+
+## Frame tab — the briefing layer (#33)
+
+The **Frame** tab turns a trip into a finished briefing, every value DERIVED
+from trip data or left honestly blank (never guessed — CLAUDE.md's one rule).
+Four panels, all from `lib/trip-frame.js` (pure, unit-tested in
+`test/trip-frame.test.mjs`):
+
+- **Glance** — fact grid: destination (legs), dates/nights (window), lodging +
+  check-in (stay entries), diet + travelers incl. pets (roster), theme. Weather
+  and drive-from-home aren't in trip data yet → rendered as "—", not fabricated.
+- **Read first** — limitations derived from trip state, each cited with a source
+  + asOf date: unpinned stops (won't map/solve), unscheduled dated entries, things
+  still to-book, cash-only totals. A clean trip shows "nothing flagged".
+- **Booking checklist** — every to-book + booked thing, soonest deadline first,
+  with phone/url/book-by. Checking a row persists (flips the entry status
+  toBook⇄booked); confirmation-backed rows are locked done.
+- **Sources** — the citation ledger: only the provenances actually present
+  (Google Places cache, hand-entered costs, booking records, NOAA when fetched).
+
+`components/TripFrame.jsx` renders it; `markerUnion()` powers the marker strip.

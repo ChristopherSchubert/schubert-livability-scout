@@ -15,10 +15,11 @@ import TripWindow from "./TripWindow";
 import BookView from "./BookView";
 import GatherBucket from "./GatherBucket";
 import TripGrid from "./TripGrid";
+import TripFrame from "./TripFrame";
 import { solveTripDay } from "../lib/solve-adapter";
 
 const TripMap = dynamic(() => import("./TripMapInner"), { ssr: false, loading: () => <p className="tw-stub">loading map…</p> });
-const TABS = ["Plan", "Days", "Book", "Shelf", "Grid", "Map"];
+const TABS = ["Plan", "Days", "Book", "Shelf", "Grid", "Map", "Frame"];
 
 function money(map) {
   return Object.entries(map || {}).map(([c, n]) => `${c === "EUR" ? "€" : c + " "}${n}`).join(" · ") || "—";
@@ -209,6 +210,7 @@ export default function TripWorkspace({ tripId }) {
       ) : null}
       {tab === "Grid" ? <TripGrid trip={trip} onEdit={setEditing} /> : null}
       {tab === "Map" ? <div className="tw-map"><TripMap trip={trip} /></div> : null}
+      {tab === "Frame" ? <TripFrame trip={trip} /> : null}
 
       {editing ? <EntryEditor tripId={tripId} entry={editing} onClose={() => setEditing(null)} /> : null}
     </main>
