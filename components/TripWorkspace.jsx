@@ -83,10 +83,20 @@ export default function TripWorkspace({ tripId }) {
     setTimeout(() => setSolveMsg(null), 6000);
   }
 
+  // Add a typed entry and open it (stay/flight/own). Shelf items are undated.
+  async function addAndEdit(fields) {
+    const saved = await addEntry(trip.id, { role: "anchor", status: "none", time: { mode: "bucket", bucket: "flex" }, title: "", ...fields });
+    if (saved) setEditing(saved);
+  }
+  const addStay = (leg) => addAndEdit({ day: leg.arrive, category: "stay", status: "reserved", role: "connective", title: `Stay — ${leg.name?.replace(/,.*$/, "")}`, time: { mode: "point" } });
+  const addFlight = () => addAndEdit({ day: trip.startDate, category: "travel", status: "booked", role: "connective", title: "Flight" });
+  const addOwn = () => addAndEdit({ day: null, category: "activity" });
+
   const trip = active && active.id === tripId ? active : null;
   const days = useMemo(() => (trip ? tripDays(trip) : []), [trip]);
   const byDay = useMemo(() => (trip ? entriesByDay(trip) : {}), [trip]);
   const pool = useMemo(() => (trip ? trip.entries.filter((e) => !e.day) : []), [trip]);
+  const flights = useMemo(() => (trip ? trip.entries.filter((e) => e.category === "travel" && (e.status === "booked" || e.booking?.confirmation)) : []), [trip]);
   const cash = useMemo(() => (trip ? cashNeeded(trip) : {}), [trip]);
   const bookings = useMemo(() => (trip ? bookingsLedger(trip) : []), [trip]);
 
@@ -125,6 +135,18 @@ export default function TripWorkspace({ tripId }) {
         <div className="tw-plan">
           <div className="tw-sec-label">The window</div>
           <TripWindow trip={trip} />
+          <div className="tw-sec-label">Flights &amp; transport</div>
+          <ul className="tw-stays">
+            {flights.map((e) => (
+              <li key={e.id} className="tw-flight" onClick={() => setEditing(e)}>
+                <span className="tw-ico">✈</span>
+                <b>{e.title}</b>
+                <span className="tw-meta">{e.day}{e.time?.start ? ` · ${e.time.start}` : ""}</span>
+                {e.booking?.confirmation ? <span className="tw-status s-booked">{e.booking.confirmation}</span> : null}
+              </li>
+            ))}
+            <li><button className="tw-add" onClick={addFlight}>＋ add flight</button></li>
+          </ul>
           <div className="tw-sec-label">Stays</div>
           <ul className="tw-stays">
             {(trip.legs || []).map((leg) => {
@@ -134,7 +156,8 @@ export default function TripWorkspace({ tripId }) {
                   <div className="tw-stay-top">
                     <b>{leg.name?.replace(/,.*$/, "")}</b>
                     <span className="tw-meta">{leg.arrive} – {leg.depart}</span>
-                    <span className="tw-stay-h">{stay ? stay.title.replace(/^Check in\s*—?\s*/i, "") : "— no stay —"}</span>
+                    <span className="tw-stay-h tw-clickable" onClick={() => (stay ? setEditing(stay) : addStay(leg))}>
+                      {stay ? stay.title.replace(/^Check in\s*—?\s*/i, "") : "＋ add stay"}</span>
                   </div>
                   <GatherBucket trip={trip} leg={leg} />
                 </li>
@@ -169,7 +192,10 @@ export default function TripWorkspace({ tripId }) {
       {tab === "Book" ? <BookView trip={trip} /> : null}
       {tab === "Shelf" ? (
         <div className="sh">
-          <p className="tw-sec-label">The shelf — gathered candidates, not yet on a day. Lay them out, or open to edit.</p>
+          <div className="tw-shelf-head">
+            <p className="tw-sec-label">The shelf — gathered candidates, not yet on a day. Lay them out, or open to edit.</p>
+            <button className="tw-add" onClick={addOwn}>＋ add your own</button>
+          </div>
           {pool.length === 0 ? <p className="tw-stub">Nothing on the shelf. Gather suggestions on the Plan tab.</p> : (
             <ul className="sh-list">
               {pool.map((e) => (

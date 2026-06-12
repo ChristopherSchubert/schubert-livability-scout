@@ -206,3 +206,10 @@
 
 .tw-flags { list-style: none; margin: .3rem 0 .5rem; padding: .4rem .7rem; background: #f6e0d4; border: 1px solid #dcb49a; border-radius: 7px; }
 .tw-flags li { font-size: .78rem; color: #7c2f12; }
+
+.tw-flight { display: flex; align-items: baseline; gap: .6rem; padding: .4rem .2rem; border-bottom: 1px dashed var(--border); border-left: 3px solid #2e5482; padding-left: .5rem; cursor: pointer; }
+.tw-flight:hover { background: #fffaf0; }
+.tw-flight b { font-weight: 600; font-size: .9rem; }
+.tw-clickable { cursor: pointer; }
+.tw-clickable:hover { color: var(--accent); }
+.tw-shelf-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }
