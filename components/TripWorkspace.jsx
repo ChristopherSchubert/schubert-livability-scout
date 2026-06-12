@@ -6,6 +6,7 @@
 // are stubs (Phase 1/2 follow-ups). Click any entry to edit in the EntryEditor.
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { useTrips } from "./TripProvider";
 import { tripDays, entriesByDay, cashNeeded, bookingsLedger, MARKER_TYPES } from "../lib/trip";
 import EntryEditor from "./EntryEditor";
@@ -15,7 +16,8 @@ import GatherBucket from "./GatherBucket";
 import TripGrid from "./TripGrid";
 import { solveTripDay } from "../lib/solve-adapter";
 
-const TABS = ["Plan", "Days", "Book", "Shelf", "Grid"];
+const TripMap = dynamic(() => import("./TripMapInner"), { ssr: false, loading: () => <p className="tw-stub">loading map…</p> });
+const TABS = ["Plan", "Days", "Book", "Shelf", "Grid", "Map"];
 const CAT_ICON = { travel: "🚆", meal: "🍴", activity: "🥾", stay: "🛏", errand: "🧾" };
 const STATUS_LABEL = { booked: "booked", reserved: "held", toBook: "to book", none: "" };
 
@@ -184,6 +186,7 @@ export default function TripWorkspace({ tripId }) {
         </div>
       ) : null}
       {tab === "Grid" ? <TripGrid trip={trip} onEdit={setEditing} /> : null}
+      {tab === "Map" ? <div className="tw-map"><TripMap trip={trip} /></div> : null}
 
       {editing ? <EntryEditor tripId={tripId} entry={editing} onClose={() => setEditing(null)} /> : null}
     </main>
