@@ -208,6 +208,27 @@ Labels in use: `data-quality`, `polish`, `follow-up` (created
 2026-06-08 alongside the walking-core ship). Plus GitHub defaults
 (`bug`, `enhancement`, `documentation`).
 
+## Save tokens: delegate to cheaper subagents
+
+When work can be farmed out, spawn subagents on the **cheapest model that can do
+the job** rather than burning the main (Opus) context on it. The main thread is
+for judgment, design, and stitching results together — not for grinding through
+mechanical or read-heavy work.
+
+- **Default to Haiku** for: searching the codebase, reading/summarizing files,
+  grep/locate sweeps, gathering "where is X used," running and reporting on a
+  script's output, drafting boilerplate. Use the `Explore` agent (read-only
+  fan-out) for broad "find all the places that…" questions.
+- **Sonnet** for self-contained implementation/refactor chunks that need some
+  reasoning but not the full main-thread context.
+- **Reserve Opus (the main thread)** for architecture decisions, tricky
+  debugging, anything touching the data-integrity rules, and final review.
+- Fan out **parallel** subagents for independent work (multiple files to read,
+  several issues to triage) instead of doing them serially in the main context.
+- The payoff is tokens: a Haiku subagent that reads ten files and returns a
+  three-line answer costs a fraction of doing it inline. When in doubt about
+  whether a task is "main-thread worthy," it probably isn't — delegate it.
+
 ## Conventions
 
 - `lib/planner-data.js` is the home for domain logic; components stay thin.
@@ -215,8 +236,11 @@ Labels in use: `data-quality`, `polish`, `follow-up` (created
   from JS maps and never overwrites user-entered data (surveys, trips).
 - New metric → add to `metricTaxonomy` *with its source*. **Never add a
   metric without a citation.** The Detail page renders it automatically.
-- Dev server: `npm run dev` (port 3000). No test suite — verify by driving
-  routes (auth-bypass section below).
+- Dev server: `npm run dev` (port 3000). Tests: `npm test` runs the pure-logic
+  suite (`node:test`, `test/*.test.mjs`) + the component suite (Vitest +
+  Testing Library, `test/components/*.test.jsx`); `npm run test:e2e` runs the
+  Playwright critical-path E2E. Details: [features/testing.md](features/testing.md).
+  Also verify UI changes by driving routes (auth-bypass section below).
 
 ## Verifying in the preview (auth bypass)
 
