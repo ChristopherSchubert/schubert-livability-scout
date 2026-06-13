@@ -22,6 +22,20 @@ overpass/db/
 data/
 scripts/.crowd-season-cache*.json
 
+# Ad-hoc / throwaway pipeline scripts + their transient outputs. The convention
+# is: a leading dot in scripts/ marks a local one-off (onboarding batches,
+# audits, rollback JSON). Keepers were committed before this rule and stay
+# tracked; everything new and dot-prefixed is ignored so `git add` can't
+# mass-stage ~90 of them (#75, and CLAUDE.md's never-`git add -A` rule).
+scripts/.*
+
+# Scratch design/notes dir + stray prototype HTML dropped into the web root.
+# (The wired-up mockups under public/mockups/ stay tracked — they back live
+# design loops, e.g. trip-walkthrough.html ↔ /api/walkthrough-feedback.)
+docs/
+public/climate-mockups.html
+public/visit-board-redesign.html
+
 # Playwright E2E artifacts (#44)
 /test-results/
 /playwright-report/
