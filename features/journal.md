@@ -37,10 +37,9 @@ raw moments. They don't blend.
 
 ## Status
 
-Built + tested (component tests pass; route + empty state verified in-browser).
-**Migration 0019 awaits an authorized apply to production** — the code ships
-safely without it (graceful degradation), and save/load goes live once it's
-applied.
+Built, tested, and **live in production** — migration 0019 applied 2026-06-13;
+verified end-to-end in-browser (compose → save → persists across reload →
+delete). Component tests pass.
 
 ## Follow-ups
 

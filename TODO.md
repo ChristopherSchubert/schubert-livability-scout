@@ -109,7 +109,7 @@ started:
   note + optional reaction (loved/liked/mixed/no) + optional "where"; reverse-
   chron list with inline edit + delete. Per-user, RLS owner-write
   (`journal_entries`, migration 0019). Provider: `addJournalEntry` /
-  `editJournalEntry` / `removeJournalEntry`. Doc: features/journal.md. **Migration
-  0019 still needs applying to prod** (gated) before save/load works live.
+  `editJournalEntry` / `removeJournalEntry`. Doc: features/journal.md. **Live in
+  prod** — migration 0019 applied 2026-06-13, verified end-to-end in-browser.
 
 **Next move:** Visit Plan rebuild (the remaining feature thread).
