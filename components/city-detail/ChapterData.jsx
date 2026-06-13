@@ -120,8 +120,8 @@ function MetricRow({ m, addon }) {
         </span>
       </div>
       {m.tagline ? <div className="metric-tagline">{m.tagline}</div> : null}
-      <div className={m.direction < 0 ? "metric-bar negative" : "metric-bar"}>
-        <span style={{ width: m.barPct != null ? `${m.barPct}%` : 0 }} />
+      <div className="metric-bar">
+        <span style={{ width: m.barPct != null ? `${m.barPct}%` : 0, background: m.barColor || undefined }} />
       </div>
       {addon}
       {m.source ? <div className="metric-source" title={m.source}>{m.source}</div> : null}

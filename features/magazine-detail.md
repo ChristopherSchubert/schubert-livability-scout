@@ -19,7 +19,19 @@ numbers → When to go → Where to walk). This is the live layout at
   - `MagazineDetail.jsx` — orchestrator + Scene, Why, and Walks (six blocks).
   - [ChapterData.jsx](../components/city-detail/ChapterData.jsx) — the five axes,
     rebuilt from the snapshot (only real taxonomy metrics, each with its source
-    or an honest "—").
+    or an honest "—"). **Bar color encodes goodness, not polarity.** The fill is
+    driven by the metric's 0–10 score via `metricBarColor()`
+    ([lib/metrics.js](../lib/metrics.js)) — weak → muted clay, strong → deep
+    teal — so a city's best "lower is better" stats (right on the water, fine
+    blocks) finally read as good instead of in the old warning red. One ramp
+    serves both directions because the score already bakes in `dir` (the band
+    inverts for "lower is better"). A few metrics carry a `theme` that tints the
+    good end toward a natural hue (`water` → blue-teal, `stone` → slate,
+    `sun` → overcast-grey→gold) **only where it reinforces goodness**;
+    the temperature day-counts (`hot_days`/`days_below_freeze`) are deliberately
+    left neutral — a literal hot=red/cold=blue gradient would paint the bar
+    loudest on its *worst* end and reintroduce the very confusion this fixes.
+    Guarded by `test/scoring.test.mjs`.
   - [ChapterWhen.jsx](../components/city-detail/ChapterWhen.jsx) — the comfort
     ribbon, the climatology small-multiples (vs the Allison Park home base), and
     the year-shape extremes strip. **All SVG paths are computed from the city's

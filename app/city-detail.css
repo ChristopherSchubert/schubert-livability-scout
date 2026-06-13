@@ -650,8 +650,9 @@
       overflow: hidden;
       margin-top: 0.4rem;
     }
+/* Fill color is set per-bar (inline) from the metric's 0–10 goodness score —
+   see metricBarColor() in lib/metrics.js. --accent is only the empty fallback. */
 .cd-root .metric-bar > span { display: block; height: 100%; background: var(--accent); }
-.cd-root .metric-bar.negative > span { background: var(--warn); opacity: 0.7; }
 .cd-root .metric-tagline {
       margin-top: 0.18rem;
       color: var(--ink-mute);

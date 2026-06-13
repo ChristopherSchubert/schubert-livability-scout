@@ -8,6 +8,7 @@ import assert from "node:assert/strict";
 import {
   defaultWeights,
   metricScore,
+  metricBarColor,
   metricTaxonomy,
   metricByKey,
   emptyMeasured,
@@ -52,6 +53,27 @@ test("metricScore: pinned value + total coverage of the taxonomy", () => {
       assert.ok(Number.isFinite(s) && s >= 0 && s <= 10, `${key} → ${s} out of range`);
     }
   }
+});
+
+test("metricBarColor: encodes goodness, themed good-ends, null-safe", () => {
+  const hex = /^#[0-9a-f]{6}$/;
+  // null score → null (no bar, never a fabricated color)
+  assert.equal(metricBarColor(null), null);
+  assert.equal(metricBarColor(null, "water"), null);
+  // endpoints are the ramp's weak/excellent stops; valid hex throughout
+  assert.equal(metricBarColor(0), "#c0846f");   // weak → muted clay
+  assert.equal(metricBarColor(10), "#0d4c44");  // excellent → deep teal
+  assert.ok(hex.test(metricBarColor(5)));
+  // out-of-range scores clamp, never throw or emit garbage
+  assert.equal(metricBarColor(-3), metricBarColor(0));
+  assert.equal(metricBarColor(99), metricBarColor(10));
+  // unknown theme falls back to the neutral ramp
+  assert.equal(metricBarColor(7, "not_a_theme"), metricBarColor(7));
+  // a theme diverges from neutral at the GOOD end but not at the weak end
+  assert.equal(metricBarColor(0, "water"), metricBarColor(0));        // weak end shared
+  assert.notEqual(metricBarColor(10, "water"), metricBarColor(10));   // good end themed
+  assert.notEqual(metricBarColor(10, "sun"), metricBarColor(10));
+  assert.notEqual(metricBarColor(10, "stone"), metricBarColor(10));
 });
 
 test("axisRollup + weightedAxisScore: null when nothing is measured", () => {
