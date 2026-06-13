@@ -7,7 +7,6 @@ import "./journal.css";
 import AuthGate from "../components/AuthGate";
 import { PlannerProvider } from "../components/PlannerProvider";
 import { TripProvider } from "../components/TripProvider";
-import { readImageManifest } from "../lib/image-manifest";
 
 export const metadata = {
   title: "Schubert Atlas",
@@ -24,8 +23,14 @@ export const viewport = {
   viewportFit: "cover",
 };
 
+// Empty manifest shape the PlannerProvider expects: { images, choices, version }.
+// In production, heroes are read from cities.hero_image (Supabase Storage) — the
+// legacy manifest.js file is unused. In dev, the /cities/[slug]/images curation
+// page writes live updates into PlannerProvider state anyway (no SSR read needed).
+const EMPTY_MANIFEST = { images: {}, choices: {}, version: 0 };
+
 export default async function RootLayout({ children }) {
-  const initialManifest = await readImageManifest();
+  const initialManifest = EMPTY_MANIFEST;
 
   return (
     <html lang="en">

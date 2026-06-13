@@ -168,7 +168,7 @@ export default function AppShell({ activeMode, activeStage, cityItem, cityNav, t
 }
 
 function TopBar({ activeMode }) {
-  const { exportPlanner, replacePlanner, saveState, hydrated } = usePlanner();
+  const { exportPlanner, saveState, hydrated } = usePlanner();
   const navRef = useRef(null);
 
   // On a phone the tab row scrolls horizontally; keep the active stage centered
@@ -214,18 +214,6 @@ function TopBar({ activeMode }) {
           link.click();
           URL.revokeObjectURL(url);
         }}
-        onImport={(file) => {
-          if (!file) return;
-          const reader = new FileReader();
-          reader.onload = () => {
-            try {
-              replacePlanner(JSON.parse(String(reader.result || "")));
-            } catch (error) {
-              window.alert(error.message || "Could not read planner file.");
-            }
-          };
-          reader.readAsText(file);
-        }}
       />
     </header>
   );
@@ -247,7 +235,7 @@ function SavePill({ saveState, hydrated }) {
   return <span className="save-pill saved" title="Saved to the cloud">{label}</span>;
 }
 
-function BackupMenu({ onExport, onImport }) {
+function BackupMenu({ onExport }) {
   const [open, setOpen] = useState(false);
   return (
     <div className={`backup-menu${open ? " open" : ""}`}>
@@ -257,10 +245,6 @@ function BackupMenu({ onExport, onImport }) {
       {open ? (
         <div className="backup-pop" role="menu" onMouseLeave={() => setOpen(false)}>
           <button type="button" onClick={() => { setOpen(false); onExport(); }}>Download backup</button>
-          <label className="backup-import">
-            Restore from file
-            <input type="file" accept="application/json" onChange={(event) => { setOpen(false); onImport(event.target.files?.[0]); }} />
-          </label>
         </div>
       ) : null}
     </div>

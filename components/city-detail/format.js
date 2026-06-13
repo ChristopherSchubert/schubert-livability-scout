@@ -2,6 +2,12 @@
 // produces). Mirrors the mockup's formatMetricNumber so the live page reads
 // identically. Pure — no React.
 
+// The water_extent_km2 measurer caps bounding-box area at this ceiling so
+// that open-ocean cities don't score astronomically high. When the stored
+// value equals the cap, the real extent is unknown-but-enormous — render
+// "≥500 km²" rather than "500.0 km²" (which looks like a precise measurement).
+const WATER_GRANDEUR_CAP_KM2 = 500;
+
 export function formatMetricNumber(m) {
   const v = m.value;
   if (v == null) return "—";
@@ -11,7 +17,11 @@ export function formatMetricNumber(m) {
     case "%":      return `${Math.round(v)}%`;
     case "frac":   return `${Math.round(v * 100)}%`;
     case "m":      return v < 1000 ? `${Math.round(v)} m` : `${(v / 1000).toFixed(1)} km`;
-    case "km²":    return `${v.toFixed(1)} km²`;
+    case "km²": {
+      // Distinguish the clamped ceiling from a precise measurement.
+      if (m.key === "water_extent_km2" && v >= WATER_GRANDEUR_CAP_KM2) return `≥${WATER_GRANDEUR_CAP_KM2} km²`;
+      return `${v.toFixed(1)} km²`;
+    }
     case "°":      return `${v.toFixed(1)}°`;
     case "$":      return `$${(v / 1000).toFixed(0)}k`;
     case "ratio":  return `${v.toFixed(1)}×`;

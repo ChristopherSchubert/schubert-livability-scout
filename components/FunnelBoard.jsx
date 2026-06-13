@@ -8,6 +8,7 @@ import {
   cityImageQuery,
   cityStage,
   citySlug,
+  learnedAxisWeights,
   visitNowScore,
   weightedAxisScore,
 } from "../lib/planner-data";
@@ -49,26 +50,40 @@ export default function FunnelBoard({ focusStage }) {
   const calCount = planner.cities.filter((c) => c.isCalibration).length;
   const visibleCities = hideCalibration ? planner.cities.filter((c) => !c.isCalibration) : planner.cities;
 
+  // Use the same weights as the Ranking view so Board and Ranking order
+  // consistently. Falls back to equal weights when <6 places are surveyed
+  // (learnedAxisWeights returns null weights until the threshold is met, and
+  // weightedAxisScore falls back to equal weights in that case anyway).
+  const learned = useMemo(() => learnedAxisWeights(planner.cities), [planner.cities]);
+  const boardWeights = useMemo(
+    () => learned.weights || EQUAL_WEIGHTS,
+    [learned.weights],
+  );
+
   const cityRows = useMemo(() => visibleCities.map((cityItem) => ({
     ...augmentCityForFilters(cityItem),
-    overall: weightedAxisScore(cityItem, EQUAL_WEIGHTS),
+    overall: weightedAxisScore(cityItem, boardWeights),
     visitNow: visitNowScore(cityItem, filters.nowMonth),
-  })), [visibleCities, filters.nowMonth]);
+  })), [visibleCities, boardWeights, filters.nowMonth]);
 
   const options = useMemo(() => availableFilterOptions(cityRows), [cityRows]);
   const filteredCities = useMemo(
     () => applyCityFilters(cityRows, filters).map((r) => r.cityItem),
-    [cityRows, filters],
+    // Depend on primitive fields rather than the filters object identity so this
+    // memo doesn't re-run when useCityFilters returns a new wrapper object with
+    // the same values (e.g. on unrelated state changes in the parent).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [cityRows, filters.query, filters.regions, filters.states, filters.chipFilters, filters.chipMode, filters.axisMins, filters.visitNowMin],
   );
 
   const grouped = useMemo(() => {
     const buckets = Object.fromEntries(STAGES.map((stage) => [stage.id, []]));
     for (const cityItem of filteredCities) buckets[cityStage(cityItem)].push(cityItem);
     for (const list of Object.values(buckets)) {
-      list.sort((a, b) => (weightedAxisScore(b, EQUAL_WEIGHTS) ?? -1) - (weightedAxisScore(a, EQUAL_WEIGHTS) ?? -1));
+      list.sort((a, b) => (weightedAxisScore(b, boardWeights) ?? -1) - (weightedAxisScore(a, boardWeights) ?? -1));
     }
     return buckets;
-  }, [filteredCities]);
+  }, [filteredCities, boardWeights]);
 
   const visibleStages = focusStage ? STAGES.filter((stage) => stage.id === focusStage) : STAGES;
   const totalForFocus = focusStage ? (grouped[focusStage] || []).length : filteredCities.length;
@@ -135,7 +150,7 @@ export default function FunnelBoard({ focusStage }) {
             return (
               <article
                 key={stage.id}
-                className={`funnel-column stage-${stage.id}${isEmpty ? " funnel-column-empty-slim" : ""}${isOver ? " drag-over" : ""}`}
+                className={`funnel-column stage-${stage.id}${isOver ? " drag-over" : ""}`}
                 onDragOver={(e) => onColDragOver(e, stage.id)}
                 onDragLeave={() => onColDragLeave(stage.id)}
                 onDrop={(e) => onColDrop(e, stage.id)}
@@ -156,6 +171,7 @@ export default function FunnelBoard({ focusStage }) {
                         key={cityItem.id}
                         cityItem={cityItem}
                         imageState={imageState}
+                        weights={boardWeights}
                         onOpen={() => router.push(`/cities/${citySlug(cityItem)}`)}
                         onAdvance={() => advanceCityStage(cityItem.id)}
                         onSendBack={() => setCityStage(cityItem.id, "backlog")}
@@ -177,11 +193,11 @@ export default function FunnelBoard({ focusStage }) {
 }
 
 // Compact draggable kanban card.
-function CityCard({ cityItem, imageState, onOpen, onAdvance, onSendBack, onDragStart, stage }) {
+function CityCard({ cityItem, imageState, weights, onOpen, onAdvance, onSendBack, onDragStart, stage }) {
   const heroQuery = cityImageQuery(cityItem.name, cityItem.stayZone, cityItem.heartIntersection);
   const heroSrc = resolveImage(cityItem.heroImage, heroQuery, imageState);
-  const equal = { setting: 1, aliveness: 1, fabric: 1, realness: 1, january: 1 };
-  const score = weightedAxisScore(cityItem, equal);
+  const cardWeights = weights || EQUAL_WEIGHTS;
+  const score = weightedAxisScore(cityItem, cardWeights);
   const stageId = stage || cityStage(cityItem);
   const isAssessed = stageId === "assessed";
   // Only Backlog → Planning is a free one-click advance. Planning→Planned,
@@ -230,8 +246,7 @@ function CityCard({ cityItem, imageState, onOpen, onAdvance, onSendBack, onDragS
 function EmptyColumn({ stage }) {
   return (
     <div className="funnel-column-empty">
-      <p>Drop a card here or use Advance →</p>
-      <small>{stage.help}</small>
+      <p>Drop a card here</p>
     </div>
   );
 }

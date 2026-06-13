@@ -52,7 +52,7 @@ export default function MagazineDetail({ cityItem }) {
 
       {/* Chapter I — the scene */}
       <section id="scene" className="hero" aria-label={cityItem.name}>
-        <img src={appendBust(heroSrc, imageState.version)} alt={`${cityItem.name} at its best`} />
+        <img src={appendBust(heroSrc, imageState.version)} alt={`${cityItem.name} at its best`} fetchPriority="high" loading="eager" decoding="async" />
         <div className="hero-grad" />
         <div className="hero-bottom">
           <h1 className="place">{head}{tail ? <>, <em>{tail}</em></> : null}</h1>

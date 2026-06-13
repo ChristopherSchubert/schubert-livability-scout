@@ -76,7 +76,9 @@ export default function Calibrate() {
       }
       return 0;
     });
-  }, [cityRows, filters, sort]);
+  // Depend on primitive fields rather than the filters object identity.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cityRows, filters.query, filters.regions, filters.states, filters.chipFilters, filters.chipMode, filters.axisMins, filters.visitNowMin, sort]);
 
   function clickSort(key, e) {
     const shift = e.shiftKey;
@@ -179,7 +181,7 @@ export default function Calibrate() {
               );
             })}
             {rows.length === 0 ? (
-              <tr><td colSpan={3 + calibrateAxes.length + 2} className="rt-empty">No cities match these filters.</td></tr>
+              <tr><td colSpan={2 + calibrateAxes.length + 2} className="rt-empty">No cities match these filters.</td></tr>
             ) : null}
           </tbody>
         </table>
