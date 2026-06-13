@@ -245,6 +245,8 @@ Planner-specific tokens:
 - **No qualifying week ≥ threshold**: jump buttons no-op with "No later/earlier week ≥ N".
 - **Long city names**: ellipsis in label and box; full name in hover header.
 - **Narrow box (short trip)**: line text spills with a paper text-shadow halo rather than clipping; box stays true-duration width.
+- **Box at left edge (pan)**: when a planning-lane bar's left edge is scrolled behind the `.lbody` boundary, `stickyLabels()` shifts `.btext` padding-left so the dates/nights label stays within the visible portion of the bar rather than being clipped by `overflow:hidden`.
+- **Committed-lane label contrast**: `.is-planned .btext` has `overflow:hidden` and `.bname` has `text-overflow:ellipsis` so city names never bleed outside the green bar onto the light timeline background (where `--panel` text would be invisible).
 - **Missing hero**: blank tile with city initial (existing `resolveImage` fallback).
 
 ### Animation / motion

@@ -602,9 +602,25 @@ export default function TripPlanner() {
         if (S.CROWDS) lc.cline.setAttribute("d", smoothPath(P(lc.crowd, 0, 5)));
       });
     }
+    // Shift .btext padding so labels stay readable when a bar's left edge is
+    // hidden behind the .lbody left boundary (overflow:hidden clips it otherwise).
+    function stickyLabels() {
+      root.querySelectorAll(".trip-pl-bar:not(.is-planned)").forEach((bar) => {
+        const start = +bar.dataset.start;
+        if (!Number.isFinite(start)) return;
+        const barLeftInLbody = start * S.dayW + S.panX; // px from .lbody left edge
+        const barW = +bar.dataset.len * S.dayW;
+        const clipped = Math.max(0, -barLeftInLbody);
+        const maxShift = Math.max(0, barW - 44); // keep at least 44 px for resize handles
+        const shift = Math.min(clipped, maxShift);
+        const bt = bar.querySelector(".btext");
+        if (bt) bt.style.paddingLeft = shift > 0 ? `${shift + 11}px` : "";
+      });
+    }
     function apply() {
       root.style.setProperty("--day-w", S.dayW + "px");
       root.style.setProperty("--pan-x", S.panX + "px");
+      stickyLabels();
       redraw();
     }
 

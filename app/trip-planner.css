@@ -202,9 +202,13 @@
   display: flex; align-items: center; justify-content: center;
   color: var(--panel); font-family: var(--font-display);
 }
+.trip-pl-bar.is-planned .btext {
+  overflow: hidden; /* prevent city-name from bleeding onto light timeline background */
+}
 .trip-pl-bar.is-planned .bname {
   font-family: var(--font-display); font-variation-settings: "opsz" 22, "wght" 560;
   font-size: 0.82rem; color: var(--panel); white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis;
 }
 .trip-pl-bar.is-planned .bdates {
   color: rgba(255, 253, 246, 0.8); font-family: var(--font-ui); font-size: 0.6rem;
