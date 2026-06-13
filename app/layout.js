@@ -7,6 +7,7 @@ import "./journal.css";
 import AuthGate from "../components/AuthGate";
 import { PlannerProvider } from "../components/PlannerProvider";
 import { TripProvider } from "../components/TripProvider";
+import { Analytics } from '@vercel/analytics/next';
 
 export const metadata = {
   title: "Schubert Atlas",
@@ -53,6 +54,7 @@ export default async function RootLayout({ children }) {
             </TripProvider>
           </PlannerProvider>
         </AuthGate>
+        <Analytics />
       </body>
     </html>
   );
