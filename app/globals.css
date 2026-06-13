@@ -2943,27 +2943,6 @@ button:hover, .button-link:hover {
 .auth-google:disabled { opacity: 0.55; cursor: not-allowed; }
 .auth-google svg { width: 18px; height: 18px; flex: none; }
 
-/* "or with email" rule — hairlines flanking a small uppercase label. */
-.auth-or {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin: 0.1rem 0 0.2rem;
-  color: var(--muted);
-  font-family: var(--font-ui);
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
-  font-size: 0.64rem;
-}
-.auth-or::before, .auth-or::after {
-  content: "";
-  flex: 1;
-  height: 1px;
-  background: var(--border);
-}
-.auth-email { display: flex; flex-direction: column; gap: 1rem; }
-.auth-ghost-center { align-self: center; text-align: center; }
-
 /* Stack on narrow screens: the scene becomes a shorter top band. */
 @media (max-width: 820px) {
   .auth-screen { grid-template-columns: 1fr; grid-template-rows: 38vh auto; }

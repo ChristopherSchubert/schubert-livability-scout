@@ -59,16 +59,13 @@ export default function AuthGate({ children }) {
 }
 
 function SignIn() {
-  const [email, setEmail] = useState("");
-  const [showEmail, setShowEmail] = useState(false);
-  const [sent, setSent] = useState(false);
   const [err, setErr] = useState("");
-  const [busy, setBusy] = useState(false);
   const [gbusy, setGbusy] = useState(false);
 
-  // Primary path: Google OAuth. Redirects the whole page to Google; on return
-  // to window.location.origin the browser client auto-exchanges the PKCE code
-  // (same pattern the magic link relies on) and onAuthStateChange flips the gate.
+  // Google OAuth is the only sign-in method (email magic-link is disabled in
+  // Supabase). Redirects the whole page to Google; on return to
+  // window.location.origin the browser client auto-exchanges the PKCE code and
+  // onAuthStateChange flips the gate.
   async function google() {
     setErr(""); setGbusy(true);
     try {
@@ -84,40 +81,11 @@ function SignIn() {
     }
   }
 
-  async function send(e) {
-    e.preventDefault();
-    setBusy(true); setErr("");
-    try {
-      const sb = getSupabase();
-      const { error } = await sb.auth.signInWithOtp({
-        email: email.trim(),
-        options: { emailRedirectTo: window.location.origin },
-      });
-      if (error) throw error;
-      setSent(true);
-    } catch (e2) {
-      setErr(e2.message || "Could not send the link.");
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  if (sent) {
-    return (
-      <div className="auth-card">
-        <span className="auth-eyebrow">Schubert Atlas</span>
-        <h1 className="auth-title">Check your <em>email</em></h1>
-        <p className="auth-muted">A sign-in link is on its way to <strong>{email}</strong>. Open it on this device to sign in. You’ll stay signed in afterward.</p>
-        <button type="button" className="auth-ghost" onClick={() => setSent(false)}>Use a different email</button>
-      </div>
-    );
-  }
-
   return (
     <div className="auth-card">
       <span className="auth-eyebrow">Schubert Atlas</span>
       <h1 className="auth-title">Find your next <em>wonderful</em> place to go.</h1>
-      <p className="auth-muted">A tool for finding wonderful places to go and enjoy. Sign in to pick up where you left off — no password to remember.</p>
+      <p className="auth-muted">A tool for finding wonderful places to go and enjoy. Sign in with Google to pick up where you left off.</p>
 
       <button type="button" className="auth-google" onClick={google} disabled={gbusy}>
         <GoogleMark />
@@ -125,29 +93,6 @@ function SignIn() {
       </button>
 
       {err ? <p className="auth-err">{err}</p> : null}
-
-      {showEmail ? (
-        <form className="auth-email" onSubmit={send}>
-          <div className="auth-or"><span>or with email</span></div>
-          <label className="auth-field">
-            <span className="auth-field-label">Your email</span>
-            <input
-              type="email" required autoFocus
-              className="auth-input"
-              placeholder="you@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </label>
-          <button type="submit" className="auth-primary" disabled={busy || !email.trim()}>
-            {busy ? "Sending…" : "Send me a link →"}
-          </button>
-        </form>
-      ) : (
-        <button type="button" className="auth-ghost auth-ghost-center" onClick={() => setShowEmail(true)}>
-          Prefer email? Get a one-tap link
-        </button>
-      )}
 
       {process.env.NODE_ENV !== "production" ? (
         <button type="button" className="auth-ghost" onClick={devSignIn}>Dev sign-in (localhost only)</button>
