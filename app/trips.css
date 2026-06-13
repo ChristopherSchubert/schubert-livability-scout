@@ -291,7 +291,42 @@
 .tc-chip.on { background: #e7f1ee; border-color: #bcd8d0; color: var(--accent); }
 .tc-foot { display: flex; align-items: center; gap: .6rem; margin-top: .4rem; }
 
-/* TripGrid — the timed hour-grid (Grid tab) */
+/* TripGrid — the timed hour-grid (Grid tab, #29 / #12) */
+
+/* Outer wrap: holds toolbar, leg tabs, legend, and leg sections */
+.tg-wrap { display: flex; flex-direction: column; gap: .3rem; }
+
+/* Per-leg paging: each .tg-leg wraps one leg's .tg-scroll.
+   On screen only the .active leg is shown; print shows all. */
+.tg-leg { display: none; }
+.tg-leg.active { display: block; }
+
+/* Leg tab selector (#12) */
+.tg-pages { display: flex; align-items: stretch; gap: .4rem; flex-wrap: wrap; margin: .15rem 0 .1rem; }
+.tg-page { border: 1px solid var(--border); border-radius: 8px; padding: .28rem .75rem; cursor: pointer; background: var(--panel); font-family: var(--font-ui); font-size: .72rem; font-weight: 600; color: var(--muted); line-height: 1.25; text-align: left; }
+.tg-page small { display: block; font-size: .6rem; font-weight: 400; opacity: .85; }
+.tg-page.on { background: var(--accent); color: #fff; border-color: var(--accent); }
+.tg-page:hover:not(.on) { border-color: var(--text); color: var(--text); }
+.tg-page:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.tg-page-spacer { flex: 1; }
+.tg-pagenote { font-family: var(--font-ui); font-size: .66rem; color: var(--muted); align-self: center; }
+
+/* Category legend + status-glyph key (#12) — print-visible */
+.tg-legend { display: flex; gap: .8rem; flex-wrap: wrap; align-items: center; font-family: var(--font-ui); font-size: .64rem; color: var(--muted); margin: .3rem 0 .2rem; }
+.tg-legend span { display: inline-flex; align-items: center; gap: .3rem; }
+.tg-li { display: inline-block; width: 16px; height: 9px; border-radius: 2px; border: 1px solid var(--border); border-left: 3px solid var(--lc, #6b6358); background: var(--panel); flex-shrink: 0; }
+.tg-li-dash { border-style: dashed; }
+.tg-legend-glyphs { margin-left: auto; }
+
+/* Status glyphs on blocks + chips (#12) */
+.tg-glyphs { font-style: normal; font-size: .58rem; margin-left: .18rem; opacity: .85; }
+.tg-chip-glyphs { font-size: .58rem; margin-left: .15rem; opacity: .9; }
+
+/* Drive connector blocks — thin dashed, travel color (#12) */
+.tg-drive { border-style: dashed !important; background: #f0f4fa !important; opacity: .92; min-height: 10px !important; }
+.tg-drive b { font-size: .58rem !important; font-style: italic; color: #2e5482; }
+
+/* Grid scroll container (unchanged from #29) */
 .tg-scroll { overflow-x: auto; border: 1px solid var(--border); border-radius: 10px; background: var(--panel); }
 .tg { display: flex; min-width: max-content; }
 .tg-gutter { position: relative; flex: 0 0 44px; border-right: 1px solid var(--border); background: var(--panel-strong); }
@@ -373,15 +408,20 @@
 .tg-print { border: 1px solid var(--rule, #d9d2c5); background: #fff; border-radius: 7px; padding: .28rem .7rem; font-size: .82rem; cursor: pointer; }
 .tg-print:hover { background: #f6f2ea; }
 
-/* ── Print: the Grid is the printable artifact (#29). Drop all app chrome,
-      let the grid fill the page, force the category colours through. ── */
+/* ── Print: the Grid is the printable artifact (#29 / #12).
+      Drop all app chrome, let the grid fill the page.
+      Per-leg paging (#12): each .tg-leg breaks to its own sheet. ── */
 @media print {
-  .sticky-header, .tw-summary, .tg-print { display: none !important; }
+  .sticky-header, .tw-summary, .tg-print, .tg-pages, .tg-pagenote { display: none !important; }
   .canvas { margin: 0 !important; }
   .tw-wrap { padding: 0; max-width: none; }
+  /* All legs show in print (regardless of which is .active on screen) */
+  .tg-leg { display: block !important; break-after: page; }
+  .tg-leg:last-of-type { break-after: auto; }
+  .tg-legend { display: flex !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   .tg-scroll { overflow: visible !important; }
   .tg { transform: none !important; }
-  .tg-block, .tg-chip { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .tg-block, .tg-chip, .tg-drive, .tg-li { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   .tg-col { break-inside: avoid; }
   @page { size: landscape; margin: 1cm; }
 }
@@ -506,3 +546,12 @@
 /* TripComposer effect footer — shows what a diet chip does downstream */
 .tc-chip-effect { margin: .3rem 0 0; font-family: var(--font-ui); font-size: .72rem; color: var(--muted); font-style: italic; padding: .3rem .5rem; background: #f5faf8; border-radius: 7px; border: 1px solid #d4e8e2; }
 @media (max-width: 640px) { .tv-compare { grid-template-columns: 1fr; } }
+
+/* ── TripMapInner (#8) — honest caption + leg-focus controls ── */
+.tm-wrap { display: flex; flex-direction: column; gap: .55rem; }
+.tm-caption { margin: 0; font-family: var(--font-ui); font-size: .8rem; color: #8a5a16; background: #fbf0e8; border: 1px solid #dcc49a; border-radius: 8px; padding: .4rem .75rem; }
+.tm-legs { display: flex; flex-wrap: wrap; gap: .35rem; }
+.tm-leg-btn { font-family: var(--font-ui); font-size: .75rem; font-weight: 600; border: 1.5px solid var(--border); border-radius: 100px; padding: .22rem .7rem; background: var(--panel); cursor: pointer; color: var(--ink, #2c2a26); transition: background .12s, border-color .12s; }
+.tm-leg-btn[style].active { background: color-mix(in srgb, var(--leg-color) 12%, white); border-color: var(--leg-color); color: var(--leg-color); }
+.tm-leg-btn:not([style]).active { background: #e7f1ee; border-color: var(--accent, #0d4c44); color: var(--accent, #0d4c44); }
+.tm-leg-btn:focus-visible { outline: 2px solid var(--accent, #0d4c44); outline-offset: 2px; }

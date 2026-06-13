@@ -112,6 +112,19 @@ for vegetarian (your chips)"). Veg signal is honest-cited: `servesVegetarianFood
 Gathered places now carry their markers forward, so a saved veg spot reads veg ✓.
 The composer shows the effect inline when you toggle a diet chip.
 
+## Map + Grid (deck parity)
+
+- **Map** ([TripMapInner](../components/TripMapInner.jsx)) — honest about coverage:
+  a caption "Showing N of M stops — X aren't pinned to a place yet" whenever placed
+  < placeable (shared `placeableStops(trip)` in [trip-frame.js](../lib/trip-frame.js)
+  so Map + Frame can't disagree). Points grouped + routed per leg (leg colors),
+  with a leg-focus control. Coords coerced to Number (jsonb stores strings) and a
+  degenerate-cluster guard so the fit never snaps to street zoom.
+- **Grid** ([TripGrid](../components/TripGrid.jsx)) — leg-paged (one leg per tab /
+  print page, `break-after:page`), a category legend + 🔒 booked · 💶 cash · 📌
+  pinned key, honest status glyphs (only on real data), and `category:travel`
+  drive connectors (duration shown only when real). Hourly gutter kept (Janice #7).
+
 ## Follow-ups (tracked as GitHub issues)
 
 - **#17 drag** — @dnd-kit reorder within a day / shelf→day.
