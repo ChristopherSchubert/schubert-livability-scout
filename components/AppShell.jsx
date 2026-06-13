@@ -299,22 +299,68 @@ function CityContextStrip({ cityItem, cityNav }) {
 // Plan·Days·Book·Shelf·Grid·Map·Frame sub-tabs (each its own URL). Reuses the
 // city-context CSS so the chrome matches the rest of the app.
 function TripContextStrip({ tripItem, tripNav }) {
-  const { updateTripFrame } = useTrips();
+  const { updateTripFrame, saveState } = useTrips();
   const navRef = useRef(null);
   useTabNav(navRef, ".city-context-tab.active", tripNav);
+
+  // Honest save state for the inline name field. The field is auto-persisted
+  // (debounced) like everything else in the app — no Save button — so instead
+  // of a button we surface the provider's real saveState: "Saving…" while a
+  // write is in flight, a brief "Saved" when it lands. nameDirty (a ref, so it
+  // doesn't re-fire this effect) scopes the indicator to name edits, not the
+  // provider's other writes.
+  const nameDirty = useRef(false);
+  const hideTimer = useRef(null);
+  const [nameStatus, setNameStatus] = useState(null); // null | saving | saved | error
+  useEffect(() => {
+    if (!nameDirty.current) return;
+    const s = saveState?.status;
+    if (s === "saving") {
+      setNameStatus("saving");
+    } else if (s === "saved") {
+      nameDirty.current = false;
+      setNameStatus("saved");
+      clearTimeout(hideTimer.current);
+      hideTimer.current = setTimeout(() => setNameStatus(null), 1600);
+    } else if (s === "error") {
+      nameDirty.current = false;
+      setNameStatus("error");
+    }
+  }, [saveState?.status, saveState?.at]);
+
+  const name = tripItem.name || "";
+  function onNameChange(event) {
+    nameDirty.current = true;
+    clearTimeout(hideTimer.current);
+    setNameStatus("saving");
+    updateTripFrame(tripItem.id, { name: event.target.value });
+  }
+
   return (
     <div className="city-context stage-board trip-context">
       <div className="city-context-left">
         <Link href="/trips" className="city-context-back" aria-label="All trips">←</Link>
         <div className="city-context-text">
           <span className="city-context-stage">Trip</span>
-          <input
-            className="city-context-name trip-context-name"
-            value={tripItem.name || ""}
-            placeholder="Untitled trip"
-            onChange={(event) => updateTripFrame(tripItem.id, { name: event.target.value })}
-            aria-label="Trip name"
-          />
+          <label className="trip-name-edit">
+            <input
+              className="city-context-name trip-context-name"
+              value={name}
+              size={Math.max(name.length, "Untitled trip".length) + 1}
+              placeholder="Untitled trip"
+              onChange={onNameChange}
+              aria-label="Trip name"
+            />
+            <svg className="trip-name-pencil" width="14" height="14" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"
+              strokeLinejoin="round" aria-hidden="true">
+              <path d="M12 20h9" />
+              <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z" />
+            </svg>
+            {nameStatus === "saving" ? <span className="trip-name-status">Saving…</span> : null}
+            {nameStatus === "saved" ? <span className="trip-name-status saved">✓ Saved</span> : null}
+            {nameStatus === "error" ? <span className="trip-name-status error">Not saved</span> : null}
+          </label>
         </div>
       </div>
       {tripNav?.length ? (

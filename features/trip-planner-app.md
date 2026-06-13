@@ -89,9 +89,13 @@ scouted places near this trip" copy. Clicking a chip appends a leg via
 `appendCityLeg` ([trip-window.js](../lib/trip-window.js), tested) which funds the
 new 1-night leg from the longest leg and **preserves the total span**. **＋ other
 city…** searches `/api/places/search` for non-Atlas destinations. Empty trips show
-an "add a city to start" dropzone. The trip name itself is editable inline in the
-trip context strip (`TripContextStrip` → `updateTripFrame`), mirroring the city
-header. Follow-ups: drag-from-tray-onto-window (click-to-add ships now);
+an "add a city to start" dropzone. The trip name is editable inline in the trip
+context strip (`TripContextStrip` → `updateTripFrame`): a discoverable field
+(pencil + hover tint + focus ring) rather than a bare input, with a live save
+state (`Saving…` / `✓ Saved`) read from the provider's real `saveState` instead
+of a Save button — consistent with the app's auto-save-everywhere model.
+Styling: `.trip-name-edit` in [trips.css](../app/trips.css). Follow-ups:
+drag-from-tray-onto-window (click-to-add ships now);
 region/state chips as a first-class trip attribute + cross-trip filter (#79).
 
 ## Hotel search → place a stay (Janice #5)

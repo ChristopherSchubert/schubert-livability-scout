@@ -540,7 +540,45 @@
 .tw-summary b { color: var(--text); font-weight: 600; }
 .tw-summary em { font-style: normal; color: var(--accent); }
 .tw-summary .tw-meta { margin-top: 0; }
-.trip-context-name { font-family: var(--font-display); font-weight: 500; border: none; background: none; padding: 0; }
+/* Inline-editable trip name (Option A): the field reads as the title at rest,
+   but a pencil + hover tint + focus ring make it discoverable, and a live save
+   status replaces the (absent) Save button. */
+.trip-name-edit {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-left: -0.45rem;
+  padding: 0.1rem 0.45rem;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  cursor: text;
+  transition: background-color 0.12s ease, border-color 0.12s ease;
+}
+.trip-name-edit:hover { background: var(--panel-strong); border-color: var(--border); }
+.trip-name-edit:focus-within { background: var(--panel); border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.trip-context-name {
+  font-family: var(--font-display);
+  font-weight: 500;
+  border: none;
+  background: none;
+  padding: 0;
+  color: var(--text);
+  min-width: 3ch;
+}
+.trip-context-name:focus, .trip-context-name:focus-visible { outline: none; }
+.trip-name-pencil { color: var(--muted); opacity: 0.5; flex: 0 0 auto; transition: opacity 0.12s ease; }
+.trip-name-edit:hover .trip-name-pencil,
+.trip-name-edit:focus-within .trip-name-pencil { opacity: 1; }
+.trip-name-status {
+  font-family: var(--font-ui);
+  font-size: 0.7rem;
+  letter-spacing: 0.03em;
+  color: var(--muted);
+  white-space: nowrap;
+  flex: 0 0 auto;
+}
+.trip-name-status.saved { color: var(--accent); }
+.trip-name-status.error { color: #a3302d; }
 
 /* ── Lay-out dealer: proposal/keep/undo, alternates row, drag-pause banner ── */
 
