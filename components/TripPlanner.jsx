@@ -302,6 +302,11 @@ export default function TripPlanner() {
   // Persist the manual order to planning_order (debounced) once the user has
   // actually dragged — never on the initial seed or promote/demote merges.
   const userReorderedRef = useRef(false);
+  // Holds the current drag's listener-cleanup so an unmount mid-drag (navigation)
+  // detaches the window pointermove/pointerup that would otherwise fire on a dead
+  // component (#61).
+  const dragCleanupRef = useRef(null);
+  useEffect(() => () => { dragCleanupRef.current?.(); }, []);
   useEffect(() => {
     if (!userReorderedRef.current || !order.length) return;
     const t = setTimeout(() => {
@@ -413,13 +418,18 @@ export default function TripPlanner() {
         return next.length === prev.length && next.every((v, i) => v === prev[i]) ? prev : next;
       });
     };
-    const up = () => {
-      setDragLaneId(null); // persistence handled by the debounced effect on `order`
+    const detach = () => {
       window.removeEventListener("pointermove", move);
       window.removeEventListener("pointerup", up);
+      dragCleanupRef.current = null;
+    };
+    const up = () => {
+      setDragLaneId(null); // persistence handled by the debounced effect on `order`
+      detach();
     };
     window.addEventListener("pointermove", move);
     window.addEventListener("pointerup", up);
+    dragCleanupRef.current = detach;
   }
 
   // ── drag a backlog card → promote (drop on a lane's timeline sets the week) ─
@@ -434,9 +444,13 @@ export default function TripPlanner() {
       moved = true;
       setGhost({ name, x: ev.clientX, y: ev.clientY });
     };
-    const up = (ev) => {
+    const detach = () => {
       window.removeEventListener("pointermove", move);
       window.removeEventListener("pointerup", up);
+      dragCleanupRef.current = null;
+    };
+    const up = (ev) => {
+      detach();
       setGhost(null);
       // Any release promotes the card into Planning. If it happened to land on a
       // lane's timeline, use that week; otherwise the planner picks the best
@@ -459,6 +473,7 @@ export default function TripPlanner() {
     };
     window.addEventListener("pointermove", move);
     window.addEventListener("pointerup", up);
+    dragCleanupRef.current = detach;
   }
 
   // ── ruler cells (months / weeks) ──────────────────────────────────────
@@ -983,7 +998,7 @@ export default function TripPlanner() {
     // ── cleanup ──
     return () => {
       if (zoom) zoom.removeEventListener("click", onZoom);
-      root.removeEventListener("wheel", onWheel);
+      root.removeEventListener("wheel", onWheel, { passive: false });
       if (ruler) ruler.removeEventListener("pointerdown", onRulerDown);
       window.removeEventListener("pointermove", onPanMove);
       window.removeEventListener("pointerup", onPanUp);

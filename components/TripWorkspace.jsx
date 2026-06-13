@@ -6,7 +6,7 @@
 // in AppShell (see TripWorkspaceRoute), and this renders ONE panel. No in-page
 // tab state — switching views is navigation (project convention, #15). Click any
 // entry to edit in the EntryEditor.
-import { useMemo, useState } from "react";
+import { useMemo, useState, useRef, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { useTrips } from "./TripProvider";
 import { tripDays, entriesByDay, cashNeeded, bookingsLedger } from "../lib/trip";
@@ -33,6 +33,8 @@ export default function TripWorkspace({ tripId, activeTab = "plan" }) {
   const tab = activeTab;
   const [editing, setEditing] = useState(null);
   const [solveMsg, setSolveMsg] = useState(null);
+  const solveTimerRef = useRef(null);
+  useEffect(() => () => clearTimeout(solveTimerRef.current), []); // clear the solve-msg timer on unmount (#61)
   // Which day is in focus. On a phone the Days panel shows ONE day at a time
   // (the deck's "Today" view, #35) chosen from the date rail; on desktop the
   // rail is a jump-nav and every day stays visible. null → first day.
@@ -68,7 +70,8 @@ export default function TripWorkspace({ tripId, activeTab = "plan" }) {
       if (t) { updateEntry(trip.id, { ...e, time: { mode: "range", start: t.start, end: t.end } }); placed++; }
     }
     setSolveMsg({ date, placed, flags });
-    setTimeout(() => setSolveMsg(null), 6000);
+    clearTimeout(solveTimerRef.current);
+    solveTimerRef.current = setTimeout(() => setSolveMsg(null), 6000);
   }
 
   // Add a typed entry and open it (stay/flight/own). Shelf items are undated.
