@@ -115,7 +115,7 @@ export function VisitPlan({ cityItem, onPatch, onChangeDay, onChangeChecklist })
   const checklistKeys = [
     ["before", "Before Booking", "Bookings, dates, money down."],
     ["during", "During Visit", "What to actually test on the ground."],
-    ["after", "After Visit", "Capture the verdict before it fades."],
+    ["after", "After Visit", "Capture how it felt before it fades."],
   ];
   const days = cityItem.days || [];
   const nights = tripNights(cityItem.arriveDate, cityItem.departDate);

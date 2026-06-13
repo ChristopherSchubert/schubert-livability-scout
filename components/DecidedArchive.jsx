@@ -6,6 +6,8 @@ import {
   cityImageQuery,
   cityStage,
   citySlug,
+  decisionLabel,
+  DECISION_VALUES,
   weightedAxisScore,
 } from "../lib/planner-data";
 import AppShell from "./AppShell";
@@ -15,14 +17,14 @@ import { resolveImage, usePlanner } from "./PlannerProvider";
 // Equal-weight measured composite — same engine as Detail / Board.
 const EQUAL_WEIGHTS = { setting: 1, aliveness: 1, fabric: 1, realness: 1, january: 1 };
 
-const DECISIONS = ["Advance", "Winter Revisit", "Eliminate"];
+const DECISIONS = DECISION_VALUES;
 
 /**
- * DecidedArchive — purpose-built page for the Decided stage.
+ * DecidedArchive — the page behind the Assessed stage.
  *
- * Not a kanban column. A filterable archive of cities you've ruled on,
- * grouped by verdict. The point is to see your decisions as a portfolio:
- * what advanced, what got winter-revisited, what dropped out.
+ * Not a kanban column. A filterable look back at the places you've visited,
+ * grouped by whether you'd go back: the ones you're returning to, the ones
+ * worth a winter revisit, and the ones you're skipping.
  */
 export default function DecidedArchive() {
   const { planner, imageState, hydrated } = usePlanner();
@@ -50,8 +52,8 @@ export default function DecidedArchive() {
       <section className="canvas-header">
         <div>
           <p className="page-eyebrow">Assessed</p>
-          <h1>Assessed cities</h1>
-          <p className="canvas-sub">{!hydrated ? "Loading…" : decided.length === 0 ? "No assessed cities yet. Cities you mark advance, winter-revisit, or eliminate on the Visited page show up here." : `${decided.length} ${decided.length === 1 ? "city" : "cities"} assessed. Filter by outcome.`}</p>
+          <h1>Looking back</h1>
+          <p className="canvas-sub">{!hydrated ? "Loading…" : decided.length === 0 ? "Nothing here yet. Places you mark going back, winter revisit, or not on the Visited page show up here." : `${decided.length} ${decided.length === 1 ? "place" : "places"} visited. Filter by whether you'd go back.`}</p>
         </div>
       </section>
 
@@ -59,14 +61,14 @@ export default function DecidedArchive() {
         <WorkspaceLoading />
       ) : decided.length === 0 ? (
         <EmptyState
-          title="No verdicts yet"
-          body="Cities you advance, winter-revisit, or eliminate will appear here as a portfolio of decisions."
+          title="Nothing here yet"
+          body="After a visit, the places you're going back to, want to revisit in winter, or are skipping show up here."
           href="/visited"
           cta="Go to Visited"
         />
       ) : (
         <>
-          <nav className="archive-filter" aria-label="Filter by decision">
+          <nav className="archive-filter" aria-label="Filter by whether you'd go back">
             {["All", ...DECISIONS].map((option) => (
               <button
                 key={option}
@@ -74,14 +76,14 @@ export default function DecidedArchive() {
                 className={`archive-chip${filter === option ? " active" : ""} ${chipClass(option)}`}
                 onClick={() => setFilter(option)}
               >
-                <span>{option}</span>
+                <span>{option === "All" ? "All" : decisionLabel(option)}</span>
                 <span className="archive-chip-count">{counts[option]}</span>
               </button>
             ))}
           </nav>
 
           {visible.length === 0 ? (
-            <p className="archive-empty">No verdicts of this kind yet.</p>
+            <p className="archive-empty">Nothing in this group yet.</p>
           ) : (
             <ul className="archive-list">
               {visible.map((cityItem) => {
@@ -101,7 +103,7 @@ export default function DecidedArchive() {
                       <header className="archive-head">
                         <Link className="archive-name" href={`/cities/${slug}/assess`}>{cityItem.name}</Link>
                         <span className="archive-score">{avg}</span>
-                        <span className={`decision-chip ${chipClass(decision)}`}>{decision}</span>
+                        <span className={`decision-chip ${chipClass(decision)}`}>{decisionLabel(decision)}</span>
                       </header>
                       {memo ? <p className="archive-memo">{truncate(memo, 220)}</p> : <p className="archive-memo archive-memo-empty">No memo recorded.</p>}
                     </div>

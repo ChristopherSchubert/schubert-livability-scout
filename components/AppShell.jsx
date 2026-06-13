@@ -14,7 +14,7 @@ const NAV_MODES = [
   { id: "planning", href: "/planning", label: "Planning", help: "Rank candidates and plan each trip's best week.", stageId: "planning" },
   { id: "planned",  href: "/planned",  label: "Planned",  help: "Trips with committed dates.", stageId: "planned" },
   { id: "visited",  href: "/visited",  label: "Visited",  help: "Back from a trip, awaiting the survey.", stageId: "visited" },
-  { id: "assessed", href: "/assessed", label: "Assessed", help: "Archive of verdicts you've made.", stageId: "assessed" },
+  { id: "assessed", href: "/assessed", label: "Assessed", help: "Where each visit landed — going back, or not.", stageId: "assessed" },
   { id: "baseline", href: "/baseline", label: "Baseline", help: "Rate places you already know — the answer key.", stageId: null },
   { id: "trips",    href: "/trips",    label: "Trips",    help: "Multi-city trips — plan, solve, book.", stageId: null },
 ];

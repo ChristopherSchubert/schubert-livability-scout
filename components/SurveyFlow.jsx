@@ -150,7 +150,7 @@ function NoteStep({ value, onChange }) {
         rows={4}
         value={value || ""}
         onChange={(e) => onChange(e.target.value)}
-        placeholder="The one thing that decided it…"
+        placeholder="The one thing that stuck with you…"
         autoFocus
       />
     </>

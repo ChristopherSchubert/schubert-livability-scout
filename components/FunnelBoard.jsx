@@ -8,6 +8,7 @@ import {
   cityImageQuery,
   cityStage,
   citySlug,
+  decisionLabel,
   learnedAxisWeights,
   visitNowScore,
   weightedAxisScore,
@@ -238,7 +239,7 @@ function CityCard({ cityItem, imageState, weights, onOpen, onAdvance, onSendBack
       </button>
       <footer className="funnel-card-foot">
         {isAssessed ? (
-          <span className={`decision-chip ${cityItem.decision?.toLowerCase().replace(/\s+/g, "-") || "assessed"}`}>{cityItem.decision || "Assessed"}</span>
+          <span className={`decision-chip ${cityItem.decision?.toLowerCase().replace(/\s+/g, "-") || "assessed"}`}>{decisionLabel(cityItem.decision)}</span>
         ) : (
           <>
             {stageId !== "backlog" ? (

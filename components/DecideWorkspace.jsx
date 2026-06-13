@@ -46,7 +46,7 @@ export default function DecideWorkspace() {
         <WorkspaceLoading />
       ) : queue.length === 0 ? (
         <section className="workspace-empty">
-          <h2>Nothing to decide right now</h2>
+          <h2>Nothing to look back on yet</h2>
           <p>Finish a trip and the city lands here for its post-visit survey.</p>
           <Link className="button-link" href="/planned">Go to Planned</Link>
         </section>

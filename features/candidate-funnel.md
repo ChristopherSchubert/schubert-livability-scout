@@ -65,6 +65,26 @@ inactive one so it clearly reads as a clickable alternate view. Styles in
 [`app/workspace.css`](../app/workspace.css) (`.view-toggle*`). Extracted so the
 two pages can't drift; pass `active="board"` / `active="ranking"`.
 
+## Voice: vacation app, not a decision tool (#68)
+
+The product reframed (2026-06-09) from "rank → decide → verdict" to "find &
+enjoy destinations." The funnel surfaces speak the kept **"would you go
+back?"** question, never a verdict. The post-visit outcome is stored under
+the historical `decision` values (`Advance` / `Winter Revisit` /
+`Eliminate`), but every display goes through `decisionLabel()` in
+[`lib/stages.js`](../lib/stages.js) → **Going back / Winter revisit / Not
+going back** — one home so the Board chip, the `/assessed` archive filters,
+and the Decide capture flow can't drift. The `/assessed` page is "Looking
+back," not a "portfolio of decisions." `chipClass()` still keys the CSS color
+off the stored value, so the helper is display-only.
+
+Open, owner's call (left on #68): the **Ranking spreadsheet + per-axis
+"minimum scores" sliders** are the most rank-and-decide-flavored surface
+left. They're functional and were kept as-is rather than removed under the
+new framing — a product decision, not a copy fix. CLAUDE.md's own
+"decision tool / final judgment" framing in the header is likewise the
+owner's to rewrite.
+
 ## Status
 
 Stub — created 2026-06-09 alongside the ViewToggle redesign. The kanban,
