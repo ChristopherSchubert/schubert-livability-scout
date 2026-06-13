@@ -73,7 +73,7 @@ export default function TripsIndex() {
     // Wrapped in the global AppShell (#65) so /trips has the same top nav as the
     // rest of the app — it was a dead-end (no way back to Board/Planning/…).
     <AppShell activeMode="trips">
-      <div className="tw-wrap">
+      <div className="tw-wrap tw-trips-index">
         <header className="tw-head tw-index-head">
           <div>
             <h1>Trips</h1>

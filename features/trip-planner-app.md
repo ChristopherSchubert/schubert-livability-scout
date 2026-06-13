@@ -17,7 +17,14 @@ design source of truth.
   travelers and diet. Replaced the old flat one-line text rows that read as a
   debug list. Stops/budget/bookings are intentionally omitted here — those need
   the per-trip normalized entries (loaded only on `enterTrip`), so showing them
-  on the index would render misleading zeros (never-invent rule).
+  on the index would render misleading zeros (never-invent rule). The cards sit
+  in a responsive grid (`repeat(auto-fit, minmax(min(100%, 320px), 1fr))`) —
+  2-up on desktop, 1-up on mobile. **Layout gotcha:** `.tw-wrap` has
+  `margin: 0 auto`, and the parent `.canvas` is a flex column; auto inline
+  margins suppress flex stretch, so the wrap collapsed to content width (~447px)
+  and the grid could never go multi-column. The `.tw-trips-index` modifier adds
+  `width: 100%` to give it a definite size (then `max-width: 920` caps, margins
+  center). Scoped to the index so the workspace pages are untouched.
 - `/trips/[id]` → [components/TripWorkspace.jsx](../components/TripWorkspace.jsx)
   — the tabbed trip page (**Plan · Days · Book · Shelf · Grid**).
 

@@ -39,9 +39,16 @@
 .tw-empty { padding: .4rem; font-style: italic; }
 /* /trips landing — dossier cards (one per trip). Warm paper surface + a deep
    green spine; the route line is the signature "where does this go" signal. */
-.tw-trip-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 1rem; }
+/* The wrap lives in a flex-column .canvas; its `margin: 0 auto` suppresses the
+   default flex stretch, so without an explicit width it collapses to content
+   width (~447px) and the grid can never go multi-column. width:100% gives it a
+   definite size → max-width caps at 920, the auto-margins center it. Scoped to
+   the index class so the trip workspace pages are untouched. */
+.tw-trips-index { width: 100%; }
+.tw-trip-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 1rem; }
 .tw-trip-card {
   display: block; position: relative; overflow: hidden;
+  width: 100%; max-width: 480px; justify-self: center;
   background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius);
   box-shadow: var(--shadow); padding: 1.05rem 1.2rem 1rem 1.35rem;
   transition: transform .14s ease, border-color .14s ease, box-shadow .14s ease;
@@ -199,8 +206,16 @@
 .tw-focus-head b { font-family: var(--font-display); font-size: 1.2rem; }
 .tw-focus-head .tw-meta { font-family: var(--font-ui); font-size: .8rem; color: var(--muted); margin: 0; }
 
-.tw-daycols-wrap { overflow-x: auto; margin: .6rem 0; padding-bottom: .2rem; }
-.tw-daycols { display: grid; gap: .5rem; min-width: min-content; }
+/* The day-board breaks out of the 920px reading column (.tw-wrap) to use the
+   full canvas width, so a 4- or 5-day city keeps all its days on one row
+   instead of wrapping into dead space beside the prose. Centered, capped to
+   the viewport so it never forces a horizontal scrollbar. */
+.tw-daycols-wrap { position: relative; left: 50%; transform: translateX(-50%); width: min(1280px, calc(100vw - 3rem)); margin: .6rem 0; padding-bottom: .2rem; }
+/* A day is a fixed-width unit, identical in every city. Cards wrap to a new
+   row (calendar-style) only when the canvas truly runs out of width — never
+   by stretching to fill or scrolling sideways. So 2-day and 5-day cities
+   show day columns of exactly the same size. */
+.tw-daycols { display: grid; gap: .5rem; grid-template-columns: repeat(auto-fill, var(--tw-daycol-w, 240px)); justify-content: center; }
 .tw-daycol { border: 1px solid var(--border); border-radius: 9px; background: var(--panel); padding: .45rem; min-width: 0; }
 .tw-dh { display: flex; justify-content: space-between; align-items: baseline; gap: .25rem; font-size: .72rem; font-weight: 700; margin-bottom: .35rem; }
 .tw-dh small { font-weight: 400; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; font-size: .62rem; }
