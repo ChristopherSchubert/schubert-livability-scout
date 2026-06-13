@@ -32,13 +32,73 @@ dashboard-side.
 - **Vercel's GitHub integration**, not the CLI. The Vercel project is linked to
   the GitHub repo through the Vercel GitHub App, configured in the Vercel
   dashboard — **not** through any file in the repo. That's why there is no
-  `vercel.json`, no `.vercel/` directory, no `.github/workflows/`, and no
-  `Dockerfile`. Don't go looking for them; their absence is expected.
+  `vercel.json` and no `.vercel/` directory: the deploy itself is
+  dashboard-driven, not file-driven. (There is now one workflow file —
+  `.github/workflows/sync-preview.yml` — but it only keeps the `preview` branch
+  fast-forwarded to `main`; it does **not** drive deployment. There's still no
+  `Dockerfile`.)
 - **Auto-deploy on push to `main`.** Every push to `main` triggers a production
   build (`next build`) and deploy. So: **pushing to `main` == deploying.** There
   is no separate deploy step to run. A push typically goes live in ~1–3 minutes.
 - Pushes to other branches / PRs get Vercel **preview** deployments at their own
   URLs (standard Vercel behaviour).
+
+## Branching & preprod (`preview`)
+
+The default path is **straight to `main`** — most changes deploy to production
+the moment they're pushed. There is one long-lived branch besides `main`:
+
+- **`preview`** — the **preproduction** branch. It exists so a *particularly
+  complex or risky* feature can be exercised on a real, stable URL before it
+  reaches production. It's pinned in Vercel to a stable custom domain:
+  **https://travel-preview.schubertfamily.com** (auto-deployed on every push to
+  `preview`).
+
+**`preview` tracks `main` by default.** A GitHub Action
+([`.github/workflows/sync-preview.yml`](../.github/workflows/sync-preview.yml))
+runs on every push to `main` and **fast-forwards `preview` to match** — so
+preprod normally mirrors production with no manual effort. The sync is
+**fast-forward-only**: if `preview` has diverged (because you pushed a feature
+onto it for testing), the Action detects that and leaves it alone, so the
+feature stays deployed to travel-preview until you're done.
+
+**Workflow:**
+
+- *Normal change* → push to `main`. It deploys to prod; the Action
+  fast-forwards `preview` so preprod stays in sync. Nothing else to do.
+- *Complex feature you want to soak first* → push it onto `preview`
+  (`git push origin my-feature:preview`, or merge your feature branch into
+  `preview`). Vercel deploys it to `travel-preview.schubertfamily.com`. Because
+  `preview` now leads `main`, the auto-sync skips it. Test there; when happy,
+  merge to `main`. Once `main` catches up (preview becomes its ancestor again),
+  the next push to `main` resumes auto-fast-forwarding `preview`.
+
+> If `preview` ever gets stuck diverged and you want to slam it back into
+> lockstep with `main`: `git push --force-with-lease origin main:preview`.
+> `preview` is throwaway preprod, so a forced realign is safe — **never** do
+> this to `main`.
+
+### Env vars must be enabled for the Preview environment
+
+Vercel scopes env vars per environment (Production / Preview / Development). For
+travel-preview to work, every var the app needs at runtime
+(`NEXT_PUBLIC_SUPABASE_*`, etc.) must have **Preview** checked under Project →
+Settings → Environment Variables — not just Production. A preview deploy missing
+`NEXT_PUBLIC_SUPABASE_*` boots but dies at auth.
+
+### Preprod domain DNS (travel-preview)
+
+Same shape as the production domain — a second `CNAME` at GoDaddy:
+
+| Type | Name | Value |
+|---|---|---|
+| `CNAME` | `travel-preview` | `cname.vercel-dns.com` |
+
+Then in Vercel → Settings → Domains, add `travel-preview.schubertfamily.com`
+and set its **Git Branch** to `preview` (this is what pins the domain to that
+branch instead of giving it a random per-deploy URL). Add
+`https://travel-preview.schubertfamily.com` to the Supabase **Redirect URLs**
+allowlist so magic-link sign-in works on preprod too.
 
 ## Environment variables
 

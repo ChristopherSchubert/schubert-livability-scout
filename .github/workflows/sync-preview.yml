@@ -1,0 +1,53 @@
+name: Keep preview in sync with main
+
+# Preview (preprod) mirrors main by default. On every push to main we
+# fast-forward the `preview` branch to match -- UNLESS preview has diverged,
+# which means a complex feature is being soaked on travel-preview. In that case
+# we leave preview untouched so the feature stays deployed. See
+# features/deployment.md ("Branching & preprod").
+#
+# Security note: this workflow consumes no event-controlled input (no
+# github.event.* / head_ref interpolation) -- only git SHAs it computes
+# itself -- so there is no command-injection surface.
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-preview-to-main
+  cancel-in-progress: false
+
+jobs:
+  fast-forward:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fast-forward preview to main when it's a clean fast-forward
+        run: |
+          set -euo pipefail
+          git fetch origin main preview || true
+          if ! git rev-parse --verify origin/preview >/dev/null 2>&1; then
+            echo "No 'preview' branch on origin yet -- nothing to sync."
+            exit 0
+          fi
+          main_sha="$(git rev-parse origin/main)"
+          preview_sha="$(git rev-parse origin/preview)"
+          if [ "$preview_sha" = "$main_sha" ]; then
+            echo "preview already matches main ($main_sha). Nothing to do."
+            exit 0
+          fi
+          if git merge-base --is-ancestor "$preview_sha" "$main_sha"; then
+            echo "Fast-forwarding preview ${preview_sha:0:7} -> main ${main_sha:0:7}."
+            git push origin "$main_sha:refs/heads/preview"
+          else
+            echo "preview has diverged from main -- a feature is under test on travel-preview."
+            echo "Leaving preview untouched."
+            exit 0
+          fi
