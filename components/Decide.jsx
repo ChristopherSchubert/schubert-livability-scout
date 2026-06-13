@@ -20,7 +20,15 @@ export default function Decide({ cityItem }) {
   const done = surveyComplete(survey);
 
   const save = (next) => {
-    updateCity(cityItem.id, { survey: next, status: "Visited" });
+    // First survey after a trip marks the city Visited. Re-surveying a city
+    // that's already visited / eliminated / decided must NOT revert its status
+    // (that decoupled status from `decision` — #71).
+    const decided = ["Advance", "Winter Revisit", "Eliminate"].includes(cityItem.decision);
+    const patch = { survey: next };
+    if (cityItem.status !== "Visited" && cityItem.status !== "Eliminated" && !decided) {
+      patch.status = "Visited";
+    }
+    updateCity(cityItem.id, patch);
     setEditing(false);
   };
 
@@ -63,6 +71,24 @@ export default function Decide({ cityItem }) {
         {survey.note ? (
           <blockquote className="survey-result-note">{survey.note}</blockquote>
         ) : null}
+
+        {/* Would you go back? — the post-visit verdict. Makes all three decisions
+            reachable (Winter Revisit had no control anywhere before, #71) and
+            frames them as the kept "should we go back?" question. */}
+        <div className="decide-verdict">
+          <span className="decide-verdict-label">Would you go back?</span>
+          <div className="decide-verdict-opts">
+            {[["Advance", "Yes — go back"], ["Winter Revisit", "Maybe — winter revisit"], ["Eliminate", "Probably not"]].map(([val, label]) => (
+              <button key={val} type="button"
+                className={`decide-verdict-opt${cityItem.decision === val ? " on" : ""}`}
+                aria-pressed={cityItem.decision === val}
+                onClick={() => updateCity(cityItem.id, { decision: cityItem.decision === val ? "Undecided" : val })}>
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+
         <button type="button" className="ghost" onClick={() => setEditing(true)}>Re-survey</button>
       </section>
     </AppShell>

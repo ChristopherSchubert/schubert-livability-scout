@@ -3121,3 +3121,11 @@ button:hover, .button-link:hover {
 .hash-slider-input::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%; background: #fffdf8; border: 2px solid var(--accent); box-shadow: 0 1px 3px rgba(30, 24, 12, 0.18); cursor: grab; }
 .hash-slider-input:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 3px rgba(44, 106, 63, 0.25); }
 .hash-slider-scale { display: flex; justify-content: space-between; padding: 0 4px; font-size: 0.68rem; color: var(--muted); font-variant-numeric: tabular-nums; margin-top: 0.2rem; }
+
+/* Post-visit verdict picker — "Would you go back?" (#71) */
+.decide-verdict { margin: 1.4rem 0 1rem; }
+.decide-verdict-label { display: block; font-family: var(--font-ui); font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: .5rem; }
+.decide-verdict-opts { display: flex; flex-wrap: wrap; gap: .5rem; }
+.decide-verdict-opt { font: inherit; font-size: .85rem; border: 1.5px solid var(--border); background: var(--panel); border-radius: 100px; padding: .35rem .9rem; cursor: pointer; color: var(--text); }
+.decide-verdict-opt:hover { border-color: var(--accent); }
+.decide-verdict-opt.on { border-color: var(--accent); background: var(--accent); color: #fff; font-weight: 600; }
