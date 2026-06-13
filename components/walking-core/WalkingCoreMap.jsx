@@ -30,7 +30,14 @@ export default function WalkingCoreMap({ cityItem }) {
       </div>
     );
   }
-  const center = [lat, lon];
+  // The core circle/plateau sit at the adaptive MEASUREMENT center (#1), not the
+  // saved pin — that's where the score was taken. When the center moved a
+  // meaningful distance from the pin, we still mark the pin separately so the
+  // map honestly shows "your pin is here; we measured the walkable core there."
+  const wcc = cityItem.walkingCoreCenter;
+  const hasCenter = wcc && Number.isFinite(wcc.lat) && Number.isFinite(wcc.lon);
+  const center = hasCenter ? [wcc.lat, wcc.lon] : [lat, lon];
+  const pinMoved = hasCenter && (wcc.moved || 0) >= 40;
 
   return (
     <MapContainer
@@ -86,14 +93,24 @@ export default function WalkingCoreMap({ cityItem }) {
           />
         ))}
 
-      {/* Anchor — black dot with paper halo, smaller than the chapter pin. */}
+      {/* Measurement center — black dot with paper halo, smaller than the chapter pin. */}
       <CircleMarker
         center={center}
         radius={7}
         pathOptions={{ color: "#fbf6ea", weight: 2.5, fillColor: "#1b1814", fillOpacity: 1 }}
       />
 
-      <ZoomToCore lat={lat} lon={lon} />
+      {/* The saved pin, shown separately only when the measurement center moved
+          off it (so the relationship is legible, not silently relocated). */}
+      {pinMoved ? (
+        <CircleMarker
+          center={[lat, lon]}
+          radius={5}
+          pathOptions={{ color: "#1b1814", weight: 2, fillColor: "#fbf6ea", fillOpacity: 1, dashArray: "2 2" }}
+        />
+      ) : null}
+
+      <ZoomToCore lat={center[0]} lon={center[1]} />
     </MapContainer>
   );
 }

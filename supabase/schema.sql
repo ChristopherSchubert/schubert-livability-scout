@@ -43,6 +43,7 @@ create table if not exists cities (
   block_geometries   jsonb default '[]',        -- per-block { name, lat, lon, accuracy, source, meta, asOf } — populated by lib/measurers/blocks.js
   block_blurbs       jsonb default '[]',        -- per-block one-line "why" string, parallel to blocks (see migration 0011)
   poi_positions      jsonb default '[]',        -- per-POI { lat, lon, category, weight } — populated by lib/measurers/walking-core.js
+  walking_core_center jsonb,                     -- { lat, lon, moved } adaptive measurement center (pin stays); 0020
   status             text default 'Idea',
   decision           text default 'Undecided',
   is_calibration     boolean not null default false,  -- cohort flag: baseline place, not a candidate
@@ -95,6 +96,7 @@ alter table cities add column if not exists block_geometries    jsonb default '[
 alter table cities add column if not exists eu_lau              jsonb;
 alter table cities add column if not exists planning_order      integer;
 alter table cities add column if not exists poi_positions       jsonb default '[]';
+alter table cities add column if not exists walking_core_center jsonb;
 alter table cities add column if not exists blocks_authored     jsonb default '[]';
 alter table cities add column if not exists block_blurbs        jsonb default '[]';
 
