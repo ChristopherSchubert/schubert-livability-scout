@@ -2913,6 +2913,57 @@ button:hover, .button-link:hover {
 .auth-ghost:hover { color: var(--accent); }
 .auth-err { color: var(--warn, #962914); font-size: 0.88rem; margin: 0; }
 
+/* Primary sign-in action: Continue with Google. Warm-white surface + hairline
+   border so it reads as the hero CTA against the cream card; the colored G is
+   the only non-palette color on screen. */
+.auth-google {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  width: 100%;
+  padding: 0.85rem 1rem;
+  background: #fff;
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: 0.98rem;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(27, 24, 20, 0.05);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.12s ease;
+}
+.auth-google:hover:not(:disabled) {
+  border-color: var(--accent);
+  box-shadow: 0 5px 16px rgba(27, 24, 20, 0.10);
+  transform: translateY(-1px);
+}
+.auth-google:disabled { opacity: 0.55; cursor: not-allowed; }
+.auth-google svg { width: 18px; height: 18px; flex: none; }
+
+/* "or with email" rule — hairlines flanking a small uppercase label. */
+.auth-or {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0.1rem 0 0.2rem;
+  color: var(--muted);
+  font-family: var(--font-ui);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.64rem;
+}
+.auth-or::before, .auth-or::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+.auth-email { display: flex; flex-direction: column; gap: 1rem; }
+.auth-ghost-center { align-self: center; text-align: center; }
+
 /* Stack on narrow screens: the scene becomes a shorter top band. */
 @media (max-width: 820px) {
   .auth-screen { grid-template-columns: 1fr; grid-template-rows: 38vh auto; }
