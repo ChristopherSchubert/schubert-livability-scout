@@ -69,6 +69,20 @@ design source of truth.
   `lib/solve.js#solveDay`: booked/reserved-with-time PINNED, the rest placed by
   travel-aware nearest-neighbour, meals into meal windows.
 
+## Cities from the scout + provenance (Janice #3)
+
+Overview shows a **provenance line** — "the places **you** scouted in your Atlas
+— not a preference guess, not a popularity list · ＋ other city adds anything you
+haven't scouted" — Janice #3's reassurance. Below it, a **city tray** of scouted
+Atlas cities (strictly `planner.cities`, never a ranking query, so the claim is
+literally true) NEAR the trip's region (haversine to leg anchors, ≤400km, capped
+12; honest "no scouted places near this trip" when empty, e.g. a Slovenia trip vs.
+a US atlas). Clicking a chip appends a leg via `appendCityLeg` ([trip-window.js](../lib/trip-window.js),
+tested) which funds the new 1-night leg from the longest leg and **preserves the
+total span**. **＋ other city…** searches `/api/places/search` for non-Atlas
+destinations. Empty trips show an "add a city to start" dropzone. Follow-up:
+drag-from-tray-onto-window (click-to-add ships now).
+
 ## Hotel search → place a stay (Janice #5)
 
 A leg with no stay offers **🔍 Search hotels** (empty stay bar / focus header).

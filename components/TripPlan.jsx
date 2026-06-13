@@ -17,7 +17,9 @@
 // rendered at once — the wall the deck was designed to avoid.
 import { useMemo, useState } from "react";
 import { useTrips } from "./TripProvider";
+import { usePlanner } from "./PlannerProvider";
 import { tripDays, entriesByDay, tripDietChips } from "../lib/trip";
+import { appendCityLeg, daysBetween } from "../lib/trip-window";
 import { CAT_ICON, MealScreen } from "./atoms";
 import GatherBucket from "./GatherBucket";
 import TripWindow from "./TripWindow";
@@ -33,13 +35,17 @@ const dow = (ymd) => (ymd ? DOW[new Date(ymd + "T00:00:00").getDay()] : "");
 // each honest — ✈ for air, 🚆 otherwise — rather than calling a drive a flight.
 const AIR_RE = /\b(fly|flight|airport|boarding|fligh)/i;
 const transportGlyph = (e) => (AIR_RE.test(e.title || "") ? "✈" : "🚆");
+// Strip bookkeeping prefixes ("Stay —", "Check in —", "Check out —") so the
+// stay bar reads as the hotel name, not the entry's clerical title.
+const stayName = (t) => (t || "").replace(/^(Stay|Check[\s-]*(?:in|out))\s*[—–-]?\s*/i, "");
 
 // ~hours a bucket holds, honest-rough: each item ≈ 2h. Shown as a "~Xh" hint,
 // never persisted — it's a fullness cue for "enough to lay out yet?", not data.
 const HOURS_PER_ITEM = 2;
 
 export default function TripPlan({ trip, onEdit }) {
-  const { addEntry, updateEntry, removeEntry } = useTrips();
+  const { addEntry, updateEntry, removeEntry, updateTripFrame } = useTrips();
+  const { planner } = usePlanner();
   const [focus, setFocus] = useState(null); // legKey of the focused city, or null
   const [flightsOpen, setFlightsOpen] = useState(false);
   // legKey whose hotel search is currently open in the overview stay bar.
@@ -47,6 +53,12 @@ export default function TripPlan({ trip, onEdit }) {
   // inline in FocusCity, so we just call setFocus — the search panel renders
   // inside the focused view. The bar button triggers the focus transition.
   const [staySearchLeg, setStaySearchLeg] = useState(null); // legKey
+  // "＋ other city" search state
+  const [otherOpen, setOtherOpen] = useState(false);
+  const [otherQuery, setOtherQuery] = useState("");
+  const [otherResults, setOtherResults] = useState([]);
+  const [otherBusy, setOtherBusy] = useState(false);
+  const [otherErr, setOtherErr] = useState("");
 
   const legs = trip.legs || [];
   const days = useMemo(() => tripDays(trip), [trip]);
@@ -69,6 +81,84 @@ export default function TripPlan({ trip, onEdit }) {
   const bucketFor = (leg) => pool.filter((e) => e.legHint && e.legHint === leg.cityId);
 
   const focused = legs.find((l) => legKey(l) === focus) || null;
+
+  // Atlas cities not already on the itinerary (strict data rule: sourced only
+  // from planner.cities — never a ranking/popularity query, so the provenance
+  // claim in the srcline is literally true).
+  const legCityIds = useMemo(() => new Set(legs.map((l) => l.cityId).filter(Boolean)), [legs]);
+  // The tray = scouted Atlas cities NEAR this trip, not the whole atlas. A trip
+  // in Slovenia shouldn't surface 119 US cities — only places within reach of
+  // its region (sorted nearest-first, capped). Far-flung or coordless trips
+  // fall back to a short alphabetical slice; ＋ other city covers the rest.
+  const scoutCities = useMemo(() => {
+    const all = (planner.cities || []).filter((c) => c.id && !legCityIds.has(c.id) && c.lat != null && c.lon != null);
+    const anchors = legs
+      .map((l) => (planner.cities || []).find((c) => c.id === l.cityId))
+      .filter((c) => c && c.lat != null);
+    if (!anchors.length) return all.slice(0, 12);
+    const km = (a, b) => {
+      const R = 6371, dLat = (b.lat - a.lat) * Math.PI / 180, dLon = (b.lon - a.lon) * Math.PI / 180;
+      const s = Math.sin(dLat / 2) ** 2 + Math.cos(a.lat * Math.PI / 180) * Math.cos(b.lat * Math.PI / 180) * Math.sin(dLon / 2) ** 2;
+      return 2 * R * Math.asin(Math.sqrt(s));
+    };
+    const near = (c) => Math.min(...anchors.map((a) => km(a, c)));
+    return all
+      .map((c) => ({ c, d: near(c) }))
+      .filter((x) => x.d <= 400) // ~within a few hours of the trip's region
+      .sort((a, b) => a.d - b.d)
+      .slice(0, 12)
+      .map((x) => x.c);
+  }, [planner.cities, legCityIds, legs]);
+
+  // Can we donate 1 calendar day to a new leg?  The longest leg must have
+  // daysBetween(arrive, depart) ≥ 1 (span ≥ 2 calendar days). If no leg
+  // qualifies, add-city chips are disabled with a tooltip.
+  const canAddCity = useMemo(() => {
+    if (legs.length === 0) return !!trip.startDate && !!trip.endDate;
+    return legs.some((l) => daysBetween(l.arrive, l.depart) >= 1);
+  }, [legs, trip.startDate, trip.endDate]);
+
+  // Append a city (from Atlas or "other city" search) as a new leg.
+  function addCityLeg(city) {
+    const { legs: next, error } = appendCityLeg(legs, city, trip.startDate, trip.endDate);
+    if (error) { alert(error); return; }
+    updateTripFrame(trip.id, { legs: next });
+  }
+
+  // "＋ other city" place search.
+  async function searchOther() {
+    const q = otherQuery.trim();
+    if (!q) return;
+    setOtherBusy(true);
+    setOtherErr("");
+    setOtherResults([]);
+    try {
+      const r = await fetch("/api/places/search", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query: q, limit: 6 }),
+      });
+      const j = await r.json();
+      if (j.error) throw new Error(j.error);
+      setOtherResults(j.results || []);
+    } catch (e) {
+      setOtherErr(e.message || "Search failed");
+    } finally {
+      setOtherBusy(false);
+    }
+  }
+
+  function pickOther(candidate) {
+    addCityLeg({
+      cityId: null,
+      name: candidate.name,
+      lat: candidate.lat ?? null,
+      lon: candidate.lon ?? null,
+    });
+    setOtherOpen(false);
+    setOtherQuery("");
+    setOtherResults([]);
+  }
 
   // Lay out a city: spread its undated bucket items across the city's open days,
   // always topping up the emptiest day next. Placement only — times come from
@@ -94,10 +184,92 @@ export default function TripPlan({ trip, onEdit }) {
     if (saved) onEdit(saved);
   }
 
+  // No-nights-free tooltip (shown when all legs are at minimum span).
+  const noNightsMsg = "no nights free — extend the trip first";
+
   return (
     <div className="tw-plan">
       <div className="tw-sec-label">The window</div>
-      <TripWindow trip={trip} focus={focus} onFocus={setFocus} />
+
+      {/* Empty-window dropzone — shown when no legs exist yet */}
+      {legs.length === 0 ? (
+        <div className="twn-empty-drop">
+          <span>Add a city below to start building your trip</span>
+        </div>
+      ) : (
+        <TripWindow trip={trip} focus={focus} onFocus={setFocus} />
+      )}
+
+      {/* Provenance line — always visible in overview (Janice #3 deliverable).
+          Deck wording: "the places you scouted … in your Atlas — not a preference
+          guess, not a popularity list." Always rendered in overview (not focused). */}
+      {!focused && (
+        <p className="tw-prov">
+          the places <b>you</b> scouted in your Atlas — not a preference guess, not a popularity list
+          · ＋ other city adds anything you haven't scouted
+        </p>
+      )}
+
+      {/* Cities-from-the-scout tray — Atlas cities not yet on the itinerary */}
+      {!focused && (
+        <div className="tw-citytray" aria-label="Your scouted Atlas cities">
+          {scoutCities.length === 0 ? (
+            <span className="tw-prov" style={{ margin: 0 }}>no scouted places near this trip —</span>
+          ) : null}
+          {scoutCities.map((c) => (
+            <button
+              key={c.id}
+              className="tw-citychip"
+              disabled={!canAddCity}
+              title={canAddCity ? `Add ${c.name} to your trip` : noNightsMsg}
+              aria-label={`Add ${c.name} to trip`}
+              onClick={() => addCityLeg({ cityId: c.id, name: c.name, lat: c.lat, lon: c.lon })}
+            >
+              {(c.name || "").split(",")[0]}
+            </button>
+          ))}
+          {/* ＋ other city — place search for cities not in the Atlas */}
+          {otherOpen ? (
+            <div className="tw-citytray-other">
+              <div className="tw-citytray-other-bar">
+                <input
+                  className="tw-citytray-other-input"
+                  value={otherQuery}
+                  placeholder="Search any city…"
+                  autoFocus
+                  onChange={(e) => setOtherQuery(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === "Enter") searchOther(); if (e.key === "Escape") setOtherOpen(false); }}
+                  aria-label="Search for a city not in your Atlas"
+                />
+                <button className="ss-go" onClick={searchOther} disabled={otherBusy}>{otherBusy ? "…" : "Search"}</button>
+                <button className="ee-mini" onClick={() => { setOtherOpen(false); setOtherResults([]); setOtherErr(""); }}>✕</button>
+              </div>
+              {otherErr && <p className="ss-err">{otherErr}</p>}
+              {otherResults.length > 0 && (
+                <div className="tw-citytray-other-results">
+                  {otherResults.map((c) => (
+                    <button key={c.placeId || c.name} className="tw-citytray-other-result"
+                            onClick={() => pickOther(c)}>
+                      <b>{c.name}</b>
+                      {c.address ? <small>{c.address}</small> : null}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          ) : (
+            <button
+              className="tw-citytray-add"
+              disabled={!canAddCity}
+              title={canAddCity ? "Add a city not in your Atlas" : noNightsMsg}
+              aria-label="Add a city not in your Atlas"
+              onClick={() => setOtherOpen(true)}
+            >
+              ＋ other city…
+            </button>
+          )}
+        </div>
+      )}
 
       {focused ? (
         <>
@@ -148,7 +320,7 @@ export default function TripPlan({ trip, onEdit }) {
                   <button key={lk} className="tw-staybar" style={{ flex: nights(leg) }}
                           onClick={() => setFocus(lk)} aria-label={`Plan ${cityName(leg)}`}>
                     <b>{cityName(leg)}</b>
-                    <small>{nights(leg)}n · 🛏 {stay.title.replace(/^Stay\s*—?\s*/i, "")}</small>
+                    <small>{nights(leg)}n · 🛏 {stayName(stay.title)}</small>
                   </button>
                 );
               }
@@ -163,7 +335,7 @@ export default function TripPlan({ trip, onEdit }) {
               );
             })}
           </div>
-          <p className="tw-plan-hint">Pick a city above to gather its bucket and lay out its days.</p>
+          {legs.length > 0 && <p className="tw-plan-hint">Pick a city above to gather its bucket and lay out its days.</p>}
         </>
       )}
     </div>
@@ -194,7 +366,7 @@ function FocusCity({ leg, days, byDay, stay, bucket, trip, onEdit, onRemove, onL
           <span className="tw-stay-placed">
             🛏 <button className="tw-stay-name tw-clickable" onClick={() => onEdit(stay)}
                         aria-label={`Edit stay: ${stay.title}`}>
-              {stay.title.replace(/^Stay\s*—?\s*/i, "")}
+              {stayName(stay.title)}
             </button>
             <button className="ee-mini" onClick={onOpenStaySearch} aria-label="Change hotel">
               change hotel
