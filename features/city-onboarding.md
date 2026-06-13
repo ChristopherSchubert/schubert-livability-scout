@@ -10,7 +10,7 @@ intermediate files in the repo.
 | Track | Where it lives | Who fills it | Rule |
 |---|---|---|---|
 | **1. Measured** (objective) | `cities.measured_metrics` (jsonb) | the pipeline only | Every metric cited to one canonical source, or left `null` ("not yet measured"). Never hand-entered. |
-| **2. Felt** (subjective) | `felt_surveys` (per-user) | the owner, via the *Decide* questionnaire | Filled only after a visit (or from memory on *Baseline*). Five anchored axes + the 0–10 Slovenia score. |
+| **2. Felt** (subjective) | `felt_surveys` (per-user) | the owner, via the *Decide* questionnaire | Filled only after a visit (or from memory on *Baseline*). Five anchored axes + the 0–10 Gut score. |
 | **3. Visit window** | `cities.visit_climate`, `crowd_season`, `season_notes` | climate from NOAA; crowd/notes qualitative | Climate is cited data; crowd season is an observed qualitative read. |
 
 A new city starts with **all three empty** and graduates as data arrives.

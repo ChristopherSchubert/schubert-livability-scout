@@ -9,9 +9,10 @@ import { usePlanner } from "./PlannerProvider";
 /**
  * Baseline — track #3. Rate places you already know deeply, from memory.
  * These are the calibration answer key: the felt scores here are what the
- * objective measurement model is ultimately trying to predict. Bled/Piran
- * should land near 10, Allison Park near 0 — if they don't, the instrument
- * is miscalibrated and nothing downstream can be trusted.
+ * objective measurement model is ultimately trying to predict. The reference
+ * set spans the range of how places actually feel to the owner — rate each
+ * honestly from firsthand memory; if the felt scores don't track the gut, the
+ * instrument is miscalibrated and nothing downstream can be trusted.
  */
 export default function Baseline() {
   const { references, setReferenceSurvey } = usePlanner();
@@ -43,7 +44,7 @@ export default function Baseline() {
           <p className="page-eyebrow">Baseline</p>
           <h1>Rate the places you already know</h1>
           <p className="canvas-sub">
-            These are the answer key. Rate them from memory using the same questionnaire you'll use after every visit — that's what makes new places comparable. Bled and Piran are the high end of the scale; a familiar place with none of the qualities is the low end.
+            These are the answer key. Rate them from memory using the same questionnaire you'll use after every visit — that's what makes new places comparable. Bled and Piran anchor the high end of the scale; the familiar places you know fill in the rest of the range from firsthand feel.
           </p>
         </div>
         <div className="felt-headline">
