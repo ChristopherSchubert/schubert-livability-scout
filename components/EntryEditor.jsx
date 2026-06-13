@@ -15,9 +15,17 @@ export default function EntryEditor({ tripId, entry, onClose }) {
   const { updateEntry, removeEntry } = useTrips();
   const [draft, setDraft] = useState(entry);
   const [picker, setPicker] = useState({ open: false, query: "", results: [], busy: false, err: "" });
+  const [hasEdited, setHasEdited] = useState(false);
   const firstRef = useRef(null);
 
-  useEffect(() => { setDraft(entry); }, [entry.id]); // eslint-disable-line
+  // New entry (id change) → fresh draft. A remote/second-tab update to the SAME
+  // entry is adopted ONLY while the user hasn't started editing — once they
+  // have, their (incrementally-persisted) edits are never clobbered (#62).
+  useEffect(() => { setDraft(entry); setHasEdited(false); }, [entry.id]); // eslint-disable-line
+  useEffect(() => {
+    if (!hasEdited && entry.id === draft.id) setDraft(entry);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [entry, hasEdited]);
   useEffect(() => { firstRef.current?.focus(); }, []);
   // Escape closes the sheet (WCAG: dismissible without the mouse). #38
   useEffect(() => {

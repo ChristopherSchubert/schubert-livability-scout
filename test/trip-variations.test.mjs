@@ -60,6 +60,31 @@ test("entriesForChoice: one column of the compare, sorted by day", () => {
   assert.deepEqual(entriesForChoice(TRIP, "f1", "z"), []); // empty choice
 });
 
+test("untagged in-range entries belong to the first choice implicitly (#62 — no tag burst on fork creation)", () => {
+  // A fork was just created over 05-21..05-23 as a SINGLE frame write; the
+  // in-range entries are untagged but must read as Option A.
+  const trip = {
+    options: { forks: [makeFork("f2", "Piran vs Trieste", "2026-05-21", "2026-05-23")] },
+    entries: [
+      { id: "base", day: "2026-05-15", title: "Ljubljana" },            // outside the fork
+      { id: "u1", day: "2026-05-21", title: "Piran walk" },             // untagged, in range
+      { id: "u2", day: "2026-05-22", title: "Piran swim", booking: { cancelBy: "2026-05-18" } },
+      { id: "b1", day: "2026-05-21", title: "Trieste", option: { forkId: "f2", choiceId: "b" } },
+    ],
+  };
+  // Option A active (default): base + the untagged in-range entries; not B's.
+  assert.deepEqual(activeEntries(trip).map((e) => e.id), ["base", "u1", "u2"]);
+  // Switch to B: base + only the explicitly-B-tagged entry.
+  const onB = { ...trip, options: setActiveChoice(trip.options, "f2", "b") };
+  assert.deepEqual(activeEntries(onB).map((e) => e.id), ["base", "b1"]);
+  // Counts + compare include the implicit ones under A.
+  assert.deepEqual(choiceCounts(trip, "f2"), { a: 2, b: 1 });
+  assert.deepEqual(entriesForChoice(trip, "f2", "a").map((e) => e.id), ["u1", "u2"]);
+  // decide-by still only counts explicitly-tagged bookings (none here) → null;
+  // the untagged in-range booking is implicit, not a committed fork hold.
+  assert.equal(forkDecideBy(trip, "f2"), null);
+});
+
 test("setActiveChoice: immutable — original options untouched", () => {
   const next = setActiveChoice(TRIP.options, "f1", "b");
   assert.equal(next.forks[0].activeChoiceId, "b");

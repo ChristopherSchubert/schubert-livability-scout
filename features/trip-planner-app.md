@@ -77,6 +77,13 @@ design source of truth.
   real-time merge · #37 timezone), **quality** (#42–46, #49–51).
 - **Solve polish** — single-meal can land in the later meal window; refine
   window selection.
+- **#62 realtime/save races (resolved)** — four fixes: (1) `addAndEdit`/
+  `addFlight` guard on a missing `trip`; (2) `reorder` clears the `ownWrites`
+  echo stamps on write failure so the corrective realtime echo isn't suppressed;
+  (3) fork creation is a single atomic frame write (range-implicit Option A) so
+  there's no per-entry tag burst racing the metadata; (4) the open `EntryEditor`
+  receives the *live* entry and adopts remote updates while the draft is
+  untouched (a `hasEdited` guard never clobbers in-progress edits).
 - **Runtime** — mirror Keychain `google-places-api-key` → `.env.local` + Vercel
   as `GOOGLE_PLACES_API_KEY` for the live place picker.
 
@@ -199,8 +206,12 @@ shown). Pure core in `lib/trip-variations.js` (`activeEntries`, `forkForDay`,
 unit-tested in `test/trip-variations.test.mjs`.
 
 - **Fork composer** (`components/TripVariations.jsx`, the **Forks** tab): name +
-  from/to over the trip's days → creates the fork and tags the in-range base
-  entries to Option A, leaving Option B blank.
+  from/to over the trip's days → creates the fork in a **single atomic frame
+  write**. The in-range untagged entries become Option A *implicitly*
+  (`activeEntries`/`entriesForChoice`/`choiceCounts` via `implicitFirstChoice`),
+  so there's no per-entry tag burst that could land after the fork metadata and
+  let another client briefly see a fork with no entries (#62). Option B starts
+  blank.
 - **Switch:** clicking a choice card sets `activeChoiceId`; the whole workspace
   follows because `TripWorkspace` feeds the read panels a **variation-filtered
   `vtrip`** (`activeEntries`) — Days/Grid/Map/Book/Frame + the rollups all show

@@ -20,7 +20,7 @@ function daysUntil(ymd) {
 }
 
 export default function TripVariations({ trip }) {
-  const { updateTripFrame, updateEntry } = useTrips();
+  const { updateTripFrame } = useTrips();
   const forks = tripForks(trip);
   const days = useMemo(() => tripDays(trip), [trip]);
   const [name, setName] = useState("");
@@ -31,13 +31,10 @@ export default function TripVariations({ trip }) {
     const f = from || days[0]?.date, t = to || days[days.length - 1]?.date;
     if (!f || !t || f > t) return;
     const fork = makeFork(`fork-${Date.now()}`, name.trim(), f, t);
-    // Tag the existing base (untagged) entries in range to Option A, so the
-    // current plan becomes Option A and Option B starts blank.
-    for (const e of trip.entries || []) {
-      if (!e.option && e.day && e.day >= f && e.day <= t) {
-        updateEntry(trip.id, { ...e, option: { forkId: fork.id, choiceId: "a" } });
-      }
-    }
+    // SINGLE atomic frame write — the in-range entries become Option A
+    // implicitly (lib/trip-variations.activeEntries), so there's no per-entry
+    // write burst that could land after the fork metadata and let another client
+    // see the fork before its entries are tagged (#62). Option B starts blank.
     updateTripFrame(trip.id, { options: { ...(trip.options || {}), forks: [...forks, fork] } });
     setName("");
   }

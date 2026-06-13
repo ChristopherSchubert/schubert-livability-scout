@@ -76,11 +76,12 @@ export default function TripWorkspace({ tripId, activeTab = "plan" }) {
 
   // Add a typed entry and open it (stay/flight/own). Shelf items are undated.
   async function addAndEdit(fields) {
+    if (!trip) return; // guard: addFlight/addStay can fire before hydration (#62)
     const saved = await addEntry(trip.id, { role: "anchor", status: "none", time: { mode: "bucket", bucket: "flex" }, title: "", ...fields });
     if (saved) setEditing(saved);
   }
   const addStay = (leg) => addAndEdit({ day: leg.arrive, category: "stay", status: "reserved", role: "connective", title: `Stay — ${leg.name?.replace(/,.*$/, "")}`, time: { mode: "point" } });
-  const addFlight = () => addAndEdit({ day: trip.startDate, category: "travel", status: "booked", role: "connective", title: "Flight" });
+  const addFlight = () => addAndEdit({ day: trip?.startDate, category: "travel", status: "booked", role: "connective", title: "Flight" });
   const addOwn = () => addAndEdit({ day: null, category: "activity" });
 
   const trip = active && active.id === tripId ? active : null;
@@ -225,7 +226,7 @@ export default function TripWorkspace({ tripId, activeTab = "plan" }) {
       {tab === "forks" ? <TripVariations trip={trip} /> : null}
       </div>
 
-      {editing ? <EntryEditor tripId={tripId} entry={editing} onClose={() => setEditing(null)} /> : null}
+      {editing ? <EntryEditor tripId={tripId} entry={trip?.entries.find((e) => e.id === editing.id) || editing} onClose={() => setEditing(null)} /> : null}
     </div>
   );
 }

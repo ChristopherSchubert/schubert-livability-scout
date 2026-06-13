@@ -1,14 +1,14 @@
 // TripVariations interaction tests (#43) — the Forks tab. Mocks TripProvider to
-// assert fork creation tags the in-range entries + writes the fork, and that
+// assert fork creation writes the fork in ONE atomic frame write (the in-range
+// entries become Option A implicitly — no per-entry tag burst, #62), and that
 // switching a choice persists the new active choice.
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, test, expect, vi, beforeEach } from "vitest";
 
 const updateTripFrame = vi.fn();
-const updateEntry = vi.fn();
 vi.mock("../../components/TripProvider", () => ({
-  useTrips: () => ({ updateTripFrame, updateEntry }),
+  useTrips: () => ({ updateTripFrame }),
 }));
 import TripVariations from "../../components/TripVariations";
 
@@ -23,19 +23,17 @@ const baseTrip = () => ({
 });
 
 describe("TripVariations", () => {
-  beforeEach(() => { updateTripFrame.mockClear(); updateEntry.mockClear(); });
+  beforeEach(() => { updateTripFrame.mockClear(); });
 
-  test("the composer creates a fork and tags in-range base entries to Option A", async () => {
+  test("the composer creates a fork in a single atomic frame write (no per-entry tag burst)", async () => {
     render(<TripVariations trip={baseTrip()} />);
     await userEvent.click(screen.getByRole("button", { name: /Create fork/ }));
-    // wrote a fork into options.forks
-    expect(updateTripFrame).toHaveBeenCalled();
+    // ONE write — the fork metadata; the in-range entries are Option A implicitly.
+    expect(updateTripFrame).toHaveBeenCalledTimes(1);
     const patch = updateTripFrame.mock.calls.at(-1)[1];
     expect(patch.options.forks).toHaveLength(1);
     expect(patch.options.forks[0].choices).toHaveLength(2);
-    // tagged both in-range base entries to choice "a"
-    expect(updateEntry).toHaveBeenCalledTimes(2);
-    expect(updateEntry.mock.calls[0][1].option.choiceId).toBe("a");
+    expect(patch.options.forks[0].activeChoiceId).toBe("a");
   });
 
   test("renders an existing fork with A/B choices + decide-by, and switches", async () => {

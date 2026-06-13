@@ -155,7 +155,13 @@ export function TripProvider({ children }) {
       const entries = a.entries.map((e) => (order.has(e.id) ? { ...e, sort: order.get(e.id) } : e)).sort(byDayThenSort);
       return { ...a, entries };
     });
-    flash(() => reorderEntries(tripId, day, ids));
+    // On write failure, clear the ownWrites stamps so the corrective realtime
+    // echo isn't suppressed — otherwise the optimistic order sticks and the UI
+    // stays desynced from the server until a refresh (#62).
+    flash(() => reorderEntries(tripId, day, ids).catch((e) => {
+      ids.forEach((id) => { delete ownWrites.current[id]; });
+      throw e;
+    }));
   }
 
   // Edit the trip frame (name/dates/legs/glance/travelers/passes) — debounced.
