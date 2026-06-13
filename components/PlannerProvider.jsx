@@ -11,6 +11,7 @@ import {
 import {
   fetchCities, insertCity, saveCityFields,
   fetchMySurveys, upsertSurvey,
+  fetchMyJournal, insertJournalEntry, updateJournalEntry, deleteJournalEntry,
   fetchMyBaselines, upsertBaseline,
   fetchMyWeights, upsertWeights,
 } from "../lib/db";
@@ -37,12 +38,16 @@ export function PlannerProvider({ children, initialManifest }) {
     let cancelled = false;
     (async () => {
       try {
-        const [cities, mySurveys, myBaselines, myWeights] = await Promise.all([
-          fetchCities(), fetchMySurveys(userId), fetchMyBaselines(userId), fetchMyWeights(userId),
+        const [cities, mySurveys, myJournal, myBaselines, myWeights] = await Promise.all([
+          fetchCities(), fetchMySurveys(userId),
+          // Journal is non-fatal: if the journal_entries table isn't migrated yet
+          // (0019), degrade to "no journal" instead of breaking the whole load.
+          fetchMyJournal(userId).catch((e) => { console.warn("journal load skipped:", e.message); return {}; }),
+          fetchMyBaselines(userId), fetchMyWeights(userId),
         ]);
         if (cancelled) return;
-        // Merge this user's survey onto each shared city.
-        const merged = cities.map((c) => ({ ...c, survey: mySurveys[c.id] || emptySurvey() }));
+        // Merge this user's survey + journal onto each shared city.
+        const merged = cities.map((c) => ({ ...c, survey: mySurveys[c.id] || emptySurvey(), journal: myJournal[c.id] || [] }));
         setPlanner({ cities: merged, selectedId: merged[0]?.id || null });
         setReferences(myBaselines || {});
         if (myWeights) setWeightsState({ ...defaultWeights(), ...myWeights });
@@ -140,6 +145,40 @@ export function PlannerProvider({ children, initialManifest }) {
       }));
       if (survey !== undefined && userId) flash(() => upsertSurvey(cityId, userId, survey));
       if (Object.keys(cityPatch).length) queueCityWrite(cityId, cityPatch);
+    },
+
+    // ── Journal (per-user log on a city) ──────────────────────────────────────
+    // Insert is awaited so the new entry carries its server id + created_at
+    // before it goes into state (mirrors addCity); edit/remove are optimistic.
+    async addJournalEntry(cityId, fields) {
+      if (!userId) return null;
+      let saved;
+      try { saved = await insertJournalEntry(cityId, userId, fields); }
+      catch (e) { console.error("addJournalEntry:", e.message); return null; }
+      setPlanner((current) => ({
+        ...current,
+        cities: current.cities.map((item) =>
+          item.id === cityId ? { ...item, journal: [saved, ...(item.journal || [])] } : item),
+      }));
+      return saved;
+    },
+    editJournalEntry(cityId, entryId, fields) {
+      setPlanner((current) => ({
+        ...current,
+        cities: current.cities.map((item) =>
+          item.id === cityId
+            ? { ...item, journal: (item.journal || []).map((e) => (e.id === entryId ? { ...e, ...fields } : e)) }
+            : item),
+      }));
+      flash(() => updateJournalEntry(entryId, fields));
+    },
+    removeJournalEntry(cityId, entryId) {
+      setPlanner((current) => ({
+        ...current,
+        cities: current.cities.map((item) =>
+          item.id === cityId ? { ...item, journal: (item.journal || []).filter((e) => e.id !== entryId) } : item),
+      }));
+      flash(() => deleteJournalEntry(entryId));
     },
 
     updateCityWith(cityId, updater) {

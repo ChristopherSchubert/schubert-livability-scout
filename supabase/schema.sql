@@ -114,6 +114,22 @@ create table if not exists felt_surveys (
   unique (city_id, user_id)
 );
 
+-- ── journal_entries (PER-USER) ──────────────────────────────────────────────
+-- The phone-friendly during/after-visit journal (0019). Unlike felt_surveys
+-- (one survey per city/user), this is a LOG: many timestamped notes per city.
+create table if not exists journal_entries (
+  id         uuid primary key default gen_random_uuid(),
+  city_id    uuid not null references cities (id) on delete cascade,
+  user_id    uuid not null references profiles (id) on delete cascade,
+  body       text not null default '',
+  reaction   text,                 -- loved | liked | mixed | no
+  at_place   text,                 -- optional free-text "where"
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+create index if not exists journal_entries_city_user_idx
+  on journal_entries (city_id, user_id, created_at desc);
+
 -- ── baseline_ratings (PER-USER) ─────────────────────────────────────────────
 -- Reference places (Bled, Piran, Shadyside, …) rated from memory. The answer
 -- key. Keyed by place name (these aren't candidate cities).
@@ -215,6 +231,7 @@ create index if not exists pois_primary_type_idx on pois (primary_type);
 alter table profiles        enable row level security;
 alter table cities          enable row level security;
 alter table felt_surveys    enable row level security;
+alter table journal_entries enable row level security;
 alter table baseline_ratings enable row level security;
 alter table user_weights    enable row level security;
 alter table trips           enable row level security;
@@ -232,6 +249,12 @@ create policy "felt readable by authed" on felt_surveys for select to authentica
 create policy "felt insert own"  on felt_surveys for insert to authenticated with check (user_id = auth.uid());
 create policy "felt update own"  on felt_surveys for update to authenticated using (user_id = auth.uid());
 create policy "felt delete own"  on felt_surveys for delete to authenticated using (user_id = auth.uid());
+
+-- journal_entries: readable by both (compare notes), writable only by owner.
+create policy "journal readable by authed" on journal_entries for select to authenticated using (true);
+create policy "journal insert own" on journal_entries for insert to authenticated with check (user_id = auth.uid());
+create policy "journal update own" on journal_entries for update to authenticated using (user_id = auth.uid());
+create policy "journal delete own" on journal_entries for delete to authenticated using (user_id = auth.uid());
 
 -- baseline_ratings: same pattern.
 create policy "baseline readable by authed" on baseline_ratings for select to authenticated using (true);

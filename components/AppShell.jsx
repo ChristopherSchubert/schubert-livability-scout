@@ -365,6 +365,7 @@ export function defaultCityNav(cityItem, activeMode) {
     ...(process.env.NODE_ENV !== "production"
       ? [{ href: `/cities/${slug}/images`, label: "Images", active: activeMode === "images" }]
       : []),
+    { href: `/cities/${slug}/journal`, label: "Journal", active: activeMode === "journal" },
     { href: `/cities/${slug}/assess`, label: "Assess", active: activeMode === "assess" },
   ];
 }

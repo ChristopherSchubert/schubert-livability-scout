@@ -1,0 +1,291 @@
+/* Journal mode (/cities/[slug]/journal) — own file so it can't be
+   swallowed by an unclosed rule elsewhere (same pattern as trips.css). */
+
+/* ============================================================== */
+/* JOURNAL WRAP                                                    */
+/* ============================================================== */
+.jr-wrap {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 1.4rem 1rem 5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+}
+
+/* ============================================================== */
+/* COMPOSE CARD                                                    */
+/* ============================================================== */
+.jr-compose-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: .7rem;
+}
+
+.jr-compose-textarea,
+.jr-edit-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  font: inherit;
+  font-size: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: .7rem .8rem;
+  background: var(--bg);
+  color: var(--text);
+  resize: vertical;
+  min-height: 6rem;
+  line-height: 1.5;
+}
+
+.jr-compose-textarea:focus,
+.jr-edit-textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+/* ============================================================== */
+/* REACTION ROW                                                    */
+/* ============================================================== */
+.jr-reaction-row {
+  display: flex;
+  gap: .5rem;
+}
+
+.jr-reaction-btn {
+  font-size: 1.35rem;
+  border: 2px solid var(--border);
+  background: var(--bg);
+  border-radius: 8px;
+  padding: .28rem .5rem;
+  cursor: pointer;
+  line-height: 1;
+  transition: border-color .1s, background .1s;
+  touch-action: manipulation;
+  min-width: 2.6rem;
+  text-align: center;
+}
+
+.jr-reaction-btn:hover {
+  border-color: var(--muted);
+  background: var(--panel-strong);
+}
+
+.jr-reaction-btn.selected {
+  border-color: var(--accent);
+  background: var(--panel-strong);
+}
+
+/* ============================================================== */
+/* WHERE INPUT                                                     */
+/* ============================================================== */
+.jr-where-input {
+  font: inherit;
+  font-size: .88rem;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: .42rem .7rem;
+  background: var(--bg);
+  color: var(--text);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.jr-where-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+/* ============================================================== */
+/* BUTTONS                                                         */
+/* ============================================================== */
+.jr-btn-primary {
+  font: inherit;
+  font-size: .9rem;
+  font-weight: 600;
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: #fff;
+  border-radius: 100px;
+  padding: .55rem 1.3rem;
+  cursor: pointer;
+  align-self: flex-end;
+  transition: opacity .1s;
+}
+
+.jr-btn-primary:disabled {
+  opacity: .4;
+  cursor: default;
+}
+
+.jr-btn-save {
+  font: inherit;
+  font-size: .82rem;
+  font-weight: 600;
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: #fff;
+  border-radius: 100px;
+  padding: .35rem .9rem;
+  cursor: pointer;
+}
+
+.jr-btn-save:disabled {
+  opacity: .4;
+  cursor: default;
+}
+
+.jr-btn-cancel {
+  font: inherit;
+  font-size: .82rem;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text);
+  border-radius: 100px;
+  padding: .35rem .9rem;
+  cursor: pointer;
+}
+
+.jr-btn-edit {
+  font: inherit;
+  font-size: .72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--muted);
+  border-radius: 100px;
+  padding: .18rem .6rem;
+  cursor: pointer;
+}
+
+.jr-btn-delete {
+  font: inherit;
+  font-size: .72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  border: 1px solid #dcb49a;
+  background: var(--panel);
+  color: #a3431f;
+  border-radius: 100px;
+  padding: .18rem .6rem;
+  cursor: pointer;
+}
+
+/* ============================================================== */
+/* CARD ACTIONS ROW                                               */
+/* ============================================================== */
+.jr-card-actions {
+  display: flex;
+  gap: .5rem;
+  justify-content: flex-end;
+}
+
+/* ============================================================== */
+/* ENTRIES LIST                                                    */
+/* ============================================================== */
+.jr-entries {
+  display: flex;
+  flex-direction: column;
+  gap: .85rem;
+}
+
+.jr-empty {
+  color: var(--muted);
+  font-family: var(--font-ui);
+  font-size: .92rem;
+  font-style: italic;
+  padding: 1.2rem 0;
+  text-align: center;
+}
+
+/* ============================================================== */
+/* ENTRY CARD                                                      */
+/* ============================================================== */
+.jr-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: .85rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: .55rem;
+}
+
+.jr-card-editing {
+  display: flex;
+  flex-direction: column;
+  gap: .7rem;
+}
+
+.jr-card-body {
+  display: flex;
+  align-items: flex-start;
+  gap: .55rem;
+}
+
+.jr-reaction-badge {
+  font-size: 1.2rem;
+  flex-shrink: 0;
+  line-height: 1.4;
+}
+
+.jr-entry-text {
+  margin: 0;
+  font-size: .95rem;
+  line-height: 1.5;
+  color: var(--text);
+  flex: 1;
+}
+
+.jr-card-footer {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  font-family: var(--font-ui);
+  font-size: .76rem;
+  flex-wrap: wrap;
+}
+
+.jr-at-place {
+  color: var(--muted);
+  flex: 1;
+}
+
+.jr-timestamp {
+  color: var(--muted);
+}
+
+.jr-card-controls {
+  display: flex;
+  gap: .4rem;
+  margin-left: auto;
+}
+
+/* ============================================================== */
+/* MOBILE TOUCH-UPS                                               */
+/* ============================================================== */
+@media (max-width: 640px) {
+  .jr-wrap {
+    padding: 1rem .75rem 5rem;
+  }
+
+  .jr-compose-card {
+    padding: .85rem .9rem;
+  }
+
+  .jr-btn-primary {
+    align-self: stretch;
+    text-align: center;
+  }
+
+  .jr-reaction-btn {
+    flex: 1;
+  }
+}

@@ -67,17 +67,17 @@ when the user drops a new pin, then re-measures.
 
 **Where we left off:** 69/69 cities have heroes (Supabase covers the whole
 list). Conversation then pivoted twice:
-- You sketched a magazine-style city detail redesign (cinematic hero → heart
-  → stay-zone map → numbers). The static mockup is at
-  `public/city-detail-redesign.html` (Newport, 1985 lines), but the live
-  `/cities/[slug]` route still renders the old dashboard layout.
+- ~~Magazine-style city detail redesign~~ **DONE** — the live `/cities/[slug]`
+  route renders `MagazineDetail` (`components/city-detail/MagazineDetail.jsx`,
+  shaped by `buildCityDetailView` in `lib/city-detail-view.js`). The static
+  `public/city-detail-redesign.html` is now just reference.
 - You complained the "January" axis still sucks — the 3 metrics ("jan high",
   "dec daylight", "clear days/yr") don't capture what you want. Asked for a
-  rebrand + year-shape + auto worst-month-per-direction.
+  rebrand + year-shape + auto worst-month-per-direction. **Still open — blocked
+  on a methodology proposal** (it's a measurement-design call, not code).
 
-**Next move:** Two threads. Either (a) wire the magazine mockup into the
-real route, or (b) draft a January-axis methodology proposal. Also a soft
-follow-up: reposition the Litchfield pin (landed off the Green).
+**Next move:** (b) draft a January-axis methodology proposal. Soft follow-up:
+reposition the Litchfield pin (landed off the Green).
 
 ## 5. City "why" quality audit — DONE (2026-06-03)
 
@@ -97,9 +97,13 @@ which is intentional.
 stage funnel landed; CityNav exists. The next slices identified but not
 started:
 - **Visit Plan rebuild** — timeline view with logistics / days / checklists
-  rails.
-- **Journal mode** — auto-activates when today falls in
-  `arriveDate`–`departDate`; phone-friendly; one-tap entries during a visit.
+  rails. Still open.
+- ~~Journal mode~~ **DONE (2026-06-13)** — phone-friendly per-city journal at
+  `/cities/[slug]/journal` (the "Journal" sub-tab). A timestamped log: compose a
+  note + optional reaction (loved/liked/mixed/no) + optional "where"; reverse-
+  chron list with inline edit + delete. Per-user, RLS owner-write
+  (`journal_entries`, migration 0019). Provider: `addJournalEntry` /
+  `editJournalEntry` / `removeJournalEntry`. Doc: features/journal.md. **Migration
+  0019 still needs applying to prod** (gated) before save/load works live.
 
-**Next move:** Pick one of those two and build it. Journal mode is the one
-you said matters most "when you're walking around the city".
+**Next move:** Visit Plan rebuild (the remaining feature thread).
