@@ -24,7 +24,7 @@ describe("atoms", () => {
 
   test("CostTag: € amount, cash-only prefix; nothing when no amount", () => {
     const { container, rerender } = render(<CostTag cost={{ amount: 40, currency: "EUR", cashOnly: true }} />);
-    expect(screen.getByText(/💶/)).toBeInTheDocument();
+    expect(screen.getByText(/💰/)).toBeInTheDocument();  // currency-neutral cash marker (#77)
     expect(screen.getByText(/€40/)).toBeInTheDocument();
     rerender(<CostTag cost={{}} />);
     expect(container).toBeEmptyDOMElement();
