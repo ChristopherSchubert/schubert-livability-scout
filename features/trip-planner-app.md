@@ -112,6 +112,18 @@ for vegetarian (your chips)"). Veg signal is honest-cited: `servesVegetarianFood
 Gathered places now carry their markers forward, so a saved veg spot reads veg ✓.
 The composer shows the effect inline when you toggle a diet chip.
 
+## Fork compare-comments (Janice #8)
+
+The Forks compare view now carries a **shared comments thread** (Janice #8).
+`trip_fork_comments` (migration 0022, RLS mirrors 0019 journal_entries —
+read by any authed traveler, write own) holds per-fork notes, each optionally
+`re: Option A/B` with a 👍/👎 lean. Helpers in [lib/fork-comments.js](../lib/fork-comments.js)
+(+ `fetchForkComments`/`addForkComment`/`removeForkComment` in db.js). The compare
+columns get day-aligned **diff highlighting** (amber where A/B differ), a per-column
+Trade summary, and make-live. The demo Piran-vs-Trieste fork (deck slide 38) is
+seeded by `scripts/seed-fork-comments-demo.mjs` (activeChoiceId 'A' preserves the
+live itinerary). Copy avoids decide/verdict lexicon (vacation-app reframe).
+
 ## Clocked agenda + pins (Days)
 
 - **Clocked agenda (rank 6)** — `solveTripDay` ([solve-adapter.js](../lib/solve-adapter.js))

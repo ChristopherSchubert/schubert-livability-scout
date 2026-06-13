@@ -290,3 +290,30 @@ create table if not exists walkthrough_feedback (
 alter table walkthrough_feedback enable row level security;
 create policy walkthrough_feedback_insert on walkthrough_feedback for insert to anon, authenticated with check (true);
 create policy walkthrough_feedback_select on walkthrough_feedback for select to authenticated using (true);
+
+-- ── trip_fork_comments (PER-FORK, SHARED) ────────────────────────────────────
+-- Per-fork discussion thread shared between travelers. choice_id targets one
+-- option (e.g. 'A'/'B'); null = general comment on the fork as a whole. lean
+-- records an optional 👍/👎. Mirrors journal_entries RLS. See migration 0022.
+create table if not exists trip_fork_comments (
+  id         uuid primary key default gen_random_uuid(),
+  trip_id    uuid not null references trips (id) on delete cascade,
+  fork_id    text not null,
+  choice_id  text,                    -- null = general; 'A'|'B'|… = re: that option
+  author_id  uuid not null references profiles (id) on delete cascade,
+  body       text not null default '',
+  lean       text check (lean in ('up', 'down') or lean is null),
+  created_at timestamptz not null default now(),
+  constraint trip_fork_comments_body_nonempty check (body <> '')
+);
+create index if not exists trip_fork_comments_trip_fork_idx
+  on trip_fork_comments (trip_id, fork_id, created_at asc);
+alter table trip_fork_comments enable row level security;
+create policy "fork comments readable by authed"
+  on trip_fork_comments for select to authenticated using (true);
+create policy "fork comments insert own"
+  on trip_fork_comments for insert to authenticated with check (author_id = auth.uid());
+create policy "fork comments update own"
+  on trip_fork_comments for update to authenticated using (author_id = auth.uid());
+create policy "fork comments delete own"
+  on trip_fork_comments for delete to authenticated using (author_id = auth.uid());

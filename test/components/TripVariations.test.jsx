@@ -10,6 +10,16 @@ const updateTripFrame = vi.fn();
 vi.mock("../../components/TripProvider", () => ({
   useTrips: () => ({ updateTripFrame }),
 }));
+// TripVariations now calls useAuth() to get userId for comment authoring.
+vi.mock("../../components/AuthGate", () => ({
+  useAuth: () => ({ userId: "test-user-id", displayName: "Test", user: { id: "test-user-id" }, signOut: vi.fn() }),
+}));
+// fetchForkComments is called on mount — stub it so it doesn't hit Supabase.
+vi.mock("../../lib/db", () => ({
+  fetchForkComments: vi.fn().mockResolvedValue([]),
+  addForkComment: vi.fn(),
+  removeForkComment: vi.fn(),
+}));
 import TripVariations from "../../components/TripVariations";
 
 const baseTrip = () => ({
@@ -44,7 +54,7 @@ describe("TripVariations", () => {
     };
     render(<TripVariations trip={trip} />);
     expect(screen.getByText("Piran vs Trieste")).toBeInTheDocument();
-    expect(screen.getByText(/decide by 2026-05-12/)).toBeInTheDocument();
+    expect(screen.getByText(/cancel-by 2026-05-12/)).toBeInTheDocument();
     // switching to Option B persists the active choice
     const choiceB = screen.getByRole("button", { name: /Option B/ });
     await userEvent.click(choiceB);

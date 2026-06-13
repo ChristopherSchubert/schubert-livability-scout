@@ -581,6 +581,39 @@
 .tv-col-by { font-style: normal; color: #8a5a16; font-size: .72rem; }
 .tv-col-empty { color: var(--muted); font-style: italic; font-size: .82rem; margin: 0; }
 
+/* ── Variations: diff highlight + make-active + trade line ── */
+.tv-col-diff { background: #fff8e6; border-radius: 4px; padding: 0 .2rem; }
+.tv-col-trade { font-family: var(--font-ui); font-size: .72rem; color: var(--muted); margin: .1rem 0 .4rem; }
+.tv-make-active { margin-left: auto; float: right; font-family: var(--font-ui); font-size: .63rem; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; color: var(--accent); background: none; border: 1px solid var(--accent); border-radius: 100px; padding: .08rem .5rem; cursor: pointer; }
+.tv-make-active:hover { background: #e7f1ee; }
+.tv-col header { display: flex; align-items: center; gap: .4rem; }
+
+/* ── Fork comments (Janice #8) ── */
+.tfc-wrap { border-top: 1px dashed var(--border); margin-top: .9rem; padding-top: .8rem; display: flex; flex-direction: column; gap: .55rem; }
+.tfc-heading { margin: 0; font-family: var(--font-ui); font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.tfc-loading, .tfc-empty { margin: 0; font-size: .82rem; color: var(--muted); font-style: italic; }
+.tfc-list { display: flex; flex-direction: column; gap: .45rem; }
+.tfc-card { position: relative; background: var(--panel); border: 1px solid var(--border); border-radius: 9px; padding: .5rem .65rem; }
+.tfc-card.mine { background: #f3f8f6; border-color: #bcd8d0; }
+.tfc-card-meta { display: flex; align-items: center; gap: .45rem; margin-bottom: .25rem; }
+.tfc-author { font-family: var(--font-ui); font-size: .72rem; font-weight: 700; color: var(--accent); }
+.tfc-opt-label { font-family: var(--font-ui); font-size: .7rem; color: var(--muted); background: var(--panel-strong); border: 1px solid var(--border); border-radius: 100px; padding: .02rem .4rem; }
+.tfc-lean { font-size: .85rem; }
+.tfc-body { margin: 0; font-size: .85rem; line-height: 1.45; white-space: pre-wrap; }
+.tfc-delete { position: absolute; top: .4rem; right: .5rem; background: none; border: none; cursor: pointer; font-size: .9rem; color: var(--muted); opacity: .55; }
+.tfc-delete:hover { opacity: 1; color: #c0392b; }
+
+/* composer */
+.tfc-composer { display: flex; flex-direction: column; gap: .35rem; }
+.tfc-textarea { font: inherit; font-size: .85rem; border: 1px solid var(--border); border-radius: 8px; padding: .4rem .55rem; background: var(--bg); resize: vertical; width: 100%; box-sizing: border-box; }
+.tfc-textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+.tfc-composer-row { display: flex; align-items: center; gap: .4rem; flex-wrap: wrap; }
+.tfc-target { font: inherit; font-size: .8rem; border: 1px solid var(--border); border-radius: 6px; padding: .25rem .4rem; background: var(--bg); flex: 1 1 120px; }
+.tfc-lean-btn { font-size: 1rem; background: var(--panel); border: 1px solid var(--border); border-radius: 6px; padding: .2rem .45rem; cursor: pointer; }
+.tfc-lean-btn.active { background: #e7f1ee; border-color: var(--accent); }
+.tfc-send { font: inherit; font-size: .82rem; font-weight: 600; background: var(--accent); color: #fff; border: none; border-radius: 100px; padding: .3rem .9rem; cursor: pointer; }
+.tfc-send:disabled { opacity: .5; cursor: default; }
+
 /* Dietary screening badges — meal entries */
 .tw-screen { display: inline-flex; align-items: center; gap: .18rem; font-family: var(--font-ui); font-size: .62rem; font-weight: 700; border-radius: 100px; padding: .03rem .42rem; border: 1px solid; white-space: nowrap; }
 .tw-screen.ok { background: #e7f1ee; border-color: #bcd8d0; color: var(--accent); }

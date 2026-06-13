@@ -4,12 +4,25 @@
 // date range into Option A / Option B, switch which one is live (the rest of
 // the workspace follows via activeEntries), and watch the decide-by countdown
 // (the earliest cancellation deadline across either option). Both futures stay
-// alive until you pick one. Forking tags the in-range base entries to Option A;
-// switch to Option B and add entries on those days to build the alternative.
-import { useMemo, useState } from "react";
+// alive until you pick one. Forking tags the in-range base entries to Option A
+// implicitly (lib/trip-variations.activeEntries), so there's no per-entry
+// write burst that could race the metadata (#62). Option B starts blank.
+//
+// Janice #8: each fork now has a shared Comments thread (Chris + Janice can
+// both read and reply). Comments are stored in trip_fork_comments via RLS.
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useTrips } from "./TripProvider";
+import { useAuth } from "./AuthGate";
 import { tripDays } from "../lib/trip";
-import { tripForks, activeEntries, choiceCounts, forkDecideBy, makeFork, setActiveChoice, entriesForChoice } from "../lib/trip-variations";
+import {
+  tripForks, activeEntries, choiceCounts, forkDecideBy, makeFork, setActiveChoice, entriesForChoice,
+} from "../lib/trip-variations";
+import {
+  fetchForkComments, addForkComment, removeForkComment,
+} from "../lib/db";
+import {
+  commentsByChoice, authorLabel, leanEmoji, choiceLabel, diffEntries,
+} from "../lib/fork-comments";
 
 function daysUntil(ymd) {
   const m = (ymd || "").match(/^(\d{4})-(\d{2})-(\d{2})/);
@@ -19,8 +32,207 @@ function daysUntil(ymd) {
   return Math.ceil((target - new Date(now.getFullYear(), now.getMonth(), now.getDate())) / 86400000);
 }
 
+// A single comment card.
+function CommentCard({ comment, myUserId, choices, onRemove }) {
+  const label = authorLabel(comment.authorId, myUserId, [], {});
+  const optLabel = choiceLabel(comment.choiceId, choices);
+  const emoji = leanEmoji(comment.lean);
+  const isMine = comment.authorId === myUserId;
+  return (
+    <div className={`tfc-card${isMine ? " mine" : ""}`}>
+      <div className="tfc-card-meta">
+        <span className="tfc-author">{label}</span>
+        <span className="tfc-opt-label">{optLabel}</span>
+        {emoji && <span className="tfc-lean" title={comment.lean}>{emoji}</span>}
+      </div>
+      <p className="tfc-body">{comment.body}</p>
+      {isMine && (
+        <button className="tfc-delete" onClick={() => onRemove(comment.id)} title="Remove comment">×</button>
+      )}
+    </div>
+  );
+}
+
+// The comments thread + composer for one fork.
+function ForkComments({ trip, fork, myUserId }) {
+  const [comments, setComments] = useState(null); // null = loading
+  const [body, setBody] = useState("");
+  const [targetChoice, setTargetChoice] = useState(""); // "" = general
+  const [lean, setLean] = useState(""); // "" | "up" | "down"
+  const [sending, setSending] = useState(false);
+  const bottomRef = useRef(null);
+
+  // Load on mount.
+  useEffect(() => {
+    let cancelled = false;
+    fetchForkComments(trip.id)
+      .then((all) => {
+        if (!cancelled) setComments(all.filter((c) => c.forkId === fork.id));
+      })
+      .catch((e) => { console.error("fetchForkComments:", e.message); if (!cancelled) setComments([]); });
+    return () => { cancelled = true; };
+  }, [trip.id, fork.id]);
+
+  async function handleSend() {
+    if (!body.trim() || sending || !myUserId) return;
+    setSending(true);
+    try {
+      const saved = await addForkComment({
+        tripId: trip.id,
+        forkId: fork.id,
+        choiceId: targetChoice || null,
+        body: body.trim(),
+        lean: lean || null,
+        authorId: myUserId,
+      });
+      setComments((prev) => [...(prev || []), saved]);
+      setBody("");
+      setLean("");
+      setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }), 50);
+    } catch (e) {
+      console.error("addForkComment:", e.message);
+    } finally {
+      setSending(false);
+    }
+  }
+
+  async function handleRemove(id) {
+    try {
+      await removeForkComment(id);
+      setComments((prev) => prev.filter((c) => c.id !== id));
+    } catch (e) {
+      console.error("removeForkComment:", e.message);
+    }
+  }
+
+  const grouped = comments ? commentsByChoice(comments) : {};
+
+  return (
+    <div className="tfc-wrap">
+      <p className="tfc-heading">Comments</p>
+
+      {comments === null ? (
+        <p className="tfc-loading">Loading…</p>
+      ) : comments.length === 0 ? (
+        <p className="tfc-empty">No comments yet — add yours below.</p>
+      ) : (
+        <div className="tfc-list">
+          {comments.map((c) => (
+            <CommentCard
+              key={c.id}
+              comment={c}
+              myUserId={myUserId}
+              choices={fork.choices}
+              onRemove={handleRemove}
+            />
+          ))}
+          <div ref={bottomRef} />
+        </div>
+      )}
+
+      <div className="tfc-composer">
+        <textarea
+          className="tfc-textarea"
+          placeholder="Add a note for Chris or Janice…"
+          value={body}
+          onChange={(e) => setBody(e.target.value)}
+          rows={2}
+        />
+        <div className="tfc-composer-row">
+          <select
+            className="tfc-target"
+            value={targetChoice}
+            onChange={(e) => setTargetChoice(e.target.value)}
+            aria-label="Which option does this comment address?"
+          >
+            <option value="">general</option>
+            {fork.choices.map((c) => (
+              <option key={c.id} value={c.id}>re: {c.label}</option>
+            ))}
+          </select>
+          <button
+            className={`tfc-lean-btn${lean === "up" ? " active" : ""}`}
+            onClick={() => setLean(lean === "up" ? "" : "up")}
+            title="Lean toward this option"
+            type="button"
+          >👍</button>
+          <button
+            className={`tfc-lean-btn${lean === "down" ? " active" : ""}`}
+            onClick={() => setLean(lean === "down" ? "" : "down")}
+            title="Lean against this option"
+            type="button"
+          >👎</button>
+          <button
+            className="tfc-send"
+            onClick={handleSend}
+            disabled={!body.trim() || sending}
+            type="button"
+          >{sending ? "Sending…" : "Send"}</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Side-by-side compare with diff highlight and make-active buttons.
+function ForkCompare({ trip, fork, onPick }) {
+  const aList = useMemo(() => entriesForChoice(trip, fork.id, fork.choices[0]?.id), [trip, fork]);
+  const bList = useMemo(() => entriesForChoice(trip, fork.id, fork.choices[1]?.id), [trip, fork]);
+  const diff = useMemo(() => diffEntries(aList, bList), [aList, bList]);
+
+  // Count nights (distinct days in each choice).
+  const aCnt = aList.length;
+  const bCnt = bList.length;
+
+  return (
+    <div className="tv-compare">
+      {fork.choices.map((c, idx) => {
+        const isLive = fork.activeChoiceId === c.id;
+        const list = idx === 0 ? aList : bList;
+        const cnt = idx === 0 ? aCnt : bCnt;
+        const otherCnt = idx === 0 ? bCnt : aCnt;
+        return (
+          <div key={c.id} className={`tv-col${isLive ? " live" : ""}`}>
+            <header>
+              {c.label}{isLive ? <i> · live</i> : null}
+              {!isLive && (
+                <button
+                  className="tv-make-active"
+                  onClick={() => onPick(fork.id, c.id)}
+                  title={`Make ${c.label} the live plan`}
+                >make live</button>
+              )}
+            </header>
+            <p className="tv-col-trade">
+              {cnt} {cnt === 1 ? "entry" : "entries"}
+              {cnt !== otherCnt ? ` · ${cnt > otherCnt ? "+" : ""}${cnt - otherCnt} vs other` : ""}
+            </p>
+            {list.length === 0 ? (
+              <p className="tv-col-empty">— empty —</p>
+            ) : (
+              <ul>
+                {list.map((e) => {
+                  const row = diff.find((d) => d.day === e.day);
+                  return (
+                    <li key={e.id} className={row?.differs ? "tv-col-diff" : ""}>
+                      <span className="tv-col-day">{e.day?.slice(5)}</span>{" "}
+                      {e.title || "Untitled"}
+                      {e.booking?.cancelBy ? <em className="tv-col-by"> · by {e.booking.cancelBy}</em> : null}
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 export default function TripVariations({ trip }) {
   const { updateTripFrame } = useTrips();
+  const { userId } = useAuth();
   const forks = tripForks(trip);
   const days = useMemo(() => tripDays(trip), [trip]);
   const [name, setName] = useState("");
@@ -45,7 +257,7 @@ export default function TripVariations({ trip }) {
 
   return (
     <div className="tv">
-      <p className="tw-sec-label">What-if — fork a stretch of the trip into two futures, keep both alive until you decide.</p>
+      <p className="tw-sec-label">What-if — fork a stretch of the trip into two futures, keep both alive until you're ready to choose.</p>
 
       {forks.map((f) => {
         const counts = choiceCounts(trip, f.id);
@@ -58,7 +270,7 @@ export default function TripVariations({ trip }) {
               <span className="tv-range">{f.range.from} – {f.range.to}</span>
               {decideBy ? (
                 <span className={`tv-decide${left != null && left <= 7 ? " soon" : ""}`}>
-                  ⏰ decide by {decideBy}{left != null ? ` · ${left}d` : ""}
+                  ⏰ cancel-by {decideBy}{left != null ? ` · ${left}d` : ""}
                 </span>
               ) : <span className="tv-decide none">no refundable deadline yet</span>}
             </header>
@@ -73,27 +285,16 @@ export default function TripVariations({ trip }) {
               ))}
             </div>
             <p className="tv-hint">
-              {f.activeChoiceId === "a"
-                ? "Option A is live — these days show its plan. Switch to Option B and add entries on those days to build the alternative."
+              {f.activeChoiceId === f.choices[0]?.id
+                ? `${f.choices[0]?.label} is live — these days show its plan. Switch to ${f.choices[1]?.label || "Option B"} and add entries on those days to build the alternative.`
                 : `${f.choices.find((c) => c.id === f.activeChoiceId)?.label} is live — add entries on ${f.range.from}–${f.range.to} to fill it out.`}
             </p>
 
-            {/* Side-by-side compare — both futures at once, the live one ringed. */}
-            <div className="tv-compare">
-              {f.choices.map((c) => {
-                const list = entriesForChoice(trip, f.id, c.id);
-                return (
-                  <div key={c.id} className={`tv-col${f.activeChoiceId === c.id ? " live" : ""}`}>
-                    <header>{c.label}{f.activeChoiceId === c.id ? <i> · live</i> : null}</header>
-                    {list.length === 0 ? <p className="tv-col-empty">— empty —</p> : (
-                      <ul>{list.map((e) => (
-                        <li key={e.id}><span className="tv-col-day">{e.day?.slice(5)}</span> {e.title || "Untitled"}{e.booking?.cancelBy ? <em className="tv-col-by"> · by {e.booking.cancelBy}</em> : null}</li>
-                      ))}</ul>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
+            {/* Side-by-side compare — both futures at once, live one ringed, diffs amber. */}
+            <ForkCompare trip={trip} fork={f} onPick={pick} />
+
+            {/* Shared comments thread (Janice #8). */}
+            <ForkComments trip={trip} fork={f} myUserId={userId} />
           </section>
         );
       })}
