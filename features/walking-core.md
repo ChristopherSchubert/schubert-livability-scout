@@ -251,9 +251,18 @@ explanation that makes them legible stays here. See
   synthesized from the city name. A curated `cities.nearby_feature`
   column would let us render "Adriatic Sea" / "Lake Bled" / "Walnut
   Street" the way the standalone mockup did.
-- **#4 — Re-run [`fit_weights.py`](../scripts/fit_weights.py)** to
-  absorb the new metric scale (`_n` integer counts → `_score` weighted
-  floats) into the calibrate weights stored in `user_weights`.
+- **#4 — Absorb the new metric scale into the weights** ✅ RESOLVED
+  (2026-06-13, verification only — no re-run needed). The premise didn't
+  match the live architecture: (a) the app's learned weights come from
+  `learnedAxisWeights()` in `lib/metrics.js`, which is **Pearson
+  correlation-based = scale-invariant** (the `_n`→`_score` shift has zero
+  effect — correlation normalizes by std-dev); (b) there are currently **0
+  completed felt-surveys**, so the learned path is inactive and the ranking
+  uses default axis weights; (c) `fit_weights.py` is a disconnected Python
+  prototype (demo data, `load_real()` reads CSVs that don't exist, **no
+  consumer in `lib/`**). Verified the ranking on the new scale is correct:
+  **Piran #1/122 (8.00)**, Ljubljana #10, Bled #21, **Allison Park #122/122
+  (2.30)** — top dozen all genuinely walkable places, no confusing reshuffle.
 - **#5 — Piran's `daily_needs_score = 0`** ✅ RESOLVED (2026-06-11). Root
   cause was *not* categorization — it was the **fetch**. `.fetch-pois.mjs`
   requested only `market`/`liquor_store` from the daily set inside one
