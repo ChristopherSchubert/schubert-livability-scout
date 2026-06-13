@@ -6,10 +6,26 @@ How Livability Scout gets from a `git push` to the live site your wife sees.
 
 - **Host: Vercel.** Confirmed by the response headers on the live site
   (`server: Vercel`, `x-vercel-id`, `x-vercel-cache`).
-- **Production URL: https://schubert-livability-scout.vercel.app**
-  (this is also the GitHub repo's `homepage` field, which is how you can
-  rediscover it: `curl -s https://api.github.com/repos/ChristopherSchubert/schubert-livability-scout | jq .homepage`).
+- **Production URL: https://travel.schubertfamily.com** (custom domain).
+  The Vercel-assigned **https://schubert-livability-scout.vercel.app** still
+  serves the same deployment and remains valid — keep it for previews and as
+  a fallback. The `.vercel.app` host is the GitHub repo's `homepage` field, which
+  is how you can rediscover it: `curl -s https://api.github.com/repos/ChristopherSchubert/schubert-livability-scout | jq .homepage`.
 - **Repo:** `ChristopherSchubert/schubert-livability-scout` (GitHub, public).
+
+### Custom domain
+
+`travel.schubertfamily.com` is added under Project → Settings → Domains. DNS
+lives at the `schubertfamily.com` registrar (not Vercel), as a single record:
+
+| Type | Host | Value |
+|---|---|---|
+| `CNAME` | `travel` | `cname.vercel-dns.com` |
+
+(On Cloudflare set the record to **DNS only** / grey-cloud, or cert issuance
+stalls.) HTTPS is auto-provisioned by Vercel once the record validates. Nothing
+in the repo configures the domain — like the rest of the Vercel setup, it's
+dashboard-side.
 
 ## How it deploys
 
@@ -71,11 +87,17 @@ live app.** Don't expect either one to see the other's secrets.
 
 ## Auth redirect allowlist (gotcha)
 
-The magic-link sign-in uses `emailRedirectTo: window.location.origin`. For links
-sent from production to work, the Supabase project's **Auth → URL Configuration
-→ Redirect URLs** must include `https://schubert-livability-scout.vercel.app`
-(and `http://localhost:3000` for dev). If sign-in links bounce to an error,
-check that allowlist first.
+The magic-link sign-in uses `emailRedirectTo: window.location.origin` (so it
+adapts to whichever host served the page — no env var pins the URL). For links
+sent from production to work, the Supabase project's **Auth → URL Configuration**
+must list every origin the app is served from. **Site URL:**
+`https://travel.schubertfamily.com`. **Redirect URLs** allowlist (keep all three):
+
+- `https://travel.schubertfamily.com` (custom domain)
+- `https://schubert-livability-scout.vercel.app` (Vercel host / previews)
+- `http://localhost:3000` (dev)
+
+If sign-in links bounce to an error, check that allowlist first.
 
 ## Checking / operating it
 
@@ -102,4 +124,5 @@ check that allowlist first.
 
 - Add a GitHub Actions check (lint + `next build` + future tests) so a broken
   push is caught before Vercel promotes it.
-- Consider a custom domain instead of the `*.vercel.app` URL.
+- ~~Consider a custom domain instead of the `*.vercel.app` URL.~~ Done:
+  `travel.schubertfamily.com` (see Custom domain above).
