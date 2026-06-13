@@ -17,6 +17,7 @@
     "@dnd-kit/utilities": "^3.2.2",
     "@supabase/ssr": "^0.10.3",
     "@supabase/supabase-js": "^2.106.2",
+    "@vercel/speed-insights": "^2.0.0",
     "leaflet": "^1.9.4",
     "next": "^16.2.6",
     "pg": "^8.21.0",
