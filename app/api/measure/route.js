@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { measurementAllowed } from "../../../lib/measurement-guard";
 import {
   measureAround, findVisitCenters, nearestWaterMulti,
   rankedWaterBodies, distanceToTarget, nearestWater, geocodeHeart,
@@ -49,6 +50,15 @@ async function ensureBoundary(supabase, city, anchor, { refresh } = {}) {
 
 export async function POST(request) {
   try {
+    // Measurement is LOCAL-ONLY (CLAUDE.md: "Production never measures").
+    // The OSM layers already fail closed on Vercel (Overpass → localhost →
+    // ECONNREFUSED), but Census / Walk Score / climate / skyline fetch the
+    // public internet with real keys, so an unguarded prod POST could burn the
+    // metered budget AND merge partial, mixed-source metrics over the real
+    // measured values. Hard-disable in production (mirrors /api/dev-login).
+    if (!measurementAllowed()) {
+      return NextResponse.json({ error: "Measurement is disabled in production (local-only)." }, { status: 404 });
+    }
     const { cityId, lat, lon, full, scout, water, setWaterTarget, refreshBoundary } = await request.json();
     // (legacy `recenter` flag is intentionally ignored — measureAround now
     //  always picks the best 700 m inside the boundary, making it redundant.)

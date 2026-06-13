@@ -34,6 +34,12 @@ rows); anon/authenticated writes are now denied (no write policy).
 
 ## Other checks — OK
 
+- **`/api/measure` prod guard** — ✅ added 2026-06-13 (#55). The route now
+  hard-refuses (404) when `NODE_ENV === 'production'` via
+  `lib/measurement-guard.js#measurementAllowed`, so a deployed instance can't be
+  POSTed to burn the metered Census/Walk Score/climate budget or merge partial,
+  mixed-source metrics over the real values. Mirrors `/api/dev-login`. Measurement
+  is local-only (CLAUDE.md). Unit-tested (`test/api-measure-guard.test.mjs`).
 - **Google Places key** — server-side only: `process.env.GOOGLE_PLACES_API_KEY`
   in `/api/places/search` + `lib/place-resolve.js`; the scripts use the Keychain
   key. Never the public key, never sent to the client. ✓ (Key still needs to be
