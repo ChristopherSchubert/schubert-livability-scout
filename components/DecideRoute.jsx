@@ -3,11 +3,19 @@
 import Link from "next/link";
 import Decide from "./Decide";
 import AppShell from "./AppShell";
-import { usePlannerCity } from "./PlannerProvider";
+import { usePlanner, usePlannerCity } from "./PlannerProvider";
 
 export default function DecideRoute({ slug }) {
   const cityItem = usePlannerCity(slug);
+  const { hydrated } = usePlanner();
   if (!cityItem) {
+    if (!hydrated) {
+      return (
+        <AppShell activeMode="assess">
+          <section className="canvas-header"><div><p className="canvas-sub">Loading…</p></div></section>
+        </AppShell>
+      );
+    }
     return (
       <AppShell activeMode="assess">
         <section className="canvas-header">

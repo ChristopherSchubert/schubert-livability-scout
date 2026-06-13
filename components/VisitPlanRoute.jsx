@@ -7,9 +7,16 @@ import { usePlanner, usePlannerCity } from "./PlannerProvider";
 
 export default function VisitPlanRoute({ slug }) {
   const cityItem = usePlannerCity(slug);
-  const { updateCity } = usePlanner();
+  const { updateCity, hydrated } = usePlanner();
 
   if (!cityItem) {
+    if (!hydrated) {
+      return (
+        <AppShell activeMode="plan">
+          <section className="canvas-header"><div><p className="canvas-sub">Loading…</p></div></section>
+        </AppShell>
+      );
+    }
     return (
       <AppShell activeMode="plan">
         <section className="canvas-header">
