@@ -66,7 +66,7 @@ export default function DecideWorkspace() {
                   <header className="verdict-head">
                     <Link className="verdict-name" href={`/cities/${slug}/assess`}>{cityItem.name}</Link>
                     {done
-                      ? <span className="felt-chip">Felt {felt.toFixed(0)}/10</span>
+                      ? <span className="felt-chip">Gut {felt.toFixed(0)}/10</span>
                       : <span className="felt-chip pending">Not surveyed</span>}
                   </header>
                   <p className="verdict-sub">{cityItem.stayZone || "—"}</p>
