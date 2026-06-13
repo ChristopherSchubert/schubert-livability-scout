@@ -24,6 +24,10 @@ import { solveTripDay } from "../lib/solve-adapter";
 
 const TripMap = dynamic(() => import("./TripMapInner"), { ssr: false, loading: () => <p className="tw-stub">loading map…</p> });
 
+// Leg palette — same as TripWindow, so the Days rail's per-day tint reads as the
+// same legs as the Plan window.
+const LEG_COLORS = ["#0d4c44", "#2e5482", "#9a5a16", "#665285", "#6b6358"];
+
 function money(map) {
   return Object.entries(map || {}).map(([c, n]) => `${c === "EUR" ? "€" : c + " "}${n}`).join(" · ") || "—";
 }
@@ -182,18 +186,19 @@ export default function TripWorkspace({ tripId, activeTab = "plan" }) {
 
   return (
     <div className="tw-wrap">
+      {/* One compact context line — repeats on every tab, so it stays tight:
+          dates · nights · travelers · cash · deadlines. Passes live on the Book
+          tab (no need to repeat their chips on every view). */}
       <div className="tw-summary">
-        <p className="tw-meta">{trip.startDate} – {trip.endDate} · {trip.legs?.length || 0} legs · {trip.entries.length} entries</p>
-        <div className="tw-frame">
-          {(trip.travelers || []).map((t) => (
-            <span key={t.name} className="tw-trav">{t.kind === "pet" ? "🐾" : "🧑"} {t.name}{t.chips?.length ? <em> · {t.chips.join(", ")}</em> : null}</span>
-          ))}
-          {(trip.passes || []).map((p) => <span key={p.id} className="tw-pass">🎟 {p.name}</span>)}
-        </div>
-        <div className="tw-rollups">
-          <span className="tw-cash">💰 cash needed: <b>{money(cash)}</b></span>
-          <span className="tw-book">⏰ {bookings.length} with a deadline / confirmation</span>
-        </div>
+        <span>{trip.startDate} – {trip.endDate}</span>
+        <span>{Math.max(0, days.length - 1)} nights</span>
+        <span>{trip.entries.length} stops</span>
+        {(trip.travelers || []).length ? (
+          <span>{trip.travelers.map((t) => `${t.kind === "pet" ? "🐾" : ""}${t.name}`).join(", ")}
+            {dietChips.length ? <em> · {dietChips.join("/")}</em> : null}</span>
+        ) : null}
+        <span>💰 <b>{money(cash)}</b></span>
+        {bookings.length ? <span>⏰ {bookings.length} to confirm</span> : null}
       </div>
 
       <div id="tw-panel">
@@ -204,11 +209,15 @@ export default function TripWorkspace({ tripId, activeTab = "plan" }) {
           <nav className="tw-daynav" aria-label="Jump to day">
             {days.map((d) => {
               const on = (focusDay || defaultDay) === d.date;
+              const li = (trip.legs || []).findIndex((l) => l.arrive <= d.date && d.date <= l.depart);
+              const count = (byDay[d.date] || []).length;
               return (
                 <button key={d.date} className={`tw-daychip${on ? " on" : ""}`} aria-current={on ? "true" : undefined}
+                        style={{ "--leg": LEG_COLORS[(li < 0 ? 0 : li) % LEG_COLORS.length] }}
+                        title={`${d.date}${d.legName ? ` · ${d.legName.replace(/,.*$/, "")}` : ""} · ${count} stop${count === 1 ? "" : "s"}`}
                         onClick={() => { setFocusDay(d.date); document.getElementById(`day-${d.date}`)?.scrollIntoView({ behavior: "smooth", block: "start" }); }}>
-                  <small>{d.date.slice(5, 7)}/{d.date.slice(8)}</small>
-                  <i>{(byDay[d.date] || []).length || ""}</i>
+                  <b>{d.date.slice(8)}</b>
+                  <i>{count || ""}</i>
                 </button>
               );
             })}

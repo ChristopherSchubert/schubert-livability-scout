@@ -12,11 +12,6 @@
 .tw-crumb a { color: var(--muted); }
 .tw-head h1 { font-family: var(--font-display); font-variation-settings: "opsz" 48, "SOFT" 60, "wght" 480; font-size: clamp(1.6rem, 3vw, 2.2rem); margin: 0; line-height: 1.05; }
 .tw-meta { font-family: var(--font-ui); font-size: .82rem; color: var(--muted); margin: .3rem 0 0; }
-.tw-frame { display: flex; flex-wrap: wrap; gap: .45rem; margin: .7rem 0 .4rem; }
-.tw-trav, .tw-pass { font-size: .76rem; background: var(--panel-strong); border: 1px solid var(--border); border-radius: 100px; padding: .12rem .6rem; }
-.tw-trav em { font-style: normal; color: var(--accent); }
-.tw-rollups { display: flex; flex-wrap: wrap; gap: 1.2rem; font-family: var(--font-ui); font-size: .82rem; color: var(--muted); margin-top: .4rem; }
-.tw-cash b { color: var(--text); }
 
 .tw-days { display: flex; flex-direction: column; gap: 1.3rem; }
 .tw-day-head { display: flex; align-items: baseline; gap: .7rem; border-bottom: 1.5px solid var(--text); padding-bottom: .3rem; margin-bottom: .5rem; }
@@ -442,7 +437,6 @@
 /* ── Mobile / responsive (#35 — phone layouts for the trip surfaces) ── */
 @media (max-width: 640px) {
   .tw-wrap { padding: 1rem .8rem 4rem; }
-  .tw-rollups { gap: .6rem; flex-direction: column; }
   /* entry rows: let the title wrap, keep time + tags readable */
   .tw-entry { flex-wrap: wrap; }
   .tw-t { flex-basis: 3.6rem; }
@@ -536,7 +530,15 @@
 
 /* ── Trip workspace now lives inside AppShell (#15): summary band + trip
       context strip name. The crumb/title moved to the AppShell context strip. ── */
-.tw-summary { border-bottom: 1px solid var(--border); padding-bottom: .8rem; margin-bottom: 1.1rem; }
+/* Compact one-line trip context — dot-separated plain text, no pills (#13 polish).
+   Repeats on every tab, so it's deliberately light. */
+.tw-summary { display: flex; flex-wrap: wrap; align-items: baseline; gap: .15rem .55rem;
+  font-family: var(--font-ui); font-size: .8rem; color: var(--muted);
+  border-bottom: 1px solid var(--border); padding-bottom: .7rem; margin-bottom: 1rem; }
+.tw-summary > span { display: inline-flex; align-items: baseline; gap: .25rem; }
+.tw-summary > span:not(:last-child)::after { content: "·"; color: var(--border); margin-left: .55rem; }
+.tw-summary b { color: var(--text); font-weight: 600; }
+.tw-summary em { font-style: normal; color: var(--accent); }
 .tw-summary .tw-meta { margin-top: 0; }
 .trip-context-name { font-family: var(--font-display); font-weight: 500; border: none; background: none; padding: 0; }
 
@@ -636,30 +638,29 @@
 .tw-entry { user-select: none; }
 
 /* ── Days date rail + mobile "Today" focus (#35) ── */
-.tw-daynav { display: flex; gap: .4rem; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: .5rem; margin-bottom: .6rem; }
-.tw-daychip { flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; gap: .1rem; min-width: 2.7rem; border: 1px solid var(--border); background: var(--panel); border-radius: 9px; padding: .3rem .35rem; cursor: pointer; font-family: var(--font-ui); }
-.tw-daychip small { font-size: .74rem; font-variant-numeric: tabular-nums; color: var(--text); }
-.tw-daychip i { font-style: normal; font-size: .6rem; min-height: .7rem; color: var(--muted); }
-.tw-daychip.on { border-color: var(--accent); background: #e7f1ee; }
-.tw-daychip.on small { color: var(--accent); font-weight: 700; }
-.tw-daychip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+/* Day selector — a single-row segmented strip. Each day is an equal-share cell
+   (flex:1 1 0) so all days fit ONE row at any width, no wrap/scroll. A thin
+   leg-color top accent ties it to the Plan window; the active day fills with its
+   leg color. Day number + a tiny stop-count. */
+.tw-daynav { display: flex; gap: 2px; margin: 0 0 1.1rem; }
+.tw-daychip { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 0;
+  border: 0; border-top: 2px solid var(--leg, var(--border)); background: var(--panel);
+  border-radius: 0 0 7px 7px; padding: .26rem .1rem .22rem; cursor: pointer; font-family: var(--font-ui); line-height: 1.15; }
+.tw-daychip b { font-size: .8rem; font-variant-numeric: tabular-nums; font-weight: 600; color: var(--text); }
+.tw-daychip i { font-style: normal; font-size: .58rem; min-height: .8em; color: var(--muted); }
+.tw-daychip:hover { background: #fffaf0; }
+.tw-daychip.on { background: var(--leg, var(--accent)); }
+.tw-daychip.on b, .tw-daychip.on i { color: #fff; }
+.tw-daychip:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 
-/* Desktop: the rail is a jump-nav; every day stays visible. Phone: focus one. */
+/* Desktop: the rail is a jump-nav; every day stays visible. Phone: focus one.
+   The segmented rail (flex:1 1 0) already fits one row at any width, so no
+   wrap/scroll hacks are needed — just hide the unfocused day bodies and keep the
+   flex chain bounded so nothing else overflows the phone. */
 @media (max-width: 640px) {
-  /* A horizontal scroll-rail of non-shrinking day chips has a min-content
-     width (~560px) that expands the whole mobile layout viewport past the phone
-     (the ≈240px overflow) — ancestor overflow-x:hidden can't contain an
-     intrinsic-min-content this far up. WRAP the chips instead: no horizontal
-     min-content, no overflow, and all days stay visible. */
-  .tw-daynav { flex-wrap: wrap; overflow-x: visible; background: var(--bg); padding-top: .4rem; }
   .tw-day:not(.focus) { display: none; }
-  /* The day-rail's non-shrinking chips were forcing the whole workspace wider
-     than the phone (≈240px overflow). Bound the flex chain so the rail scrolls
-     inside the viewport instead of stretching its parent, and let the day head
-     wrap its buttons. */
   .tw-wrap { overflow-x: hidden; }
   #tw-panel, .tw-days, .tw-day { min-width: 0; }
-  .tw-daynav { max-width: 100%; }
   .tw-day-head { flex-wrap: wrap; gap: .3rem .5rem; }
   .tw-day-head b { flex: 1 1 auto; }
 }
