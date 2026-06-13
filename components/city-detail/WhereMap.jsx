@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { MapContainer, TileLayer, CircleMarker, Circle, Polygon, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { PLATEAU, D_HALF, MAX_RADIUS } from "../../lib/measurers/walking-core.js";
@@ -15,16 +16,22 @@ function geojsonToLeafletPolys(geojson) {
 // Fit the view to the stay-zone polygon when present, else to the pin.
 function FitView({ polys, center }) {
   const map = useMap();
-  if (polys.length) {
-    const pts = polys.flat(2).filter((p) => Array.isArray(p));
+  // In an effect, not the render body, so an unrelated re-render doesn't reset
+  // the user's pan/zoom and StrictMode doesn't double-fire (#57). Keyed on the
+  // geometry's content so it re-fits only when the polygon/pin actually changes.
+  const polyKey = JSON.stringify(polys);
+  const centerKey = center ? center.join(",") : "";
+  useEffect(() => {
+    const pts = (polys || []).flat(2).filter((p) => Array.isArray(p));
     if (pts.length) {
       const lats = pts.map((p) => p[0]);
       const lons = pts.map((p) => p[1]);
       map.fitBounds([[Math.min(...lats), Math.min(...lons)], [Math.max(...lats), Math.max(...lons)]], { padding: [40, 40] });
-      return null;
+    } else if (center) {
+      map.setView(center, 14.5);
     }
-  }
-  if (center) map.setView(center, 14.5);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [polyKey, centerKey, map]);
   return null;
 }
 

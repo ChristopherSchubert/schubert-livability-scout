@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { MapContainer, TileLayer, CircleMarker, Circle, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { PLATEAU, D_HALF, MAX_RADIUS } from "../../lib/measurers/walking-core.js";
@@ -13,9 +14,11 @@ import { PLATEAU, D_HALF, MAX_RADIUS } from "../../lib/measurers/walking-core.js
 
 function ZoomToCore({ lat, lon }) {
   const map = useMap();
-  if (lat != null && lon != null) {
-    map.setView([lat, lon], 16);
-  }
+  // In an effect, not the render body — otherwise every PlannerProvider context
+  // update re-snaps the map and loses the user's pan/zoom (#57).
+  useEffect(() => {
+    if (lat != null && lon != null) map.setView([lat, lon], 16);
+  }, [lat, lon, map]);
   return null;
 }
 

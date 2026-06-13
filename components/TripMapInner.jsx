@@ -6,14 +6,20 @@
 // uses. Loaded via dynamic({ ssr:false }) — react-leaflet is client-only.
 import { MapContainer, TileLayer, CircleMarker, Polyline, Tooltip, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import { useMemo } from "react";
+import { useMemo, useEffect } from "react";
 import { tripDays, entriesByDay } from "../lib/trip";
 import { CAT_COLOR } from "./atoms";
 
 function FitBounds({ points }) {
   const map = useMap();
-  if (points.length === 1) map.setView(points[0], 14);
-  else if (points.length > 1) map.fitBounds(points, { padding: [40, 40] });
+  // In an effect, not the render body, so re-renders don't snap the view back
+  // and StrictMode doesn't double-fire (#57). Keyed on the points' content.
+  const key = JSON.stringify(points);
+  useEffect(() => {
+    if (points.length === 1) map.setView(points[0], 14);
+    else if (points.length > 1) map.fitBounds(points, { padding: [40, 40] });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key, map]);
   return null;
 }
 
