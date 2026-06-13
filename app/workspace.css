@@ -633,7 +633,8 @@
   /* On a city page the global funnel is redundant — the context strip's
      back-arrow returns to the stage workspace. Collapse it so the sub-nav owns
      the second row and we reclaim the vertical space. */
-  .sticky-header.has-city .stage-nav { display: none; }
+  .sticky-header.has-city .stage-nav,
+  .sticky-header.has-trip .stage-nav { display: none; }
 
   /* Keep the city context to ONE short row — it's mostly static identification
      and shouldn't eat the always-sticky header. Back-arrow + a small,

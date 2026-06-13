@@ -646,8 +646,22 @@
 
 /* Desktop: the rail is a jump-nav; every day stays visible. Phone: focus one. */
 @media (max-width: 640px) {
-  .tw-daynav { position: sticky; top: var(--app-header-h, 0); z-index: 5; background: var(--bg); padding-top: .4rem; }
+  /* A horizontal scroll-rail of non-shrinking day chips has a min-content
+     width (~560px) that expands the whole mobile layout viewport past the phone
+     (the ≈240px overflow) — ancestor overflow-x:hidden can't contain an
+     intrinsic-min-content this far up. WRAP the chips instead: no horizontal
+     min-content, no overflow, and all days stay visible. */
+  .tw-daynav { flex-wrap: wrap; overflow-x: visible; background: var(--bg); padding-top: .4rem; }
   .tw-day:not(.focus) { display: none; }
+  /* The day-rail's non-shrinking chips were forcing the whole workspace wider
+     than the phone (≈240px overflow). Bound the flex chain so the rail scrolls
+     inside the viewport instead of stretching its parent, and let the day head
+     wrap its buttons. */
+  .tw-wrap { overflow-x: hidden; }
+  #tw-panel, .tw-days, .tw-day { min-width: 0; }
+  .tw-daynav { max-width: 100%; }
+  .tw-day-head { flex-wrap: wrap; gap: .3rem .5rem; }
+  .tw-day-head b { flex: 1 1 auto; }
 }
 
 /* Screen-reader-only utility (#38) — visible to AT, removed from the visual flow */

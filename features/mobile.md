@@ -296,3 +296,25 @@ scannable list instead:
   Code: `components/Calibrate.jsx` (`clickSort`/`sort` state already exist —
   just needs a `<select>` bound to them at mobile width). Low priority; the
   default ranking is the most useful sort. _(promote to a GitHub issue when picked up)_
+
+## /trips v2 workspace (2026-06-13, rank 13)
+
+The real Trip Planner (`/trips/[id]/[tab]`, [TripWorkspace](../components/TripWorkspace.jsx))
+got its first dedicated mobile pass — the prior audit only covered the legacy
+`TripPlanner.jsx`, giving false "mobile is done" confidence over the
+highest-traffic surface.
+
+- **Doubled chrome dropped** — `.sticky-header.has-trip .stage-nav { display:none }`
+  ([workspace.css](../app/workspace.css)) collapses the redundant global funnel on
+  trip pages (it already did this for city pages via `.has-city`); the trip's own
+  sub-nav (Plan·Days·Book·Shelf·Grid·Map·Frame) owns the second row.
+- **Day-rail overflow fixed** — the Days date-rail was a horizontal scroll strip
+  of 11 non-shrinking chips whose ~560px min-content **expanded the whole layout
+  viewport** to 614px (≈240px horizontal overflow) — ancestor `overflow-x:hidden`
+  can't contain an intrinsic min-content that high in the tree. On `≤640px` the
+  rail now **wraps** (`flex-wrap:wrap`); no horizontal min-content, all days
+  visible, 0 overflow. Verified at 375px across Plan/Days/Book/Grid/Map/Frame/Forks.
+- **"Today" decision** — no separate Today tab; the existing mobile single-day
+  Days view (`.tw-day:not(.focus){display:none}`, #35) IS the Today view. It now
+  opens on **today when the trip is underway**, else the first day (`defaultDay`
+  in TripWorkspace, computed in an effect so `new Date()` stays out of render).

@@ -136,6 +136,16 @@ export default function TripWorkspace({ tripId, activeTab = "plan" }) {
   const vtrip = useMemo(() => (trip ? { ...trip, entries: activeEntries(trip) } : null), [trip]);
   const days = useMemo(() => (trip ? tripDays(trip) : []), [trip]);
   const byDay = useMemo(() => (vtrip ? entriesByDay(vtrip) : {}), [vtrip]);
+  // Which day the Days panel opens on (the mobile single-day "Today" view, #35):
+  // today when the trip is underway, else the first day. Computed in an effect
+  // so it doesn't run during render (new Date()).
+  const [todayStr, setTodayStr] = useState(null);
+  useEffect(() => { setTodayStr(new Date().toISOString().slice(0, 10)); }, []);
+  const defaultDay = useMemo(() => {
+    if (!days.length) return undefined;
+    if (todayStr && days.some((d) => d.date === todayStr)) return todayStr;
+    return days[0].date;
+  }, [days, todayStr]);
 
   // Detect whether a day's entries were edited after the last solve so we can
   // show an "edited since solve" pill and relabel the solve button.
@@ -193,7 +203,7 @@ export default function TripWorkspace({ tripId, activeTab = "plan" }) {
         <div className="tw-days">
           <nav className="tw-daynav" aria-label="Jump to day">
             {days.map((d) => {
-              const on = (focusDay || days[0]?.date) === d.date;
+              const on = (focusDay || defaultDay) === d.date;
               return (
                 <button key={d.date} className={`tw-daychip${on ? " on" : ""}`} aria-current={on ? "true" : undefined}
                         onClick={() => { setFocusDay(d.date); document.getElementById(`day-${d.date}`)?.scrollIntoView({ behavior: "smooth", block: "start" }); }}>
@@ -205,7 +215,7 @@ export default function TripWorkspace({ tripId, activeTab = "plan" }) {
           </nav>
           {days.map((d) => {
             const list = byDay[d.date] || [];
-            const focused = (focusDay || days[0]?.date) === d.date;
+            const focused = (focusDay || defaultDay) === d.date;
             const ds = daySchedules[d.date];
             const hasSolved = !!ds;
             const stale = hasSolved && editedSinceSolve(d.date);
