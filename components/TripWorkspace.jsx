@@ -247,7 +247,7 @@ export default function TripWorkspace({ tripId, activeTab = "plan" }) {
         </div>
       ) : null}
 
-      {tab === "book" ? <BookView trip={vtrip} /> : null}
+      {tab === "book" ? <BookView trip={vtrip} onEdit={setEditing} /> : null}
       {tab === "shelf" ? (
         <div className="sh">
           <div className="tw-shelf-head">

@@ -112,6 +112,19 @@ for vegetarian (your chips)"). Veg signal is honest-cited: `servesVegetarianFood
 Gathered places now carry their markers forward, so a saved veg spot reads veg ✓.
 The composer shows the effect inline when you toggle a diet chip.
 
+## Book page — deadline-driven actions (rank 9)
+
+The Book page is a **Needs-action / Booked** action surface, not a flat read-only
+list. `splitBookings(trip)` partitions entries; `holdPhrase(entry)` derives an
+honest status from real fields only ('prepaid 🔒' / 'held to arrival' /
+'free-cancel by &lt;date&gt;' / 'to book' — never a guessed date); `isUrgent`
+flags a cancelBy within ~5 days. Needs-action rows carry a **mark booked…**
+button (opens EntryEditor prefilled). Cash is **itemized** (`cashNeededLines`)
+not a lone total. Passes show when/where when present (else blank). Real
+cancelBy/hold data is set by `scripts/seed-booking-holds.mjs` from the deck
+(Union free-cancel 2026-05-12, Toplice held-to-arrival, balloon/canyoning
+prepaid). Helpers in [lib/trip.js](../lib/trip.js); tested.
+
 ## Fork compare-comments (Janice #8)
 
 The Forks compare view now carries a **shared comments thread** (Janice #8).

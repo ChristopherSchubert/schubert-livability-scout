@@ -236,17 +236,37 @@
 
 /* Book tab */
 .bk { display: flex; flex-direction: column; gap: 1.6rem; }
+.bk-sec { display: flex; flex-direction: column; gap: .3rem; }
 .bk-h { font-family: var(--font-display); font-size: 1.1rem; font-weight: 500; margin: 0 0 .3rem; display: flex; align-items: baseline; gap: .6rem; }
+.bk-h-action { color: var(--text); }
 .bk-big { font-size: 1.4rem; color: var(--accent); }
 .bk-count { font-family: var(--font-ui); font-size: .8rem; color: var(--muted); }
+.bk-count-warn { color: #8a5a16; font-weight: 700; background: #fbf0e2; border: 1px solid #dcc49a; border-radius: 100px; padding: .02rem .5rem; font-size: .72rem; }
+.bk-count-clear { color: var(--accent); font-size: .72rem; font-style: italic; }
 .bk-note { color: var(--muted); font-size: .82rem; margin: 0; }
 .bk-ledger, .bk-passes { list-style: none; margin: .4rem 0 0; padding: 0; }
-.bk-row { display: flex; align-items: baseline; gap: 1rem; padding: .45rem .2rem; border-bottom: 1px dashed var(--border); font-size: .88rem; }
-.bk-row .bk-title { flex: 1; }
-.bk-row .bk-title em { font-style: normal; color: var(--muted); }
-.bk-deadline { color: #8a5a16; font-size: .78rem; }
-.bk-conf { font-family: var(--font-ui); font-size: .76rem; color: var(--muted); }
-.bk-passes li { padding: .3rem .2rem; border-bottom: 1px dashed var(--border); font-size: .9rem; }
+.bk-row { display: flex; align-items: baseline; gap: .65rem; flex-wrap: wrap; padding: .45rem .2rem; border-bottom: 1px dashed var(--border); font-size: .88rem; }
+.bk-action { border-left: 3px solid #dcc49a; padding-left: .5rem; }
+.bk-urgent { border-left-color: #c0392b !important; background: #fff8f6; }
+.bk-title { flex: 1 1 auto; }
+.bk-title em { font-style: normal; color: var(--muted); font-size: .82rem; }
+.bk-conf { font-family: var(--font-ui); font-size: .76rem; color: var(--muted); flex: 0 0 auto; }
+.bk-phrase { font-family: var(--font-ui); font-size: .76rem; flex: 0 0 auto; }
+.bk-okk { color: var(--accent); }
+.bk-due { color: #8a5a16; font-weight: 600; }
+.bk-mark { font-family: var(--font-ui); font-size: .7rem; font-weight: 700; color: var(--accent); background: #e7f1ee; border: 1px solid #bcd8d0; border-radius: 100px; padding: .1rem .55rem; cursor: pointer; flex: 0 0 auto; }
+.bk-mark:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+/* Cash breakdown */
+.bk-cashlines { list-style: none; margin: .4rem 0 0; padding: 0; }
+.bk-cashline { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; padding: .3rem .2rem; border-bottom: 1px dotted var(--border); font-size: .86rem; }
+.bk-cashline-title { flex: 1; color: var(--text); }
+.bk-cashline-amount { font-family: var(--font-ui); font-variant-numeric: tabular-nums; font-weight: 600; color: var(--text); flex: 0 0 auto; }
+/* Passes */
+.bk-pass-row { display: flex; align-items: baseline; flex-wrap: wrap; gap: .5rem; padding: .3rem .2rem; border-bottom: 1px dashed var(--border); font-size: .9rem; }
+.bk-pass-name { flex: 1; }
+.bk-pass-covers { font-style: italic; color: var(--muted); font-size: .8rem; flex-basis: 100%; margin-left: 1.4rem; }
+.bk-pass-when, .bk-pass-where { font-family: var(--font-ui); font-size: .76rem; color: var(--accent); background: #e7f1ee; border-radius: 100px; padding: .05rem .45rem; }
+.bk-cost { font-family: var(--font-ui); font-size: .78rem; color: var(--text); flex: 0 0 auto; }
 .tw-stub { color: var(--muted); font-style: italic; padding: 2rem .2rem; }
 
 .tw-add { font-family: var(--font-ui); font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--accent); background: none; border: 1px solid var(--border); border-radius: 100px; padding: .1rem .55rem; margin-left: .6rem; cursor: pointer; }
