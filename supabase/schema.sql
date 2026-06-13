@@ -62,6 +62,7 @@ create table if not exists cities (
   water_target       jsonb,                     -- user-picked water body { name, point, … } for water_dist_m
   stay_zone_boundary jsonb,                     -- GeoJSON polygon: the adaptive stay-zone
   boundary_source    text,                      -- provenance of stay_zone_boundary (Census/OSM/NRHP/circle/…)
+  nearby_feature     text,                      -- curated region label for the walking-core headline (#3)
   boundary_set_at    date,                      -- when the boundary was last fetched
   horizon_features   jsonb,                     -- visible peaks { peaks: [{ name, angle, dir, … }], occupancyPct }
   lat                double precision,          -- geocoded heart (persisted, reused)
@@ -97,6 +98,7 @@ alter table cities add column if not exists eu_lau              jsonb;
 alter table cities add column if not exists planning_order      integer;
 alter table cities add column if not exists poi_positions       jsonb default '[]';
 alter table cities add column if not exists walking_core_center jsonb;
+alter table cities add column if not exists nearby_feature      text;
 alter table cities add column if not exists blocks_authored     jsonb default '[]';
 alter table cities add column if not exists block_blurbs        jsonb default '[]';
 

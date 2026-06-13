@@ -262,10 +262,15 @@ explanation that makes them legible stays here. See
 - **#2 — Drop legacy `_n` measurers + taxonomy entries** after one
   measurement cycle confirms the new scores look right. See "Legacy `_n`
   counts" above for the migration plan.
-- **#3 — Region label per city**: the full-screen view's subtitle is
-  synthesized from the city name. A curated `cities.nearby_feature`
-  column would let us render "Adriatic Sea" / "Lake Bled" / "Walnut
-  Street" the way the standalone mockup did.
+- **#3 — Region label per city** ✅ RESOLVED (2026-06-13). Added
+  `cities.nearby_feature` (text, migration 0021), round-tripped through
+  `lib/city-row.js` + `mapPatch`; `WalkingCoreView`'s `cityHeadlineSub` now
+  prefers it over the name-parsed region, falling back to the old behaviour
+  when null. Seeded only **definitional** features — the issue's own examples
+  (Piran → "Adriatic Sea", Bled → "Lake Bled") plus the namesake-lake towns
+  (Lake George, Deep Creek Lake, Schroon Lake, Saranac Lake) — no
+  editorial-voice guesses. The remaining ~116 are a standing **owner curation**
+  task (their voice); the column + view are ready for them.
 - **#4 — Absorb the new metric scale into the weights** ✅ RESOLVED
   (2026-06-13, verification only — no re-run needed). The premise didn't
   match the live architecture: (a) the app's learned weights come from

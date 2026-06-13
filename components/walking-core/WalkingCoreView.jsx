@@ -36,9 +36,11 @@ function useBackHref(slug) {
   return ref;
 }
 
-// Curated subtitle for the city headline overlay. Pulls country / region
-// out of the city name where possible; falls back to stay_zone.
+// Curated subtitle for the city headline overlay. Prefers the curated
+// `nearby_feature` region label (#3 — "Adriatic Sea", "Lake Bled"); otherwise
+// pulls country / region out of the city name, then falls back to stay_zone.
 function cityHeadlineSub(cityItem) {
+  if (cityItem.nearbyFeature) return cityItem.nearbyFeature;
   const name = cityItem.name || "";
   if (name.includes(",")) {
     const region = name.split(",").slice(1).join(",").trim();
