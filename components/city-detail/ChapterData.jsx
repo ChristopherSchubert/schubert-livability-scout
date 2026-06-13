@@ -103,13 +103,20 @@ function MetricRow({ m, addon }) {
       <div className="metric-top">
         <span className="metric-name">{m.label}</span>
         <span className="metric-value">
-          {m.value != null ? (
+          {m.count != null ? (
+            // POI rows lead with the real "places within the 15-min walk" count;
+            // the weighted score (what drives the bar) + plateau split live in
+            // the tooltip so the headline stays a number a human reads directly.
+            <span title={`Walkability-weighted score ${m.score} · ${m.count.inPlateau} within the 5-min plateau`}>
+              {m.count.total}
+            </span>
+          ) : m.value != null ? (
             <>
               {formatMetricNumber(m)}
               {m.unit === "days" ? <small style={{ color: "var(--ink-mute)", fontWeight: 400 }}> / 365</small> : null}
             </>
           ) : "—"}
-          {m.legacy ? (
+          {m.count == null && m.legacy ? (
             <small
               className="metric-legacy"
               title={`Legacy raw count: ${m.legacy.value} within 700 m · ${m.legacy.source}`}

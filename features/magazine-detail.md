@@ -31,7 +31,15 @@ numbers → When to go → Where to walk). This is the live layout at
     the temperature day-counts (`hot_days`/`days_below_freeze`) are deliberately
     left neutral — a literal hot=red/cold=blue gradient would paint the bar
     loudest on its *worst* end and reintroduce the very confusion this fixes.
-    Guarded by `test/scoring.test.mjs`.
+    Guarded by `test/scoring.test.mjs`. **Headers are plain-language** — no
+    pipeline vocabulary (`(weighted)`, "plateau-decay sum") in titles/taglines;
+    methodology lives in `metricMethod`, surfaced in the detail accordion.
+    **POI rows lead with a real count**, not the abstract weighted score: the
+    walking-core measurer stores `meta.in_plateau`/`meta.beyond` per POI metric,
+    so `metricSnapshot` exposes `count = in_plateau + beyond` (places within the
+    1500 m / 15-min walk) and the row shows that integer ("6 cafés"), matching
+    the tagline. The weighted score still drives the bar and rides in the value's
+    tooltip; the legacy 700 m `· N raw` suffix is dropped for these rows.
   - [ChapterWhen.jsx](../components/city-detail/ChapterWhen.jsx) — the comfort
     ribbon, the climatology small-multiples (vs the Allison Park home base), and
     the year-shape extremes strip. **All SVG paths are computed from the city's
