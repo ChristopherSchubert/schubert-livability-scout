@@ -46,8 +46,14 @@ export function PlannerProvider({ children, initialManifest }) {
           fetchMyBaselines(userId), fetchMyWeights(userId),
         ]);
         if (cancelled) return;
-        // Merge this user's survey + journal onto each shared city.
-        const merged = cities.map((c) => ({ ...c, survey: mySurveys[c.id] || emptySurvey(), journal: myJournal[c.id] || [] }));
+        // Merge this user's survey + journal onto each shared city, then apply
+        // the persisted manual order (planning_order). Stable: rows without an
+        // order keep their created-at sequence behind the ordered ones (#56).
+        const merged = cities
+          .map((c) => ({ ...c, survey: mySurveys[c.id] || emptySurvey(), journal: myJournal[c.id] || [] }))
+          .map((c, i) => ({ c, i }))
+          .sort((a, b) => ((a.c.planningOrder ?? Infinity) - (b.c.planningOrder ?? Infinity)) || (a.i - b.i))
+          .map((x) => x.c);
         setPlanner({ cities: merged, selectedId: merged[0]?.id || null });
         setReferences(myBaselines || {});
         if (myWeights) setWeightsState({ ...defaultWeights(), ...myWeights });
@@ -209,14 +215,22 @@ export function PlannerProvider({ children, initialManifest }) {
     },
 
     moveCity(cityId, direction) {
-      // Local-only reorder (display order isn't persisted in this version).
+      // Reorder + PERSIST to planning_order so the order survives a reload (#56)
+      // — same column the TripPlanner drag uses, and the mount-load sorts by it.
       setPlanner((current) => {
         const index = current.cities.findIndex((item) => item.id === cityId);
         const nextIndex = index + direction;
         if (index < 0 || nextIndex < 0 || nextIndex >= current.cities.length) return current;
-        const cities = [...current.cities];
-        const [moved] = cities.splice(index, 1);
-        cities.splice(nextIndex, 0, moved);
+        const reordered = [...current.cities];
+        const [moved] = reordered.splice(index, 1);
+        reordered.splice(nextIndex, 0, moved);
+        // Renumber + persist only the rows whose order actually changed (new
+        // objects, no mutation of shared state).
+        const cities = reordered.map((c, i) => {
+          if (c.planningOrder === i) return c;
+          queueCityWrite(c.id, { planningOrder: i });
+          return { ...c, planningOrder: i };
+        });
         return { ...current, cities };
       });
     },
@@ -239,7 +253,7 @@ export function PlannerProvider({ children, initialManifest }) {
 
 // Whitelist the shared fields updateCityWith may persist (drops transient keys).
 function mapWritable(obj) {
-  const allow = ["name","stayZone","stayZoneBoundary","heartIntersection","tripWeek","why","blocks","status","decision","heroImage","arriveDate","departDate","tripLength","flightDetails","carDetails","lodgingDetails","logisticsNotes","days","checklists","measuredMetrics","visitClimate","crowdSeason","seasonNotes"];
+  const allow = ["name","stayZone","stayZoneBoundary","heartIntersection","tripWeek","why","blocks","status","decision","heroImage","arriveDate","departDate","tripLength","flightDetails","carDetails","lodgingDetails","logisticsNotes","days","checklists","measuredMetrics","visitClimate","crowdSeason","seasonNotes","planningOrder"];
   const out = {};
   for (const k of allow) if (k in obj) out[k] = obj[k];
   return out;
