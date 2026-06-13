@@ -75,9 +75,10 @@ export default function WalkingCoreMap({ cityItem }) {
         pathOptions={{ color: "#0d4c44", weight: 2, opacity: 0.75, fill: false, dashArray: "5 5" }}
       />
 
-      {/* POI dots with weight-opacity. */}
+      {/* POI dots with weight-opacity. A null/NaN coordinate (partial cache
+          write) would throw inside Leaflet and unmount the whole map — guard it. */}
       {positions
-        .filter((p) => p.weight != null && p.weight > 0)
+        .filter((p) => p.weight != null && p.weight > 0 && Number.isFinite(p.lat) && Number.isFinite(p.lon))
         .map((p, i) => (
           <CircleMarker
             key={i}

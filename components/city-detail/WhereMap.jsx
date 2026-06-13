@@ -93,7 +93,7 @@ export default function WhereMap({ lat, lon, boundary, poiPositions = [] }) {
           {/* POI dots, opacity = w(d). Skips anything past the cutoff (already
               filtered by the measurer; the .filter here is belt-and-suspenders). */}
           {poiPositions
-            .filter((p) => p.weight != null && p.weight > 0)
+            .filter((p) => p.weight != null && p.weight > 0 && Number.isFinite(p.lat) && Number.isFinite(p.lon))
             .map((p, i) => (
               <CircleMarker
                 key={i}
