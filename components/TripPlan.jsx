@@ -19,7 +19,7 @@
 //
 // This replaces the old always-expanded list where every leg's suggestion tray
 // rendered at once — the wall the deck was designed to avoid.
-import { useMemo, useState, useCallback } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import {
   DndContext,
   PointerSensor,
@@ -32,7 +32,7 @@ import {
 import { useTrips } from "./TripProvider";
 import { usePlanner } from "./PlannerProvider";
 import { tripDays, entriesByDay, tripDietChips, layOutLegPlan } from "../lib/trip";
-import { appendCityLeg, daysBetween } from "../lib/trip-window";
+import { appendCityLeg, daysBetween, nearestCities } from "../lib/trip-window";
 import { CAT_ICON, MealScreen } from "./atoms";
 import GatherBucket from "./GatherBucket";
 import TripWindow from "./TripWindow";
@@ -56,6 +56,21 @@ const stayName = (t) => (t || "").replace(/^(Stay|Check[\s-]*(?:in|out))\s*[—�
 // never persisted — it's a fullness cue for "enough to lay out yet?", not data.
 const HOURS_PER_ITEM = 2;
 
+// Geographic Google-Places types. The cold-start name geocode (below) only
+// adopts a center when the trip name resolves to a PLACE — a region, locality,
+// admin area, or natural feature — never a business that happens to match the
+// words. Keeps "Weekend getaway" from latching onto a random café, and honours
+// the never-invent rule: an unrecognised name leaves the anchor null.
+const GEO_PLACE_TYPES = new Set([
+  "political", "locality", "sublocality", "neighborhood", "colloquial_area",
+  "administrative_area_level_1", "administrative_area_level_2",
+  "administrative_area_level_3", "natural_feature", "archipelago",
+  "country", "postal_code",
+]);
+const isGeographicPlace = (p) =>
+  !!p && p.lat != null && p.lon != null &&
+  (p.types || []).some((t) => GEO_PLACE_TYPES.has(t));
+
 export default function TripPlan({ trip, onEdit }) {
   const { addEntry, updateEntry, removeEntry, updateTripFrame } = useTrips();
   const { planner } = usePlanner();
@@ -69,6 +84,9 @@ export default function TripPlan({ trip, onEdit }) {
   const [otherResults, setOtherResults] = useState([]);
   const [otherBusy, setOtherBusy] = useState(false);
   const [otherErr, setOtherErr] = useState("");
+  // Cold-start suggestion anchor: when the trip has no legs yet but its name
+  // reads as a real place, the geocoded center grounds the tray. { lat, lon } | null.
+  const [nameAnchor, setNameAnchor] = useState(null);
 
   const legs = trip.legs || [];
   const days = useMemo(() => tripDays(trip), [trip]);
@@ -96,29 +114,49 @@ export default function TripPlan({ trip, onEdit }) {
   // from planner.cities — never a ranking/popularity query, so the provenance
   // claim in the srcline is literally true).
   const legCityIds = useMemo(() => new Set(legs.map((l) => l.cityId).filter(Boolean)), [legs]);
+
+  // Cold-start grounding: with no legs yet, geocode the trip name once (debounced)
+  // and adopt its center as the tray's anchor — so "Hudson River Valley" surfaces
+  // nearby scouted places instead of an alphabetical slice. Only a name that
+  // resolves to a geographic place counts; anything else leaves the anchor null
+  // (never an invented center). Once a city is added, legs drive the ranking and
+  // this stops firing.
+  useEffect(() => {
+    if (legs.length > 0) { setNameAnchor(null); return; }
+    const name = (trip.name || "").trim();
+    if (name.length < 3) { setNameAnchor(null); return; }
+    let cancelled = false;
+    const t = setTimeout(async () => {
+      try {
+        const r = await fetch("/api/places/search", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ query: name, limit: 1 }),
+        });
+        const j = await r.json();
+        const top = (j.results || [])[0];
+        if (!cancelled) setNameAnchor(isGeographicPlace(top) ? { lat: top.lat, lon: top.lon } : null);
+      } catch {
+        if (!cancelled) setNameAnchor(null);
+      }
+    }, 600);
+    return () => { cancelled = true; clearTimeout(t); };
+  }, [trip.name, legs.length]);
+
   // The tray = scouted Atlas cities NEAR this trip, not the whole atlas. A trip
   // in Slovenia shouldn't surface 119 US cities — only places within reach of
-  // its region (sorted nearest-first, capped). Far-flung or coordless trips
-  // fall back to a short alphabetical slice; ＋ other city covers the rest.
+  // its region (nearest-first, capped). Anchors = the trip's leg cities, or — at
+  // cold start — the geocoded trip name. With no usable anchor, fall back to a
+  // short alphabetical slice; ＋ other city covers the rest.
   const scoutCities = useMemo(() => {
     const all = (planner.cities || []).filter((c) => c.id && !legCityIds.has(c.id) && c.lat != null && c.lon != null);
-    const anchors = legs
+    const legAnchors = legs
       .map((l) => (planner.cities || []).find((c) => c.id === l.cityId))
       .filter((c) => c && c.lat != null);
+    const anchors = legAnchors.length ? legAnchors : (nameAnchor ? [nameAnchor] : []);
     if (!anchors.length) return all.slice(0, 12);
-    const km = (a, b) => {
-      const R = 6371, dLat = (b.lat - a.lat) * Math.PI / 180, dLon = (b.lon - a.lon) * Math.PI / 180;
-      const s = Math.sin(dLat / 2) ** 2 + Math.cos(a.lat * Math.PI / 180) * Math.cos(b.lat * Math.PI / 180) * Math.sin(dLon / 2) ** 2;
-      return 2 * R * Math.asin(Math.sqrt(s));
-    };
-    const near = (c) => Math.min(...anchors.map((a) => km(a, c)));
-    return all
-      .map((c) => ({ c, d: near(c) }))
-      .filter((x) => x.d <= 400) // ~within a few hours of the trip's region
-      .sort((a, b) => a.d - b.d)
-      .slice(0, 12)
-      .map((x) => x.c);
-  }, [planner.cities, legCityIds, legs]);
+    return nearestCities(all, anchors, { maxKm: 400, limit: 12 });
+  }, [planner.cities, legCityIds, legs, nameAnchor]);
 
   // Can we donate 1 calendar day to a new leg?  The longest leg must have
   // daysBetween(arrive, depart) ≥ 1 (span ≥ 2 calendar days). If no leg

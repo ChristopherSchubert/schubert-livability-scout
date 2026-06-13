@@ -75,13 +75,24 @@ Overview shows a **provenance line** — "the places **you** scouted in your Atl
 — not a preference guess, not a popularity list · ＋ other city adds anything you
 haven't scouted" — Janice #3's reassurance. Below it, a **city tray** of scouted
 Atlas cities (strictly `planner.cities`, never a ranking query, so the claim is
-literally true) NEAR the trip's region (haversine to leg anchors, ≤400km, capped
-12; honest "no scouted places near this trip" when empty, e.g. a Slovenia trip vs.
-a US atlas). Clicking a chip appends a leg via `appendCityLeg` ([trip-window.js](../lib/trip-window.js),
-tested) which funds the new 1-night leg from the longest leg and **preserves the
-total span**. **＋ other city…** searches `/api/places/search` for non-Atlas
-destinations. Empty trips show an "add a city to start" dropzone. Follow-up:
-drag-from-tray-onto-window (click-to-add ships now).
+literally true) NEAR the trip's region. "Near" = nearest-first to a set of
+**anchors**, ≤400km, capped 12, via `nearestCities` ([trip-window.js](../lib/trip-window.js),
+tested in [test/trip-nearest-cities.test.mjs](../test/trip-nearest-cities.test.mjs)).
+Anchors are the trip's leg cities — or, at **cold start with no legs yet**, the
+trip name's geocoded center: when the name reads as a real place ("Hudson River
+Valley", "Vermont") `TripPlan` geocodes it once (debounced, `/api/places/search`,
+adopted only if the result is a geographic type — `isGeographicPlace`, never a
+business matching the words) and ranks the tray off that point instead of a flat
+alphabetical slice. A name that doesn't resolve leaves the anchor null (honest: no
+invented center). Empty/unrecognised → short alphabetical slice + honest "no
+scouted places near this trip" copy. Clicking a chip appends a leg via
+`appendCityLeg` ([trip-window.js](../lib/trip-window.js), tested) which funds the
+new 1-night leg from the longest leg and **preserves the total span**. **＋ other
+city…** searches `/api/places/search` for non-Atlas destinations. Empty trips show
+an "add a city to start" dropzone. The trip name itself is editable inline in the
+trip context strip (`TripContextStrip` → `updateTripFrame`), mirroring the city
+header. Follow-ups: drag-from-tray-onto-window (click-to-add ships now);
+region/state chips as a first-class trip attribute + cross-trip filter (#79).
 
 ## Hotel search → place a stay (Janice #5)
 

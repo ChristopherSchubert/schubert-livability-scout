@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { STAGES, citySlug, cityStage } from "../lib/planner-data";
 import { usePlanner } from "./PlannerProvider";
+import { useTrips } from "./TripProvider";
 
 // Top-nav workflow modes. The home is "Board" (every candidate by stage);
 // "Ranking" is a view toggle on the Board page, not a separate tab. The other
@@ -298,6 +299,7 @@ function CityContextStrip({ cityItem, cityNav }) {
 // Plan·Days·Book·Shelf·Grid·Map·Frame sub-tabs (each its own URL). Reuses the
 // city-context CSS so the chrome matches the rest of the app.
 function TripContextStrip({ tripItem, tripNav }) {
+  const { updateTripFrame } = useTrips();
   const navRef = useRef(null);
   useTabNav(navRef, ".city-context-tab.active", tripNav);
   return (
@@ -306,7 +308,13 @@ function TripContextStrip({ tripItem, tripNav }) {
         <Link href="/trips" className="city-context-back" aria-label="All trips">←</Link>
         <div className="city-context-text">
           <span className="city-context-stage">Trip</span>
-          <span className="city-context-name trip-context-name">{tripItem.name || "Untitled trip"}</span>
+          <input
+            className="city-context-name trip-context-name"
+            value={tripItem.name || ""}
+            placeholder="Untitled trip"
+            onChange={(event) => updateTripFrame(tripItem.id, { name: event.target.value })}
+            aria-label="Trip name"
+          />
         </div>
       </div>
       {tripNav?.length ? (
