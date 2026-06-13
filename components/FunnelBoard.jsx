@@ -88,23 +88,31 @@ export default function FunnelBoard({ focusStage }) {
   const visibleStages = focusStage ? STAGES.filter((stage) => stage.id === focusStage) : STAGES;
   const totalForFocus = focusStage ? (grouped[focusStage] || []).length : filteredCities.length;
 
-  // Drag handlers — set/clear the dataTransfer, highlight column under cursor,
-  // and on drop, move the card by writing the column's stage onto the city.
+  // Native drag is a desktop-only convenience for the two FREE moves. Planned
+  // (commit dates), Visited (return), and Assessed (survey) require data entered
+  // on their own pages, so they are NOT drop targets — see canDrop. On touch
+  // (where HTML5 DnD doesn't fire at all) every free move is reachable via the
+  // card's ← Backlog / Planning → footer buttons, and the gated moves via the
+  // city's own page; the "drag to move" hint is hidden on touch (#59).
+  const canDrop = (stageId) => stageId === "backlog" || stageId === "planning";
   function onCardDragStart(e, cityItem) {
     e.dataTransfer.setData("text/plain", cityItem.id);
     e.dataTransfer.effectAllowed = "move";
   }
-  function onColDragOver(e, stageId) { e.preventDefault(); e.dataTransfer.dropEffect = "move"; setDragOver(stageId); }
+  // Only call preventDefault() (which signals a valid drop + lights the column)
+  // for stages a card can actually land in — a data-gated column no longer
+  // shows a green drop highlight it would silently reject (#60).
+  function onColDragOver(e, stageId) {
+    if (!canDrop(stageId)) return;
+    e.preventDefault(); e.dataTransfer.dropEffect = "move"; setDragOver(stageId);
+  }
   function onColDragLeave(stageId) { setDragOver((s) => (s === stageId ? null : s)); }
   function onColDrop(e, stageId) {
-    e.preventDefault(); setDragOver(null);
+    setDragOver(null);
+    if (!canDrop(stageId)) return; // defense: gated columns never preventDefault, so won't fire drop
+    e.preventDefault();
     const id = e.dataTransfer.getData("text/plain");
-    if (!id) return;
-    // Only Backlog and Planning are free moves. Planned (commit dates), Visited
-    // (return), and Assessed (survey) require data entered on their own pages —
-    // block the drop rather than fake the transition.
-    if (stageId !== "backlog" && stageId !== "planning") return;
-    setCityStage(id, stageId);
+    if (id) setCityStage(id, stageId);
   }
 
   return (
@@ -117,7 +125,7 @@ export default function FunnelBoard({ focusStage }) {
               : focusStage
               ? `${totalForFocus} ${totalForFocus === 1 ? "city" : "cities"} in ${STAGES.find((stage) => stage.id === focusStage)?.label}`
               : `${filteredCities.length} of ${planner.cities.filter((c) => !hideCalibration || !c.isCalibration).length} candidates`}
-            {hydrated ? <span className="funnel-meta-hint"> · drag to move · click to open</span> : null}
+            {hydrated ? <span className="funnel-meta-hint"> · <span className="hint-drag">drag or </span>use the buttons to move · open a card for the rest</span> : null}
           </>
         }
       />
@@ -164,7 +172,7 @@ export default function FunnelBoard({ focusStage }) {
                   <span className="funnel-column-count">{cities.length}</span>
                 </header>
                 {cities.length === 0 ? (
-                  <EmptyColumn stage={stage} />
+                  <EmptyColumn stage={stage} droppable={canDrop(stage.id)} />
                 ) : (
                   <div className="funnel-column-list">
                     {cities.map((cityItem) => (
@@ -177,6 +185,7 @@ export default function FunnelBoard({ focusStage }) {
                         onAdvance={() => advanceCityStage(cityItem.id)}
                         onSendBack={() => setCityStage(cityItem.id, "backlog")}
                         onDragStart={(e) => onCardDragStart(e, cityItem)}
+                        onDragEnd={() => setDragOver(null)}
                         stage={stage.id}
                       />
                     ))}
@@ -194,7 +203,7 @@ export default function FunnelBoard({ focusStage }) {
 }
 
 // Compact draggable kanban card.
-function CityCard({ cityItem, imageState, weights, onOpen, onAdvance, onSendBack, onDragStart, stage }) {
+function CityCard({ cityItem, imageState, weights, onOpen, onAdvance, onSendBack, onDragStart, onDragEnd, stage }) {
   const heroQuery = cityImageQuery(cityItem.name, cityItem.stayZone, cityItem.heartIntersection);
   const heroSrc = resolveImage(cityItem.heroImage, heroQuery, imageState);
   const cardWeights = weights || EQUAL_WEIGHTS;
@@ -213,6 +222,7 @@ function CityCard({ cityItem, imageState, weights, onOpen, onAdvance, onSendBack
       className={`funnel-card stage-${stageId}`}
       draggable
       onDragStart={onDragStart}
+      onDragEnd={onDragEnd}
     >
       <button type="button" className="funnel-card-body" onClick={onOpen}>
         <div className="funnel-card-hero">
@@ -244,10 +254,12 @@ function CityCard({ cityItem, imageState, weights, onOpen, onAdvance, onSendBack
   );
 }
 
-function EmptyColumn({ stage }) {
+function EmptyColumn({ stage, droppable }) {
   return (
     <div className="funnel-column-empty">
-      <p>Drop a card here</p>
+      {/* Only promise a drop where one is actually accepted (#60). Gated stages
+          fill from a city's own page, not by dropping a card here. */}
+      <p>{droppable ? "Drop a card here" : "Set from a city's page"}</p>
     </div>
   );
 }

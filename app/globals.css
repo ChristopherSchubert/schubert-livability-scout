@@ -1476,6 +1476,9 @@ button:hover, .button-link:hover {
   font-size: 0.92rem;
 }
 .funnel-meta-hint { color: var(--muted); font-weight: 400; }
+/* Native HTML5 drag doesn't fire on touch, so only advertise it on a fine
+   pointer; touch users move cards with the footer buttons (#59). */
+@media (hover: none) and (pointer: coarse) { .hint-drag { display: none; } }
 .funnel-tools {
   display: flex;
   align-items: center;

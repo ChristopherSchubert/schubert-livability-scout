@@ -12,6 +12,17 @@ Two lenses on the **same** candidate set, switched by a shared toggle:
     in [`workspace.css`](../app/workspace.css) now reserves 3 lines
     (`min-height` + `-webkit-line-clamp: 3`) so every filled column's header
     is the same height and the first cards line up.
+  - **Drag is desktop-only convenience; the buttons are the real mechanism
+    (#59/#60).** Native HTML5 DnD doesn't fire on touch, and only Backlog and
+    Planning are valid drop targets anyway (the later stages are data-gated).
+    So every move is reachable *without* drag: the free Backlog⇄Planning moves
+    via each card's `← Backlog` / `Planning →` footer buttons, the gated moves
+    via the city's own page. `canDrop(stageId)` gates the highlight — a
+    data-gated column no longer lights green then silently rejects the drop —
+    and `onDragEnd` clears a stuck highlight after an Esc/cancel. The "drag or"
+    fragment of the move hint is hidden on coarse pointers
+    (`@media (hover: none)`), and an empty gated column reads "Set from a
+    city's page" instead of a false "Drop a card here".
 - **Ranking** (`/ranking`, [`Calibrate.jsx`](../components/Calibrate.jsx)) — a
   sortable table of the same cities with per-axis columns, an Overall column
   (weights **learned** from the owner's gut via `learnedAxisWeights`), and a
