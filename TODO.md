@@ -96,8 +96,14 @@ which is intentional.
 **Where we left off:** Full architecture audit done; Selection Board / five-
 stage funnel landed; CityNav exists. The next slices identified but not
 started:
-- **Visit Plan rebuild** — timeline view with logistics / days / checklists
-  rails. Still open.
+- ~~Visit Plan rebuild~~ **DONE** — shipped as a polished single-city plan
+  (`components/PlannerShell.jsx#VisitPlan`, redesigned 2026-06-09): all three
+  rails present — Trip Setup (schedule + flight/car/lodging logistics), a
+  day-by-day In-City Itinerary, and three Before/During/After checklists. It's a
+  deliberate **form-based** plan (name-the-day + narrative), distinct from the
+  cross-city `/trips` Trip Planner. A timed hour-grid like TripGrid would be a
+  *new* "timed itinerary" feature, not a finish-the-rebuild task — file a fresh
+  issue if it becomes a priority. Doc: features/visit-plan.md.
 - ~~Journal mode~~ **DONE (2026-06-13)** — phone-friendly per-city journal at
   `/cities/[slug]/journal` (the "Journal" sub-tab). A timestamped log: compose a
   note + optional reaction (loved/liked/mixed/no) + optional "where"; reverse-
