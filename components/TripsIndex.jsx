@@ -3,6 +3,7 @@
 // /trips — the trips list (#18) + the New-trip composer entry (#19).
 import { useState } from "react";
 import Link from "next/link";
+import AppShell from "./AppShell";
 import { useTrips } from "./TripProvider";
 import TripComposer from "./TripComposer";
 
@@ -10,7 +11,10 @@ export default function TripsIndex() {
   const { trips, hydrated } = useTrips();
   const [composing, setComposing] = useState(false);
   return (
-    <main className="tw-wrap">
+    // Wrapped in the global AppShell (#65) so /trips has the same top nav as the
+    // rest of the app — it was a dead-end (no way back to Board/Planning/…).
+    <AppShell activeMode="trips">
+    <div className="tw-wrap">
       <header className="tw-head tw-index-head">
         <div>
           <h1>Trips</h1>
@@ -33,6 +37,7 @@ export default function TripsIndex() {
         </ul>
       )}
       {composing ? <TripComposer onClose={() => setComposing(false)} /> : null}
-    </main>
+    </div>
+    </AppShell>
   );
 }
