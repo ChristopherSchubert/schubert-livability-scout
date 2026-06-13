@@ -5,6 +5,7 @@ import { useState } from "react";
 import Link from "next/link";
 import AppShell from "./AppShell";
 import { useTrips } from "./TripProvider";
+import { tripDisplayName } from "../lib/trip";
 import TripComposer from "./TripComposer";
 
 export default function TripsIndex() {
@@ -29,7 +30,7 @@ export default function TripsIndex() {
           {trips.map((t) => (
             <li key={t.id} className="tw-list-row">
               <Link href={`/trips/${t.id}`}>
-                <b>{t.name}</b>
+                <b>{tripDisplayName(t)}</b>
                 <span className="tw-meta">{t.startDate || "—"} – {t.endDate || "—"} · {t.legs?.length || 0} legs</span>
               </Link>
             </li>

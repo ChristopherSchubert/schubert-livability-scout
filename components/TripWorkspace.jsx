@@ -108,7 +108,7 @@ export default function TripWorkspace({ tripId, activeTab = "plan" }) {
           {(trip.passes || []).map((p) => <span key={p.id} className="tw-pass">🎟 {p.name}</span>)}
         </div>
         <div className="tw-rollups">
-          <span className="tw-cash">💶 cash needed: <b>{money(cash)}</b></span>
+          <span className="tw-cash">💰 cash needed: <b>{money(cash)}</b></span>
           <span className="tw-book">⏰ {bookings.length} with a deadline / confirmation</span>
         </div>
       </div>

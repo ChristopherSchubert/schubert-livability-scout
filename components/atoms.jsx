@@ -34,11 +34,11 @@ export function BookingBadge({ status }) {
   return <span className={`tw-status s-${status}`}>{STATUS_LABEL[status] || status}</span>;
 }
 
-// A cost atom: € amount, prefixed 💶 when it's cash-only.
+// A cost atom: € amount, prefixed 💰 when it's cash-only.
 export function CostTag({ cost }) {
   if (!cost || cost.amount == null) return null;
   const sym = cost.currency === "EUR" ? "€" : `${cost.currency || ""} `;
-  return <span className="tw-cost">{cost.cashOnly ? "💶 " : ""}{sym}{cost.amount}</span>;
+  return <span className="tw-cost">{cost.cashOnly ? "💰 " : ""}{sym}{cost.amount}</span>;
 }
 
 // The row of marker glyphs (vegetarian, kid-ok, etc.) carried by an entry.

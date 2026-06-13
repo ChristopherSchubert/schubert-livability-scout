@@ -81,7 +81,7 @@ function EntryCard({ entry, cityId }) {
           type="text"
           value={editAtPlace}
           onChange={e => setEditAtPlace(e.target.value)}
-          placeholder="where? (the lake promenade…)"
+          placeholder="where? (a café, a viewpoint, a street…)"
         />
         <div className="jr-card-actions">
           <button className="jr-btn-save" onClick={handleEditSave} disabled={!editBody.trim()}>Save</button>
@@ -158,7 +158,7 @@ export default function Journal({ cityItem }) {
           type="text"
           value={atPlace}
           onChange={e => setAtPlace(e.target.value)}
-          placeholder="where? (the lake promenade…)"
+          placeholder="where? (a café, a viewpoint, a street…)"
         />
         <button
           className="jr-btn-primary"
