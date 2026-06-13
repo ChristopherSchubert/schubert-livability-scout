@@ -6,26 +6,37 @@ How Livability Scout gets from a `git push` to the live site your wife sees.
 
 - **Host: Vercel.** Confirmed by the response headers on the live site
   (`server: Vercel`, `x-vercel-id`, `x-vercel-cache`).
-- **Production URL: https://travel.schubertfamily.com** (custom domain).
-  The Vercel-assigned **https://schubert-livability-scout.vercel.app** still
-  serves the same deployment and remains valid — keep it for previews and as
-  a fallback. The `.vercel.app` host is the GitHub repo's `homepage` field, which
-  is how you can rediscover it: `curl -s https://api.github.com/repos/ChristopherSchubert/schubert-livability-scout | jq .homepage`.
+- **URLs are being migrated** to a clean `schubert-travel` naming, in two
+  stages. Today the app runs on Vercel-assigned `.vercel.app` hosts; once the
+  `schubertfamily.com` domain registration completes, the custom domains take
+  over. Both keep serving the same deployment through the transition.
+
+  | Role | Today (`.vercel.app`) | Once DNS lands (custom) |
+  |---|---|---|
+  | **Production** (`main`) | `https://schubert-travel.vercel.app` | `https://travel.schubertfamily.com` |
+  | **Preprod** (`preview`) | `https://schubert-travel-preview.vercel.app` | `https://travel-preview.schubertfamily.com` |
+
+  The older `https://schubert-livability-scout.vercel.app` (the GitHub repo's
+  `homepage` field) still resolves during the transition; retire it once
+  `schubert-travel` is the settled name and update `homepage` to match.
 - **Repo:** `ChristopherSchubert/schubert-livability-scout` (GitHub, public).
 
-### Custom domain
+### Custom domains (pending DNS)
 
-`travel.schubertfamily.com` is added under Project → Settings → Domains. DNS
-lives at the `schubertfamily.com` registrar (not Vercel), as a single record:
+Both custom domains are subdomains of `schubertfamily.com`, whose DNS lives at
+the **GoDaddy** registrar (not Vercel). Each is one `CNAME`:
 
-| Type | Host | Value |
-|---|---|---|
-| `CNAME` | `travel` | `cname.vercel-dns.com` |
+| Type | Name (host) | Value | Vercel → Git Branch |
+|---|---|---|---|
+| `CNAME` | `travel` | `cname.vercel-dns.com` | `main` (production) |
+| `CNAME` | `travel-preview` | `cname.vercel-dns.com` | `preview` |
 
-(On Cloudflare set the record to **DNS only** / grey-cloud, or cert issuance
-stalls.) HTTPS is auto-provisioned by Vercel once the record validates. Nothing
-in the repo configures the domain — like the rest of the Vercel setup, it's
-dashboard-side.
+GoDaddy: enter the **Name** as just `travel` / `travel-preview` (it appends the
+zone automatically), no trailing dot on the value, TTL 1 hour or 600s. Add each
+domain under Project → Settings → Domains and set its **Git Branch** as above —
+that's what pins the preprod domain to the `preview` branch. HTTPS is
+auto-provisioned by Vercel once each record validates. Nothing in the repo
+configures the domains — like the rest of the Vercel setup, it's dashboard-side.
 
 ## How it deploys
 
@@ -50,9 +61,10 @@ the moment they're pushed. There is one long-lived branch besides `main`:
 
 - **`preview`** — the **preproduction** branch. It exists so a *particularly
   complex or risky* feature can be exercised on a real, stable URL before it
-  reaches production. It's pinned in Vercel to a stable custom domain:
-  **https://travel-preview.schubertfamily.com** (auto-deployed on every push to
-  `preview`).
+  reaches production. It's pinned in Vercel to a stable preprod host
+  (**`https://schubert-travel-preview.vercel.app`** today,
+  **`https://travel-preview.schubertfamily.com`** once DNS lands), auto-deployed
+  on every push to `preview`.
 
 **`preview` tracks `main` by default.** A GitHub Action
 ([`.github/workflows/sync-preview.yml`](../.github/workflows/sync-preview.yml))
@@ -68,7 +80,7 @@ feature stays deployed to travel-preview until you're done.
   fast-forwards `preview` so preprod stays in sync. Nothing else to do.
 - *Complex feature you want to soak first* → push it onto `preview`
   (`git push origin my-feature:preview`, or merge your feature branch into
-  `preview`). Vercel deploys it to `travel-preview.schubertfamily.com`. Because
+  `preview`). Vercel deploys it to the preprod host. Because
   `preview` now leads `main`, the auto-sync skips it. Test there; when happy,
   merge to `main`. Once `main` catches up (preview becomes its ancestor again),
   the next push to `main` resumes auto-fast-forwarding `preview`.
@@ -86,19 +98,9 @@ travel-preview to work, every var the app needs at runtime
 Settings → Environment Variables — not just Production. A preview deploy missing
 `NEXT_PUBLIC_SUPABASE_*` boots but dies at auth.
 
-### Preprod domain DNS (travel-preview)
-
-Same shape as the production domain — a second `CNAME` at GoDaddy:
-
-| Type | Name | Value |
-|---|---|---|
-| `CNAME` | `travel-preview` | `cname.vercel-dns.com` |
-
-Then in Vercel → Settings → Domains, add `travel-preview.schubertfamily.com`
-and set its **Git Branch** to `preview` (this is what pins the domain to that
-branch instead of giving it a random per-deploy URL). Add
-`https://travel-preview.schubertfamily.com` to the Supabase **Redirect URLs**
-allowlist so magic-link sign-in works on preprod too.
+> Preprod domain DNS + branch assignment live in the **Custom domains** table
+> near the top of this doc. The Supabase redirect-allowlist entries for every
+> host are in **Auth redirect allowlist** below.
 
 ## Environment variables
 
@@ -149,12 +151,22 @@ live app.** Don't expect either one to see the other's secrets.
 
 The magic-link sign-in uses `emailRedirectTo: window.location.origin` (so it
 adapts to whichever host served the page — no env var pins the URL). For links
-sent from production to work, the Supabase project's **Auth → URL Configuration**
-must list every origin the app is served from. **Site URL:**
-`https://travel.schubertfamily.com`. **Redirect URLs** allowlist (keep all three):
+to work from every host the app is served from, the Supabase project's **Auth →
+URL Configuration** must list them all. Because the URLs are mid-migration, the
+allowlist should carry both today's `.vercel.app` hosts and the future custom
+domains — Supabase ignores entries that aren't in use, so listing all of them is
+safe and means nothing breaks at cutover.
 
-- `https://travel.schubertfamily.com` (custom domain)
-- `https://schubert-livability-scout.vercel.app` (Vercel host / previews)
+**Site URL:** `https://schubert-travel.vercel.app` today; switch to
+`https://travel.schubertfamily.com` once that DNS validates.
+
+**Redirect URLs** allowlist:
+
+- `https://schubert-travel.vercel.app` (production, today)
+- `https://schubert-travel-preview.vercel.app` (preprod, today)
+- `https://travel.schubertfamily.com` (production, after DNS)
+- `https://travel-preview.schubertfamily.com` (preprod, after DNS)
+- `https://schubert-livability-scout.vercel.app` (legacy host, until retired)
 - `http://localhost:3000` (dev)
 
 If sign-in links bounce to an error, check that allowlist first.
@@ -163,7 +175,7 @@ If sign-in links bounce to an error, check that allowlist first.
 
 - **Is the latest push live yet?** The served HTML / assets update when the
   build finishes. Quick smell test for "did my CSS/font work ship":
-  `curl -s https://schubert-livability-scout.vercel.app | grep -oE 'Fraunces|auth-scene'`
+  `curl -s https://schubert-travel.vercel.app | grep -oE 'Fraunces|auth-scene'`
   (the root route is the auth gate, so workspace-page markup won't appear in the
   SSR HTML — it's client-rendered behind auth).
 - **"The live site looks unchanged" almost always means** the deploy hasn't
