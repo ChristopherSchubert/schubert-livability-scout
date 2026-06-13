@@ -6,8 +6,8 @@
 // themselves; bucket/flex entries collect in a tray above the grid. Click a
 // block to edit. Horizontal scroll for long trips.
 import { useMemo } from "react";
-import { tripDays, entriesByDay } from "../lib/trip";
-import { CAT_COLOR } from "./atoms";
+import { tripDays, entriesByDay, tripDietChips } from "../lib/trip";
+import { CAT_COLOR, MealScreen } from "./atoms";
 
 const HOUR_START = 6, HOUR_END = 24, PX = 42; // px per hour
 
@@ -30,6 +30,7 @@ const fmtClock = (m) => `${String(Math.floor(m / 60)).padStart(2, "0")}:${String
 export default function TripGrid({ trip, onEdit }) {
   const days = useMemo(() => (trip ? tripDays(trip) : []), [trip]);
   const byDay = useMemo(() => (trip ? entriesByDay(trip) : {}), [trip]);
+  const dietChips = useMemo(() => (trip ? tripDietChips(trip) : []), [trip]);
   const bodyH = (HOUR_END - HOUR_START) * PX;
   const hours = [];
   for (let h = HOUR_START; h <= HOUR_END; h++) hours.push(h);
@@ -56,7 +57,9 @@ export default function TripGrid({ trip, onEdit }) {
               <div className="tg-head"><b>{d.date.slice(5)}</b><small>{d.legName ? d.legName.replace(/,.*$/, "") : ""}</small></div>
               {untimed.length ? (
                 <div className="tg-tray">{untimed.map((e) => (
-                  <button key={e.id} className="tg-chip" style={{ "--c": CAT_COLOR[e.category] || "#6b6358" }} onClick={() => onEdit(e)} title={e.title}>{e.title}</button>
+                  <button key={e.id} className="tg-chip" style={{ "--c": CAT_COLOR[e.category] || "#6b6358" }} onClick={() => onEdit(e)} title={e.title}>
+                    {e.title}<MealScreen entry={e} dietChips={dietChips} />
+                  </button>
                 ))}</div>
               ) : null}
               <div className="tg-body" style={{ height: bodyH }}>
@@ -71,6 +74,7 @@ export default function TripGrid({ trip, onEdit }) {
                             aria-label={`${e.title}, ${fmtClock(s.start)}–${fmtClock(s.end)}${e.place ? `, ${e.place.name}` : ""}`}>
                       <b>{e.title}</b>
                       {height > 30 && e.place ? <small>{e.place.name}</small> : null}
+                      <MealScreen entry={e} dietChips={dietChips} />
                     </button>
                   );
                 })}

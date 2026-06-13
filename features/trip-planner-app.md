@@ -69,6 +69,20 @@ design source of truth.
   `lib/solve.js#solveDay`: booked/reserved-with-time PINNED, the rest placed by
   travel-aware nearest-neighbour, meals into meal windows.
 
+## Chips screen meals (Janice #2)
+
+A traveler's **veg/vegan chip** isn't just a label — it screens meals (the
+deck's promise made real, 2026-06-13). `tripDietChips(trip)` (in
+[lib/trip.js](../lib/trip.js)) collects the active diet chips; `mealVegState(entry,
+chips)` returns `ok` (a cited veg marker is present) or `unverified` (chip active,
+no marker) — **never a fabricated "no veg"**. `<MealScreen>` ([atoms.jsx](../components/atoms.jsx))
+renders 🥦 veg ✓ / 🥦 veg? on meal entries across EntryRow, the Plan day-columns +
+bucket, the Grid, and the GatherBucket suggestions tray (header: "meals screened
+for vegetarian (your chips)"). Veg signal is honest-cited: `servesVegetarianFood`
+**or** a vegan/vegetarian `primary_type` ([deriveMarkers](../lib/sourcing.js)).
+Gathered places now carry their markers forward, so a saved veg spot reads veg ✓.
+The composer shows the effect inline when you toggle a diet chip.
+
 ## Follow-ups (tracked as GitHub issues)
 
 - **#17 drag** — @dnd-kit reorder within a day / shelf→day.

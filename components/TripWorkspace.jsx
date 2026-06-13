@@ -9,7 +9,7 @@
 import { useMemo, useState, useRef, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { useTrips } from "./TripProvider";
-import { tripDays, entriesByDay, cashNeeded, bookingsLedger } from "../lib/trip";
+import { tripDays, entriesByDay, cashNeeded, bookingsLedger, tripDietChips } from "../lib/trip";
 import { activeEntries, forkForDay } from "../lib/trip-variations";
 import { CAT_ICON } from "./atoms";
 import DayEntries from "./DayEntries";
@@ -93,6 +93,7 @@ export default function TripWorkspace({ tripId, activeTab = "plan" }) {
   const flights = useMemo(() => (vtrip ? vtrip.entries.filter((e) => e.category === "travel" && (e.status === "booked" || e.booking?.confirmation)) : []), [vtrip]);
   const cash = useMemo(() => (vtrip ? cashNeeded(vtrip) : {}), [vtrip]);
   const bookings = useMemo(() => (vtrip ? bookingsLedger(vtrip) : []), [vtrip]);
+  const dietChips = useMemo(() => (trip ? tripDietChips(trip) : []), [trip]);
 
   if (!trip) {
     return <div className="tw-wrap"><p className="tw-loading">{hydrated ? "Trip not found." : "Loading trip…"}</p></div>;
@@ -144,7 +145,7 @@ export default function TripWorkspace({ tripId, activeTab = "plan" }) {
                   <ul className="tw-flags">{solveMsg.flags.map((f, i) => <li key={i}>⚠ {f}</li>)}</ul>
                 ) : null}
                 {list.length === 0 ? <p className="tw-empty">— open day —</p> : (
-                  <DayEntries tripId={tripId} day={d.date} list={list} onEdit={setEditing} onReorder={reorder} />
+                  <DayEntries tripId={tripId} day={d.date} list={list} onEdit={setEditing} onReorder={reorder} dietChips={dietChips} />
                 )}
               </section>
             );

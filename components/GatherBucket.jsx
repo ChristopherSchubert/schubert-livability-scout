@@ -9,7 +9,9 @@ import { useState } from "react";
 import { useTrips } from "./TripProvider";
 import { usePlanner } from "./PlannerProvider";
 import { getSupabase } from "../lib/supabase";
-import { CAT_ICON } from "./atoms";
+import { CAT_ICON, MealScreen } from "./atoms";
+import { tripDietChips } from "../lib/trip";
+import { deriveMarkers } from "../lib/sourcing";
 
 // Google primary_type → v2 category (the buckets a suggestion can become).
 const TYPE_CAT = {
@@ -33,6 +35,7 @@ export default function GatherBucket({ trip, leg }) {
 
   const city = planner.cities.find((c) => c.id === leg.cityId);
   const cityName = (leg.name || city?.name || "").split(",")[0];
+  const dietChips = tripDietChips(trip);
 
   async function browse() {
     setOpen(true);
@@ -42,14 +45,14 @@ export default function GatherBucket({ trip, leg }) {
       const sb = getSupabase();
       const dLat = 1500 / 111320, dLon = 1500 / (111320 * Math.cos((city.lat * Math.PI) / 180));
       const { data, error } = await sb.from("pois")
-        .select("place_id,name,lat,lon,primary_type,rating,user_rating_count")
+        .select("place_id,name,lat,lon,primary_type,rating,user_rating_count,attributes,attributes_fetched_at")
         .gte("lat", city.lat - dLat).lte("lat", city.lat + dLat)
         .gte("lon", city.lon - dLon).lte("lon", city.lon + dLon)
         .not("business_status", "eq", "CLOSED_PERMANENTLY")
         .order("user_rating_count", { ascending: false, nullsFirst: false }).limit(60);
       if (error) throw error;
       const ranked = (data || [])
-        .map((p) => ({ ...p, score: (p.rating || 0) * Math.log10((p.user_rating_count || 0) + 1) }))
+        .map((p) => ({ ...p, score: (p.rating || 0) * Math.log10((p.user_rating_count || 0) + 1), markers: deriveMarkers(p) }))
         .sort((a, b) => b.score - a.score).slice(0, 12);
       setCands(ranked);
     } catch (e) {
@@ -68,6 +71,9 @@ export default function GatherBucket({ trip, leg }) {
       day: null, role: "anchor", category: catFor(p.primary_type), status: "none",
       title: p.name, time: { mode: "bucket", bucket: "flex" }, legHint: leg.cityId || null,
       place: { placeId: p.place_id, name: p.name, lat: p.lat, lon: p.lon },
+      // Carry the cited markers (veg/dog/patio…) so a gathered place keeps its
+      // honest provenance — the screening badge then reads veg ✓, not "veg?".
+      ...(p.markers?.length ? { markers: p.markers } : {}),
     });
     setSaved((s) => ({ ...s, [p.place_id]: e ? "saved" : "err" }));
   }
@@ -81,14 +87,22 @@ export default function GatherBucket({ trip, leg }) {
       {open ? (
         busy ? <p className="gb-busy">searching the cache…</p> : (
           <div className="gb-cards">
+            {dietChips.length ? (
+              <p className="gb-diet-note">🥦 meals screened for vegetarian (your chips)</p>
+            ) : null}
             {(cands || []).length === 0 ? <p className="gb-busy">no cached suggestions here.</p> :
               cands.map((p) => {
                 const cat = catFor(p.primary_type);
                 const st = saved[p.place_id];
+                // Build a synthetic entry-like object for MealScreen: category + markers.
+                // attributes===null means never fetched → deriveMarkers returns [] → unverified badge.
+                // Only show screening when attributes were fetched (p.attributes !== null).
+                const screenEntry = { category: cat, markers: p.attributes !== null ? (p.markers || []) : null };
                 return (
                   <div key={p.place_id} className={`gb-card cat-${cat}`}>
                     <b>{CAT_ICON[cat]} {p.name}</b>
                     <small>{p.rating ? `★${p.rating}` : ""}{p.user_rating_count ? ` (${p.user_rating_count.toLocaleString()})` : ""}{p.primary_type ? ` · ${p.primary_type.replace(/_/g, " ")}` : ""}</small>
+                    {screenEntry.markers !== null ? <MealScreen entry={screenEntry} dietChips={dietChips} /> : null}
                     <button className={`gb-save${st === "saved" ? " done" : ""}`} disabled={!!st}
                             onClick={() => save(p)}>
                       {st === "saved" ? "✓ saved" : st === "saving" ? "…" : "+ save"}

@@ -4,9 +4,9 @@
 // (#21). Accepts optional drag props (setNodeRef/style/handle) so the same row
 // renders both statically and as a @dnd-kit sortable item (#17) — the grip
 // handle carries the drag listeners while the row body stays click-to-edit.
-import { CatIcon, TimeChip, BookingBadge, CostTag, MarkerSet } from "./atoms";
+import { CatIcon, TimeChip, BookingBadge, CostTag, MarkerSet, MealScreen } from "./atoms";
 
-export default function EntryRow({ e, onEdit, setNodeRef, style, handle }) {
+export default function EntryRow({ e, onEdit, setNodeRef, style, handle, dietChips }) {
   return (
     <li ref={setNodeRef} style={style}
         className={`tw-entry cat-${e.category || "activity"}`} onClick={() => onEdit(e)}
@@ -20,6 +20,7 @@ export default function EntryRow({ e, onEdit, setNodeRef, style, handle }) {
         <BookingBadge status={e.status} />
         <CostTag cost={e.cost} />
         <MarkerSet markers={e.markers} />
+        <MealScreen entry={e} dietChips={dietChips} />
       </span>
     </li>
   );

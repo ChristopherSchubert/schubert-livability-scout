@@ -16,7 +16,7 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import EntryRow from "./EntryRow";
 
-function SortableRow({ e, onEdit }) {
+function SortableRow({ e, onEdit, dietChips }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: e.id });
   const style = { transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.5 : 1 };
   const handle = (
@@ -24,10 +24,10 @@ function SortableRow({ e, onEdit }) {
             onClick={(ev) => ev.stopPropagation()} aria-label={`Reorder ${e.title || "entry"}`}
             title="Drag to reorder (or focus + Space + arrows)">⠿</button>
   );
-  return <EntryRow e={e} onEdit={onEdit} setNodeRef={setNodeRef} style={style} handle={handle} />;
+  return <EntryRow e={e} onEdit={onEdit} setNodeRef={setNodeRef} style={style} handle={handle} dietChips={dietChips} />;
 }
 
-export default function DayEntries({ tripId, day, list, onEdit, onReorder }) {
+export default function DayEntries({ tripId, day, list, onEdit, onReorder, dietChips }) {
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
@@ -45,7 +45,7 @@ export default function DayEntries({ tripId, day, list, onEdit, onReorder }) {
     <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
       <SortableContext items={ids} strategy={verticalListSortingStrategy}>
         <ul className="tw-entries">
-          {list.map((e) => <SortableRow key={e.id} e={e} onEdit={onEdit} />)}
+          {list.map((e) => <SortableRow key={e.id} e={e} onEdit={onEdit} dietChips={dietChips} />)}
         </ul>
       </SortableContext>
     </DndContext>

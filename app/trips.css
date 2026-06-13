@@ -422,4 +422,15 @@
 .tv-col-day { font-variant-numeric: tabular-nums; color: var(--muted); font-size: .74rem; }
 .tv-col-by { font-style: normal; color: #8a5a16; font-size: .72rem; }
 .tv-col-empty { color: var(--muted); font-style: italic; font-size: .82rem; margin: 0; }
+
+/* Dietary screening badges — meal entries */
+.tw-screen { display: inline-flex; align-items: center; gap: .18rem; font-family: var(--font-ui); font-size: .62rem; font-weight: 700; border-radius: 100px; padding: .03rem .42rem; border: 1px solid; white-space: nowrap; }
+.tw-screen.ok { background: #e7f1ee; border-color: #bcd8d0; color: var(--accent); }
+.tw-screen.warn { background: #fbf5e8; border-color: #dcc49a; color: #8a5a16; }
+
+/* GatherBucket diet-chip header note */
+.gb-diet-note { width: 100%; margin: 0 0 .2rem; font-family: var(--font-ui); font-size: .72rem; color: var(--muted); font-style: italic; }
+
+/* TripComposer effect footer — shows what a diet chip does downstream */
+.tc-chip-effect { margin: .3rem 0 0; font-family: var(--font-ui); font-size: .72rem; color: var(--muted); font-style: italic; padding: .3rem .5rem; background: #f5faf8; border-radius: 7px; border: 1px solid #d4e8e2; }
 @media (max-width: 640px) { .tv-compare { grid-template-columns: 1fr; } }

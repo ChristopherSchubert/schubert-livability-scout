@@ -4,11 +4,12 @@
 // rows (each a person/pet with chips — the union is the trip's marker set).
 // createTrip inserts it owned by the current user; then we route into it. The
 // window/legs are filled in on the Plan tab.
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useTrips } from "./TripProvider";
 
 const CHIP_OPTIONS = ["veg", "vegan", "nut allergy", "limited mobility", "kid"];
+const DIET_CHIP_LABELS = { veg: "vegetarian", vegan: "vegan" };
 
 export default function TripComposer({ onClose }) {
   const { createTrip } = useTrips();
@@ -18,6 +19,17 @@ export default function TripComposer({ onClose }) {
   const [end, setEnd] = useState("");
   const [travelers, setTravelers] = useState([{ name: "", kind: "person", chips: [] }]);
   const [busy, setBusy] = useState(false);
+
+  // Collect all active diet chips across travelers to show the effect preview.
+  const activeDietChips = useMemo(() => {
+    const found = new Set();
+    for (const t of travelers) {
+      for (const c of t.chips || []) {
+        if (DIET_CHIP_LABELS[c]) found.add(c);
+      }
+    }
+    return [...found];
+  }, [travelers]);
 
   function setTrav(i, patch) { setTravelers((ts) => ts.map((t, j) => (j === i ? { ...t, ...patch } : t))); }
   function toggleChip(i, chip) {
@@ -72,6 +84,11 @@ export default function TripComposer({ onClose }) {
             </div>
           ))}
           <button className="ee-mini" onClick={addTraveler}>＋ traveler</button>
+          {activeDietChips.length ? (
+            <p className="tc-chip-effect">
+              🥦 {activeDietChips.map((c) => DIET_CHIP_LABELS[c]).join(" + ")} isn't just a label — meal suggestions get screened for it, and every meal on the trip is flagged veg ✓ or veg?.
+            </p>
+          ) : null}
         </div>
 
         <footer className="tc-foot">

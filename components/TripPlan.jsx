@@ -17,8 +17,8 @@
 // rendered at once — the wall the deck was designed to avoid.
 import { useMemo, useState } from "react";
 import { useTrips } from "./TripProvider";
-import { tripDays, entriesByDay } from "../lib/trip";
-import { CAT_ICON } from "./atoms";
+import { tripDays, entriesByDay, tripDietChips } from "../lib/trip";
+import { CAT_ICON, MealScreen } from "./atoms";
 import GatherBucket from "./GatherBucket";
 import TripWindow from "./TripWindow";
 
@@ -45,6 +45,7 @@ export default function TripPlan({ trip, onEdit }) {
   const legs = trip.legs || [];
   const days = useMemo(() => tripDays(trip), [trip]);
   const byDay = useMemo(() => entriesByDay(trip), [trip]);
+  const dietChips = useMemo(() => tripDietChips(trip), [trip]);
   // Every transport entry — booked or not. The old filter gated on
   // booked/confirmation, so a real trip's unbooked travel rows vanished and the
   // section read "none yet" on a packed itinerary (rank 2). Unbooked is shown
@@ -101,6 +102,7 @@ export default function TripPlan({ trip, onEdit }) {
             leg={focused} days={legDays(focused)} byDay={byDay} stay={stayFor(focused)}
             bucket={bucketFor(focused)} trip={trip} onEdit={onEdit} onRemove={removeEntry}
             onLayOut={() => layOut(focused)} onAddOwn={() => addOwn(focused)}
+            dietChips={dietChips}
           />
         </>
       ) : (
@@ -147,7 +149,7 @@ export default function TripPlan({ trip, onEdit }) {
 }
 
 // The focused city: its header, day columns, and the one bucket.
-function FocusCity({ leg, days, byDay, stay, bucket, trip, onEdit, onRemove, onLayOut, onAddOwn }) {
+function FocusCity({ leg, days, byDay, stay, bucket, trip, onEdit, onRemove, onLayOut, onAddOwn, dietChips }) {
   const open = days.length;
   const hours = bucket.length * HOURS_PER_ITEM;
   const ready = bucket.length >= Math.max(2, open);
@@ -172,6 +174,7 @@ function FocusCity({ leg, days, byDay, stay, bucket, trip, onEdit, onRemove, onL
                        role="button" tabIndex={0} aria-label={`Edit ${e.title || "entry"}`}
                        onKeyDown={(ev) => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); onEdit(e); } }}>
                     <b>{CAT_ICON[e.category] || "•"} {e.title || "untitled"}</b>
+                    <MealScreen entry={e} dietChips={dietChips} />
                   </div>
                 ))}
                 <div className="tw-cap"><i style={{ width: `${fill}%` }} /></div>
@@ -206,6 +209,7 @@ function FocusCity({ leg, days, byDay, stay, bucket, trip, onEdit, onRemove, onL
                 </span>
                 <b>{CAT_ICON[e.category] || "•"} {e.title || "untitled"}</b>
                 {e.place?.name && e.place.name !== e.title ? <small>{e.place.name}</small> : null}
+                <MealScreen entry={e} dietChips={dietChips} />
               </div>
             ))}
           </div>

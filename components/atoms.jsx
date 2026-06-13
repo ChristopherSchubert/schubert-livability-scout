@@ -5,7 +5,7 @@
 // booking/status badge, the cost tag, and the marker set, so EntryRow, the
 // Grid, GatherBucket and BookView all render an entry the same way. Pure
 // presentational — no data fetching, no context.
-import { MARKER_TYPES } from "../lib/trip";
+import { MARKER_TYPES, mealVegState } from "../lib/trip";
 
 export const CAT_ICON = { travel: "🚆", meal: "🍴", activity: "🥾", stay: "🛏", errand: "🧾" };
 export const CAT_COLOR = { meal: "#9a5a16", activity: "#0d4c44", travel: "#2e5482", stay: "#665285", errand: "#6b6358" };
@@ -39,6 +39,23 @@ export function CostTag({ cost }) {
   if (!cost || cost.amount == null) return null;
   const sym = cost.currency === "EUR" ? "€" : `${cost.currency || ""} `;
   return <span className="tw-cost">{cost.cashOnly ? "💰 " : ""}{sym}{cost.amount}</span>;
+}
+
+// Dietary screening badge for meal entries. Renders only when dietChips is
+// non-empty and the entry is a meal. 'ok' = Google-cited veg signal present;
+// 'unverified' = no signal (honest "we don't know", NOT "not veg").
+export function MealScreen({ entry, dietChips }) {
+  const state = mealVegState(entry, dietChips);
+  if (!state) return null;
+  if (state === "ok") {
+    return <span className="tw-screen ok" title="Vegetarian-friendly — confirmed by Google">🥦 veg ✓</span>;
+  }
+  return (
+    <span className="tw-screen warn"
+          title="Vegetarian menu not verified — no veg signal from Google for this place">
+      🥦 veg?
+    </span>
+  );
 }
 
 // The row of marker glyphs (vegetarian, kid-ok, etc.) carried by an entry.
