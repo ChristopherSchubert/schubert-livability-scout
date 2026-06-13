@@ -112,6 +112,20 @@ for vegetarian (your chips)"). Veg signal is honest-cited: `servesVegetarianFood
 Gathered places now carry their markers forward, so a saved veg spot reads veg ✓.
 The composer shows the effect inline when you toggle a diet chip.
 
+## Clocked agenda + pins (Days)
+
+- **Clocked agenda (rank 6)** — `solveTripDay` ([solve-adapter.js](../lib/solve-adapter.js))
+  used to drop the solver's generated connective blocks (travel/rest/free carry no
+  entry id), so the day looked like anchors jumping with unexplained gaps. It now
+  returns the full ordered `schedule`; after a solve, the Days view renders the
+  interleaved agenda — persisted anchors + muted, non-editable "auto" connective
+  rows with a time-rail. Durations come straight from solve.js (never invented).
+- **Pin / hold (rank 7)** — an explicit `pinned` boolean (jsonb payload, no schema
+  change). EntryEditor has a "📌 Hold at this time" checkbox; `fixedTimeOf` keys off
+  `e.pinned` (not the old dishonest status==="booked" inference); pinned rows show
+  📌. A day tracks "edited since solve" → the button relabels "↻ Re-solve around
+  pins", which keeps pinned entries fixed.
+
 ## Map + Grid (deck parity)
 
 - **Map** ([TripMapInner](../components/TripMapInner.jsx)) — honest about coverage:

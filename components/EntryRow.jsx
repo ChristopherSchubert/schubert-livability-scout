@@ -9,13 +9,17 @@ import { CatIcon, TimeChip, BookingBadge, CostTag, MarkerSet, MealScreen } from 
 export default function EntryRow({ e, onEdit, setNodeRef, style, handle, dietChips }) {
   return (
     <li ref={setNodeRef} style={style}
-        className={`tw-entry cat-${e.category || "activity"}`} onClick={() => onEdit(e)}
+        className={`tw-entry cat-${e.category || "activity"}${e.pinned ? " pinned" : ""}`} onClick={() => onEdit(e)}
         role="button" tabIndex={0} aria-label={`Edit ${e.title || "entry"}`} title="Edit entry"
         onKeyDown={(ev) => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); onEdit(e); } }}>
       {handle || null}
       <TimeChip entry={e} />
       <CatIcon cat={e.category} />
-      <span className="tw-title">{e.title}{e.place ? <em className="tw-place"> · {e.place.name}</em> : null}</span>
+      <span className="tw-title">
+        {e.pinned ? <span className="tw-pin" title="Held at this time">📌</span> : null}
+        {e.title}
+        {e.place ? <em className="tw-place"> · {e.place.name}</em> : null}
+      </span>
       <span className="tw-tags">
         <BookingBadge status={e.status} />
         <CostTag cost={e.cost} />

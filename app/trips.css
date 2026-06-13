@@ -350,6 +350,52 @@
 .tw-solve:disabled { opacity: .4; cursor: default; }
 .tw-solvemsg { margin-left: .5rem; font-family: var(--font-ui); font-size: .72rem; color: var(--accent); }
 
+/* "edited since solve" pill — appears in the day header after a solve when the
+   entry list has changed (new entry, pinned toggle, removal, etc.). Cues the
+   user that the clocked agenda is stale and a re-solve would update it. */
+.tw-solve-stale { font-family: var(--font-ui); font-size: .64rem; font-weight: 600; color: #8a5a16; background: #fef5e8; border: 1px solid #dcc49a; border-radius: 100px; padding: .08rem .5rem; margin-left: .4rem; white-space: nowrap; }
+
+/* ── Clocked agenda (Feature A, #6) ── */
+/* After a solve, the day renders the full interleaved schedule: persisted
+   anchor rows (EntryRow, click-to-edit) + generated connective rows (view-only).
+   Generated rows share the same <ul> but are visually distinct — muted,
+   indented, with a left time-rail. They carry aria-hidden="false" so they
+   read as context in screen readers, but have no click handler. */
+.tw-clocked .tw-gen {
+  display: flex; align-items: baseline; gap: .45rem;
+  padding: .22rem .4rem .22rem 1.2rem;
+  border-bottom: 1px dotted var(--border);
+  border-left: 3px solid transparent;
+  opacity: .72;
+  font-size: .8rem;
+  cursor: default;
+  user-select: none;
+}
+.tw-gen-travel { border-left-color: #bcd0e8 !important; }
+.tw-gen-flexible { border-left-color: var(--border) !important; }
+.tw-gen-meal { border-left-color: #d4b98a !important; }
+
+.tw-gen-time {
+  flex: 0 0 4.2rem; font-family: var(--font-ui); font-variant-numeric: tabular-nums;
+  font-size: .72rem; color: var(--muted);
+}
+.tw-gen-time small { font-size: .68rem; color: var(--muted); }
+.tw-gen-icon { flex: 0 0 auto; font-size: .78rem; color: var(--muted); }
+.tw-gen-label { flex: 1; color: var(--muted); font-style: italic; }
+.tw-gen-tag {
+  flex: 0 0 auto; font-family: var(--font-ui); font-size: .58rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .06em;
+  color: #9a948a; background: var(--panel-strong);
+  border: 1px solid var(--border); border-radius: 100px; padding: 0 .35rem;
+}
+
+/* Pin indicator on anchor rows */
+.tw-pin { font-style: normal; margin-right: .18rem; font-size: .8rem; line-height: 1; }
+.tw-entry.pinned { border-left-width: 4px; }
+
+/* Pin row in EntryEditor */
+.ee-pin-row .ee-check { font-size: .82rem; color: var(--text); }
+
 /* Shelf — the gathered pool */
 .sh-list { list-style: none; margin: .6rem 0 0; padding: 0; }
 .sh-item { display: flex; align-items: center; gap: .55rem; padding: .5rem .4rem; border-bottom: 1px dashed var(--border); border-left: 3px solid var(--border); }

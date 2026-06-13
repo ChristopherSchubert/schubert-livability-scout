@@ -96,6 +96,18 @@ export default function EntryEditor({ tripId, entry, onClose }) {
           <input className="ee-time" value={t.end || ""} placeholder="end"
                  onChange={(e) => patchTime({ mode: "range", end: e.target.value })} />
         </label>
+        {/* Pin — "Hold at this time": the solver will never move a pinned entry.
+            Stored as entry.pinned (boolean) in the jsonb payload — no schema
+            change needed. First-class: takes precedence over status-inferred
+            pinning in fixedTimeOf (lib/solve-adapter.js). */}
+        <label className="ee-row ee-pin-row">
+          <span>Pin</span>
+          <label className="ee-check">
+            <input type="checkbox" checked={!!draft.pinned}
+                   onChange={(e) => patch({ pinned: e.target.checked })} />
+            📌 Hold at this time — re-solve won&apos;t move this
+          </label>
+        </label>
 
         <div className="ee-row ee-place-row">
           <span>Place</span>

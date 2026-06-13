@@ -13,6 +13,7 @@ import { tripDays, entriesByDay, cashNeeded, bookingsLedger, tripDietChips } fro
 import { activeEntries, forkForDay } from "../lib/trip-variations";
 import { CAT_ICON } from "./atoms";
 import DayEntries from "./DayEntries";
+import EntryRow from "./EntryRow";
 import TripVariations from "./TripVariations";
 import EntryEditor from "./EntryEditor";
 import TripPlan from "./TripPlan";
@@ -27,6 +28,39 @@ function money(map) {
   return Object.entries(map || {}).map(([c, n]) => `${c === "EUR" ? "€" : c + " "}${n}`).join(" · ") || "—";
 }
 
+// ClockedAgenda — renders the full ordered day schedule after a solve, mixing
+// persisted anchor rows (click-to-edit via EntryRow) and generated connective
+// rows (view-only, muted, never draggable). Connective rows show a left
+// time-rail and an "auto" tag to distinguish them from anchors.
+// schedule rows with an id → look up the live entry so edits (e.g. pinned)
+// show immediately; rows with generated:true → render as connective.
+function ClockedAgenda({ schedule, anchorEntries, onEdit, dietChips }) {
+  const byId = Object.fromEntries((anchorEntries || []).map((e) => [e.id, e]));
+  return (
+    <ul className="tw-entries tw-clocked">
+      {schedule.map((row) => {
+        if (row.generated) {
+          // Generated connective block (travel, buffer/rest, free time, generic meal)
+          const icon = row.kind === "travel" ? "↳" : row.kind === "meal" ? "🍽" : "·";
+          return (
+            <li key={row.key} className={`tw-gen tw-gen-${row.kind || "flexible"}`} aria-hidden="false">
+              <span className="tw-gen-time">{row.start}{row.end && row.end !== row.start ? <small>–{row.end}</small> : null}</span>
+              <span className="tw-gen-icon">{icon}</span>
+              <span className="tw-gen-label">{row.title}</span>
+              <span className="tw-gen-tag">auto</span>
+            </li>
+          );
+        }
+        // Anchor row — look up the live entry (carries latest edits + pinned flag)
+        const entry = byId[row.id] || { id: row.id, title: row.title, category: row.kind || "activity", time: { mode: "range", start: row.start, end: row.end } };
+        return (
+          <EntryRow key={row.id} e={entry} onEdit={onEdit} dietChips={dietChips} />
+        );
+      })}
+    </ul>
+  );
+}
+
 export default function TripWorkspace({ tripId, activeTab = "plan" }) {
   const { active, hydrated, addEntry, updateEntry, reorder } = useTrips();
   const tab = activeTab;
@@ -38,6 +72,12 @@ export default function TripWorkspace({ tripId, activeTab = "plan" }) {
   // (the deck's "Today" view, #35) chosen from the date rail; on desktop the
   // rail is a jump-nav and every day stays visible. null → first day.
   const [focusDay, setFocusDay] = useState(null);
+
+  // Clocked agenda state (Feature A / #6): keyed by date, each value is
+  //   { schedule: [...], solvedAt: ISO-string }
+  // schedule = the full ordered sequence from solveTripDay, including
+  // generated connective rows. Not persisted — view-only after each solve.
+  const [daySchedules, setDaySchedules] = useState({});
 
   // Create a blank entry on a day, then open it in the editor (addEntry returns
   // the row with its server-generated id, so the editor can patch it).
@@ -54,20 +94,27 @@ export default function TripWorkspace({ tripId, activeTab = "plan" }) {
   }
 
   // Solve a day: lay its placeable entries into a clocked, travel-aware schedule
-  // (lib/solve-adapter → solveDay). Booked entries stay pinned; the rest get
-  // times. Lodging = the leg's stay (for travel-to/from-base legs).
+  // (lib/solve-adapter → solveDay). Pinned entries (e.pinned or booked+time)
+  // stay fixed; the rest get times assigned. Lodging = the leg's stay.
+  //
+  // After solving:
+  //   • each anchor's time is written back via updateEntry (persisted)
+  //   • the full schedule (anchors + generated connective blocks) is stored in
+  //     daySchedules[date] so the agenda view can render the interleaved layout
+  //   • solvedAt is recorded so we can detect edits-since-solve
   function solveOneDay(date) {
     const list = byDay[date] || [];
     if (!list.length) return;
     const leg = (trip.legs || []).find((l) => l.arrive <= date && date <= l.depart);
     const stayE = trip.entries.find((e) => e.category === "stay" && e.place?.lat != null && leg && e.day >= leg.arrive && e.day <= leg.depart);
     const lodging = stayE?.place ? { lat: stayE.place.lat, lon: stayE.place.lon, name: stayE.place.name } : null;
-    const { times, flags } = solveTripDay(list, { lodging });
+    const { times, schedule, flags } = solveTripDay(list, { lodging });
     let placed = 0;
     for (const e of list) {
       const t = times[e.id];
       if (t) { updateEntry(trip.id, { ...e, time: { mode: "range", start: t.start, end: t.end } }); placed++; }
     }
+    setDaySchedules((prev) => ({ ...prev, [date]: { schedule, solvedAt: new Date().toISOString() } }));
     setSolveMsg({ date, placed, flags });
     clearTimeout(solveTimerRef.current);
     solveTimerRef.current = setTimeout(() => setSolveMsg(null), 6000);
@@ -89,6 +136,30 @@ export default function TripWorkspace({ tripId, activeTab = "plan" }) {
   const vtrip = useMemo(() => (trip ? { ...trip, entries: activeEntries(trip) } : null), [trip]);
   const days = useMemo(() => (trip ? tripDays(trip) : []), [trip]);
   const byDay = useMemo(() => (vtrip ? entriesByDay(vtrip) : {}), [vtrip]);
+
+  // Detect whether a day's entries were edited after the last solve so we can
+  // show an "edited since solve" pill and relabel the solve button.
+  // We compare the sorted entry-id+time fingerprint against what the schedule
+  // captured at solve time (the schedule's anchor ids are a stable set).
+  function editedSinceSolve(date) {
+    const ds = daySchedules[date];
+    if (!ds) return false; // never solved → button just says "⚡ solve"
+    const list = byDay[date] || [];
+    // fingerprint: sorted "id:start:pinned" of persisted entries
+    const fp = (entries) => entries
+      .filter((e) => e.id && e.category !== "travel" && e.category !== "stay")
+      .map((e) => `${e.id}:${e.time?.start || ""}:${!!e.pinned}`)
+      .sort()
+      .join("|");
+    const currentFp = fp(list);
+    // fingerprint at solve time: anchor rows (those with an id) in the schedule
+    const scheduledFp = fp(
+      ds.schedule
+        .filter((r) => r.id)
+        .map((r) => ({ id: r.id, category: "activity", time: { start: r.start }, pinned: false }))
+    );
+    return currentFp !== scheduledFp;
+  }
   const pool = useMemo(() => (vtrip ? vtrip.entries.filter((e) => !e.day) : []), [vtrip]);
   const flights = useMemo(() => (vtrip ? vtrip.entries.filter((e) => e.category === "travel" && (e.status === "booked" || e.booking?.confirmation)) : []), [vtrip]);
   const cash = useMemo(() => (vtrip ? cashNeeded(vtrip) : {}), [vtrip]);
@@ -135,16 +206,39 @@ export default function TripWorkspace({ tripId, activeTab = "plan" }) {
           {days.map((d) => {
             const list = byDay[d.date] || [];
             const focused = (focusDay || days[0]?.date) === d.date;
+            const ds = daySchedules[d.date];
+            const hasSolved = !!ds;
+            const stale = hasSolved && editedSinceSolve(d.date);
+            const solveLabel = hasSolved ? "↻ Re-solve around pins" : "⚡ solve";
             return (
               <section key={d.date} id={`day-${d.date}`} className={`tw-day${focused ? " focus" : ""}`}>
-                <div className="tw-day-head"><b>{d.date}</b>{d.legName ? <span className="tw-leg">{d.legName}</span> : null}<span className="tw-count">{list.length}</span>
-                  <button className="tw-solve" onClick={() => solveOneDay(d.date)} title="Lay out this day on the clock" disabled={!list.length}>⚡ solve</button>
+                <div className="tw-day-head">
+                  <b>{d.date}</b>
+                  {d.legName ? <span className="tw-leg">{d.legName}</span> : null}
+                  <span className="tw-count">{list.length}</span>
+                  <button className="tw-solve" onClick={() => solveOneDay(d.date)} title="Lay out this day on the clock (pinned entries stay fixed)" disabled={!list.length}>{solveLabel}</button>
                   <button className="tw-add" onClick={() => addToDay(d.date)} title="Add an entry to this day">＋ add</button>
-                  {solveMsg && solveMsg.date === d.date ? <span className="tw-solvemsg" role="status" aria-live="polite">laid out {solveMsg.placed}{solveMsg.flags.length ? ` · ${solveMsg.flags.length} flag(s)` : " · fits"}</span> : null}</div>
+                  {stale ? <span className="tw-solve-stale" title="Entries changed since last solve">edited since solve</span> : null}
+                  {solveMsg && solveMsg.date === d.date ? <span className="tw-solvemsg" role="status" aria-live="polite">laid out {solveMsg.placed}{solveMsg.flags.length ? ` · ${solveMsg.flags.length} flag(s)` : " · fits"}</span> : null}
+                </div>
                 {solveMsg && solveMsg.date === d.date && solveMsg.flags.length ? (
                   <ul className="tw-flags">{solveMsg.flags.map((f, i) => <li key={i}>⚠ {f}</li>)}</ul>
                 ) : null}
-                {list.length === 0 ? <p className="tw-empty">— open day —</p> : (
+                {list.length === 0 ? <p className="tw-empty">— open day —</p> : hasSolved ? (
+                  // Clocked agenda view (Feature A): render the interleaved
+                  // schedule — persisted anchors and generated connective rows.
+                  // DayEntries is NOT used here because generated rows are not
+                  // sortable (no id, no drag). Instead we render a single <ul>
+                  // mixing EntryRow (for anchors) and ClockedConnective (for
+                  // generated blocks). The dnd-sortable list is shown only when
+                  // no solve has been run (or when re-solving clears the schedule).
+                  <ClockedAgenda
+                    schedule={ds.schedule}
+                    anchorEntries={list}
+                    onEdit={setEditing}
+                    dietChips={dietChips}
+                  />
+                ) : (
                   <DayEntries tripId={tripId} day={d.date} list={list} onEdit={setEditing} onReorder={reorder} dietChips={dietChips} />
                 )}
               </section>
