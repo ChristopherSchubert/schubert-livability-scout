@@ -137,16 +137,13 @@ export default function HorizonStrip({ horizon }) {
     return { ...band, samples: silhouetteSamples(inBand), peaks: inBand };
   });
 
+  const svgLabel = isEmpty
+    ? "Open horizon — no named peaks within 90 km"
+    : `Horizon panorama — dominant peak ${dominant?.name}, ${dominant?.angle}° ${dominant?.dir}`;
+
   return (
-    <div
-      className={`horizon-strip${isEmpty ? " is-empty" : ""}`}
-      aria-label={
-        isEmpty
-          ? "Open horizon — no named peaks within 90 km"
-          : `Horizon panorama — dominant peak ${dominant?.name}, ${dominant?.angle}° ${dominant?.dir}`
-      }
-    >
-      <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" role="img">
+    <div className={`horizon-strip${isEmpty ? " is-empty" : ""}`}>
+      <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" role="img" aria-label={svgLabel}>
         <defs>
           <linearGradient id="hs-sky" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%"  stopColor="#dfe5eb" />

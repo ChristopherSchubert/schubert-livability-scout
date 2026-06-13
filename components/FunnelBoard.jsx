@@ -130,6 +130,7 @@ export default function FunnelBoard({ focusStage }) {
           value={filters.query}
           onChange={(e) => filters.setQuery(e.target.value)}
           placeholder="Search city name…"
+          aria-label="Search city name"
         />
         <CityFiltersBar filters={filters} />
         <span className="rank-controls-spacer" />

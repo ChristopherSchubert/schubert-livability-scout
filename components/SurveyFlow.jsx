@@ -80,15 +80,22 @@ export default function SurveyFlow({ title, subtitle, context, initial, onSave, 
 }
 
 function AxisStep({ axis, value, onPick }) {
+  const labelId = `survey-q-${axis.key}`;
   return (
     <>
-      <h2 className="survey-q">{axis.label}</h2>
+      <h2 id={labelId} className="survey-q">{axis.label}</h2>
       <p className="survey-prompt">{axis.prompt}</p>
-      <div className="survey-anchors">
+      <div
+        className="survey-anchors"
+        role="radiogroup"
+        aria-labelledby={labelId}
+      >
         {axis.anchors.map((a) => (
           <button
             key={a.value}
             type="button"
+            role="radio"
+            aria-checked={value === a.value}
             className={`survey-anchor${value === a.value ? " active" : ""}`}
             onClick={() => onPick(a.value)}
           >
@@ -104,13 +111,19 @@ function AxisStep({ axis, value, onPick }) {
 function SloveniaStep({ value, onPick }) {
   return (
     <>
-      <h2 className="survey-q">The Gut score</h2>
+      <h2 id="survey-q-gut" className="survey-q">The Gut score</h2>
       <p className="survey-prompt">Setting the breakdown aside — what does your gut say? How close did this get to the Bled / Piran feeling?</p>
-      <div className="slovenia-scale">
+      <div
+        className="slovenia-scale"
+        role="radiogroup"
+        aria-labelledby="survey-q-gut"
+      >
         {Array.from({ length: 11 }, (_, n) => (
           <button
             key={n}
             type="button"
+            role="radio"
+            aria-checked={value === n}
             className={`slovenia-tick${value === n ? " active" : ""}`}
             onClick={() => onPick(n)}
           >

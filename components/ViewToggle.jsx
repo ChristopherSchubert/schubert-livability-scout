@@ -5,6 +5,8 @@
 // Pass the active view id ("board" | "ranking").
 
 import Link from "next/link";
+import { useRef } from "react";
+import { useRouter } from "next/navigation";
 
 function BoardIcon() {
   // kanban columns
@@ -34,20 +36,41 @@ const VIEWS = [
 ];
 
 export default function ViewToggle({ active }) {
+  const router = useRouter();
+  const tabRefs = useRef([]);
+
+  function handleKeyDown(e, index) {
+    const count = VIEWS.length;
+    let next = -1;
+    if (e.key === "ArrowRight") next = (index + 1) % count;
+    else if (e.key === "ArrowLeft") next = (index - 1 + count) % count;
+    else if (e.key === "Home") next = 0;
+    else if (e.key === "End") next = count - 1;
+
+    if (next !== -1) {
+      e.preventDefault();
+      tabRefs.current[next]?.focus();
+      router.push(VIEWS[next].href);
+    }
+  }
+
   return (
     <div className="view-toggle" role="tablist" aria-label="Switch candidate view">
       <span className="view-toggle-label" aria-hidden="true">View</span>
-      {VIEWS.map(({ id, href, label, Icon }) => {
+      {VIEWS.map(({ id, href, label, Icon }, index) => {
         const isActive = id === active;
         return (
           <Link
             key={id}
             href={href}
+            ref={(el) => { tabRefs.current[index] = el; }}
             className={`view-toggle-tab${isActive ? " active" : ""}`}
             role="tab"
             aria-selected={isActive}
             aria-current={isActive ? "page" : undefined}
+            tabIndex={isActive ? 0 : -1}
             title={`${label} view`}
+            onKeyDown={(e) => handleKeyDown(e, index)}
           >
             <Icon />
             {label}

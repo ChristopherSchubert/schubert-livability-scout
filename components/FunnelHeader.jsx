@@ -9,10 +9,10 @@
 // `meta` should be a single-line node so the header height matches across views.
 export default function FunnelHeader({ meta }) {
   return (
-    <section className="funnel-header">
+    <section className="funnel-header" aria-labelledby="funnel-header-title">
       <div className="funnel-header-titles">
         <p className="page-eyebrow">Candidates</p>
-        <h1>Every candidate</h1>
+        <h1 id="funnel-header-title">Every candidate</h1>
         {meta ? <p className="funnel-meta">{meta}</p> : null}
       </div>
     </section>

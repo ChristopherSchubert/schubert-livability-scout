@@ -68,8 +68,8 @@ export default function ChapterWhen({ view, homebase }) {
           <p className="sub">Climate comfort{crowd ? " and tourist crowd" : ""} plotted across the calendar year. The best visit windows are months with high comfort{crowd ? " and low crowd" : ""}.</p>
         </div>
 
-        <div className="climate" aria-label="Monthly climate comfort vs tourist crowd density">
-          <svg viewBox="0 0 1080 320" preserveAspectRatio="none" role="img">
+        <div className="climate">
+          <svg viewBox="0 0 1080 320" preserveAspectRatio="none" role="img" aria-label="Monthly climate comfort vs tourist crowd density">
             <defs>
               <linearGradient id="comfortGrad" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor="#0d4c44" stopOpacity="0.32" />
