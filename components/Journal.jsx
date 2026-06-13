@@ -2,10 +2,15 @@
 
 import { useState } from "react";
 import { usePlanner } from "./PlannerProvider";
+import { parseDateLocal } from "../lib/date-fmt";
 
 // Short human-readable date: "Jun 10" or "Jun 10, 2025" when not this year.
+// created_at is a full timestamp (a real instant); parseDateLocal passes it
+// straight through `new Date`, and also handles a bare date-only value without
+// the UTC-midnight off-by-one (#54).
 function fmtDate(isoStr) {
-  const d = new Date(isoStr);
+  const d = parseDateLocal(isoStr);
+  if (!d) return "";
   const now = new Date();
   const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   const m = months[d.getMonth()];

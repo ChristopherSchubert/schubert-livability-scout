@@ -11,6 +11,7 @@ import {
 import AppShell from "./AppShell";
 import { WorkspaceLoading } from "./Loading";
 import { resolveImage, usePlanner } from "./PlannerProvider";
+import { parseDateLocal, formatDateRange } from "../lib/date-fmt";
 
 // Equal-weight measured composite — same engine as the Detail and Board
 // scores. Calibrate applies any learned per-axis weights; here we just want a
@@ -33,8 +34,8 @@ export default function VisitWorkspace() {
       .filter((cityItem) => cityStage(cityItem) === "planned")
       .map((cityItem) => ({
         cityItem,
-        arrive: parseDate(cityItem.arriveDate),
-        depart: parseDate(cityItem.departDate),
+        arrive: parseDateLocal(cityItem.arriveDate),
+        depart: parseDateLocal(cityItem.departDate),
       }))
       .sort((a, b) => {
         // Trips with concrete arrive dates first, sorted by date ascending.
@@ -125,25 +126,6 @@ function EmptyState({ title, body, href, cta }) {
       {href ? <Link className="button-link" href={href}>{cta}</Link> : null}
     </section>
   );
-}
-
-function parseDate(value) {
-  if (!value) return null;
-  const d = new Date(value);
-  return Number.isNaN(d.getTime()) ? null : d;
-}
-
-function formatDateRange(arrive, depart) {
-  if (!arrive) return "";
-  const fmt = new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric" });
-  if (!depart) return fmt.format(arrive);
-  const sameMonth = arrive.getMonth() === depart.getMonth() && arrive.getFullYear() === depart.getFullYear();
-  if (sameMonth) {
-    const monthDay = new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric" });
-    const dayOnly = new Intl.DateTimeFormat(undefined, { day: "numeric" });
-    return `${monthDay.format(arrive)} – ${dayOnly.format(depart)}`;
-  }
-  return `${fmt.format(arrive)} – ${fmt.format(depart)}`;
 }
 
 function firstLine(value) {

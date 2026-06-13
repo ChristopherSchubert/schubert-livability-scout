@@ -145,7 +145,11 @@ export function VisitPlan({ cityItem, onPatch, onChangeDay, onChangeChecklist })
             <input value={cityItem.tripWeek || ""} onChange={(event) => onPatch({ tripWeek: event.target.value })} placeholder="Jun week 1" />
           </Field>
           <Field label="Trip length">
-            <input value={cityItem.tripLength || ""} onChange={(event) => onPatch({ tripLength: event.target.value })} placeholder="7 nights" />
+            {/* When both dates are set they're authoritative — derive the length
+                (was a free-text field that drifted to a stale "7 nights"). #54 */}
+            {nights != null
+              ? <input value={`${nights} night${nights === 1 ? "" : "s"}`} readOnly title="Derived from arrive → depart" />
+              : <input value={cityItem.tripLength || ""} onChange={(event) => onPatch({ tripLength: event.target.value })} placeholder="7 nights" />}
           </Field>
           <Field label="Arrive">
             <input type="date" value={cityItem.arriveDate || ""} onChange={(event) => onPatch({ arriveDate: event.target.value })} />
