@@ -240,10 +240,25 @@ distinct from this feature's design goes to GitHub issues; the
 explanation that makes them legible stays here. See
 [CLAUDE.md](../CLAUDE.md) → "TODOs and follow-ups" for the rule.
 
-- **#1 — Adaptive centering**: walking-core uses the saved visit pin.
-  osm-core uses `findVisitCenters` to slide to the densest 700 m cluster
-  inside the stay-zone polygon — walking-core should do the same.
-  ([lib/measure.js](../lib/measure.js#findVisitCenters))
+- **#1 — Adaptive centering** ✅ RESOLVED (2026-06-13). walking-core now
+  scores at the densest point within **250 m** of the pin, inside the stay
+  zone — the pin never moves, only the measurement center. Implemented as a
+  **self-contained grid search over the same Google-cache density it scores**
+  (not `findVisitCenters`, which optimises *OSM* density: a trial of that
+  dropped jim-thorpe 5.2→5.0 by sliding to an OSM cluster the pin-keyed Google
+  cache couldn't cover). It moves only for a gain that's meaningful both
+  relatively (≥5%) and absolutely (≥1.5 weighted), so it can only **raise or
+  hold** a score, and a near-zero residential pin (Allison Park) is never
+  relocated to inflate a trivial reading. The 250 m cap is deliberate: the
+  pin-keyed cache only reaches ~MAX_RADIUS from the pin, so larger
+  off-centeredness needs a pois *refetch* — that's the pin-recenter pass's job
+  (`scripts/recenter-apply.mjs`), not a measure-time move. The chosen center is
+  stored in `cities.walking_core_center` (migration 0020) so `WalkingCoreMap`
+  draws the core circle there and marks the pin separately when it moved.
+  Bulk-applied: **41/122 cities recentered** (most pins geocode ~250 m+ off the
+  commercial peak); ranking stayed sane (Piran #1, Allison Park #122,
+  top-6 unchanged, slots 7–12 nudged ≤0.2). Reversible by re-measuring with the
+  recenter disabled.
 - **#2 — Drop legacy `_n` measurers + taxonomy entries** after one
   measurement cycle confirms the new scores look right. See "Legacy `_n`
   counts" above for the migration plan.
