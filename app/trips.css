@@ -37,9 +37,30 @@
 .tw-status.s-reserved { background: #fbf0e2; border-color: #dcc49a; color: #8a5a16; }
 .tw-cost { font-family: var(--font-ui); font-size: .78rem; color: var(--text); }
 .tw-empty { padding: .4rem; font-style: italic; }
-.tw-list { list-style: none; margin: 0; padding: 0; }
-.tw-list-row a { display: flex; align-items: baseline; gap: 1rem; padding: .8rem .3rem; border-bottom: 1px solid var(--border); }
-.tw-list-row b { font-family: var(--font-display); font-size: 1.1rem; }
+/* /trips landing — dossier cards (one per trip). Warm paper surface + a deep
+   green spine; the route line is the signature "where does this go" signal. */
+.tw-trip-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 1rem; }
+.tw-trip-card {
+  display: block; position: relative; overflow: hidden;
+  background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius);
+  box-shadow: var(--shadow); padding: 1.05rem 1.2rem 1rem 1.35rem;
+  transition: transform .14s ease, border-color .14s ease, box-shadow .14s ease;
+}
+.tw-trip-card::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--accent); opacity: .85; }
+.tw-trip-card:hover { transform: translateY(-2px); border-color: var(--accent); box-shadow: 0 16px 36px rgba(40, 32, 20, .12); }
+.tw-trip-card-name {
+  font-family: var(--font-display); font-variation-settings: "opsz" 36, "SOFT" 50, "wght" 560;
+  font-size: 1.32rem; font-weight: 600; color: var(--text); line-height: 1.12; margin: 0 0 .5rem;
+}
+.tw-route { font-family: var(--font-ui); font-size: .92rem; color: var(--text); display: flex; flex-wrap: wrap; align-items: center; gap: .3rem .4rem; margin: 0 0 .7rem; }
+.tw-route-stop { display: inline-flex; align-items: center; gap: .4rem; }
+.tw-route-arrow { color: var(--muted); opacity: .55; }
+.tw-route-more { color: var(--muted); font-size: .82rem; }
+.tw-route-empty { color: var(--muted); font-style: italic; font-size: .88rem; }
+.tw-card-meta { font-family: var(--font-ui); font-size: .8rem; color: var(--muted); margin: 0; }
+.tw-card-diet { font-style: normal; color: var(--accent); }
+.tw-trip-empty { text-align: center; color: var(--muted); font-family: var(--font-ui); padding: 2.6rem 1rem; display: flex; flex-direction: column; align-items: center; gap: .9rem; border: 1px dashed var(--border); border-radius: var(--radius); background: var(--panel); }
+.tw-trip-empty p { margin: 0; font-size: .95rem; }
 
 /* EntryEditor side sheet */
 .ee-scrim { position: fixed; inset: 0; background: rgba(41,33,19,.32); z-index: 200; display: flex; justify-content: flex-end; }

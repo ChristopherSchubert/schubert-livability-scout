@@ -11,6 +11,13 @@ design source of truth.
 
 - `/trips` → [components/TripsIndex.jsx](../components/TripsIndex.jsx) — the
   user's trips + the **New trip** composer ([TripComposer](../components/TripComposer.jsx)).
+  Each trip is a **dossier card** (`.tw-trip-card`): name in Fraunces, the
+  **route** (leg cities joined `A → B → C` — the signature "where does this go"
+  signal, capped 4 + "+N more"), a human date range (`May 15–25, 2026`), nights,
+  travelers and diet. Replaced the old flat one-line text rows that read as a
+  debug list. Stops/budget/bookings are intentionally omitted here — those need
+  the per-trip normalized entries (loaded only on `enterTrip`), so showing them
+  on the index would render misleading zeros (never-invent rule).
 - `/trips/[id]` → [components/TripWorkspace.jsx](../components/TripWorkspace.jsx)
   — the tabbed trip page (**Plan · Days · Book · Shelf · Grid**).
 
