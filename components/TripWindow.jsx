@@ -46,7 +46,7 @@ function BoundaryHandle({ id, colIdx, cellW, label, onNudge }) {
   );
 }
 
-export default function TripWindow({ trip }) {
+export default function TripWindow({ trip, focus = null, onFocus }) {
   const { updateTripFrame } = useTrips();
   const rowRef = useRef(null);
   const [cellW, setCellW] = useState(0);
@@ -73,7 +73,7 @@ export default function TripWindow({ trip }) {
     if (!start) return [];
     return baseLegs.map((l, i) => ({
       legName: l.legName || l.name, arrive: l.arrive, depart: l.depart,
-      startIdx: Math.max(0, between(start, l.arrive)),
+      legKey: l.cityId || l.name, startIdx: Math.max(0, between(start, l.arrive)),
       span: Math.max(1, between(l.arrive, l.depart) + 1),
       color: LEG_COLORS[i % LEG_COLORS.length],
     }));
@@ -130,12 +130,21 @@ export default function TripWindow({ trip }) {
       </div>
       <DndContext sensors={sensors} onDragMove={onDragMove} onDragEnd={onDragEnd} onDragCancel={() => setPreview(null)}>
         <div className="twn-legs" ref={rowRef} style={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }}>
-          {view.map((s, i) => (
-            <span key={i} className="twn-leg"
-                  style={{ gridColumn: `${s.startIdx + 1} / span ${Math.max(1, s.span)}`, "--leg": s.color }}>
-              {s.legName ? s.legName.replace(/,.*$/, "") : "—"}<small> {Math.max(1, s.span)}n</small>
-            </span>
-          ))}
+          {view.map((s, i) => {
+            const style = { gridColumn: `${s.startIdx + 1} / span ${Math.max(1, s.span)}`, "--leg": s.color };
+            const label = s.legName ? s.legName.replace(/,.*$/, "") : "—";
+            const body = <>{label}<small> {Math.max(1, s.span)}n</small></>;
+            return onFocus ? (
+              <button key={i} type="button"
+                      className={`twn-leg twn-leg-btn${focus === s.legKey ? " on" : ""}`}
+                      style={style} aria-pressed={focus === s.legKey}
+                      aria-label={`Plan ${label}`} onClick={() => onFocus(focus === s.legKey ? null : s.legKey)}>
+                {body}
+              </button>
+            ) : (
+              <span key={i} className="twn-leg" style={style}>{body}</span>
+            );
+          })}
           {cellW ? boundaries.map((b) => (
             <BoundaryHandle key={b.i} id={b.i} colIdx={b.colIdx} cellW={cellW}
                             label={`Move days between ${segments[b.i]?.legName?.replace(/,.*$/, "")} and ${segments[b.i + 1]?.legName?.replace(/,.*$/, "")}`}

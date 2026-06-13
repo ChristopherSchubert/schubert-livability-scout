@@ -15,9 +15,8 @@ import { CAT_ICON } from "./atoms";
 import DayEntries from "./DayEntries";
 import TripVariations from "./TripVariations";
 import EntryEditor from "./EntryEditor";
-import TripWindow from "./TripWindow";
+import TripPlan from "./TripPlan";
 import BookView from "./BookView";
-import GatherBucket from "./GatherBucket";
 import TripGrid from "./TripGrid";
 import TripFrame from "./TripFrame";
 import { solveTripDay } from "../lib/solve-adapter";
@@ -80,8 +79,6 @@ export default function TripWorkspace({ tripId, activeTab = "plan" }) {
     const saved = await addEntry(trip.id, { role: "anchor", status: "none", time: { mode: "bucket", bucket: "flex" }, title: "", ...fields });
     if (saved) setEditing(saved);
   }
-  const addStay = (leg) => addAndEdit({ day: leg.arrive, category: "stay", status: "reserved", role: "connective", title: `Stay — ${leg.name?.replace(/,.*$/, "")}`, time: { mode: "point" } });
-  const addFlight = () => addAndEdit({ day: trip?.startDate, category: "travel", status: "booked", role: "connective", title: "Flight" });
   const addOwn = () => addAndEdit({ day: null, category: "activity" });
 
   const trip = active && active.id === tripId ? active : null;
@@ -118,45 +115,7 @@ export default function TripWorkspace({ tripId, activeTab = "plan" }) {
       </div>
 
       <div id="tw-panel">
-      {tab === "plan" ? (
-        <div className="tw-plan">
-          <div className="tw-sec-label">The window</div>
-          <TripWindow trip={trip} />
-          <div className="tw-sec-label">Flights &amp; transport</div>
-          <ul className="tw-stays">
-            {flights.map((e) => (
-              <li key={e.id} className="tw-flight" onClick={() => setEditing(e)}
-                  role="button" tabIndex={0} aria-label={`Edit ${e.title}`}
-                  onKeyDown={(ev) => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); setEditing(e); } }}>
-                <span className="tw-ico">✈</span>
-                <b>{e.title}</b>
-                <span className="tw-meta">{e.day}{e.time?.start ? ` · ${e.time.start}` : ""}</span>
-                {e.booking?.confirmation ? <span className="tw-status s-booked">{e.booking.confirmation}</span> : null}
-              </li>
-            ))}
-            <li><button className="tw-add" onClick={addFlight}>＋ add flight</button></li>
-          </ul>
-          <div className="tw-sec-label">Stays</div>
-          <ul className="tw-stays">
-            {(trip.legs || []).map((leg) => {
-              const stay = trip.entries.find((e) => e.category === "stay" && (byDay[leg.arrive] || []).includes(e));
-              return (
-                <li key={leg.cityId || leg.name} className="tw-stay">
-                  <div className="tw-stay-top">
-                    <b>{leg.name?.replace(/,.*$/, "")}</b>
-                    <span className="tw-meta">{leg.arrive} – {leg.depart}</span>
-                    <span className="tw-stay-h tw-clickable" onClick={() => (stay ? setEditing(stay) : addStay(leg))}
-                          role="button" tabIndex={0} aria-label={stay ? `Edit stay ${stay.title}` : `Add stay in ${leg.name}`}
-                          onKeyDown={(ev) => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); stay ? setEditing(stay) : addStay(leg); } }}>
-                      {stay ? stay.title.replace(/^Check in\s*—?\s*/i, "") : "＋ add stay"}</span>
-                  </div>
-                  <GatherBucket trip={trip} leg={leg} />
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-      ) : null}
+      {tab === "plan" ? <TripPlan trip={vtrip} onEdit={setEditing} /> : null}
 
       {tab === "days" ? (
         <div className="tw-days">
@@ -200,7 +159,13 @@ export default function TripWorkspace({ tripId, activeTab = "plan" }) {
             <p className="tw-sec-label">The shelf — gathered candidates, not yet on a day. Lay them out, or open to edit.</p>
             <button className="tw-add" onClick={addOwn}>＋ add your own</button>
           </div>
-          {pool.length === 0 ? <p className="tw-stub">Nothing on the shelf. Gather suggestions on the Plan tab.</p> : (
+          {pool.length === 0 ? (
+            <p className="tw-stub">
+              {trip.entries.length
+                ? `Everything's on a day — all ${trip.entries.length} stops are placed, nothing waiting here. Gather more on the Plan tab to add to the shelf.`
+                : "Nothing on the shelf yet. Gather suggestions on the Plan tab."}
+            </p>
+          ) : (
             <ul className="sh-list">
               {pool.map((e) => (
                 <li key={e.id} className={`sh-item cat-${e.category || "activity"}`}>

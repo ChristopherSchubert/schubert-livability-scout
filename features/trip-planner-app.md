@@ -46,10 +46,16 @@ design source of truth.
 
 ## The surfaces (Phases 1–2)
 
-- **Plan** — [TripWindow](../components/TripWindow.jsx) (date ribbon + colour-coded
-  leg bars) · Stays summary · per-leg [GatherBucket](../components/GatherBucket.jsx)
-  (browse the pois cache near a leg, ranked by rating × log(reviews); save lands
-  on the **Shelf**).
+- **Plan** — [TripPlan](../components/TripPlan.jsx): the deck's **window-as-nav
+  focus flow** (rebuilt 2026-06-13 after the trips-flow audit). Overview = the
+  [TripWindow](../components/TripWindow.jsx) date ribbon + collapsed Flights bar +
+  width-proportional stay bars (one per leg). Click a leg (in the window or its
+  bar) → the page **focuses** that city: a header, its day columns (the dated
+  entries, color-keyed + icon-tagged), and one **bucket** (undated want-list) with
+  [GatherBucket](../components/GatherBucket.jsx) (browse the pois cache, ranked by
+  rating × log(reviews)), ＋ add your own, and **Lay out →**. Replaces the old
+  always-expanded list where every leg's tray bloomed at once. Styling lives in
+  [trips.css](../app/trips.css) (`.tw-staysrow`/`.tw-daycols`/`.tw-mini`/`.tw-bucket`).
 - **Days** — the agenda by day; `＋ add` (create) and `⚡ solve` per day.
 - **Book** — [BookView](../components/BookView.jsx): cash needed, the bookings
   ledger (soonest deadline first), passes — all derived by `lib/trip.js`.

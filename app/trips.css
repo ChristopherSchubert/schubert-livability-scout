@@ -86,13 +86,63 @@
 .tw-tab.on { color: var(--text); border-bottom-color: var(--accent); }
 .tw-badge { font-style: normal; font-size: .64rem; background: #fbf0e2; color: #8a5a16; border-radius: 100px; padding: 0 .4rem; }
 
-/* Plan tab: window + stays */
-.tw-sec-label { font-family: var(--font-ui); font-size: .68rem; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); margin: 1.1rem 0 .5rem; }
-.tw-plan .tw-sec-label:first-child { margin-top: 0; }
+/* ============================ Plan tab ============================ */
+.tw-sec-label { font-family: var(--font-ui); font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); margin: 1.1rem 0 .5rem; display: flex; align-items: center; gap: .6rem; }
+.tw-sec-label::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+.tw-plan > .tw-sec-label:first-child { margin-top: 0; }
+.tw-plan-hint { font-size: .72rem; color: var(--muted); margin: .5rem 0 0; }
 .tw-stays { list-style: none; margin: 0; padding: 0; }
-.tw-stay { display: flex; align-items: baseline; gap: .8rem; padding: .5rem .2rem; border-bottom: 1px dashed var(--border); }
-.tw-stay b { font-family: var(--font-display); font-size: 1rem; flex: 0 0 9rem; }
-.tw-stay-h { margin-left: auto; font-size: .85rem; color: var(--text); }
+
+/* Collapsed Flights/Stays one-liner (focus mode + flights toggle) */
+.tw-collapsec { display: flex; align-items: center; gap: .5rem; width: 100%; text-align: left; font-family: var(--font-ui); font-size: .74rem; color: var(--muted); border: 1px solid var(--panel-strong); background: var(--panel); border-radius: 8px; padding: .42rem .8rem; margin: .5rem 0; cursor: pointer; }
+.tw-collapsec:hover { border-color: var(--border); }
+.tw-collapsec b { color: var(--text); font-weight: 600; }
+.tw-flights-open { margin: -.2rem 0 .5rem; }
+
+/* Overview: stays as width-proportional bars (one per leg) */
+.tw-staysrow { display: flex; gap: .4rem; margin: .2rem 0 0; }
+.tw-staybar { display: flex; flex-direction: column; justify-content: center; gap: .15rem; min-height: 52px; min-width: 0; border: 1px solid var(--border); border-left: 4px solid var(--leg, #665285); border-radius: 8px; background: var(--panel); padding: .45rem .65rem; cursor: pointer; text-align: left; font: inherit; }
+.tw-staybar:hover { border-color: var(--accent); }
+.tw-staybar b { font-family: var(--font-display); font-size: .95rem; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tw-staybar small { color: var(--muted); font-size: .72rem; }
+
+/* Focused city: header + day columns + bucket */
+.tw-focus-head { display: flex; align-items: baseline; gap: .7rem; flex-wrap: wrap; margin: 1rem 0 .2rem; padding-bottom: .35rem; border-bottom: 1.5px solid var(--text); }
+.tw-focus-head b { font-family: var(--font-display); font-size: 1.2rem; }
+.tw-focus-head .tw-meta { font-family: var(--font-ui); font-size: .8rem; color: var(--muted); margin: 0; }
+
+.tw-daycols-wrap { overflow-x: auto; margin: .6rem 0; padding-bottom: .2rem; }
+.tw-daycols { display: grid; gap: .5rem; min-width: min-content; }
+.tw-daycol { border: 1px solid var(--border); border-radius: 9px; background: var(--panel); padding: .45rem; min-width: 0; }
+.tw-dh { display: flex; justify-content: space-between; align-items: baseline; gap: .25rem; font-size: .72rem; font-weight: 700; margin-bottom: .35rem; }
+.tw-dh small { font-weight: 400; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; font-size: .62rem; }
+.tw-cap { height: 5px; border-radius: 100px; background: var(--panel-strong); margin-top: .35rem; overflow: hidden; }
+.tw-cap i { display: block; height: 100%; background: var(--accent); }
+
+/* mini cards — dense, color-keyed (bucket + day columns) */
+.tw-cardrow { display: flex; flex-wrap: wrap; gap: .5rem; margin: .5rem 0 0; }
+.tw-mini { position: relative; flex: 1 1 160px; min-width: 150px; max-width: 240px; background: var(--panel); border: 1px solid var(--border); border-left: 4px solid var(--cat, var(--border)); border-radius: 7px; padding: .4rem .55rem; cursor: pointer; }
+.tw-daycol .tw-mini { flex: none; max-width: none; margin-bottom: .35rem; padding: .3rem .45rem; }
+.tw-mini b { font-weight: 600; font-size: .82rem; overflow-wrap: anywhere; }
+.tw-mini small { display: block; color: var(--muted); font-size: .68rem; margin-top: .1rem; }
+.tw-mini.cat-meal { --cat: #9a5a16; }
+.tw-mini.cat-activity { --cat: #0d4c44; }
+.tw-mini.cat-stay { --cat: #665285; }
+.tw-mini.cat-travel { --cat: #2e5482; }
+.tw-mini.cat-errand { --cat: #6b6358; }
+.tw-mini.has-acts { padding-right: 2.8rem; }
+.tw-iacts { position: absolute; top: 3px; right: 4px; display: flex; gap: 3px; }
+.tw-iacts i { font-style: normal; cursor: pointer; font-size: .66rem; line-height: 1; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border); border-radius: 5px; background: var(--panel); color: #6b6358; }
+.tw-iacts i:hover { color: var(--accent); border-color: var(--accent); background: #e7f1ee; }
+
+/* the bucket */
+.tw-bucket { border: 1.5px dashed var(--border); border-radius: 10px; padding: .7rem .9rem; margin-top: .6rem; background: rgba(255,253,246,.6); }
+.tw-bucket-head { display: flex; align-items: center; gap: .7rem; flex-wrap: wrap; }
+.tw-bucket-head > b { font-family: var(--font-display); font-size: .95rem; font-weight: 500; }
+.tw-ready { font-size: .72rem; color: var(--muted); }
+.tw-ready b { color: var(--accent); }
+.tw-layout { margin-left: auto; font-family: var(--font-ui); font-size: .76rem; font-weight: 700; background: var(--accent); color: #fff; border: 0; border-radius: 100px; padding: .35rem .95rem; cursor: pointer; }
+.tw-toolrow { display: flex; gap: .5rem; align-items: center; flex-wrap: wrap; margin-top: .6rem; }
 
 /* TripWindow — date ribbon + leg segments */
 .twn { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; background: var(--panel); }
@@ -130,23 +180,20 @@
 .tw-add { font-family: var(--font-ui); font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--accent); background: none; border: 1px solid var(--border); border-radius: 100px; padding: .1rem .55rem; margin-left: .6rem; cursor: pointer; }
 .tw-add:hover { border-color: var(--accent); }
 
-/* GatherBucket — per-leg pois-cache suggestions */
-.tw-stay { flex-direction: column; align-items: stretch; gap: .5rem; }
-.tw-stay-top { display: flex; align-items: baseline; gap: .8rem; }
-.tw-stay-top b { font-family: var(--font-display); font-size: 1rem; flex: 0 0 9rem; }
-.tw-stay-top .tw-stay-h { margin-left: auto; }
-.gb-trigger { align-self: flex-start; font-family: var(--font-ui); font-size: .74rem; font-weight: 600; color: var(--accent); background: #e7f1ee; border: 1px solid #bcd8d0; border-radius: 100px; padding: .2rem .7rem; cursor: pointer; }
+/* GatherBucket — Browse-suggestions tray (Google Places pois cache) */
+.gb { width: 100%; }
+.gb-trigger { align-self: flex-start; font-family: var(--font-ui); font-size: .74rem; font-weight: 600; color: var(--accent); background: #e7f1ee; border: 1px solid #bcd8d0; border-radius: 100px; padding: .22rem .8rem; cursor: pointer; }
 .gb-trigger:disabled { color: var(--muted); background: var(--panel); border-color: var(--border); cursor: default; }
 .gb-trigger em { font-style: normal; color: var(--muted); }
-.gb-busy { color: var(--muted); font-size: .82rem; font-style: italic; margin: .3rem 0; }
-.gb-cards { display: flex; flex-wrap: wrap; gap: .55rem; margin: .2rem 0 .4rem; }
-.gb-card { flex: 1 1 200px; min-width: 200px; max-width: 280px; border: 1px solid var(--border); border-left: 3px solid var(--border); border-radius: 8px; background: var(--panel); padding: .5rem .6rem; display: flex; flex-direction: column; gap: .15rem; }
-.gb-card.cat-meal { border-left-color: #9a5a16; }
-.gb-card.cat-activity { border-left-color: #0d4c44; }
-.gb-card.cat-errand { border-left-color: #6b6358; }
-.gb-card b { font-weight: 600; font-size: .86rem; }
-.gb-card small { color: var(--muted); font-size: .72rem; }
-.gb-save { align-self: flex-start; margin-top: .25rem; font-size: .7rem; font-weight: 700; color: var(--accent); background: none; border: 1px solid var(--accent); border-radius: 100px; padding: .08rem .55rem; cursor: pointer; }
+.gb-busy { color: var(--muted); font-size: .82rem; font-style: italic; margin: .4rem 0; }
+.gb-cards { display: flex; flex-wrap: wrap; gap: .5rem; margin: .5rem 0 .2rem; width: 100%; }
+.gb-card { position: relative; flex: 1 1 160px; min-width: 150px; max-width: 240px; border: 1px solid var(--border); border-left: 4px solid var(--cat, var(--border)); border-radius: 7px; background: var(--panel); padding: .4rem .55rem; }
+.gb-card.cat-meal { --cat: #9a5a16; }
+.gb-card.cat-activity { --cat: #0d4c44; }
+.gb-card.cat-errand { --cat: #6b6358; }
+.gb-card b { font-weight: 600; font-size: .82rem; overflow-wrap: anywhere; }
+.gb-card small { display: block; color: var(--muted); font-size: .68rem; margin: .1rem 0 .25rem; }
+.gb-save { font-size: .66rem; font-weight: 700; color: var(--accent); background: none; border: 1px solid var(--accent); border-radius: 100px; padding: .06rem .5rem; cursor: pointer; }
 .gb-save.done, .gb-save:disabled { color: var(--muted); border-color: var(--border); cursor: default; }
 
 /* TripsIndex header + composer */
@@ -228,9 +275,13 @@
   .tw-t { flex-basis: 3.6rem; }
   .tw-title { flex: 1 1 60%; }
   .tw-tags { margin-left: 3.6rem; }
-  /* plan: stack stay meta */
-  .tw-stay-top { flex-wrap: wrap; gap: .3rem .8rem; }
-  .tw-stay-top b, .tw-stay-top .tw-stay-h { flex-basis: 100%; margin-left: 0; }
+  /* plan: stack the proportional stay bars; full-width collapsed bars */
+  .tw-staysrow { flex-direction: column; }
+  .tw-staybar { flex: none !important; min-height: 44px; }
+  .tw-collapsec { min-height: 40px; }
+  .tw-bucket-head { gap: .4rem; }
+  .tw-layout { margin-left: 0; }
+  .tw-mini, .gb-card { flex: 1 1 100% !important; max-width: none; min-height: 44px; }
   .twn-day { font-size: .8rem; }
   .twn-dow, .twn-mo { font-size: .52rem; }
   /* editor + composer go full-bleed */
