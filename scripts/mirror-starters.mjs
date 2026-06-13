@@ -41,16 +41,19 @@ const PER_CITY_QUERIES = {
 
 const BUCKET = "city-images";
 const env = await loadEnv();
-const sb = createClient(env.NEXT_PUBLIC_SUPABASE_URL, env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY, {
+const secret = env.SUPABASE_SECRET_KEY || env.SUPABASE_SERVICE_ROLE_KEY;
+const sb = createClient(env.NEXT_PUBLIC_SUPABASE_URL, secret || env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY, {
   auth: { persistSession: false },
 });
-const { error: authErr } = await sb.auth.signInWithPassword({
-  email: env.DEV_LOGIN_EMAIL,
-  password: env.DEV_LOGIN_PASSWORD,
-});
-if (authErr) {
-  console.error("Sign-in failed:", authErr.message);
-  process.exit(1);
+if (!secret) {
+  const { error: authErr } = await sb.auth.signInWithPassword({
+    email: env.DEV_LOGIN_EMAIL,
+    password: env.DEV_LOGIN_PASSWORD,
+  });
+  if (authErr) {
+    console.error("Sign-in failed:", authErr.message, "(no SUPABASE_SECRET_KEY set)");
+    process.exit(1);
+  }
 }
 
 const { data: cityRows, error: rowsErr } = await sb.from("cities").select("id, name, hero_image");

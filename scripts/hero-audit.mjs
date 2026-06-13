@@ -11,16 +11,19 @@ const url = env.NEXT_PUBLIC_SUPABASE_URL;
 const anon = env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 const email = env.DEV_LOGIN_EMAIL;
 const password = env.DEV_LOGIN_PASSWORD;
-if (!url || !anon || !email || !password) {
+const secret = env.SUPABASE_SECRET_KEY || env.SUPABASE_SERVICE_ROLE_KEY;
+if (!url || !(secret || anon) || (!secret && (!email || !password))) {
   console.error("Missing env: NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY, DEV_LOGIN_EMAIL, DEV_LOGIN_PASSWORD");
   process.exit(2);
 }
 
-const sb = createClient(url, anon, { auth: { persistSession: false } });
-const { error: authErr } = await sb.auth.signInWithPassword({ email, password });
-if (authErr) {
-  console.error("Sign-in failed:", authErr.message);
-  process.exit(1);
+const sb = createClient(url, secret || anon, { auth: { persistSession: false } });
+if (!secret) {
+  const { error: authErr } = await sb.auth.signInWithPassword({ email, password });
+  if (authErr) {
+    console.error("Sign-in failed:", authErr.message, "(no SUPABASE_SECRET_KEY set)");
+    process.exit(1);
+  }
 }
 
 const { data, error } = await sb.from("cities").select("name, hero_image").order("name");

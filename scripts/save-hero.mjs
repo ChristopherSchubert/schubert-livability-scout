@@ -68,9 +68,11 @@ await writeFile(
 // ── Supabase mirror ───────────────────────────────────────────────────────
 let publicUrl = null;
 let supabaseStatus = "skipped (no env)";
-if (env.NEXT_PUBLIC_SUPABASE_URL && env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY && env.DEV_LOGIN_EMAIL && env.DEV_LOGIN_PASSWORD) {
-  const sb = createClient(env.NEXT_PUBLIC_SUPABASE_URL, env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY, { auth: { persistSession: false } });
-  const { error: authErr } = await sb.auth.signInWithPassword({ email: env.DEV_LOGIN_EMAIL, password: env.DEV_LOGIN_PASSWORD });
+const _secret = env.SUPABASE_SECRET_KEY || env.SUPABASE_SERVICE_ROLE_KEY;
+if (env.NEXT_PUBLIC_SUPABASE_URL && (_secret || (env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY && env.DEV_LOGIN_EMAIL && env.DEV_LOGIN_PASSWORD))) {
+  const sb = createClient(env.NEXT_PUBLIC_SUPABASE_URL, _secret || env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY, { auth: { persistSession: false } });
+  let authErr = null;
+  if (!_secret) { ({ error: authErr } = await sb.auth.signInWithPassword({ email: env.DEV_LOGIN_EMAIL, password: env.DEV_LOGIN_PASSWORD })); }
   if (authErr) {
     supabaseStatus = `auth failed: ${authErr.message}`;
   } else {
