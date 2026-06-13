@@ -154,7 +154,21 @@ The OSM 700 m hard-ring counts (`cafe_n` / `bar_n` / `rest_n` /
 measurement cycle as a sanity check. In
 [lib/planner-data.js](../lib/planner-data.js) the taxonomy entries carry
 `supersededBy: "<key>_score"` and `axisRollup` skips them when the
-superseding metric has a value. Migration plan:
+superseding metric has a value.
+
+**By-the-numbers display (#68 follow-up):** the chapter used to render each
+`_n` as its own full row next to the weighted `_score` row — two rows per POI
+type, ~8 extra rows across Aliveness + Realness. `axesSnapshot` in
+[lib/city-detail-view.js](../lib/city-detail-view.js) now **folds** the raw
+count into the weighted row as a compact `legacy` sub-stat (rendered by
+[ChapterData.jsx](../components/city-detail/ChapterData.jsx) as
+`4.6 · 7 raw`, full OSM provenance in the title tooltip). The fold only
+happens when the weighted metric itself has a value; a city not yet
+re-measured with the weighted core still shows its raw `_n` on its own row, so
+nothing is lost. Guarded by
+[test/city-detail-view.test.mjs](../test/city-detail-view.test.mjs).
+
+Migration plan:
 
 1. **One full cycle** (current state): both `_n` and `_score` are measured;
    `_score` drives the rollup whenever it's present.

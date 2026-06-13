@@ -109,6 +109,14 @@ function MetricRow({ m, addon }) {
               {m.unit === "days" ? <small style={{ color: "var(--ink-mute)", fontWeight: 400 }}> / 365</small> : null}
             </>
           ) : "—"}
+          {m.legacy ? (
+            <small
+              className="metric-legacy"
+              title={`Legacy raw count: ${m.legacy.value} within 700 m · ${m.legacy.source}`}
+            >
+              {m.value != null ? " · " : ""}{m.legacy.value} raw
+            </small>
+          ) : null}
         </span>
       </div>
       {m.tagline ? <div className="metric-tagline">{m.tagline}</div> : null}
