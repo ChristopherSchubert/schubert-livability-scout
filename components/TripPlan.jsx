@@ -11,14 +11,27 @@
 //   that city: Flights + Stays fold to one-line bars, and the city opens with
 //   its day columns and ONE bucket (the want-list). The bucket gathers
 //   candidates (GatherBucket → Google Places cache), holds your own additions,
-//   and "Lay out →" spreads the undated items across the city's open days.
+//   and "Lay out →" computes a PROPOSAL without persisting it. The user reviews
+//   the proposed placements (ghosted cards in day columns), keeps or undoes.
+//   A "Didn't fit — alternates" row shows demoted items. Dragging a bucket
+//   card onto a day column pins it and pauses auto-layout; the user can
+//   re-lay-out around pins.
 //
 // This replaces the old always-expanded list where every leg's suggestion tray
 // rendered at once — the wall the deck was designed to avoid.
-import { useMemo, useState } from "react";
+import { useMemo, useState, useCallback } from "react";
+import {
+  DndContext,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  useDroppable,
+  useDraggable,
+  DragOverlay,
+} from "@dnd-kit/core";
 import { useTrips } from "./TripProvider";
 import { usePlanner } from "./PlannerProvider";
-import { tripDays, entriesByDay, tripDietChips } from "../lib/trip";
+import { tripDays, entriesByDay, tripDietChips, layOutLegPlan } from "../lib/trip";
 import { appendCityLeg, daysBetween } from "../lib/trip-window";
 import { CAT_ICON, MealScreen } from "./atoms";
 import GatherBucket from "./GatherBucket";
@@ -49,9 +62,6 @@ export default function TripPlan({ trip, onEdit }) {
   const [focus, setFocus] = useState(null); // legKey of the focused city, or null
   const [flightsOpen, setFlightsOpen] = useState(false);
   // legKey whose hotel search is currently open in the overview stay bar.
-  // Clicking "Search hotels" on a bar focuses that leg AND opens StaySearch
-  // inline in FocusCity, so we just call setFocus — the search panel renders
-  // inside the focused view. The bar button triggers the focus transition.
   const [staySearchLeg, setStaySearchLeg] = useState(null); // legKey
   // "＋ other city" search state
   const [otherOpen, setOtherOpen] = useState(false);
@@ -160,22 +170,6 @@ export default function TripPlan({ trip, onEdit }) {
     setOtherResults([]);
   }
 
-  // Lay out a city: spread its undated bucket items across the city's open days,
-  // always topping up the emptiest day next. Placement only — times come from
-  // ⚡ Solve on the Days tab. This is the honest core of the deck's "Lay out →".
-  async function layOut(leg) {
-    const ld = legDays(leg);
-    if (!ld.length) return;
-    const counts = ld.map((d) => (byDay[d.date] || []).length);
-    for (const item of bucketFor(leg)) {
-      let mi = 0;
-      for (let i = 1; i < counts.length; i++) if (counts[i] < counts[mi]) mi = i;
-      counts[mi] += 1;
-      // eslint-disable-next-line no-await-in-loop
-      await updateEntry(trip.id, { ...item, day: ld[mi].date });
-    }
-  }
-
   async function addOwn(leg) {
     const saved = await addEntry(trip.id, {
       day: null, role: "anchor", category: "activity", status: "none",
@@ -186,6 +180,65 @@ export default function TripPlan({ trip, onEdit }) {
 
   // No-nights-free tooltip (shown when all legs are at minimum span).
   const noNightsMsg = "no nights free — extend the trip first";
+
+  // ── Proposal state — lifted here so FocusCity callbacks can reach updateEntry ──
+  // proposal: { placements: [{entryId, day}], alternates: [entryId] } | null
+  // If non-null, day columns show ghost cards for proposed placements.
+  // pinnedIds: Set — entries the user has manually dragged to a specific day
+  //             while the proposal is staged; these are fixed in re-layouts.
+  const [proposal, setProposal] = useState(null);
+  const [pinnedIds, setPinnedIds] = useState(() => new Set());
+  // paused: true when the user has manually dragged a card (auto-layout paused)
+  const [layoutPaused, setLayoutPaused] = useState(false);
+
+  // Start a proposal (or re-compute around current pins).
+  const startProposal = useCallback((leg) => {
+    const ld = legDays(leg);
+    if (!ld.length) return;
+    const bucket = bucketFor(leg);
+    if (!bucket.length) return;
+    // When re-laying out around pins, entries that are already pinned (in byDay
+    // via a prior keep, or manually dragged this session) are already counted in
+    // byDay — layOutLegPlan's byDay seed includes them so they reduce room.
+    const result = layOutLegPlan(leg, ld, bucket, byDay, pinnedIds);
+    setProposal(result);
+    setLayoutPaused(false);
+  }, [days, byDay, pinnedIds]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Keep: persist all proposed placements, then clear proposal state.
+  const keepProposal = useCallback(async (leg) => {
+    if (!proposal) return;
+    const bucket = bucketFor(leg);
+    const byId = Object.fromEntries(bucket.map((e) => [e.id, e]));
+    for (const { entryId, day } of proposal.placements) {
+      const entry = byId[entryId];
+      if (entry) {
+        // eslint-disable-next-line no-await-in-loop
+        await updateEntry(trip.id, { ...entry, day });
+      }
+    }
+    setProposal(null);
+    setPinnedIds(new Set());
+    setLayoutPaused(false);
+  }, [proposal, trip.id, updateEntry]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Undo: discard the proposal without writing anything.
+  const undoProposal = useCallback(() => {
+    setProposal(null);
+    setPinnedIds(new Set());
+    setLayoutPaused(false);
+  }, []);
+
+  // Manual drag: place a bucket card on a specific day → pin it, pause auto.
+  // This is called by FocusCity after a successful drag-end.
+  const handleManualDrop = useCallback(async (leg, entry, targetDay) => {
+    // Persist immediately — manual placement is always direct.
+    await updateEntry(trip.id, { ...entry, day: targetDay, pinned: true });
+    setPinnedIds((prev) => new Set([...prev, entry.id]));
+    // If a proposal is staged, flag as paused (user can re-lay out around pins).
+    if (proposal) setLayoutPaused(true);
+    else setProposal(null); // no proposal → stay clear
+  }, [proposal, trip.id, updateEntry]);
 
   return (
     <div className="tw-plan">
@@ -273,13 +326,20 @@ export default function TripPlan({ trip, onEdit }) {
 
       {focused ? (
         <>
-          <button className="tw-collapsec" onClick={() => setFocus(null)} aria-label="Back to all cities">
+          <button className="tw-collapsec" onClick={() => { setFocus(null); undoProposal(); }} aria-label="Back to all cities">
             ← <b>All cities</b> · Flights {flights.length} ✈ · Stays {stayCount} 🛏
           </button>
           <FocusCity
             leg={focused} days={legDays(focused)} byDay={byDay} stay={stayFor(focused)}
             bucket={bucketFor(focused)} trip={trip} onEdit={onEdit} onRemove={removeEntry}
-            onLayOut={() => layOut(focused)} onAddOwn={() => addOwn(focused)}
+            onLayOut={() => startProposal(focused)}
+            onRelayout={() => startProposal(focused)}
+            onKeep={() => keepProposal(focused)}
+            onUndo={undoProposal}
+            onManualDrop={(entry, day) => handleManualDrop(focused, entry, day)}
+            proposal={proposal}
+            layoutPaused={layoutPaused}
+            onAddOwn={() => addOwn(focused)}
             dietChips={dietChips}
             staySearchOpen={staySearchLeg === legKey(focused)}
             onOpenStaySearch={() => setStaySearchLeg(legKey(focused))}
@@ -342,13 +402,108 @@ export default function TripPlan({ trip, onEdit }) {
   );
 }
 
+// ── DayDropZone — wraps a day column so bucket cards can be dragged onto it ──
+function DayDropZone({ date, children }) {
+  const { setNodeRef, isOver } = useDroppable({ id: `day-${date}` });
+  return (
+    <div ref={setNodeRef} className={`tw-daycol${isOver ? " tw-daycol-over" : ""}`}>
+      {children}
+    </div>
+  );
+}
+
+// ── DraggableBucketCard — a bucket card that can be dragged to a day column ──
+function DraggableBucketCard({ entry, onEdit, onRemove, dietChips, isProposed, isAlternate }) {
+  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+    id: `bucket-${entry.id}`,
+    data: { entryId: entry.id },
+  });
+  const style = transform
+    ? { transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`, zIndex: 200 }
+    : undefined;
+
+  const cls = [
+    "tw-mini has-acts",
+    `cat-${entry.category || "activity"}`,
+    isProposed ? "tw-proposed" : "",
+    isAlternate ? "tw-alternate" : "",
+    isDragging ? "tw-dragging" : "",
+  ].filter(Boolean).join(" ");
+
+  return (
+    <div ref={setNodeRef} style={style} className={cls} {...attributes}>
+      {/* drag grip */}
+      <span className="tw-grip" {...listeners} aria-label={`Drag ${entry.title || "item"} to a day`} tabIndex={0}>⠿</span>
+      <span className="tw-iacts">
+        <i role="button" tabIndex={0} title="edit" aria-label={`Edit ${entry.title || "item"}`}
+           onClick={() => onEdit(entry)}
+           onKeyDown={(ev) => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); onEdit(entry); } }}>✎</i>
+        <i role="button" tabIndex={0} title="remove" aria-label={`Remove ${entry.title || "item"}`}
+           onClick={() => onRemove(entry.id)}
+           onKeyDown={(ev) => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); onRemove(entry.id); } }}>✕</i>
+      </span>
+      <b>{CAT_ICON[entry.category] || "•"} {entry.title || "untitled"}</b>
+      {entry.place?.name && entry.place.name !== entry.title ? <small>{entry.place.name}</small> : null}
+      <MealScreen entry={entry} dietChips={dietChips} />
+    </div>
+  );
+}
+
 // The focused city: its header (with stay slot / StaySearch), day columns,
-// and the one bucket.
-function FocusCity({ leg, days, byDay, stay, bucket, trip, onEdit, onRemove, onLayOut, onAddOwn,
-                     dietChips, staySearchOpen, onOpenStaySearch, onCloseStaySearch }) {
+// and the one bucket — now with proposal/keep/undo and DnD drag-to-pin.
+function FocusCity({ leg, days, byDay, stay, bucket, trip, onEdit, onRemove,
+                     onLayOut, onRelayout, onKeep, onUndo, onManualDrop,
+                     proposal, layoutPaused,
+                     onAddOwn, dietChips,
+                     staySearchOpen, onOpenStaySearch, onCloseStaySearch }) {
   const open = days.length;
   const hours = bucket.length * HOURS_PER_ITEM;
   const ready = bucket.length >= Math.max(2, open);
+
+  // Build fast lookup maps from the proposal (if staged).
+  // proposedByDay: { [date]: [entryId, …] }
+  // alternateSet: Set<entryId>
+  const proposedByDay = useMemo(() => {
+    if (!proposal) return {};
+    const map = {};
+    for (const { entryId, day } of proposal.placements) {
+      (map[day] ||= []).push(entryId);
+    }
+    return map;
+  }, [proposal]);
+
+  const alternateSet = useMemo(() =>
+    new Set(proposal?.alternates || []),
+  [proposal]);
+
+  // The bucket entries that are not yet proposed or already placed:
+  // in a staged proposal, the bucket cards show either as "proposed" (ghost in
+  // their target column) or as "alternate" (in the Didn't fit row).
+  const bucketById = useMemo(() =>
+    Object.fromEntries(bucket.map((e) => [e.id, e])),
+  [bucket]);
+
+  // Sensor with a small distance threshold so taps don't accidentally drag.
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }));
+  const [activeEntry, setActiveEntry] = useState(null);
+
+  function handleDragStart({ active }) {
+    const entryId = active.data.current?.entryId;
+    const entry = bucket.find((e) => e.id === entryId);
+    setActiveEntry(entry || null);
+  }
+
+  function handleDragEnd({ active, over }) {
+    setActiveEntry(null);
+    if (!over) return;
+    const entryId = active.data.current?.entryId;
+    const entry = bucket.find((e) => e.id === entryId);
+    if (!entry) return;
+    // over.id is "day-YYYY-MM-DD"
+    const targetDay = over.id.replace(/^day-/, "");
+    if (!targetDay || !days.some((d) => d.date === targetDay)) return;
+    onManualDrop(entry, targetDay);
+  }
 
   // When a stay is just placed via StaySearch, open it in EntryEditor for
   // booking details and close the search panel.
@@ -358,7 +513,7 @@ function FocusCity({ leg, days, byDay, stay, bucket, trip, onEdit, onRemove, onL
   }
 
   return (
-    <>
+    <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
       <div className="tw-focus-head">
         <b>{cityName(leg)}</b>
         <span className="tw-meta">{leg.arrive} – {leg.depart} · {days.length}d</span>
@@ -389,25 +544,53 @@ function FocusCity({ leg, days, byDay, stay, bucket, trip, onEdit, onRemove, onL
         </div>
       ) : null}
 
+      {/* Proposal keep/undo bar — shown when a proposal is staged */}
+      {proposal && (
+        <div className="tw-proposal-bar" role="region" aria-label="Layout proposal">
+          <span className="tw-proposal-label">{cityName(leg)} · proposal</span>
+          <button className="tw-proposal-keep" onClick={onKeep}>✓ keep this layout</button>
+          <button className="tw-proposal-undo" onClick={onUndo}>↶ undo</button>
+        </div>
+      )}
+
+      {/* Paused banner — shown after a manual drag while a proposal is staged */}
+      {layoutPaused && (
+        <div className="tw-layout-paused" role="status">
+          <span>Auto-layout paused — manual edits</span>
+          <button className="tw-relayout" onClick={onRelayout}>↻ re-lay out around my pins</button>
+        </div>
+      )}
+
       <div className="tw-daycols-wrap">
         <div className="tw-daycols" style={{ gridTemplateColumns: `repeat(${Math.max(1, days.length)}, minmax(120px, 1fr))` }}>
           {days.map((d) => {
             const list = byDay[d.date] || [];
             const marker = d.date === leg.arrive ? "arrive" : d.date === leg.depart ? "depart" : "";
             const fill = Math.min(100, list.length * 28);
+            // Ghost cards for proposed placements on this day
+            const proposed = (proposedByDay[d.date] || []).map((eid) => bucketById[eid]).filter(Boolean);
             return (
-              <div key={d.date} className="tw-daycol">
+              <DayDropZone key={d.date} date={d.date}>
                 <div className="tw-dh"><span>{dow(d.date)} {d.date.slice(8)}</span>{marker ? <small>{marker}</small> : null}</div>
                 {list.map((e) => (
-                  <div key={e.id} className={`tw-mini cat-${e.category || "activity"}`} onClick={() => onEdit(e)}
+                  <div key={e.id} className={`tw-mini cat-${e.category || "activity"}${e.pinned ? " tw-pinned-entry" : ""}`}
+                       onClick={() => onEdit(e)}
                        role="button" tabIndex={0} aria-label={`Edit ${e.title || "entry"}`}
                        onKeyDown={(ev) => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); onEdit(e); } }}>
+                    <b>{CAT_ICON[e.category] || "•"} {e.title || "untitled"}{e.pinned ? " 📌" : ""}</b>
+                    <MealScreen entry={e} dietChips={dietChips} />
+                  </div>
+                ))}
+                {/* Ghost proposed cards */}
+                {proposed.map((e) => (
+                  <div key={`proposed-${e.id}`} className={`tw-mini tw-proposed cat-${e.category || "activity"}`}
+                       aria-label={`Proposed: ${e.title || "item"}`}>
                     <b>{CAT_ICON[e.category] || "•"} {e.title || "untitled"}</b>
                     <MealScreen entry={e} dietChips={dietChips} />
                   </div>
                 ))}
                 <div className="tw-cap"><i style={{ width: `${fill}%` }} /></div>
-              </div>
+              </DayDropZone>
             );
           })}
         </div>
@@ -421,26 +604,43 @@ function FocusCity({ leg, days, byDay, stay, bucket, trip, onEdit, onRemove, onL
               ? <><b>{bucket.length} item{bucket.length === 1 ? "" : "s"} · ~{hours}h</b> · {open} open day{open === 1 ? "" : "s"}{ready ? " · enough to lay out" : ""}</>
               : "empty — the want-list for this city"}
           </span>
-          {bucket.length ? <button className="tw-layout" onClick={onLayOut}>Lay out {cityName(leg)} →</button> : null}
+          {bucket.length && !proposal ? (
+            <button className="tw-layout" onClick={onLayOut}>Lay out {cityName(leg)} →</button>
+          ) : null}
         </div>
 
+        {/* Alternates row — shown when proposal has overflowed items */}
+        {proposal && alternateSet.size > 0 && (
+          <div className="tw-alternates">
+            <div className="tw-alternates-head">Didn't fit — alternates</div>
+            <div className="tw-cardrow">
+              {[...alternateSet].map((eid) => {
+                const e = bucketById[eid];
+                if (!e) return null;
+                return (
+                  <DraggableBucketCard
+                    key={e.id} entry={e} onEdit={onEdit} onRemove={onRemove}
+                    dietChips={dietChips} isAlternate
+                  />
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Full bucket cards (draggable) — when no proposal, show all;
+            when proposal staged, show only remaining (proposed are ghosted in columns) */}
         {bucket.length ? (
           <div className="tw-cardrow">
-            {bucket.map((e) => (
-              <div key={e.id} className={`tw-mini has-acts cat-${e.category || "activity"}`}>
-                <span className="tw-iacts">
-                  <i role="button" tabIndex={0} title="edit" aria-label={`Edit ${e.title || "item"}`}
-                     onClick={() => onEdit(e)}
-                     onKeyDown={(ev) => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); onEdit(e); } }}>✎</i>
-                  <i role="button" tabIndex={0} title="remove" aria-label={`Remove ${e.title || "item"}`}
-                     onClick={() => onRemove(e.id)}
-                     onKeyDown={(ev) => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); onRemove(e.id); } }}>✕</i>
-                </span>
-                <b>{CAT_ICON[e.category] || "•"} {e.title || "untitled"}</b>
-                {e.place?.name && e.place.name !== e.title ? <small>{e.place.name}</small> : null}
-                <MealScreen entry={e} dietChips={dietChips} />
-              </div>
-            ))}
+            {bucket
+              .filter((e) => !proposal || (!proposedByDay || !Object.values(proposedByDay).some((ids) => ids.includes(e.id))))
+              .filter((e) => !alternateSet.has(e.id))
+              .map((e) => (
+                <DraggableBucketCard
+                  key={e.id} entry={e} onEdit={onEdit} onRemove={onRemove}
+                  dietChips={dietChips}
+                />
+              ))}
           </div>
         ) : null}
 
@@ -450,6 +650,15 @@ function FocusCity({ leg, days, byDay, stay, bucket, trip, onEdit, onRemove, onL
           {!bucket.length ? <span className="tw-plan-hint">booked &amp; dated things skip the bucket — they place themselves</span> : null}
         </div>
       </div>
-    </>
+
+      {/* DragOverlay — floating clone while dragging */}
+      <DragOverlay>
+        {activeEntry ? (
+          <div className={`tw-mini tw-drag-overlay cat-${activeEntry.category || "activity"}`}>
+            <b>{CAT_ICON[activeEntry.category] || "•"} {activeEntry.title || "untitled"}</b>
+          </div>
+        ) : null}
+      </DragOverlay>
+    </DndContext>
   );
 }

@@ -540,6 +540,95 @@
 .tw-summary .tw-meta { margin-top: 0; }
 .trip-context-name { font-family: var(--font-display); font-weight: 500; border: none; background: none; padding: 0; }
 
+/* ── Lay-out dealer: proposal/keep/undo, alternates row, drag-pause banner ── */
+
+/* The keep/undo bar — shown while a proposal is staged (deck §Lay out · the machine deals) */
+.tw-proposal-bar {
+  display: flex; align-items: center; gap: .5rem; flex-wrap: wrap;
+  padding: .45rem .7rem; margin: .3rem 0;
+  background: #e7f1ee; border: 1.5px solid #bcd8d0; border-radius: 9px;
+}
+.tw-proposal-label {
+  font-family: var(--font-ui); font-size: .76rem; font-weight: 700;
+  color: var(--accent); flex: 1 1 auto;
+}
+.tw-proposal-keep {
+  font-family: var(--font-ui); font-size: .76rem; font-weight: 700;
+  background: var(--accent); color: #fff; border: 0;
+  border-radius: 100px; padding: .3rem .9rem; cursor: pointer;
+}
+.tw-proposal-keep:hover { background: #0a3830; }
+.tw-proposal-undo {
+  font-family: var(--font-ui); font-size: .76rem; font-weight: 600;
+  background: none; color: var(--accent); border: 1px solid var(--accent);
+  border-radius: 100px; padding: .3rem .8rem; cursor: pointer;
+}
+.tw-proposal-undo:hover { background: rgba(13,76,68,.07); }
+
+/* Ghost / proposed cards — semi-transparent, dashed border, no pointer events */
+.tw-mini.tw-proposed {
+  opacity: .55; border-style: dashed; cursor: default; pointer-events: none;
+  background: rgba(231,241,238,.6);
+}
+
+/* Alternate cards — muted, still draggable */
+.tw-mini.tw-alternate {
+  opacity: .7; background: #f9f6f0; border-color: #c9c2b5;
+}
+
+/* "Didn't fit — alternates" row */
+.tw-alternates { margin: .55rem 0 .2rem; }
+.tw-alternates-head {
+  font-family: var(--font-ui); font-size: .68rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .1em; color: var(--muted);
+  margin-bottom: .35rem;
+}
+
+/* Day column drop-zone hover highlight */
+.tw-daycol-over {
+  background: #d8ece7 !important; border-color: var(--accent) !important;
+  outline: 2px dashed var(--accent); outline-offset: -2px;
+}
+
+/* Drag overlay (floating clone while dragging a bucket card) */
+.tw-drag-overlay {
+  box-shadow: 0 8px 24px rgba(13,76,68,.25); opacity: .92; cursor: grabbing;
+  pointer-events: none;
+}
+
+/* Dragging card in the bucket (hidden in place, showing overlay) */
+.tw-mini.tw-dragging { opacity: .25; }
+
+/* Pin indicator on placed entries (manually dropped entries get .tw-pinned-entry) */
+.tw-pinned-entry { border-left-width: 4px; }
+
+/* Paused banner — shown after a manual drag while a proposal is staged */
+.tw-layout-paused {
+  display: flex; align-items: center; gap: .5rem; flex-wrap: wrap;
+  padding: .35rem .65rem; margin: .25rem 0;
+  background: #fef5e8; border: 1px solid #dcc49a; border-radius: 8px;
+  font-family: var(--font-ui); font-size: .72rem; color: #8a5a16; font-weight: 600;
+}
+.tw-relayout {
+  font-family: var(--font-ui); font-size: .72rem; font-weight: 700;
+  background: none; color: #8a5a16; border: 1px solid #dcc49a;
+  border-radius: 100px; padding: .2rem .7rem; cursor: pointer;
+}
+.tw-relayout:hover { background: #fbf0e2; }
+
+/* Bucket-card drag grip (bucket cards, not day-entry sort grips) */
+.tw-mini .tw-grip {
+  float: left; margin-right: .3rem; cursor: grab; color: var(--muted);
+  font-size: .85rem; line-height: 1.4; touch-action: none; opacity: .5;
+}
+.tw-mini .tw-grip:hover { opacity: 1; color: var(--accent); }
+.tw-mini .tw-grip:active { cursor: grabbing; }
+
+@media (max-width: 640px) {
+  .tw-proposal-bar { flex-direction: column; align-items: flex-start; gap: .3rem; }
+  .tw-layout-paused { flex-direction: column; align-items: flex-start; }
+}
+
 /* ── Drag-to-reorder grip (#17, @dnd-kit) ── */
 .tw-grip { border: none; background: none; cursor: grab; color: var(--muted, #9a948a); font-size: 1rem; line-height: 1; padding: 0 .3rem 0 0; touch-action: none; opacity: .5; align-self: center; }
 .tw-grip:hover, .tw-grip:focus-visible { opacity: 1; color: var(--accent, #0d4c44); }

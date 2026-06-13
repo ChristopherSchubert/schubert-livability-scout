@@ -112,6 +112,18 @@ for vegetarian (your chips)"). Veg signal is honest-cited: `servesVegetarianFood
 Gathered places now carry their markers forward, so a saved veg spot reads veg ✓.
 The composer shows the effect inline when you toggle a diet chip.
 
+## Lay-out dealer (rank 10)
+
+"Lay out &lt;city&gt; →" is a dealer, not a blind spreader. `layOutLegPlan(leg,
+legDays, bucket, byDay, pinnedIds)` (pure, tested, in [lib/trip.js](../lib/trip.js))
+deals bucket items onto the emptiest open day first under a soft per-day capacity
+(4 normal / 2 on arrive-depart days — a presentational cue, never persisted);
+over-supply items become **alternates** ("didn't fit"), not casualties. TripPlan
+stages the result as a **proposal** (ghost placements + alternates row) with
+**✓ keep this layout** / **↶ undo** — nothing is written until kept. A @dnd-kit
+drag of a bucket card onto a day pins it and flips the panel to "Auto-layout
+paused — ↻ re-lay out around your pins". Empty bucket = no-op.
+
 ## Book page — deadline-driven actions (rank 9)
 
 The Book page is a **Needs-action / Booked** action surface, not a flat read-only
