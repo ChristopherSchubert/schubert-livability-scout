@@ -21,6 +21,7 @@ import { tripDays, entriesByDay, tripDietChips } from "../lib/trip";
 import { CAT_ICON, MealScreen } from "./atoms";
 import GatherBucket from "./GatherBucket";
 import TripWindow from "./TripWindow";
+import StaySearch from "./StaySearch";
 
 const legKey = (leg) => leg?.cityId || leg?.name || "";
 const cityName = (leg) => (leg?.name || "").split(",")[0] || "—";
@@ -41,6 +42,11 @@ export default function TripPlan({ trip, onEdit }) {
   const { addEntry, updateEntry, removeEntry } = useTrips();
   const [focus, setFocus] = useState(null); // legKey of the focused city, or null
   const [flightsOpen, setFlightsOpen] = useState(false);
+  // legKey whose hotel search is currently open in the overview stay bar.
+  // Clicking "Search hotels" on a bar focuses that leg AND opens StaySearch
+  // inline in FocusCity, so we just call setFocus — the search panel renders
+  // inside the focused view. The bar button triggers the focus transition.
+  const [staySearchLeg, setStaySearchLeg] = useState(null); // legKey
 
   const legs = trip.legs || [];
   const days = useMemo(() => tripDays(trip), [trip]);
@@ -103,6 +109,9 @@ export default function TripPlan({ trip, onEdit }) {
             bucket={bucketFor(focused)} trip={trip} onEdit={onEdit} onRemove={removeEntry}
             onLayOut={() => layOut(focused)} onAddOwn={() => addOwn(focused)}
             dietChips={dietChips}
+            staySearchOpen={staySearchLeg === legKey(focused)}
+            onOpenStaySearch={() => setStaySearchLeg(legKey(focused))}
+            onCloseStaySearch={() => setStaySearchLeg(null)}
           />
         </>
       ) : (
@@ -132,11 +141,24 @@ export default function TripPlan({ trip, onEdit }) {
           <div className="tw-staysrow">
             {legs.map((leg) => {
               const stay = stayFor(leg);
+              const lk = legKey(leg);
+              if (stay) {
+                // Filled stay bar: city + stay name, clicking focuses the leg.
+                return (
+                  <button key={lk} className="tw-staybar" style={{ flex: nights(leg) }}
+                          onClick={() => setFocus(lk)} aria-label={`Plan ${cityName(leg)}`}>
+                    <b>{cityName(leg)}</b>
+                    <small>{nights(leg)}n · 🛏 {stay.title.replace(/^Stay\s*—?\s*/i, "")}</small>
+                  </button>
+                );
+              }
+              // Empty stay bar: dashed, offers "🔍 Search hotels" affordance.
               return (
-                <button key={legKey(leg)} className="tw-staybar" style={{ flex: nights(leg) }}
-                        onClick={() => setFocus(legKey(leg))} aria-label={`Plan ${cityName(leg)}`}>
-                  <b>{cityName(leg)}</b>
-                  <small>{nights(leg)}n{stay ? " · 🛏" : ""}</small>
+                <button key={lk} className="tw-staybar tw-staybar-empty" style={{ flex: nights(leg) }}
+                        onClick={() => { setFocus(lk); setStaySearchLeg(lk); }}
+                        aria-label={`Search hotels for ${cityName(leg)}`}>
+                  <span className="tw-staybar-slot-btn">🔍 Search hotels</span>
+                  <small>{cityName(leg)} · {nights(leg)}n</small>
                 </button>
               );
             })}
@@ -148,17 +170,52 @@ export default function TripPlan({ trip, onEdit }) {
   );
 }
 
-// The focused city: its header, day columns, and the one bucket.
-function FocusCity({ leg, days, byDay, stay, bucket, trip, onEdit, onRemove, onLayOut, onAddOwn, dietChips }) {
+// The focused city: its header (with stay slot / StaySearch), day columns,
+// and the one bucket.
+function FocusCity({ leg, days, byDay, stay, bucket, trip, onEdit, onRemove, onLayOut, onAddOwn,
+                     dietChips, staySearchOpen, onOpenStaySearch, onCloseStaySearch }) {
   const open = days.length;
   const hours = bucket.length * HOURS_PER_ITEM;
   const ready = bucket.length >= Math.max(2, open);
+
+  // When a stay is just placed via StaySearch, open it in EntryEditor for
+  // booking details and close the search panel.
+  function handleStayPlaced(saved) {
+    onCloseStaySearch();
+    onEdit(saved);
+  }
+
   return (
     <>
       <div className="tw-focus-head">
         <b>{cityName(leg)}</b>
-        <span className="tw-meta">{leg.arrive} – {leg.depart} · {days.length}d{stay ? ` · ${stay.title.replace(/^Check in\s*—?\s*/i, "")}` : ""}</span>
+        <span className="tw-meta">{leg.arrive} – {leg.depart} · {days.length}d</span>
+        {stay ? (
+          <span className="tw-stay-placed">
+            🛏 <button className="tw-stay-name tw-clickable" onClick={() => onEdit(stay)}
+                        aria-label={`Edit stay: ${stay.title}`}>
+              {stay.title.replace(/^Stay\s*—?\s*/i, "")}
+            </button>
+            <button className="ee-mini" onClick={onOpenStaySearch} aria-label="Change hotel">
+              change hotel
+            </button>
+          </span>
+        ) : (
+          <button className="tw-add" onClick={onOpenStaySearch} aria-label={`Search hotels for ${cityName(leg)}`}>
+            🔍 Search hotels
+          </button>
+        )}
       </div>
+
+      {staySearchOpen ? (
+        <div className="ss-focus-wrap">
+          <div className="ss-focus-hd">
+            <span className="ss-focus-label">stays · {cityName(leg)} · {leg.arrive} – {leg.depart}</span>
+            <button className="ee-mini" onClick={onCloseStaySearch} aria-label="Close hotel search">✕ close</button>
+          </div>
+          <StaySearch trip={trip} leg={leg} onPlaced={handleStayPlaced} />
+        </div>
+      ) : null}
 
       <div className="tw-daycols-wrap">
         <div className="tw-daycols" style={{ gridTemplateColumns: `repeat(${Math.max(1, days.length)}, minmax(120px, 1fr))` }}>

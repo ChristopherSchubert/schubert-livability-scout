@@ -69,6 +69,21 @@ design source of truth.
   `lib/solve.js#solveDay`: booked/reserved-with-time PINNED, the rest placed by
   travel-aware nearest-neighbour, meals into meal windows.
 
+## Hotel search → place a stay (Janice #5)
+
+A leg with no stay offers **🔍 Search hotels** (empty stay bar / focus header).
+[StaySearch](../components/StaySearch.jsx) queries `hotels in <city>` via
+`/api/places/search` with `rich:true` — a higher-SKU field mask
+(`FIELD_MASK_RICH` in [place-resolve.js](../lib/place-resolve.js)) that adds
+`googleMapsUri,rating,userRatingCount`; the default mask (EntryEditor's picker)
+is untouched, so only hotel search pays the richer cost. Each result shows ★rating
+(count) + a prominent **↗ photos & reviews** link to the Google listing — Janice's
+ritual ("I POUR over reviews and photos"). **＋ use this stay** creates the stay
+entry on the leg and opens the EntryEditor for booking details (confirmation /
+cancel-by stay honest-null until entered). Follow-ups (commented in StaySearch):
+drag-onto-segment, ✂ split-a-stay. Local dev needs `GOOGLE_PLACES_API_KEY` in
+`.env.local` (mirrored from Keychain `google-places-api-key`); prod has it on Vercel.
+
 ## Chips screen meals (Janice #2)
 
 A traveler's **veg/vegan chip** isn't just a label — it screens meals (the

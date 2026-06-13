@@ -106,6 +106,47 @@
 .tw-staybar b { font-family: var(--font-display); font-size: .95rem; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .tw-staybar small { color: var(--muted); font-size: .72rem; }
 
+/* Empty stay bar (dashed, "Search hotels" affordance) */
+.tw-staybar-empty { border: 1.5px dashed var(--border) !important; border-left: 1.5px dashed var(--border) !important; background: rgba(210,230,225,.12) !important; flex-direction: column; align-items: flex-start; gap: .2rem; }
+.tw-staybar-empty:hover { border-color: var(--accent) !important; }
+.tw-staybar-slot-btn { font-family: var(--font-ui); font-size: .76rem; font-weight: 700; color: var(--accent); }
+
+/* Stay placed in focus-head */
+.tw-stay-placed { display: flex; align-items: center; gap: .35rem; flex-wrap: wrap; font-family: var(--font-ui); font-size: .82rem; color: var(--muted); }
+.tw-stay-name { font-family: var(--font-display); font-size: .9rem; font-weight: 500; color: var(--text); background: none; border: 0; padding: 0; cursor: pointer; }
+.tw-stay-name:hover { color: var(--accent); }
+
+/* StaySearch — hotel search panel (deck STAYS phase, Janice #5) */
+.ss-focus-wrap { border: 1.5px solid var(--border); border-radius: 10px; background: var(--panel); padding: .7rem .9rem; margin: .4rem 0 .6rem; }
+.ss-focus-hd { display: flex; align-items: center; justify-content: space-between; margin-bottom: .55rem; }
+.ss-focus-label { font-family: var(--font-ui); font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); }
+.ss-wrap { display: flex; flex-direction: column; gap: .4rem; }
+.ss-bar { display: flex; gap: .4rem; }
+.ss-input { flex: 1; font: inherit; font-size: .88rem; border: 1px solid var(--border); border-radius: 8px; padding: .38rem .6rem; background: var(--bg); }
+.ss-input:focus { outline: none; border-color: var(--accent); }
+.ss-go { font-family: var(--font-ui); font-size: .76rem; font-weight: 700; background: var(--accent); color: #fff; border: 0; border-radius: 8px; padding: .38rem .85rem; cursor: pointer; white-space: nowrap; }
+.ss-go:disabled { opacity: .5; cursor: default; }
+.ss-err { color: #a3431f; font-size: .76rem; margin: .1rem 0 0; }
+.ss-hint { font-size: .72rem; color: var(--muted); margin: .1rem 0 0; font-style: italic; }
+.ss-results { list-style: none; margin: .2rem 0 0; padding: 0; display: flex; flex-direction: column; gap: .3rem; }
+.ss-card { border: 1px solid var(--border); border-left: 4px solid #665285; border-radius: 8px; background: var(--bg); padding: .45rem .65rem; display: flex; align-items: flex-start; justify-content: space-between; gap: .7rem; flex-wrap: wrap; }
+.ss-card:hover { border-color: var(--accent); border-left-color: #665285; background: #f9fdf9; }
+.ss-card-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: .15rem; }
+.ss-name { font-weight: 600; font-size: .9rem; overflow-wrap: anywhere; }
+.ss-rating { font-family: var(--font-ui); font-size: .78rem; color: #8a5a16; font-weight: 600; }
+.ss-rcount { font-weight: 400; color: var(--muted); }
+.ss-addr { color: var(--muted); font-size: .72rem; }
+.ss-card-acts { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; flex-shrink: 0; }
+/* "↗ photos & reviews" — accent color per the spec */
+.ss-glink { font-family: var(--font-ui); font-size: .74rem; font-weight: 700; color: var(--accent); text-decoration: none; white-space: nowrap; }
+.ss-glink:hover { text-decoration: underline; }
+.ss-use { font-family: var(--font-ui); font-size: .72rem; font-weight: 700; background: var(--accent); color: #fff; border: 0; border-radius: 100px; padding: .22rem .7rem; cursor: pointer; white-space: nowrap; }
+.ss-use:disabled { opacity: .5; cursor: default; }
+@media (max-width: 640px) {
+  .ss-card { flex-direction: column; gap: .4rem; }
+  .ss-card-acts { flex-direction: row; }
+}
+
 /* Focused city: header + day columns + bucket */
 .tw-focus-head { display: flex; align-items: baseline; gap: .7rem; flex-wrap: wrap; margin: 1rem 0 .2rem; padding-bottom: .35rem; border-bottom: 1.5px solid var(--text); }
 .tw-focus-head b { font-family: var(--font-display); font-size: 1.2rem; }
