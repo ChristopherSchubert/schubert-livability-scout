@@ -1,11 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import Decide from "./Decide";
+import VisitReview from "./VisitReview";
 import AppShell from "./AppShell";
 import { usePlanner, usePlannerCity } from "./PlannerProvider";
 
-export default function DecideRoute({ slug }) {
+export default function VisitReviewRoute({ slug }) {
   const cityItem = usePlannerCity(slug);
   const { hydrated } = usePlanner();
   if (!cityItem) {
@@ -28,5 +28,5 @@ export default function DecideRoute({ slug }) {
       </AppShell>
     );
   }
-  return <Decide cityItem={cityItem} />;
+  return <VisitReview cityItem={cityItem} />;
 }

@@ -1,6 +1,6 @@
-import DecideRoute from "../../../../components/DecideRoute";
+import VisitReviewRoute from "../../../../components/VisitReviewRoute";
 
-export default async function CityDecidePage({ params }) {
+export default async function CityAssessPage({ params }) {
   const { slug } = await params;
-  return <DecideRoute slug={slug} />;
+  return <VisitReviewRoute slug={slug} />;
 }

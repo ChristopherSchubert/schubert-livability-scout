@@ -7,12 +7,13 @@ import SurveyFlow from "./SurveyFlow";
 import { usePlanner } from "./PlannerProvider";
 
 /**
- * Decide — the felt-score questionnaire for a candidate, run after a visit.
+ * VisitReview — the felt-score questionnaire for a place, run after a visit.
  * If not yet surveyed (or the user hits "Re-survey"), shows the facilitated
  * SurveyFlow. Otherwise shows the recorded result: the Gut score,
- * the five diagnostic axes, and the note.
+ * the five diagnostic axes, and the note. Closes on the kept "would you go
+ * back?" question — never a verdict on where to live.
  */
-export default function Decide({ cityItem }) {
+export default function VisitReview({ cityItem }) {
   const { updateCity } = usePlanner();
   const [editing, setEditing] = useState(false);
   const cityNav = defaultCityNav(cityItem, "assess");

@@ -1,10 +1,12 @@
 # Livability Scout — Project Guide
 
-A decision tool for finding a US place to live part-time that reproduces the
-lived feeling of Bled and Piran, Slovenia: walkable, nature-adjacent, real
-public life, alive year-round. It ranks candidate places to **visit**, then
-captures the owner's firsthand reaction after each visit. Final judgment
-happens on the ground.
+A tool for finding US places to **visit** that reproduce the lived feeling of
+Bled and Piran, Slovenia: walkable, nature-adjacent, real public life, alive
+year-round. It surfaces candidate destinations, helps plan a trip to each, and
+captures the owner's firsthand reaction afterward. This is a vacation /
+exploration app — find and enjoy places worth the trip. It is **not** a
+relocation or "where to live" decision tool: the kept post-visit question is
+"would we go back?", never a verdict on settling somewhere.
 
 ## The one rule that overrides everything
 
@@ -72,8 +74,10 @@ a pattern to copy.
    `metricTaxonomy` in `lib/planner-data.js`. Each metric has one canonical
    source. Filled only by the pipeline. Stored as `{ value, asOf }`.
 2. **Felt (subjective)** — `cityItem.survey`. Same 5 axes, scored 1–5 against
-   fixed anchors, plus a 0–10 **Slovenia score** — the regression target the
-   measured metrics aim to predict. Captured via `SurveyFlow` after a visit;
+   fixed anchors, plus a 0–10 **Gut score** (field key `survey.slovenia`; the
+   UI never says "Slovenia score") — the regression target the measured metrics
+   aim to predict, i.e. how well a place reproduces the feeling worth a return
+   trip. Captured via `SurveyFlow` after a visit;
    baselines on the Baseline tab. 5 felt axes ≪ 20 metrics on purpose:
    humans honestly distinguish a handful, not twenty. Machines do the rest.
 3. **Visit window** — `visitClimate` (NOAA normals), `crowdSeason`,

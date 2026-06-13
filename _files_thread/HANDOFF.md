@@ -1,5 +1,15 @@
 # Project Handoff — "The Slovenia Test" Location Scoring System
 
+> **⚠️ Superseded framing (reframed 2026-06-09).** This is the original
+> inception handoff and is kept as a historical record. The product has since
+> been reframed from a **relocation / "where to live" decision tool** into a
+> **vacation / exploration app**: find and enjoy US destinations worth the
+> trip, plan trips to them, and afterward ask only "would we go back?" — never
+> a verdict on settling somewhere. Where this document says "secondary home,"
+> "scout candidates," "ranks candidates," or "final judgment on the ground,"
+> read it as project archaeology, not current intent. Current framing lives in
+> [CLAUDE.md](../CLAUDE.md) and [features/candidate-funnel.md](../features/candidate-funnel.md).
+
 **Purpose of this document:** Hand off a quantitative location-scoring project to Claude Code (or any engineer) so it can be finished and run without re-deriving the reasoning. Read this top to bottom before touching code. The hard part of this project was *not* the code — it was figuring out what to measure and what *not* to fake. Those lessons are encoded below; please respect them.
 
 ---

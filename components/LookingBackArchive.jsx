@@ -6,8 +6,8 @@ import {
   cityImageQuery,
   cityStage,
   citySlug,
-  decisionLabel,
-  DECISION_VALUES,
+  revisitLabel,
+  REVISIT_OUTCOMES,
   weightedAxisScore,
 } from "../lib/planner-data";
 import AppShell from "./AppShell";
@@ -17,16 +17,16 @@ import { resolveImage, usePlanner } from "./PlannerProvider";
 // Equal-weight measured composite — same engine as Detail / Board.
 const EQUAL_WEIGHTS = { setting: 1, aliveness: 1, fabric: 1, realness: 1, january: 1 };
 
-const DECISIONS = DECISION_VALUES;
+const DECISIONS = REVISIT_OUTCOMES;
 
 /**
- * DecidedArchive — the page behind the Assessed stage.
+ * LookingBackArchive — the page behind the Assessed stage.
  *
  * Not a kanban column. A filterable look back at the places you've visited,
  * grouped by whether you'd go back: the ones you're returning to, the ones
  * worth a winter revisit, and the ones you're skipping.
  */
-export default function DecidedArchive() {
+export default function LookingBackArchive() {
   const { planner, imageState, hydrated } = usePlanner();
   const [filter, setFilter] = useState("All");
 
@@ -76,7 +76,7 @@ export default function DecidedArchive() {
                 className={`archive-chip${filter === option ? " active" : ""} ${chipClass(option)}`}
                 onClick={() => setFilter(option)}
               >
-                <span>{option === "All" ? "All" : decisionLabel(option)}</span>
+                <span>{option === "All" ? "All" : revisitLabel(option)}</span>
                 <span className="archive-chip-count">{counts[option]}</span>
               </button>
             ))}
@@ -103,7 +103,7 @@ export default function DecidedArchive() {
                       <header className="archive-head">
                         <Link className="archive-name" href={`/cities/${slug}/assess`}>{cityItem.name}</Link>
                         <span className="archive-score">{avg}</span>
-                        <span className={`decision-chip ${chipClass(decision)}`}>{decisionLabel(decision)}</span>
+                        <span className={`decision-chip ${chipClass(decision)}`}>{revisitLabel(decision)}</span>
                       </header>
                       {memo ? <p className="archive-memo">{truncate(memo, 220)}</p> : <p className="archive-memo archive-memo-empty">No memo recorded.</p>}
                     </div>

@@ -81,7 +81,7 @@ function useTabNav(navRef, activeSelector, dep) {
 
 // Which workflow-mode tab should light up when you're looking at a specific
 // city? The mode whose stage the city is currently sitting in. Used by the
-// Detail / Images routes (Visit / Decide override with a fixed mode).
+// Detail / Images routes (Visit / VisitReview override with a fixed mode).
 export function modeForCity(cityItem) {
   if (!cityItem) return "board";
   return STAGE_TO_MODE[cityStage(cityItem)] || "board";

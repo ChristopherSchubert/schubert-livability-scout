@@ -56,7 +56,7 @@ semantics), not eyeballed.
   the sort key and put full axis detail one tap deep.
 - **Global nav:** **top-scroller, not a bottom tab bar** (owner's call deferred
   to Claude — chose top-scroller to keep the editorial voice and avoid
-  all-day chrome on a part-time tool). Make both tab bars horizontally
+  all-day chrome on an occasional-use trip app). Make both tab bars horizontally
   scroll-aware with the active item auto-scrolled into view, and **collapse the
   global funnel on city pages** (the back-arrow already provides upward nav) so
   it's one bar, not two.
