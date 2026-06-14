@@ -254,7 +254,13 @@ mechanical or read-heavy work.
   from JS maps and never overwrites user-entered data (surveys, trips).
 - New metric → add to `metricTaxonomy` *with its source*. **Never add a
   metric without a citation.** The Detail page renders it automatically.
-- Dev server: `npm run dev` (port 3000). Tests: `npm test` runs the pure-logic
+- **Localhost ports: this project's claimed block is `38520–38539`** (base
+  38520, registered in `~/.claude/ports.md` per the global port-reservation
+  rule — never squat tool defaults like 3000). The Next.js dev server runs on
+  **38520**, the static `public/` server on **38521** (both bound in
+  `.claude/launch.json`). Run it with `npm run dev -- -p 38520`. Bind any new
+  local service inside the block.
+- Tests: `npm test` runs the pure-logic
   suite (`node:test`, `test/*.test.mjs`) + the component suite (Vitest +
   Testing Library, `test/components/*.test.jsx`); `npm run test:e2e` runs the
   Playwright critical-path E2E. Details: [features/testing.md](features/testing.md).
