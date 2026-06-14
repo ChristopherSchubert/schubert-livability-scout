@@ -75,6 +75,27 @@ These are **not** Travel's tickets; they gate our cutover steps. Filed/confirmed
 
 ---
 
+## Writer pre-flight — inputs the writer must have (not in tickets, by design)
+
+These are operational inputs (secrets / access / values), deliberately kept out of
+the backlog. The writer must have each in hand before the ticket that needs it.
+
+- **Only #88 is startable today.** Live as of 2026-06-14: all five `schubert-family#19`
+  deliverables are unchecked. #89 unblocks when the `travel` schema is exposed on the
+  Data API; #91 on Google-redirects + realtime-publication + members; #93 on the signing key.
+- **`schubert-family` credentials** (from owner/platform) — needed before #89/#92/#94:
+  `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY`
+  → Vercel + `.env.local`; the Postgres pooler **DB password** → macOS Keychain
+  (`supabase-db-password`) for the measurement pipeline (#92) and migrations.
+- **`NEXT_PUBLIC_HUB_URL` value** (from owner/platform) — needed for #88. Interim
+  `schubert-family.vercel.app`; post-cutover `schubertfamily.com`.
+- **Test service token + `FEED_SERVICE_TOKEN_SIGNING_KEY`** (interlock #5) — needed for #93.
+- **Read access to `ChristopherSchubert/schubert-family`** — to run
+  `conformance/check-feed.mjs` (#93) and reference `feed-contract.ts` + the
+  `platform.member` DDL / `current_member_id()` / `reconcile_member()` definitions (#90).
+- **Clean working tree** — the pre-existing WIP (`CLAUDE.md` + `components/`/`lib/` edits)
+  committed or stashed before #89's migrations, so migration commits stay narrow.
+
 ## File structure
 
 **Create:**
