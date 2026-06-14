@@ -40,6 +40,13 @@ session log, not a live figure.
 
 Ranked value × applicability × readiness ÷ effort, bugs first.
 
+> **Top priority (owner directive, 2026-06-14):** the **#84 family-hub platform
+> integration** epic is now #1 — it gets knocked out before any other in-flight
+> work. Plan: [features/platform-integration.md](features/platform-integration.md);
+> children #88–#94; dependency DAG + platform interlocks on #84. It's an auth +
+> production-DB migration, gated on owner sign-off and platform-side deliverables.
+> Everything below is sequenced *after* it.
+
 1. **#85 — Board score tooltip mislabels weight provenance** *(bug, data-quality)*.
    A card claims "equal weights" while showing a learned-weight score once ≥6
    places are surveyed. Wrong output / false provenance is the worst failure
@@ -62,7 +69,7 @@ Ranked value × applicability × readiness ÷ effort, bugs first.
 6. **#86 — E2E teardown guaranteed in CI** *(follow-up)*. Stops slow pollution of
    the shared Supabase from CI runs. Low urgency, real.
 
-**Held pending an owner decision:** #84 (platform / family-hub integration).
+**Now #1 (see the top note):** #84 — moved from held to top priority per the owner directive 2026-06-14.
 
 ## Decisions only the owner can make
 
@@ -75,10 +82,11 @@ These gate sequencing and can't be resolved from code or convention:
 2. **Slovenia trio price data** — build an EU price adapter (extend the SURS
    PxWeb path already used for ownership %) to fill `median_price_usd`, or leave
    it honest-`null`? Pure effort-vs-value call; null is acceptable.
-3. **#84 platform integration** — is the family-hub contract a now-priority or
-   parked? Product-direction call. It consolidates the database + identity into
-   the shared `schubert-family` Supabase project (schema-per-app) and is a larger,
-   lower-readiness piece.
+3. **#84 platform integration** — ✅ resolved 2026-06-14: now-priority (top of
+   queue). Contract questions answered by the platform steward; implementation
+   plan + children #88–#94 filed. Remaining owner gates: explicit sign-off on the
+   auth handoff + DB migration before any code; `schubert-travel` retirement stays
+   owner-only and deferred.
 
 ## Acceptance audit — 2026-06-14
 

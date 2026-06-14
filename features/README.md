@@ -26,6 +26,7 @@ docs are worse than no feature docs.
 | Baseline comparison (vs Allison Park) | [baseline-comparison.md](baseline-comparison.md) | stub — only in mockup |
 | Six blocks (curated walk list) | [six-blocks.md](six-blocks.md) | stub — data live, UI pending |
 | Deployment (Vercel auto-deploy from `main`) | [deployment.md](deployment.md) | documented |
+| Family-hub platform integration (#84 epic) | [platform-integration.md](platform-integration.md) | implementation plan — not started |
 | Candidate funnel (Board ⇄ Ranking + shared filters + ViewToggle) | [candidate-funnel.md](candidate-funnel.md) | stub — created 2026-06-09 |
 | Funnel board (5-stage kanban) | [candidate-funnel.md](candidate-funnel.md) | stub |
 | Calibrate (weighted ranking + learned weights) | [candidate-funnel.md](candidate-funnel.md) | stub |

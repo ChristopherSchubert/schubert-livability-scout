@@ -1,0 +1,246 @@
+# Family-Hub Platform Integration — Implementation Plan
+
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development
+> or superpowers:executing-plans to implement, task-by-task, with review checkpoints.
+> Steps use checkbox (`- [ ]`) syntax. **This is an auth + production-DB migration:
+> nothing here runs without the owner's explicit sign-off, and the cutover steps
+> interlock with platform-side deliverables (see "Platform interlocks").**
+
+**Goal:** Adopt the `schubert-family` platform contract (#84) — consolidate Travel's
+database into a `travel` schema in the shared Supabase project, move identity onto the
+platform's shared `auth.users` + member directory, and expose `GET /api/feed` — while
+keeping Travel's repo, Vercel deployment, and subdomain unchanged.
+
+**Architecture:** One shared Supabase project (`schubert-family`, `cigsjmoornigndaygqua`),
+schema-per-app (ADR 0001). Travel's tables live in a `travel` schema; the client is scoped
+to it via `db: { schema: 'travel' }`. Identity resolves through a thin local
+`travel.member` mirror (id = the platform member uuid, ADR 0003), synced from
+`platform.member`; every owner FK re-points at the mirror and every RLS policy is rewritten
+from `= auth.uid()` to `= (select platform.current_member_id())`. The feed is one stateless
+household-scoped endpoint the hub pulls with an HS256 service token.
+
+**Tech stack:** Next.js (app router), `@supabase/ssr` (`createBrowserClient`) + bare
+`@supabase/supabase-js` (server routes), Postgres/RLS, `pg` (measurement pipeline), zod.
+
+**Decision lineage:** the platform's own `docs/discovery/livability-findings.md` initially
+recommended *not* migrating Travel's schema ("leave it standalone, link from the
+dashboard"). **ADR 0001 + 0003 (accepted 2026-06-14) supersede that** — schema-per-app
+consolidation is the accepted decision. This plan implements the ADRs.
+
+---
+
+## Out of scope (firm)
+
+- **Retiring `schubert-travel` is NOT in this work.** It stays live as a fallback;
+  the owner decommissions it personally, ~weeks after cutover. The platform's
+  conformance gate explicitly excludes retirement.
+- Cross-app "sign-in once" SSO (parent-domain `.schubertfamily.com` cookie) is a
+  **post-cutover** capability (platform #6 proven / #16 cutover, gated on the domain
+  ~2026-06-16). Interim on `*.vercel.app`, each app signs in on its own origin.
+
+## Platform interlocks (deliverables the hub owes — track as blockers)
+
+These are **not** Travel's tickets; they gate our cutover steps. Filed/confirmed in
+`ChristopherSchubert/schubert-family`:
+
+1. **Google OAuth provider + redirect URLs configured on `schubert-family`'s Auth**
+   (provider creds are platform-owned; Travel never holds `GOOGLE_CLIENT_*`/`AUTH_SECRET`). → gates Ticket 4.
+2. **`travel` schema exposed on the project Data API.** → gates Tickets 2–6.
+3. **`travel` tables added to the `supabase_realtime` publication** (a DB-level action). → gates Ticket 4's realtime.
+4. **Chris + Janice pre-added to `platform.member`** (`status='active'`, with emails) so `reconcile_member()` email-matches on first sign-in. → gates Ticket 3 seeding + Ticket 4.
+5. **`FEED_SERVICE_TOKEN_SIGNING_KEY` provisioned + a service token issued** for conformance testing. → gates Ticket 6.
+6. **Contract docs reconciled** (the "RLS verbatim" wording, the seven-FK rule, token-rotation procedure) — informational; build against the corrected `/conformance` + `feed-contract.ts`.
+
+## Safety scaffolding (every ticket)
+
+- **Back up `schubert-travel` first** (`pg_dump` of all data) before any destructive step; keep `schubert-travel` running untouched.
+- **Free-tier note:** the org is on the Supabase free plan (2-project cap already hit). Supabase **branching may be unavailable** — develop migrations against a **local stack** (`supabase start`) or a scratch schema, verify, then apply forward-only to `schubert-family`. Confirm branch availability before relying on it.
+- **Narrow commits only** — stage exact paths (the tree carries unrelated WIP). **Pre-req: the existing uncommitted WIP (`CLAUDE.md` + several components) must be committed or stashed by the owner before this epic starts**, or migrations can't be cleanly committed.
+- Each task is test-first where there's testable code; migrations are verified by query + the conformance harness.
+
+---
+
+## File structure
+
+**Create:**
+- `supabase/migrations/0023_travel_schema.sql` — create `travel` schema, move/own all tables (or a documented `set search_path` strategy).
+- `supabase/migrations/0024_member_mirror.sql` — `travel.member` mirror + sync trigger/function.
+- `supabase/migrations/0025_repoint_fks.sql` — drop `profiles`/`handle_new_user`, re-point 7 FKs to `travel.member`.
+- `supabase/migrations/0026_rls_current_member.sql` — rewrite all RLS policies to `current_member_id()`.
+- `app/api/feed/route.js` — the household-scoped feed endpoint.
+- `lib/feed.js` — pure trip→card mapping (unit-tested).
+- `src/lib/env.schema.js` (or `lib/env.js`) — zod boot validator for required env.
+- `test/feed.test.mjs` — card-shape tests against the contract.
+- `.env.example` — renamed from `.env.local.example`, full key catalog.
+
+**Modify:**
+- `lib/supabase.js:16-26` — add `{ db: { schema: 'travel' } }`; re-point URL/key to `schubert-family`.
+- `app/api/dev-login/route.js`, `app/api/measure/route.js`, `app/api/walkthrough-feedback/route.js`, `lib/image-manifest.js:160` — add `db: { schema: 'travel' }` to each server `createClient`.
+- `lib/db.js:331-346` (`subscribeTrip`) — change `schema: "public"` → `schema: "travel"` on both `postgres_changes` listeners.
+- `components/AuthGate.jsx` — call `reconcile_member` on `SIGNED_IN`, then upsert the `travel.member` mirror row.
+- `lib/measurers/_db.js` — re-point `host`/`user` to `schubert-family`'s pooler; Keychain password; `set search_path = travel`.
+- `features/README.md` — index entry (this file).
+
+---
+
+## Ticket 1 — Env/config standardization + boot validator
+
+**Why first:** lowest-risk, mostly independent of the DB move, and de-risks every later
+ticket (a missing var is the classic cutover failure). Travel already prefers
+`NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` with an anon fallback and holds **no**
+`GOOGLE_CLIENT_*`/`AUTH_SECRET` (verified) — so this is mostly formalizing + a validator.
+
+**Files:** Create `lib/env.js`, `.env.example`; Modify `lib/supabase.js`.
+
+- [ ] Add a zod boot validator `lib/env.js` asserting: `NEXT_PUBLIC_SUPABASE_URL`,
+  `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY` (server), `NEXT_PUBLIC_HUB_URL`. Fail loudly at boot if missing.
+- [ ] Drop the `NEXT_PUBLIC_SUPABASE_ANON_KEY` fallback in `lib/supabase.js` once the publishable key is set in both `.env.local` and Vercel.
+- [ ] Rename `.env.local.example` → `.env.example`; document all ~13 real keys in the standard's section order (App / Database / Supabase / Integrations / Crypto / Local-dev). Add `NEXT_PUBLIC_HUB_URL`.
+- [ ] **Test:** boot the dev server with a var removed; expect the validator to throw a named error. With all present, expect normal boot.
+
+**Acceptance:**
+- [ ] Boot validator rejects a missing required var by name.
+- [ ] `.env.example` lists every key; no `GOOGLE_CLIENT_*`/`AUTH_SECRET` present (confirmed not needed).
+- [ ] `NEXT_PUBLIC_HUB_URL` added to `.env.local` + Vercel.
+
+## Ticket 2 — Port schema + migrate data into `schubert-family.travel`
+
+**Depends on:** interlock #2 (travel schema on Data API). Back up `schubert-travel` first.
+
+**Files:** Create `supabase/migrations/0023_travel_schema.sql`.
+
+- [ ] `pg_dump` all data from `schubert-travel` (schema + data) — archive it.
+- [ ] Author `0023`: `create schema if not exists travel;` then create every Travel table (cities, pois, poi_positions, the 7 per-user tables, walkthrough_feedback, etc.) in `travel`, porting the bodies of migrations 0001–0022. Keep RLS **off/old** for now; identity rewrite is Ticket 3.
+- [ ] Apply `0023` to `schubert-family` (local-stack-verified first).
+- [ ] Migrate data: load the non-user reference data (cities, pois, poi_positions, walkthrough_feedback) into `travel.*`. Per-user rows (`felt_surveys`, `baseline_ratings`, etc.) load with their **old** `schubert-travel` `user_id`s for now; Ticket 3 remaps them.
+- [ ] **Verify:** row counts match the `schubert-travel` source for every table (`select count(*)` parity).
+
+**Acceptance:**
+- [ ] `schubert-family.travel` has every Travel table with row-count parity to `schubert-travel`.
+- [ ] `schubert-travel` is untouched and still live.
+
+## Ticket 3 — Identity: member mirror + FK re-point + RLS rewrite
+
+**Depends on:** Ticket 2 + interlock #4 (Chris/Janice in `platform.member`). **The load-bearing ticket.**
+
+**Files:** Create `0024_member_mirror.sql`, `0025_repoint_fks.sql`, `0026_rls_current_member.sql`.
+
+- [ ] `0024`: create the mirror + sync.
+```sql
+create table travel.member (
+  id           uuid primary key,                 -- = platform.member.id
+  household_id uuid not null,
+  display_name text not null,
+  synced_at    timestamptz not null default now()
+);
+-- Sync helper: upsert the caller's platform member into the local mirror.
+create or replace function travel.sync_current_member()
+returns travel.member language plpgsql security definer set search_path = '' as $$
+declare m platform.member; r travel.member;
+begin
+  select * into m from platform.member where auth_user_id = auth.uid() and status='active' limit 1;
+  if not found then raise exception 'no active platform member for %', auth.uid(); end if;
+  insert into travel.member (id, household_id, display_name)
+    values (m.id, m.household_id, m.display_name)
+    on conflict (id) do update set household_id=excluded.household_id,
+      display_name=excluded.display_name, synced_at=now()
+    returning * into r;
+  return r;
+end $$;
+```
+- [ ] Seed the mirror: have Chris + Janice sign in once (post-Ticket-4) **or** seed both rows directly from `platform.member` by email. Build the remap map `old schubert-travel auth uid → email → platform.member.id` (emails come from the `schubert-travel` `auth.users` dump; only 2 users).
+- [ ] `0025`: remap each per-user table's owner column from the old auth uid to the matched `member.id`; **drop** `profiles` + `handle_new_user` + `on_auth_user_created`; re-point all seven FKs to `travel.member(id)`:
+  `felt_surveys.user_id`, `journal_entries.user_id`, `baseline_ratings.user_id`,
+  `user_weights.user_id`, `trips.user_id`, `trip_fork_comments.author_id`
+  (+ `trip_entries` is owner-via-subquery — no column, but its policy changes in `0026`).
+- [ ] `0026`: rewrite every policy. Pattern — replace `auth.uid()` with `(select platform.current_member_id())`:
+```sql
+-- example: felt_surveys
+drop policy "felt insert own" on travel.felt_surveys;
+create policy "felt insert own" on travel.felt_surveys for insert to authenticated
+  with check (user_id = (select platform.current_member_id()));
+-- ...repeat for update/delete and for journal_entries, baseline_ratings,
+-- user_weights, trips, trip_fork_comments (author_id), and:
+drop policy "trip_entries insert own" on travel.trip_entries;
+create policy "trip_entries insert own" on travel.trip_entries for insert to authenticated
+  with check (trip_id in (select id from travel.trips
+                          where user_id = (select platform.current_member_id())));
+-- ...update/delete likewise.
+```
+- [ ] **Test (TDD via two seeded members):** as Chris's session, insert/select own `felt_surveys` → allowed; attempt to read/write Janice's row → blocked. Repeat for `trips`/`trip_entries`. The per-user comparison (Chris vs Janice felt scores) must still hold.
+
+**Acceptance:**
+- [ ] All 11 policies + the `trip_entries` subquery resolve via `current_member_id()`; per-user isolation verified for both members.
+- [ ] `profiles` + `handle_new_user` dropped; all 7 FKs point at `travel.member`.
+- [ ] Existing rows remapped to the correct `member.id` (no orphaned owners).
+
+## Ticket 4 — App client + auth + realtime re-point
+
+**Depends on:** Tickets 2–3 + interlocks #1 (Google provider) and #3 (realtime publication).
+
+**Files:** Modify `lib/supabase.js`, the four server `createClient` sites, `lib/db.js:331-346`, `components/AuthGate.jsx`.
+
+- [ ] `lib/supabase.js`: `createBrowserClient(url, key, { db: { schema: 'travel' } })`; point `NEXT_PUBLIC_SUPABASE_URL`/key at `schubert-family` (in `.env.local` + Vercel).
+- [ ] Add `{ db: { schema: 'travel' } }` (or `auth: {...}, db: {...}`) to the bare `createClient` in `app/api/dev-login/route.js`, `app/api/measure/route.js`, `app/api/walkthrough-feedback/route.js`, `lib/image-manifest.js:160`.
+- [ ] `AuthGate.jsx`: on `SIGNED_IN`, call `await getSupabase().schema('platform').rpc('reconcile_member')` then `await getSupabase().schema('travel').rpc('sync_current_member')` before flipping the gate (so the mirror exists before any per-user read). Keep the existing `signInWithOAuth({provider:'google', redirectTo: window.location.origin})` — only the project it authenticates against changes.
+- [ ] `lib/db.js` `subscribeTrip`: change both `schema: "public"` → `schema: "travel"`.
+- [ ] **Verify in preview** (auth-bypass `/api/dev-login`): sign in, confirm the gate flips, a trip loads, an edit round-trips, and realtime fires (open two tabs).
+
+**Acceptance:**
+- [ ] Sign-in against `schubert-family` works; `reconcile_member` + mirror sync run; gate flips.
+- [ ] `/trips` reads/writes against `travel.*`; realtime updates propagate.
+- [ ] `dev-login` still works (localhost-only).
+
+## Ticket 5 — Re-point the local measurement pipeline
+
+**Depends on:** Ticket 2. (Independent of app auth.)
+
+**Files:** Modify `lib/measurers/_db.js`.
+
+- [ ] Re-point `host`/`user` to `schubert-family`'s pooler (`...pooler.supabase.com`, user `postgres.cigsjmoornigndaygqua`); store the new DB password in Keychain (service `supabase-db-password`); set `search_path = travel` on connect.
+- [ ] **Verify:** run one read-only measurer query against `schubert-family.travel` and confirm it returns a known city's row. Do **not** run a paid Google fetch.
+
+**Acceptance:**
+- [ ] The pipeline connects to `schubert-family.travel` and reads/writes a city row.
+- [ ] Keychain holds the new password; CLAUDE.md "two secret stores" note updated.
+
+## Ticket 6 — `GET /api/feed` + token verification + conformance
+
+**Depends on:** Ticket 3 (member/household) + interlock #5 (signing key/token).
+
+**Files:** Create `app/api/feed/route.js`, `lib/feed.js`, `test/feed.test.mjs`.
+
+- [ ] `lib/feed.js`: pure `tripsToCards(trips, { memberByTrip })` → cards matching `feed-contract.ts`: `{ key:'trip:<id>', kind:'countdown', title:'Trip to <name>', body:'<n> days away', event_at:start_date, deep_link:'<HUB or app>/trips/<id>', member_id: <member uuid | null=household-wide>, priority }`. ~1 card/trip. Summaries only — never raw rows.
+- [ ] **Test first** (`test/feed.test.mjs`): assert each card has non-empty `key`/`title`, `kind` ∈ enum, `member_id` is a uuid-or-null, `event_at` ISO — i.e. mirror `check-feed.mjs`'s assertions on sample trips.
+- [ ] `app/api/feed/route.js`: verify `Authorization: Bearer <token>` HS256 against `FEED_SERVICE_TOKEN_SIGNING_KEY`; reject tokenless calls; query the household's trips via `current_household_id()`; return `{ cards }`.
+- [ ] **Verify:** `node conformance/check-feed.mjs <preview-url>/api/feed <service-token>` exits 0 against a Travel preview.
+
+**Acceptance:**
+- [ ] `/api/feed` returns contract-valid cards (~1/trip), rejects tokenless calls, passes `check-feed.mjs`.
+- [ ] No raw data in any card (summaries only).
+
+## Ticket 7 — Cutover verification (no retirement)
+
+**Depends on:** Tickets 2–6 + all interlocks.
+
+- [ ] Run the full conformance checklist: client scoped to `travel`, identity native, `check-feed.mjs` green.
+- [ ] Verify **prod** (Vercel) signs in + reads/writes against `schubert-family`; verify the **local pipeline** measures; verify **realtime**; verify per-user isolation (Chris vs Janice).
+- [ ] Update `features/deployment.md` (new project, env), this doc's status, and CLAUDE.md (Supabase project ref, two-secret-stores note). **Leave `schubert-travel` live.**
+
+**Acceptance:**
+- [ ] Platform conformance bar met: (a) data in `schubert-family.travel`, (b) identity on the shared project, (c) feed passes.
+- [ ] Prod + pipeline + realtime + per-user isolation all verified post-cutover.
+- [ ] `schubert-travel` still live as fallback; retirement left to the owner.
+
+---
+
+## Self-review
+
+- **Spec coverage:** contract §1 identity → Tickets 3–4; §2 members/mirror → Ticket 3; §3 feed → Ticket 6; env standard → Ticket 1; realtime → Ticket 4; pipeline (Travel-specific) → Ticket 5; conformance → Tickets 6–7. The seven FKs + `trip_entries` subquery are all enumerated in Ticket 3.
+- **Interlocks:** each cutover ticket names its platform dependency; none assume platform work is done.
+- **Naming consistency:** `travel.member`, `platform.current_member_id()`, `platform.reconcile_member()`, `travel.sync_current_member()` used consistently across tickets.
+- **Out-of-scope guard:** retirement excluded in three places (header, out-of-scope, Ticket 7).
+
+## Follow-ups (tracked as GitHub issues)
+
+Child tickets of epic #84 — see the issue links added when filed.
