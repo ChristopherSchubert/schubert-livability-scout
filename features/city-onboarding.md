@@ -47,6 +47,22 @@ the actual heart — a wrong pin measures the wrong place.
 
 ### 3. Run the measurement pipeline
 
+**Prerequisite — populate the POI cache (FREE for US cities).** The
+`walking_core` measurer reads POIs from the unified `pois` cache; it does
+**not** fetch them. Fill a new US city for **$0** from local Overpass first:
+
+```bash
+node scripts/.fetch-pois-osm.mjs --slug <slug>     # source='osm', one query, free
+```
+
+⚠️ Do **not** reach for `scripts/.fetch-pois.mjs` (Google Places) by habit —
+it costs ~$3.22/city at the Enterprise SKU and is now behind a $25 cost gate.
+Use it only when you specifically want the trip UI's ratings/price for a city
+you're planning a trip to. The OSM populator skips any city already cached, so
+it's safe to re-run. Non-US places (Slovenia anchors) get zero from local
+Overpass — leave them on their existing Google cache. See
+[walking-core.md](walking-core.md#populating-the-poi-cache-cost-matters).
+
 One command, one entrypoint. The script iterates the measurer registry
 ([lib/measurers/_registry.js](../lib/measurers/_registry.js)) and runs every
 measurer for the city, idempotently — anything already populated is

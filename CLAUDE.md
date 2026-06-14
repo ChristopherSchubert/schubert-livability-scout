@@ -39,8 +39,12 @@ place-first language only. (2026-06-07: the owner pushed back hard on the
 
 ## ⛔ Overpass: local Docker only, no public fallback
 
-We run our own Overpass at `http://localhost:12345/api/interpreter` with
-the planet file loaded. Public mirrors silently return truncated bodies that
+We run our own Overpass at `http://localhost:12345/api/interpreter`. ⚠️ It
+holds a **US-only extract** (container `overpass-us`, geofabrik
+`north-america/us-updates` diff), **not** the planet — a query around Bled or
+any non-US place returns zero. Non-US places (the Slovenia anchors) can't be
+measured locally; keep them on their existing Google `pois` cache, or load a
+Europe extract first. Public mirrors silently return truncated bodies that
 look like "this town has zero cafés" (data-quality incidents 2026-06-04,
 2026-06-05). Rules:
 
@@ -137,8 +141,18 @@ force-pushes, column drops): confirm first.
 A city has a stay zone (polygon in `stay_zone_boundary`) and a measurement
 field. The field used to be a 700 m hard disk; as of 2026-06-08 it's a
 **plateau-decay walking core**: 500 m solid plateau (full credit) + 400 m
-decay constant + 1500 m outer cutoff. POI source is **Google Places** via
-the local `pois` cache, not OSM (OSM coverage was too thin). Per-POI
+decay constant + 1500 m outer cutoff. POI source is the unified local `pois`
+cache; the score reads only `{location, category}` per row and is
+**source-agnostic** (each row carries a `source`). Fill a new US city for
+**free** from OSM — `node scripts/.fetch-pois-osm.mjs --slug <slug>` (one
+Overpass query, no cost). Google Places (`scripts/.fetch-pois.mjs`) is the
+*paid* path — ~$3.22/city at the Enterprise SKU — kept only for cities where
+you want the trip-planning UI's ratings/price; it's now behind a **$25 cost
+gate** (`--yes` to override) after the 2026-06-14 ~$300 incident (a radius
+bump silently re-billed the whole atlas). A city must be filled from exactly
+**one** source — the OSM populator skips any city that already has cached rows
+so we never double-count or re-pay. (Earlier docs claimed "OSM coverage was
+too thin"; measured 2026-06-14, US OSM ≈ Google, median 0.95×.) Per-POI
 positions + decay weights are cached in `cities.poi_positions` so the chapter
 map can render the dots without a runtime API call.
 

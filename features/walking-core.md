@@ -180,18 +180,33 @@ Migration plan:
 3. **Drop the `_n` measurers and taxonomy entries.** Separate follow-up
    commit. Until then both round-trip transparently.
 
-## Re-running the measurement
+## Populating the POI cache (cost matters)
 
-After [bumping the POI cache to 1500 m](../scripts/.fetch-pois.mjs) (one-time):
+The score reads the unified `pois` cache and is **source-agnostic** — it only
+needs `{location, category}` per row. Two populators write the same table:
 
 ```sh
-node scripts/.fetch-pois.mjs --all              # refreshes Places cache
-node scripts/measure-cities.mjs --measurer walking_core --all
+# NEW US city — FREE (one local Overpass query, source='osm'):
+node scripts/.fetch-pois-osm.mjs --slug <slug>
+
+# Paid Google path — ~$3.22/city (Enterprise SKU). Only for cities where you
+# want the trip UI's ratings/price. Now behind a $25 cost gate:
+node scripts/.fetch-pois.mjs --slug <slug>           # --yes required above $25
 ```
 
-Single city:
+⚠️ **Never run `node scripts/.fetch-pois.mjs --all` (≈ $390) or `--force` to
+"refresh" the cache.** A POI cache is durable — we already paid for the 122
+cities in it. A methodology change (radius/decay) operates on the cache, it
+does **not** require re-billing Google. The 2026-06-14 ~$300 incident was a
+radius bump that silently re-fetched the whole atlas; the cost gate now blocks
+that. The OSM populator skips any city that already has cached rows, so it
+never double-counts or re-pays. Non-US places return zero from local Overpass
+(US-only extract) — keep the Slovenia anchors on their existing Google cache.
+
+Then (re)measure — reading the cache is free:
 
 ```sh
+node scripts/measure-cities.mjs --measurer walking_core --all
 node scripts/measure-cities.mjs --measurer walking_core --slug piran-slovenia
 ```
 

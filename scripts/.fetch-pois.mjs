@@ -169,6 +169,37 @@ if (slugArg) {
 // dense neighborhoods (Strip District, Squirrel Hill) with only partial data.
 // Default is to (re)fetch every requested city; the upsert is idempotent.
 const skipCached = argv.includes("--skip-cached");
+
+// ── Cost guardrail ──────────────────────────────────────────────────────────
+// Each city = (tiles × 2 passes) Google Nearby Search calls billed at the
+// Enterprise SKU. A full --all sweep across the atlas is a ~$400 event, and a
+// radius bump silently re-bills every cached city. So: estimate the spend up
+// front and REFUSE to run a costly sweep unless the caller types --yes. This is
+// the backstop against the 2026-06 incident where re-caching 122 cities at the
+// new 1500 m radius quietly cost ~$300. (Context: features/walking-core.md.)
+const COST_PER_CALL = 0.035; // Enterprise Nearby Search SKU, USD
+let tilesPerCity = 0;
+for (let dy = -RADIUS_M; dy <= RADIUS_M; dy += TILE_STEP)
+  for (let dx = -RADIUS_M; dx <= RADIUS_M; dx += TILE_STEP)
+    if (Math.hypot(dx, dy) <= RADIUS_M + TILE_R) tilesPerCity++;
+const callsPerCity = tilesPerCity * 2; // GOOGLE_TYPES pass + DAILY_TYPES pass
+const estCost = cities.length * callsPerCity * COST_PER_CALL;
+const COST_GATE = 25; // USD — above this, demand explicit --yes
+console.error(
+  `Plan: ${cities.length} cit${cities.length === 1 ? "y" : "ies"} × ${callsPerCity} Google calls ` +
+  `≈ $${estCost.toFixed(2)} (Enterprise SKU)${skipCached ? "; cached cities will be skipped" : ""}.`,
+);
+if (estCost > COST_GATE && !argv.includes("--yes")) {
+  console.error(
+    `\n⛔ Estimated spend $${estCost.toFixed(2)} exceeds the $${COST_GATE} gate.\n` +
+    `   This is real money. To proceed, re-run with --yes.\n` +
+    `   To cut cost: target specific slugs (--slug a,b,c) or add --skip-cached to\n` +
+    `   bill only the genuinely-new cities.`,
+  );
+  await client.end();
+  process.exit(2);
+}
+
 let total = 0;
 for (const city of cities) {
   if (skipCached && !force) {
