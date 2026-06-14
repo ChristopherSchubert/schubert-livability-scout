@@ -11,7 +11,7 @@ try {
     const m = line.match(/^(NEXT_PUBLIC_SUPABASE_URL|NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY)=(.*)$/);
     if (m) process.env[m[1]] = m[2].trim();
   }
-} catch { /* CI without .env.local — the spec skips its self-cleanup */ }
+} catch { /* No .env.local (e.g. CI) — the spec's teardown then fails loudly rather than leaking (#86). */ }
 
 // E2E critical-path tests (#44). Runs against the dev server (reused if already
 // up). The spec creates a NEW trip — owned by the dev-login user — so writes
@@ -25,14 +25,15 @@ module.exports = defineConfig({
   retries: 0,
   reporter: [["list"]],
   use: {
-    baseURL: "http://localhost:3000",
+    // This project's claimed port block is 38520–38539 (never 3000; see CLAUDE.md).
+    baseURL: "http://localhost:38520",
     headless: true,
     trace: "on-first-retry",
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
   webServer: {
-    command: "npm run dev",
-    url: "http://localhost:3000",
+    command: "npm run dev -- -p 38520",
+    url: "http://localhost:38520",
     reuseExistingServer: true,
     timeout: 120_000,
   },
