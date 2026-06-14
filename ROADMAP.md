@@ -45,9 +45,12 @@ Ranked value × applicability × readiness ÷ effort, bugs first.
 > work. Plan: [features/platform-integration.md](features/platform-integration.md);
 > children #88–#94; dependency DAG + platform interlocks on #84. It's an auth +
 > production-DB migration, gated on owner sign-off and platform-side deliverables.
-> **Phasing open** (pending the platform PM): owner approved the auth design but not
-> the timing — it may be all-in-one now, or feed-first (#88+#93) with the DB+auth
-> consolidation (#89–#92) deferred to a later phase. Everything below is *after* it.
+> **Phasing decided** (platform steward, 2026-06-14): **(A) all-in-one now** — plan
+> #88–#94 accepted as written; interlocks tracked as platform `schubert-family#19`.
+> #88 (env) is unblocked now; #89 unblocks when the `travel` schema is exposed on the
+> Data API. ⚠️ Auth+DB *implementation* go still pending the owner's **direct**
+> confirmation (the steward asserts sign-off; owner told Travel timing was open).
+> Everything below is *after* it.
 
 1. **#85 — Board score tooltip mislabels weight provenance** *(bug, data-quality)*.
    A card claims "equal weights" while showing a learned-weight score once ≥6

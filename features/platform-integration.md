@@ -38,23 +38,19 @@ consolidation is the accepted decision. This plan implements the ADRs.
   **post-cutover** capability (platform #6 proven / #16 cutover, gated on the domain
   ~2026-06-16). Interim on `*.vercel.app`, each app signs in on its own origin.
 
-## Phasing (OPEN — pending the platform PM; owner approves the design, not the timing)
+## Phasing — DECIDED (A) all-in-one (platform steward, 2026-06-14)
 
-The owner signed off on the auth/identity design but left the **timing** open
-("this pass or phase 2"). Two facts shape the options:
-- **DB-move + auth-move are coupled** — one shared project ⇒ one `auth.users`, so
-  Tickets 2 (schema/data) + 3 (identity/RLS) + 4 (app/auth) move together or not at all.
-- **The feed decouples** — Ticket 6 can ship *now* from the current `schubert-travel`
-  DB with household-wide cards (`member_id: null`), no DB/auth change (the discovery
-  doc's "thin integration").
+The platform steward chose **(A) full consolidation this pass** (over feed-first):
+Travel is the reference integration that proves identity/member/RLS end-to-end
+before Finance adopts. Plan #88–#94 accepted as written; critical path
+#89→#90→{#91,#93}→#94 confirmed; #90 (mirror + FK re-point + the
+`owner = (select current_member_id())` rewrite) is the load-bearing one the steward
+will audit closely.
 
-So the live options, raised with the platform PM on #84:
-- **(A) All-in-one now** — Tickets 1–7 this pass.
-- **(B) Feed-first** — Tickets 1 + 6 now (feed, household-wide); defer 2–5 to a
-  later phase (e.g. alongside #16's domain cutover + cross-app SSO). Only interlocks
-  #2 and #5 needed near-term under (B).
-
-**Do not start Tickets 2–5 until the phasing is settled.**
+⚠️ **Travel-side gate still open:** the steward's comment states the owner signed off
+on the auth + DB migration for this pass, but the owner told the Travel PM directly
+that the timing was undecided. **Confirm the owner's direct go on the auth+DB
+migration before starting #89–#92.** #88 (env, no auth/DB) is unblocked now.
 
 ## Platform interlocks (deliverables the hub owes — track as blockers)
 
@@ -64,14 +60,14 @@ These are **not** Travel's tickets; they gate our cutover steps. Filed/confirmed
 1. **Google OAuth provider + redirect URLs configured on `schubert-family`'s Auth**
    (provider creds are platform-owned; Travel never holds `GOOGLE_CLIENT_*`/`AUTH_SECRET`). → gates Ticket 4.
 2. **`travel` schema exposed on the project Data API.** → gates Tickets 2–6.
-3. **`travel` tables added to the `supabase_realtime` publication** (a DB-level action). → gates Ticket 4's realtime.
+3. **`travel` tables added to the `supabase_realtime` publication** — specifically **`travel.trips` and `travel.trip_entries`** (the only tables `subscribeTrip` listens to). → gates Ticket 4's realtime. Tracked as platform `schubert-family#19`.
 4. **Chris + Janice pre-added to `platform.member`** (`status='active'`, with emails) so `reconcile_member()` email-matches on first sign-in. → gates Ticket 3 seeding + Ticket 4.
 5. **`FEED_SERVICE_TOKEN_SIGNING_KEY` provisioned + a service token issued** for conformance testing. → gates Ticket 6.
 6. **Contract docs reconciled** (the "RLS verbatim" wording, the seven-FK rule, token-rotation procedure) — informational; build against the corrected `/conformance` + `feed-contract.ts`.
 
 ## Safety scaffolding (every ticket)
 
-- **Back up `schubert-travel` first** (`pg_dump` of all data) before any destructive step; keep `schubert-travel` running untouched.
+- **The host move is ADDITIVE — copy, never move; never `DROP`.** Now canonical in the platform `/conformance`: create `schubert-family.travel`, **copy** the data, re-point + verify, then run on it. **No migration in this work may `DROP` `schubert-travel` or its objects** — it is the rollback path and stays live until the owner retires it by hand. `pg_dump` a backup first anyway.
 - **Free-tier note:** the org is on the Supabase free plan (2-project cap already hit). Supabase **branching may be unavailable** — develop migrations against a **local stack** (`supabase start`) or a scratch schema, verify, then apply forward-only to `schubert-family`. Confirm branch availability before relying on it.
 - **Narrow commits only** — stage exact paths (the tree carries unrelated WIP). **Pre-req: the existing uncommitted WIP (`CLAUDE.md` + several components) must be committed or stashed by the owner before this epic starts**, or migrations can't be cleanly committed.
 - Each task is test-first where there's testable code; migrations are verified by query + the conformance harness.
