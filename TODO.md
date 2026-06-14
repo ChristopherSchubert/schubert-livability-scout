@@ -3,6 +3,12 @@
 Six sessions on this project got cut off mid-work. One entry per session,
 with where we left off and the next move. (2026-06-03 sweep.)
 
+> **Note (2026-06-14):** the "78" city counts below are a 2026-06-03 snapshot of
+> the **candidate destinations** and are now stale. Live ground truth is **122
+> measured places** (78 candidates + 3 Slovenia anchors + ~41 later additions),
+> tracked in [METRICS_COMPLETION.md](METRICS_COMPLETION.md). Cross-backlog
+> sequencing lives in [ROADMAP.md](ROADMAP.md).
+
 ## 1. Missing city metrics — IN PROGRESS
 
 **Where we left off (resumed 2026-06-03 ~18:00):** Local Overpass import was
