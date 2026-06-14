@@ -12,6 +12,14 @@ Two lenses on the **same** candidate set, switched by a shared toggle:
     in [`workspace.css`](../app/workspace.css) now reserves 3 lines
     (`min-height` + `-webkit-line-clamp: 3`) so every filled column's header
     is the same height and the first cards line up.
+  - **Score badge provenance (#85).** Each card shows the city's Overall
+    measured score; its tooltip names the *actual* weighting in effect —
+    "equal weights" below the learned threshold, "learned weights" once ≥6
+    places are surveyed. It used to hardcode "equal weights" and silently
+    mislabel learned-weight scores. The card lives in
+    [`FunnelCard.jsx`](../components/FunnelCard.jsx), extracted from the board so
+    it renders and is tested in isolation
+    ([`test/components/FunnelCard.test.jsx`](../test/components/FunnelCard.test.jsx)).
   - **Drag is desktop-only convenience; the buttons are the real mechanism
     (#59/#60).** Native HTML5 DnD doesn't fire on touch, and only Backlog and
     Planning are valid drop targets anyway (the later stages are data-gated).

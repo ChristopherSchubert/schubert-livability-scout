@@ -4,19 +4,17 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import {
   STAGES,
-  STAGE_INDEX,
-  cityImageQuery,
   cityStage,
   citySlug,
-  revisitLabel,
   learnedAxisWeights,
   visitNowScore,
   weightedAxisScore,
 } from "../lib/planner-data";
 import AppShell from "./AppShell";
+import { CityCard } from "./FunnelCard";
 import FunnelHeader from "./FunnelHeader";
 import { WorkspaceLoading } from "./Loading";
-import { appendBust, resolveImage, usePlanner } from "./PlannerProvider";
+import { usePlanner } from "./PlannerProvider";
 import ViewToggle from "./ViewToggle";
 import {
   CityFilterDrawer,
@@ -182,6 +180,7 @@ export default function FunnelBoard({ focusStage }) {
                         cityItem={cityItem}
                         imageState={imageState}
                         weights={boardWeights}
+                        usingLearnedWeights={Boolean(learned.weights)}
                         onOpen={() => router.push(`/cities/${citySlug(cityItem)}`)}
                         onAdvance={() => advanceCityStage(cityItem.id)}
                         onSendBack={() => setCityStage(cityItem.id, "backlog")}
@@ -200,58 +199,6 @@ export default function FunnelBoard({ focusStage }) {
 
       <CityFilterDrawer filters={filters} options={options} />
     </AppShell>
-  );
-}
-
-// Compact draggable kanban card.
-function CityCard({ cityItem, imageState, weights, onOpen, onAdvance, onSendBack, onDragStart, onDragEnd, stage }) {
-  const heroQuery = cityImageQuery(cityItem.name, cityItem.stayZone, cityItem.heartIntersection);
-  const heroSrc = resolveImage(cityItem.heroImage, heroQuery, imageState);
-  const cardWeights = weights || EQUAL_WEIGHTS;
-  const score = weightedAxisScore(cityItem, cardWeights);
-  const stageId = stage || cityStage(cityItem);
-  const isAssessed = stageId === "assessed";
-  // Only Backlog → Planning is a free one-click advance. Planning→Planned,
-  // Planned→Visited, Visited→Assessed each need data entered on their own page,
-  // so the Board offers no advance button for them.
-  const canAdvanceFreely = stageId === "backlog";
-  const nextStage = STAGES[STAGE_INDEX[stageId] + 1];
-  const advanceLabel = nextStage ? `${nextStage.label} →` : null;
-
-  return (
-    <article
-      className={`funnel-card stage-${stageId}`}
-      draggable
-      onDragStart={onDragStart}
-      onDragEnd={onDragEnd}
-    >
-      <button type="button" className="funnel-card-body" onClick={onOpen}>
-        <div className="funnel-card-hero">
-          {heroSrc
-            ? <img className="funnel-card-image" src={appendBust(heroSrc, imageState.version)} alt="" />
-            : <div className="funnel-card-placeholder" aria-hidden="true">{cityItem.name.slice(0, 1)}</div>}
-          <span className="funnel-card-score" title="Overall measured score (equal weights)">{score != null ? score.toFixed(1) : "—"}</span>
-        </div>
-        <div className="funnel-card-copy">
-          <strong>{cityItem.name}</strong>
-          <span className="funnel-card-meta">{cityItem.stayZone || "—"}</span>
-        </div>
-      </button>
-      <footer className="funnel-card-foot">
-        {isAssessed ? (
-          <span className={`decision-chip ${cityItem.decision?.toLowerCase().replace(/\s+/g, "-") || "assessed"}`}>{revisitLabel(cityItem.decision)}</span>
-        ) : (
-          <>
-            {stageId !== "backlog" ? (
-              <button type="button" className="ghost" onClick={onSendBack} title="Send back to Backlog">← Backlog</button>
-            ) : <span aria-hidden="true" />}
-            {canAdvanceFreely
-              ? <button type="button" className="advance" onClick={onAdvance} title={`Move to ${nextStage?.label || "next stage"}`}>{advanceLabel}</button>
-              : <span aria-hidden="true" />}
-          </>
-        )}
-      </footer>
-    </article>
   );
 }
 
