@@ -269,20 +269,20 @@ mechanical or read-heavy work.
 ## Verifying in the preview (auth bypass)
 
 The app is Supabase-auth-gated. To drive the preview, use `/api/dev-login` —
-hard-disabled in production, mints a real session from `DEV_LOGIN_EMAIL` /
-`DEV_LOGIN_PASSWORD` in `.env.local`. Two ways in:
+hard-disabled in production. It mints a real session for `DEV_LOGIN_EMAIL` via
+the **service-role** key (`SUPABASE_SECRET_KEY` in `.env.local`,
+`generateLink` → `verifyOtp`), so it works even with email/password sign-in
+disabled (sign-in is Google-only; #87). `DEV_LOGIN_PASSWORD` is no longer used.
 
-1. **Form rendered** — `preview_click` on `button.auth-ghost` ("Dev
-   sign-in"). AuthGate's `devSignIn()` handles the rest.
-2. **Stuck on "Loading…"** — call the endpoint and adopt the session:
-   ```js
-   const r = await fetch('/api/dev-login', { method: 'POST' });
-   const { access_token, refresh_token } = await r.json();
-   await window.__supabase?.auth.setSession({ access_token, refresh_token });
-   location.reload();
-   ```
-   Do **not** hand-craft the `sb-<ref>-auth-token` localStorage entry —
-   `getSession()` will hang refreshing a session it didn't mint.
+**Sign in:** `preview_click` on `button.auth-ghost` ("Dev sign-in (localhost
+only)") on the auth gate. AuthGate's `devSignIn()` POSTs the endpoint and adopts
+the session through the app's own Supabase client; `onAuthStateChange` flips the
+gate to the workspace.
+
+There is **no `window.__supabase` global** — the browser client lives inside
+React (`getSupabase()`), so adopt sessions through the button, not an injected
+global. (Don't hand-craft the `sb-<ref>-auth-token` localStorage/cookie entry
+either — `getSession()` will hang refreshing a session it didn't mint.)
 
 `preview_logs` showing `FATAL: Turbopack ... Next.js package not found`
 means the dev server is broken (SSR still returns 200; React never

@@ -112,9 +112,13 @@ Settings → Environment Variables — not just Production. A preview deploy mis
   `DEV_LOGIN_EMAIL`, `DEV_LOGIN_PASSWORD`.
 - If you add a new env var, it must be added in **both** places (`.env.local`
   for dev, Vercel dashboard for prod) or the live build/runtime will break.
-- `DEV_LOGIN_*` powers the localhost-only `/api/dev-login` auth bypass. The
-  endpoint is hard-disabled in production (`NODE_ENV === "production"`), so it's
-  inert live even though the vars exist there.
+- `DEV_LOGIN_EMAIL` + `SUPABASE_SECRET_KEY` power the localhost-only
+  `/api/dev-login` auth bypass — it mints a session for the dev user via the
+  service-role admin API (`generateLink` → `verifyOtp`), so it survives
+  email/password sign-in being disabled (#87). `DEV_LOGIN_PASSWORD` is now
+  unused. The endpoint is hard-disabled in production
+  (`NODE_ENV === "production"`), so it's inert live even though the vars exist
+  there.
 
 ### Secrets: macOS Keychain (local pipeline) vs Vercel (prod runtime)
 
