@@ -4,14 +4,14 @@
     {
       "name": "Next.js dev server",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
-      "port": 3000
+      "runtimeArgs": ["run", "dev", "--", "-p", "38520"],
+      "port": 38520
     },
     {
       "name": "Static public folder",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "8765", "--directory", "public"],
-      "port": 8765
+      "runtimeArgs": ["-m", "http.server", "38521", "--directory", "public"],
+      "port": 38521
     }
   ]
 }
