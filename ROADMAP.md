@@ -48,9 +48,8 @@ Ranked value × applicability × readiness ÷ effort, bugs first.
 > **Phasing decided** (platform steward, 2026-06-14): **(A) all-in-one now** — plan
 > #88–#94 accepted as written; interlocks tracked as platform `schubert-family#19`.
 > #88 (env) is unblocked now; #89 unblocks when the `travel` schema is exposed on the
-> Data API. ⚠️ Auth+DB *implementation* go still pending the owner's **direct**
-> confirmation (the steward asserts sign-off; owner told Travel timing was open).
-> Everything below is *after* it.
+> Data API. ✅ Auth+DB go **confirmed by the owner** (2026-06-14), absolute condition:
+> **never delete `schubert-travel`** (copy-only; it's the rollback). Everything below is *after* it.
 
 1. **#85 — Board score tooltip mislabels weight provenance** *(bug, data-quality)*.
    A card claims "equal weights" while showing a learned-weight score once ≥6

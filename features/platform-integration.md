@@ -47,10 +47,11 @@ before Finance adopts. Plan #88–#94 accepted as written; critical path
 `owner = (select current_member_id())` rewrite) is the load-bearing one the steward
 will audit closely.
 
-⚠️ **Travel-side gate still open:** the steward's comment states the owner signed off
-on the auth + DB migration for this pass, but the owner told the Travel PM directly
-that the timing was undecided. **Confirm the owner's direct go on the auth+DB
-migration before starting #89–#92.** #88 (env, no auth/DB) is unblocked now.
+✅ **Travel-side gate cleared (owner, 2026-06-14):** the owner gave direct go on
+**(A) all-in-one** — the auth handoff + DB migration this pass — with one **absolute,
+non-negotiable condition: never delete the existing `schubert-travel` database.**
+Copy-only, re-point, verify; it stays live as the rollback and the owner retires it
+by hand. #88 starts now; #89–#92 proceed as `schubert-family#19` interlocks land.
 
 ## Platform interlocks (deliverables the hub owes — track as blockers)
 
