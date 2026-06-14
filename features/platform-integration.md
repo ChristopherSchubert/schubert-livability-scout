@@ -38,6 +38,24 @@ consolidation is the accepted decision. This plan implements the ADRs.
   **post-cutover** capability (platform #6 proven / #16 cutover, gated on the domain
   ~2026-06-16). Interim on `*.vercel.app`, each app signs in on its own origin.
 
+## Phasing (OPEN — pending the platform PM; owner approves the design, not the timing)
+
+The owner signed off on the auth/identity design but left the **timing** open
+("this pass or phase 2"). Two facts shape the options:
+- **DB-move + auth-move are coupled** — one shared project ⇒ one `auth.users`, so
+  Tickets 2 (schema/data) + 3 (identity/RLS) + 4 (app/auth) move together or not at all.
+- **The feed decouples** — Ticket 6 can ship *now* from the current `schubert-travel`
+  DB with household-wide cards (`member_id: null`), no DB/auth change (the discovery
+  doc's "thin integration").
+
+So the live options, raised with the platform PM on #84:
+- **(A) All-in-one now** — Tickets 1–7 this pass.
+- **(B) Feed-first** — Tickets 1 + 6 now (feed, household-wide); defer 2–5 to a
+  later phase (e.g. alongside #16's domain cutover + cross-app SSO). Only interlocks
+  #2 and #5 needed near-term under (B).
+
+**Do not start Tickets 2–5 until the phasing is settled.**
+
 ## Platform interlocks (deliverables the hub owes — track as blockers)
 
 These are **not** Travel's tickets; they gate our cutover steps. Filed/confirmed in

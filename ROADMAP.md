@@ -45,7 +45,9 @@ Ranked value × applicability × readiness ÷ effort, bugs first.
 > work. Plan: [features/platform-integration.md](features/platform-integration.md);
 > children #88–#94; dependency DAG + platform interlocks on #84. It's an auth +
 > production-DB migration, gated on owner sign-off and platform-side deliverables.
-> Everything below is sequenced *after* it.
+> **Phasing open** (pending the platform PM): owner approved the auth design but not
+> the timing — it may be all-in-one now, or feed-first (#88+#93) with the DB+auth
+> consolidation (#89–#92) deferred to a later phase. Everything below is *after* it.
 
 1. **#85 — Board score tooltip mislabels weight provenance** *(bug, data-quality)*.
    A card claims "equal weights" while showing a learned-weight score once ≥6
