@@ -41,3 +41,9 @@ public/visit-board-redesign.html
 /playwright-report/
 /blob-report/
 /.playwright/
+.vercel
+
+# Legacy local hero images. Prod reads cities.hero_image from Supabase Storage;
+# these repo copies are unused (#75). 76 older files remain tracked in history;
+# this ignores newly-generated per-city dirs so they stop accreting as untracked.
+public/assets/images/cities/
