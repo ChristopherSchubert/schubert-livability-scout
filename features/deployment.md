@@ -9,10 +9,12 @@ How Livability Scout gets from a `git push` to the live site your wife sees.
 - **Production URL: `https://travel.schubertfamily.com`** (custom domain, live).
   The Vercel-assigned `https://schubert-travel.vercel.app` still resolves and
   serves the same deployment — keep it as a fallback / for previews.
-- **Preprod URL: `https://schubert-travel-preview.vercel.app`** (pinned in
-  Vercel to the `preview` branch). The custom `travel-preview.schubertfamily.com`
-  CNAME hasn't been added at GoDaddy yet — when it lands, point Vercel at it the
-  same way the prod domain works today.
+- **Preprod URL: `https://travel-preview.schubertfamily.com`** (custom domain,
+  live; pinned in Vercel to the `preview` branch). **Auth-gated by Vercel
+  Deployment Protection — by design** (sits behind a Vercel sign-in wall;
+  reviewers/teammates need a Vercel team invite to access). Don't disable. The
+  `.vercel.app` host `https://schubert-travel-preview.vercel.app` still resolves
+  and serves the same branch as a fallback.
 - The older `https://schubert-livability-scout.vercel.app` (the GitHub repo's
   `homepage` field) still resolves; retire it now that the `travel`/`schubert-travel`
   naming is settled and update `homepage` to match.
@@ -21,9 +23,7 @@ How Livability Scout gets from a `git push` to the live site your wife sees.
 ### Custom domains
 
 Both custom domains are subdomains of `schubertfamily.com`, whose DNS lives at
-the **GoDaddy** registrar (not Vercel). Each is one `CNAME`. `travel` is live;
-`travel-preview` is the still-pending preprod CNAME (add at GoDaddy + Vercel
-when ready):
+the **GoDaddy** registrar (not Vercel). Each is one `CNAME`. Both are live:
 
 | Type | Name (host) | Value | Vercel → Git Branch |
 |---|---|---|---|
