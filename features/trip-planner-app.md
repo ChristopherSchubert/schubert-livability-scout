@@ -333,6 +333,22 @@ hotel) lives in the **city cards** below the bar, not on it. Unblocks #34
 > `trip-planner-critique.md`) still describe the earlier date-ribbon / stay-bar
 > window and want a reconciliation pass.
 
+## Region/state chips (#79)
+
+A trip carries an explicit set of geographic tags — `trips.regions` jsonb
+(`[{ label, kind: state|region, lat, lon, source? }]`, migration 0023). They
+render as chips under the spine ([TripRegions](../components/TripRegions.jsx)):
+info-blue for a typed region, neutral for a state / leg-derived tag. Adding one
+geocodes free text via `/api/places/search` and keeps only geographic results
+(`isGeographicPlace` in [lib/places.js](../lib/places.js), shared with the
+cold-start trip-name anchor) — a result with no center yields no chip
+(never-invent). Chip centers join the leg cities as **suggestion anchors** for
+the scout tray (`legs ∪ chips`), so a trip tagged "Hudson River Valley" grounds
+its suggestions there even before any leg is added.
+
+Follow-ups on #79: the cross-trip `/trips` region filter, and optional
+auto-seeding a leg's state as a `source: "leg"` chip.
+
 Verified in-browser on the Slovenia trip: 2 handles between Ljubljana/Bled/Piran;
 a pointer drag previewed then committed Bled 4n→6n / Piran 5n→3n; the keyboard
 nudge moved one day and clamped Ljubljana at its 1-day floor; reload confirmed

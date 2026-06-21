@@ -33,9 +33,11 @@ import { useTrips } from "./TripProvider";
 import { usePlanner } from "./PlannerProvider";
 import { tripDays, entriesByDay, tripDietChips, layOutLegPlan } from "../lib/trip";
 import { appendCityLeg, daysBetween, nearestCities } from "../lib/trip-window";
+import { isGeographicPlace } from "../lib/places";
 import { CAT_ICON, MealScreen } from "./atoms";
 import GatherBucket from "./GatherBucket";
 import TripWindow, { LEG_COLORS } from "./TripWindow";
+import TripRegions from "./TripRegions";
 import StaySearch from "./StaySearch";
 
 const legKey = (leg) => leg?.cityId || leg?.name || "";
@@ -58,21 +60,6 @@ const stayName = (t) => (t || "").replace(/^(Stay|Check[\s-]*(?:in|out))\s*[—�
 // ~hours a bucket holds, honest-rough: each item ≈ 2h. Shown as a "~Xh" hint,
 // never persisted — it's a fullness cue for "enough to lay out yet?", not data.
 const HOURS_PER_ITEM = 2;
-
-// Geographic Google-Places types. The cold-start name geocode (below) only
-// adopts a center when the trip name resolves to a PLACE — a region, locality,
-// admin area, or natural feature — never a business that happens to match the
-// words. Keeps "Weekend getaway" from latching onto a random café, and honours
-// the never-invent rule: an unrecognised name leaves the anchor null.
-const GEO_PLACE_TYPES = new Set([
-  "political", "locality", "sublocality", "neighborhood", "colloquial_area",
-  "administrative_area_level_1", "administrative_area_level_2",
-  "administrative_area_level_3", "natural_feature", "archipelago",
-  "country", "postal_code",
-]);
-const isGeographicPlace = (p) =>
-  !!p && p.lat != null && p.lon != null &&
-  (p.types || []).some((t) => GEO_PLACE_TYPES.has(t));
 
 export default function TripPlan({ trip, onEdit }) {
   const { addEntry, updateEntry, removeEntry, updateTripFrame } = useTrips();
@@ -156,10 +143,14 @@ export default function TripPlan({ trip, onEdit }) {
     const legAnchors = legs
       .map((l) => (planner.cities || []).find((c) => c.id === l.cityId))
       .filter((c) => c && c.lat != null);
-    const anchors = legAnchors.length ? legAnchors : (nameAnchor ? [nameAnchor] : []);
+    // Region/state chips are first-class anchors too (#79): a trip tagged
+    // "Hudson River Valley" with no legs yet still grounds the tray there.
+    const regionAnchors = (trip.regions || []).filter((r) => r.lat != null && r.lon != null);
+    const groundAnchors = [...legAnchors, ...regionAnchors];
+    const anchors = groundAnchors.length ? groundAnchors : (nameAnchor ? [nameAnchor] : []);
     if (!anchors.length) return all.slice(0, 12);
     return nearestCities(all, anchors, { maxKm: 400, limit: 12 });
-  }, [planner.cities, legCityIds, legs, nameAnchor]);
+  }, [planner.cities, legCityIds, legs, trip.regions, nameAnchor]);
 
   // Can we donate 1 calendar day to a new leg?  The longest leg must have
   // daysBetween(arrive, depart) ≥ 1 (span ≥ 2 calendar days). If no leg
@@ -290,6 +281,15 @@ export default function TripPlan({ trip, onEdit }) {
         </div>
       ) : (
         <TripWindow trip={trip} focus={focus} onFocus={setFocus} />
+      )}
+
+      {/* Trip-level geographic tags (#79): region/state chips that describe the
+          trip and feed the suggestion anchor above + the cross-trip filter. */}
+      {!focused && (
+        <TripRegions
+          regions={trip.regions || []}
+          onChange={(regions) => updateTripFrame(trip.id, { regions })}
+        />
       )}
 
       {/* Provenance line — always visible in overview (Janice #3 deliverable).

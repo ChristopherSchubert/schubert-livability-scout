@@ -137,6 +137,49 @@
 .tw-citychip:hover:not(:disabled) { background: var(--accent); color: #fff; border-color: var(--accent); }
 .tw-citychip:disabled { color: var(--muted); background: var(--panel-strong); border-color: var(--border); cursor: not-allowed; opacity: .7; }
 .tw-citychip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* Trip region/state chips (#79) — info-blue for a typed region, neutral cream
+   for a state or a leg-derived tag, so the two read apart at a glance. */
+.tw-regions { margin: .35rem 0 .8rem; position: relative; }
+.tw-region-chips { list-style: none; display: flex; flex-wrap: wrap; gap: .35rem; padding: 0; margin: 0; align-items: center; }
+.tw-region-chip {
+  display: inline-flex; align-items: center; gap: .25rem;
+  font-family: var(--font-ui); font-size: .74rem; font-weight: 600;
+  border-radius: 100px; padding: .2rem .35rem .2rem .7rem; white-space: nowrap;
+}
+.tw-region-chip.kind-region { color: #1d4477; background: #e1ecf7; border: 1px solid #bcd2ea; }
+.tw-region-chip.kind-state, .tw-region-chip.from-leg { color: var(--muted); background: var(--panel-strong, #f1ead9); border: 1px solid var(--border); }
+.tw-region-src { font-weight: 500; opacity: .8; }
+.tw-region-x {
+  border: none; background: transparent; cursor: pointer; color: inherit;
+  font-size: 1rem; line-height: 1; padding: 0 .15rem; border-radius: 100px; opacity: .65;
+}
+.tw-region-x:hover { opacity: 1; }
+.tw-region-add {
+  font-family: var(--font-ui); font-size: .74rem; font-weight: 600; color: var(--muted);
+  background: transparent; border: 1px dashed var(--border); border-radius: 100px;
+  padding: .2rem .7rem; cursor: pointer; white-space: nowrap;
+}
+.tw-region-add:hover { color: var(--accent); border-color: var(--accent); }
+.tw-region-pop {
+  position: absolute; z-index: 30; margin-top: .35rem; width: min(340px, 90vw);
+  background: #fffdf8; border: 1px solid var(--border); border-radius: 12px;
+  padding: .5rem; box-shadow: var(--shadow);
+}
+.tw-region-input { width: 100%; padding: .5rem .6rem; border: 1px solid var(--border); border-radius: 9px; background: #fffdf8; font: inherit; }
+.tw-region-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.tw-region-hint { font-size: .76rem; color: var(--muted); margin: .4rem .2rem 0; }
+.tw-region-results { list-style: none; padding: 0; margin: .35rem 0 0; display: grid; gap: .15rem; }
+.tw-region-results button {
+  width: 100%; text-align: left; display: flex; align-items: center; gap: .5rem;
+  border: none; background: transparent; padding: .4rem .5rem; border-radius: 8px; cursor: pointer; font: inherit;
+}
+.tw-region-results button:hover { background: #f3ede0; }
+.tw-region-result-name { font-weight: 600; }
+.tw-region-results small { color: var(--muted); font-size: .74rem; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tw-region-kind { font-family: var(--font-ui); font-size: .6rem; text-transform: uppercase; letter-spacing: .08em; padding: .1rem .4rem; border-radius: 100px; }
+.tw-region-kind.kind-region { color: #1d4477; background: #e1ecf7; }
+.tw-region-kind.kind-state { color: var(--muted); background: var(--panel-strong, #f1ead9); }
 .tw-citytray-add { font-family: var(--font-ui); font-size: .74rem; font-weight: 600; color: var(--muted); background: var(--panel); border: 1px dashed var(--border); border-radius: 100px; padding: .22rem .75rem; cursor: pointer; white-space: nowrap; }
 .tw-citytray-add:hover:not(:disabled) { color: var(--accent); border-color: var(--accent); }
 .tw-citytray-add:disabled { cursor: not-allowed; opacity: .6; }
