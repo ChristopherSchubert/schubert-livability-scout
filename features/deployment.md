@@ -10,11 +10,18 @@ How Livability Scout gets from a `git push` to the live site your wife sees.
   The Vercel-assigned `https://schubert-travel.vercel.app` still resolves and
   serves the same deployment — keep it as a fallback / for previews.
 - **Preprod URL: `https://travel-preview.schubertfamily.com`** (custom domain,
-  live; pinned in Vercel to the `preview` branch). **Auth-gated by Vercel
-  Deployment Protection — by design** (sits behind a Vercel sign-in wall;
-  reviewers/teammates need a Vercel team invite to access). Don't disable. The
-  `.vercel.app` host `https://schubert-travel-preview.vercel.app` still resolves
-  and serves the same branch as a fallback.
+  live; pinned in Vercel to the `preview` branch).
+  **Today** (2026-06-21): currently double-gated — Vercel Deployment Protection
+  wall (401) **plus** the app's own Google sign-in. **Decision in flight:** owner
+  decided to drop the Vercel wall so preprod matches prod's single Google-only
+  gate; flip is pending in Vercel → Settings → Deployment Protection (toggle
+  Vercel Authentication off, or scope to "Only Production Deployments"). After
+  the flip, preprod reads `200` (the sign-in screen). ⚠️ Prod and preprod share
+  the same Supabase project, so a preprod sign-in writes to real user data —
+  keep AuthGate intact when soaking risky changes; a broken AuthGate on preprod
+  would be world-readable. The `.vercel.app` host
+  `https://schubert-travel-preview.vercel.app` still resolves and serves the
+  same branch as a fallback.
 - The older `https://schubert-livability-scout.vercel.app` (the GitHub repo's
   `homepage` field) still resolves; retire it now that the `travel`/`schubert-travel`
   naming is settled and update `homepage` to match.
