@@ -123,10 +123,10 @@ the backlog. The writer must have each in hand before the ticket that needs it.
 ## File structure
 
 **Create:**
-- `supabase/migrations/0023_travel_schema.sql` — create `travel` schema, move/own all tables (or a documented `set search_path` strategy).
-- `supabase/migrations/0024_member_mirror.sql` — `travel.member` mirror + sync trigger/function.
-- `supabase/migrations/0025_repoint_fks.sql` — drop `profiles`/`handle_new_user`, re-point 7 FKs to `travel.member`.
-- `supabase/migrations/0026_rls_current_member.sql` — rewrite all RLS policies to `current_member_id()`.
+- `supabase/migrations/0024_travel_schema.sql` — create `travel` schema, move/own all tables (or a documented `set search_path` strategy). *(Numbered from 0024 — `0023_trip_regions.sql` is already taken by #79.)*
+- `supabase/migrations/0025_member_mirror.sql` — `travel.member` mirror + sync trigger/function.
+- `supabase/migrations/0026_repoint_fks.sql` — drop `profiles`/`handle_new_user`, re-point 7 FKs to `travel.member`.
+- `supabase/migrations/0027_rls_current_member.sql` — rewrite all RLS policies to `current_member_id()`.
 - `app/api/feed/route.js` — the household-scoped feed endpoint.
 - `lib/feed.js` — pure trip→card mapping (unit-tested).
 - `src/lib/env.schema.js` (or `lib/env.js`) — zod boot validator for required env.
@@ -180,7 +180,7 @@ callsites (4 API routes + `lib/image-manifest.js` + `scripts/hero-audit.mjs`).
 
 **Depends on:** interlock #2 (travel schema on Data API). Back up `schubert-travel` first.
 
-**Files:** Create `supabase/migrations/0023_travel_schema.sql`.
+**Files:** Create `supabase/migrations/0024_travel_schema.sql`.
 
 - [ ] `pg_dump` all data from `schubert-travel` (schema + data) — archive it.
 - [ ] Author `0023`: `create schema if not exists travel;` then create every Travel table (cities, pois, poi_positions, the 7 per-user tables, walkthrough_feedback, etc.) in `travel`, porting the bodies of migrations 0001–0022. Keep RLS **off/old** for now; identity rewrite is Ticket 3.
@@ -196,7 +196,7 @@ callsites (4 API routes + `lib/image-manifest.js` + `scripts/hero-audit.mjs`).
 
 **Depends on:** Ticket 2 + interlock #4 (Chris/Janice in `platform.member`). **The load-bearing ticket.**
 
-**Files:** Create `0024_member_mirror.sql`, `0025_repoint_fks.sql`, `0026_rls_current_member.sql`.
+**Files:** Create `0025_member_mirror.sql`, `0026_repoint_fks.sql`, `0027_rls_current_member.sql`.
 
 - [ ] `0024`: create the mirror + sync.
 ```sql

@@ -47,33 +47,36 @@ Ranked value × applicability × readiness ÷ effort, bugs first.
 > production-DB migration, gated on owner sign-off and platform-side deliverables.
 > **Phasing decided** (platform steward, 2026-06-14): **(A) all-in-one now** — plan
 > #88–#94 accepted as written; interlocks tracked as platform `schubert-family#19`.
-> #88 (env) is unblocked now; #89 unblocks when the `travel` schema is exposed on the
-> Data API. ✅ Auth+DB go **confirmed by the owner** (2026-06-14), absolute condition:
-> **never delete `schubert-travel`** (copy-only; it's the rollback). Everything below is *after* it.
+> **#88 (env validator) ✅ shipped + closed** (`c8a4283`, 2026-06-21) — `lib/env.js`
+> boot-validates required env via `instrumentation.js`; anon-key fallback dropped.
+> `NEXT_PUBLIC_HUB_URL` = `https://schubertfamily.com` (apex; set in Vercel + `.env.local`).
+> The `travel` schema is **created + exposed** (verified 2026-06-21 via PGRST205), so **#89
+> is next** — gated only on a **seated writer + the `schubert-family` DB password (Keychain)
+> + owner go to apply migrations to the shared DB**. ✅ Auth+DB go **confirmed by the owner**
+> (2026-06-14), absolute condition: **never delete `schubert-travel`** (copy-only; rollback).
+> Critical path: ~~#88~~ → **#89** → #90 → {#91, #93} → #94 (#92 parallel after #89).
+> Details + next-writer checklist in the [[project_family_hub_integration]] memory.
 
-1. **#85 — Board score tooltip mislabels weight provenance** *(bug, data-quality)*.
-   A card claims "equal weights" while showing a learned-weight score once ≥6
-   places are surveyed. Wrong output / false provenance is the worst failure
-   class for this project. Smallest, highest-leverage fix.
-2. **#68 — Reframe cleanup** *(the north star)*. The "vacation app, not a
-   decision tool" reframe is still half-spoken in the UI. Inventory issue, ready
-   to execute. CLAUDE.md itself still carries the old framing and should be
-   reworded in the same pass. (Fold in the #67 residual baseline-copy nits.)
-3. **#75 — Repo hygiene** *(scoped)*. Ship the safe parts (dotfile triage,
-   `.gitignore` gaps, dead `MapEmbed`/`MapPicker` removal). ⚠️ Do **not**
-   blind-move the `public/*.html` mockups — several are live design surfaces
-   wired to APIs (`city-detail-redesign.html` ↔ `/api/mockup-data`,
-   `trip-walkthrough.html` ↔ `/api/walkthrough-feedback`). Gate, don't delete.
-   See the grooming comment on #75.
-4. **#82 + #83 — Account menu + settings** *(one UI stream)*. There is currently
-   no visible sign-out affordance anywhere. Pair them; design via `design:*`.
-   Work against today's Supabase/Google auth — **not** blocked by #84.
-5. **#79 — Region/state trip chips + cross-trip filter** *(enhancement)*. The
-   deferred richer version of trip grounding; good value, lower urgency.
-6. **#86 — E2E teardown guaranteed in CI** *(follow-up)*. Stops slow pollution of
-   the shared Supabase from CI runs. Low urgency, real.
+### Recently shipped — verified in commits (2026-06-14 → 21)
+✅ **#88 env/config + zod boot validator (`c8a4283`) — first #84 child shipped** ·
+#85 tooltip provenance (`bc0d4f7`) · #86 E2E teardown (`76fd65a`) · #82 account menu
+(`81192e1`) · #79 region/state trip chips (`990cff3`/`2cf9d5a`/`d3498e2`) · #97
+`/api/mockup-data` 500 (`db1fd3e` — was a Keychain-pg client that can't run on Vercel;
+moved to the service role) · #96 prod-login incident (dashboard: Google client secret +
+Site URL on `schubert-travel`; verified clean Google logins for both users 2026-06-21).
 
-**Now #1 (see the top note):** #84 — moved from held to top priority per the owner directive 2026-06-14.
+### Open queue (all *after* the #84 epic)
+1. **#68 — Reframe cleanup** *(north star)*. Residual decision-tool/verdict language.
+   The 2026-06-13 repo-wide purge (`7cc682b`) didn't get everything; #68 is the inventory
+   of what remains. CLAUDE.md still carries old framing **and the stale prod URL**
+   (`schubert-livability-scout.vercel.app` → should be `travel.schubertfamily.com`) — fix
+   in the same pass. (Fold in the #67 residual baseline-copy nit.)
+2. **#75 — Repo hygiene** *(scoped)*. Safe parts (dotfile triage, `.gitignore` gaps, dead
+   `MapEmbed`/`MapPicker`). ⚠️ Do **not** blind-move the live `public/*.html` mockups
+   (wired to APIs). See the grooming comment on #75.
+3. **#83 — Account settings surface**. The menu (#82) shipped; this is the panel it opens.
+   Design via `design:*`.
+4. **#95 — Family-hub colour system** *(FYI / optional alignment)*.
 
 ## Decisions only the owner can make
 
