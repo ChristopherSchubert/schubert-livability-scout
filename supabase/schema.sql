@@ -179,6 +179,7 @@ create table if not exists trips (
   glance      jsonb default '{}',
   pre_trip    jsonb default '{}',
   legs        jsonb default '[]',           -- accommodations live here per-leg (leg.candidates[] + leg.chosenId)
+  regions     jsonb not null default '[]',  -- geographic tags [ { label, kind: state|region, lat, lon, source? } ] for cross-trip filter + suggestion anchor (0023, #79)
   options     jsonb default '{}',
   entries     jsonb default '[]',           -- v1 blob; superseded by trip_entries (0016), kept as a migration source
   travelers   jsonb not null default '[]',  -- [ { name, kind: person|pet, chips[] } ] — union of chips = active marker set (0017)
