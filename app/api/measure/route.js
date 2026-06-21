@@ -67,7 +67,7 @@ export async function POST(request) {
     const token = auth.startsWith("Bearer ") ? auth.slice(7) : null;
 
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
     const supabase = createClient(url, key, {
       auth: { persistSession: false },
       global: token ? { headers: { Authorization: `Bearer ${token}` } } : {},

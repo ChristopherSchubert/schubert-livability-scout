@@ -44,8 +44,7 @@ export async function GET(request) {
   // key for local probing. In prod the publishable key returns [] because
   // cities RLS gates anon reads — set SUPABASE_SECRET_KEY on Vercel.
   const key = process.env.SUPABASE_SECRET_KEY
-    || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
-    || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
   if (!supabaseUrl || !key) {
     return NextResponse.json(
       { error: "Server not configured: NEXT_PUBLIC_SUPABASE_URL + SUPABASE_SECRET_KEY required." },

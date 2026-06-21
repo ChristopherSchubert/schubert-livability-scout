@@ -143,25 +143,38 @@ the backlog. The writer must have each in hand before the ticket that needs it.
 
 ---
 
-## Ticket 1 — Env/config standardization + boot validator
+## Ticket 1 — Env/config standardization + boot validator ✅ shipped (#88)
 
 **Why first:** lowest-risk, mostly independent of the DB move, and de-risks every later
 ticket (a missing var is the classic cutover failure). Travel already prefers
 `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` with an anon fallback and holds **no**
 `GOOGLE_CLIENT_*`/`AUTH_SECRET` (verified) — so this is mostly formalizing + a validator.
 
-**Files:** Create `lib/env.js`, `.env.example`; Modify `lib/supabase.js`.
+**Files:** Create `lib/env.js` + `instrumentation.js` + `.env.example`; modify
+`lib/supabase.js`; sweep `NEXT_PUBLIC_SUPABASE_ANON_KEY` fallback from 6 other
+callsites (4 API routes + `lib/image-manifest.js` + `scripts/hero-audit.mjs`).
 
-- [ ] Add a zod boot validator `lib/env.js` asserting: `NEXT_PUBLIC_SUPABASE_URL`,
-  `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY` (server), `NEXT_PUBLIC_HUB_URL`. Fail loudly at boot if missing.
-- [ ] Drop the `NEXT_PUBLIC_SUPABASE_ANON_KEY` fallback in `lib/supabase.js` once the publishable key is set in both `.env.local` and Vercel.
-- [ ] Rename `.env.local.example` → `.env.example`; document all ~13 real keys in the standard's section order (App / Database / Supabase / Integrations / Crypto / Local-dev). Add `NEXT_PUBLIC_HUB_URL`.
-- [ ] **Test:** boot the dev server with a var removed; expect the validator to throw a named error. With all present, expect normal boot.
+- [x] Zod boot validator `lib/env.js` asserts the 4 required keys
+  (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`,
+  `SUPABASE_SECRET_KEY`, `NEXT_PUBLIC_HUB_URL`); wired to boot via
+  `instrumentation.js` (Node runtime only). Optional keys typed (Unsplash,
+  Census, Walkscore, Google Places, dev-login, Overpass).
+- [x] Anon-key fallback dropped from `lib/supabase.js` **and** every other
+  callsite (publishable key is set in both `.env.local` and Vercel; confirmed
+  via `vercel env ls production`).
+- [x] `.env.local.example` → `.env.example`; ~11 keys in the standard's
+  section order (App / Supabase / Integrations / Local-dev).
+- [x] **Tested both ways:** `test/env.test.mjs` covers happy path + per-key
+  missing-required failures + the URL-format guard (6 tests, all pass).
+  Verified with the real dev server: clean boot with all required env →
+  `HTTP 200`; with `NEXT_PUBLIC_HUB_URL` removed → boot refuses with
+  `Invalid environment — refusing to start: NEXT_PUBLIC_HUB_URL: …`.
 
-**Acceptance:**
-- [ ] Boot validator rejects a missing required var by name.
-- [ ] `.env.example` lists every key; no `GOOGLE_CLIENT_*`/`AUTH_SECRET` present (confirmed not needed).
-- [ ] `NEXT_PUBLIC_HUB_URL` added to `.env.local` + Vercel.
+**Outstanding (Vercel side, owner action):**
+- [ ] Add `NEXT_PUBLIC_HUB_URL` to the Vercel project's Environment Variables
+  (Production + Preview, value `https://schubert-family.vercel.app` interim
+  → `https://schubertfamily.com` at cutover). **Required before the next prod
+  push**, otherwise the validator refuses to boot in prod.
 
 ## Ticket 2 — Port schema + migrate data into `schubert-family.travel`
 

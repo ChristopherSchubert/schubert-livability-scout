@@ -8,7 +8,7 @@ import { createClient } from "@supabase/supabase-js";
 
 const env = await loadEnv();
 const url = env.NEXT_PUBLIC_SUPABASE_URL;
-const anon = env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const anon = env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 const email = env.DEV_LOGIN_EMAIL;
 const password = env.DEV_LOGIN_PASSWORD;
 const secret = env.SUPABASE_SECRET_KEY || env.SUPABASE_SERVICE_ROLE_KEY;

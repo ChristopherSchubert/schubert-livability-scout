@@ -14,7 +14,7 @@ export async function POST() {
   }
   const email = process.env.DEV_LOGIN_EMAIL;
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
   const secretKey = process.env.SUPABASE_SECRET_KEY;
   if (!email || !url || !anonKey || !secretKey) {
     return NextResponse.json({ error: "Dev login not configured." }, { status: 404 });
