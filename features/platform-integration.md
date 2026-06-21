@@ -216,7 +216,7 @@ create policy "trip_entries insert own" on travel.trip_entries for insert to aut
 
 **Files:** Modify `lib/supabase.js`, the four server `createClient` sites, `lib/db.js:331-346`, `components/AuthGate.jsx`.
 
-- [ ] `lib/supabase.js`: `createBrowserClient(url, key, { db: { schema: 'travel' } })`; point `NEXT_PUBLIC_SUPABASE_URL`/key at `schubert-family` (in `.env.local` + Vercel).
+- [ ] `lib/supabase.js`: `createBrowserClient(url, key, { db: { schema: 'travel' }, cookieOptions: { domain: isProd ? '.schubertfamily.com' : undefined, sameSite: 'lax', secure: true } })`; point `NEXT_PUBLIC_SUPABASE_URL`/key at `schubert-family` (in `.env.local` + Vercel). **The `.schubertfamily.com` cookie scope is what delivers cross-app SSO** (platform spike `schubert-family#6`) — moving to shared `auth.users` alone is *not* enough; without the parent-domain cookie, users still get a second login.
 - [ ] Add `{ db: { schema: 'travel' } }` (or `auth: {...}, db: {...}`) to the bare `createClient` in `app/api/dev-login/route.js`, `app/api/measure/route.js`, `app/api/walkthrough-feedback/route.js`, `lib/image-manifest.js:160`.
 - [ ] `AuthGate.jsx`: on `SIGNED_IN`, call `await getSupabase().schema('platform').rpc('reconcile_member')` then `await getSupabase().schema('travel').rpc('sync_current_member')` before flipping the gate (so the mirror exists before any per-user read). Keep the existing `signInWithOAuth({provider:'google', redirectTo: window.location.origin})` — only the project it authenticates against changes.
 - [ ] `lib/db.js` `subscribeTrip`: change both `schema: "public"` → `schema: "travel"`.
@@ -226,6 +226,8 @@ create policy "trip_entries insert own" on travel.trip_entries for insert to aut
 - [ ] Sign-in against `schubert-family` works; `reconcile_member` + mirror sync run; gate flips.
 - [ ] `/trips` reads/writes against `travel.*`; realtime updates propagate.
 - [ ] `dev-login` still works (localhost-only).
+- [ ] Browser-client session cookie scoped to `.schubertfamily.com` in production (host-only in dev).
+- [ ] **Cross-app SSO verified:** already signed in on `schubertfamily.com`, opening `travel.schubertfamily.com` lands in the authed app with **no second sign-in**.
 
 ## Ticket 5 — Re-point the local measurement pipeline
 
