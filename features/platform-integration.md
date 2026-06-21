@@ -75,6 +75,30 @@ These are **not** Travel's tickets; they gate our cutover steps. Filed/confirmed
 
 ---
 
+## Live-data drift — copy → freeze → final sync → flip (mandatory)
+
+Prod is live and in **daily use** on `schubert-travel`, so a one-shot copy at #89
+would lose everything written between the copy and the #91 flip. Handle it as:
+
+- **Classify tables (in #89):** *static reference* — `cities`, `pois`, `poi_positions`,
+  `walkthrough_feedback` (owner-global, effectively static during the window) → copy once.
+  *Mutable per-user* — the 7 owner tables (`felt_surveys`, `journal_entries`,
+  `baseline_ratings`, `user_weights`, `trips`, `trip_entries`, `trip_fork_comments`) →
+  re-synced at cutover.
+- **Make the data copy idempotent (in #89):** upsert on PK so it can be re-run cheaply
+  as the final delta.
+- **At cutover (in #91): brief write-freeze + final delta-sync.** It's a 2-user app —
+  coordinate a short maintenance window with Chris + Janice, stop writes, re-run the
+  idempotent per-user-table copy (+ the old-uid → `member.id` FK remap on the delta),
+  then flip the app env to `schubert-family`. No writes accepted on `schubert-travel`
+  after the final sync.
+- **Verify zero loss (in #94):** per-user-table row counts match `schubert-travel` ↔
+  `schubert-family.travel` at the flip; spot-check the latest survey/trip/journal row is
+  present post-cutover.
+
+Don't build CDC/replication for two users — a coordinated freeze + idempotent re-copy is
+simpler and loss-proof.
+
 ## Writer pre-flight — inputs the writer must have (not in tickets, by design)
 
 These are operational inputs (secrets / access / values), deliberately kept out of
