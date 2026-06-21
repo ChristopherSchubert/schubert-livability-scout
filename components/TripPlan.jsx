@@ -35,10 +35,13 @@ import { tripDays, entriesByDay, tripDietChips, layOutLegPlan } from "../lib/tri
 import { appendCityLeg, daysBetween, nearestCities } from "../lib/trip-window";
 import { CAT_ICON, MealScreen } from "./atoms";
 import GatherBucket from "./GatherBucket";
-import TripWindow from "./TripWindow";
+import TripWindow, { LEG_COLORS } from "./TripWindow";
 import StaySearch from "./StaySearch";
 
 const legKey = (leg) => leg?.cityId || leg?.name || "";
+const DOW3 = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const dowDay = (ymd) => (ymd ? `${DOW3[new Date(ymd + "T00:00:00").getDay()]} ${+ymd.slice(8, 10)}` : "");
+const spanLabel = (leg) => (leg?.arrive && leg?.depart ? `${dowDay(leg.arrive)} – ${dowDay(leg.depart)}` : "");
 const cityName = (leg) => (leg?.name || "").split(",")[0] || "—";
 const DOW = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const dow = (ymd) => (ymd ? DOW[new Date(ymd + "T00:00:00").getDay()] : "");
@@ -280,8 +283,6 @@ export default function TripPlan({ trip, onEdit }) {
 
   return (
     <div className="tw-plan">
-      <div className="tw-sec-label">The window</div>
-
       {/* Empty-window dropzone — shown when no legs exist yet */}
       {legs.length === 0 ? (
         <div className="twn-empty-drop">
@@ -407,33 +408,30 @@ export default function TripPlan({ trip, onEdit }) {
             </ul>
           ) : null}
 
-          <div className="tw-sec-label">Stays · click a city to plan it</div>
-          <div className="tw-staysrow">
-            {legs.map((leg) => {
+          {/* City cards — readable detail under the bar; click to plan. Each
+              row sheds dates → nights → hotel as it narrows; city stays. */}
+          <div className="tw-citycards" aria-label="Cities — click one to plan its days">
+            {legs.map((leg, i) => {
               const stay = stayFor(leg);
               const lk = legKey(leg);
-              if (stay) {
-                // Filled stay bar: city + stay name, clicking focuses the leg.
-                return (
-                  <button key={lk} className="tw-staybar" style={{ flex: nights(leg) }}
-                          onClick={() => setFocus(lk)} aria-label={`Plan ${cityName(leg)}`}>
-                    <b>{cityName(leg)}</b>
-                    <small>{nights(leg)}n · 🛏 {stayName(stay.title)}</small>
-                  </button>
-                );
-              }
-              // Empty stay bar: dashed, offers "🔍 Search hotels" affordance.
+              const on = focus === lk;
               return (
-                <button key={lk} className="tw-staybar tw-staybar-empty" style={{ flex: nights(leg) }}
-                        onClick={() => { setFocus(lk); setStaySearchLeg(lk); }}
-                        aria-label={`Search hotels for ${cityName(leg)}`}>
-                  <span className="tw-staybar-slot-btn">🔍 Search hotels</span>
-                  <small>{cityName(leg)} · {nights(leg)}n</small>
-                </button>
+                <div key={lk} className={`tw-citycard${on ? " on" : ""}`}>
+                  <button className="tw-citycard-in"
+                          onClick={() => { setFocus(lk); if (!stay) setStaySearchLeg(lk); }}
+                          aria-label={stay ? `Plan ${cityName(leg)}` : `Plan ${cityName(leg)} and search hotels`}>
+                    <span className="tw-citycard-dot" style={{ "--leg": LEG_COLORS[i % LEG_COLORS.length] }} aria-hidden="true" />
+                    <span className="tw-citycard-name">{cityName(leg)}</span>
+                    <span className="tw-citycard-meta tw-citycard-nights">· {nights(leg)}n</span>
+                    <span className="tw-citycard-meta tw-citycard-dates">· {spanLabel(leg)}</span>
+                    {stay
+                      ? <span className="tw-citycard-hotel">🛏 <span>{stayName(stay.title)}</span></span>
+                      : <span className="tw-citycard-hotel empty">🔍 <span>Search hotels</span></span>}
+                  </button>
+                </div>
               );
             })}
           </div>
-          {legs.length > 0 && <p className="tw-plan-hint">Pick a city above to gather its bucket and lay out its days.</p>}
         </>
       )}
     </div>
@@ -600,7 +598,7 @@ function FocusCity({ leg, days, byDay, stay, bucket, trip, onEdit, onRemove,
       )}
 
       <div className="tw-daycols-wrap">
-        <div className="tw-daycols" style={{ gridTemplateColumns: `repeat(${Math.max(1, days.length)}, minmax(120px, 1fr))` }}>
+        <div className="tw-daycols">
           {days.map((d) => {
             const list = byDay[d.date] || [];
             const marker = d.date === leg.arrive ? "arrive" : d.date === leg.depart ? "depart" : "";
@@ -615,7 +613,7 @@ function FocusCity({ leg, days, byDay, stay, bucket, trip, onEdit, onRemove,
                        onClick={() => onEdit(e)}
                        role="button" tabIndex={0} aria-label={`Edit ${e.title || "entry"}`}
                        onKeyDown={(ev) => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); onEdit(e); } }}>
-                    <b>{CAT_ICON[e.category] || "•"} {e.title || "untitled"}{e.pinned ? " 📌" : ""}</b>
+                    <b><span className="tw-mini-i" aria-hidden="true">{CAT_ICON[e.category] || "•"}</span><span className="tw-mini-t">{e.title || "untitled"}{e.pinned ? " 📌" : ""}</span></b>
                     <MealScreen entry={e} dietChips={dietChips} />
                   </div>
                 ))}
@@ -623,7 +621,7 @@ function FocusCity({ leg, days, byDay, stay, bucket, trip, onEdit, onRemove,
                 {proposed.map((e) => (
                   <div key={`proposed-${e.id}`} className={`tw-mini tw-proposed cat-${e.category || "activity"}`}
                        aria-label={`Proposed: ${e.title || "item"}`}>
-                    <b>{CAT_ICON[e.category] || "•"} {e.title || "untitled"}</b>
+                    <b><span className="tw-mini-i" aria-hidden="true">{CAT_ICON[e.category] || "•"}</span><span className="tw-mini-t">{e.title || "untitled"}</span></b>
                     <MealScreen entry={e} dietChips={dietChips} />
                   </div>
                 ))}

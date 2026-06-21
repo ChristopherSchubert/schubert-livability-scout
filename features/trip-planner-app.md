@@ -61,10 +61,15 @@ design source of truth.
 ## The surfaces (Phases 1–2)
 
 - **Plan** — [TripPlan](../components/TripPlan.jsx): the deck's **window-as-nav
-  focus flow** (rebuilt 2026-06-13 after the trips-flow audit). Overview = the
-  [TripWindow](../components/TripWindow.jsx) date ribbon + collapsed Flights bar +
-  width-proportional stay bars (one per leg). Click a leg (in the window or its
-  bar) → the page **focuses** that city: a header, its day columns (the dated
+  focus flow** (rebuilt 2026-06-13 after the trips-flow audit; window reworked
+  into the "spine" 2026-06-14). Overview = the
+  [TripWindow](../components/TripWindow.jsx) **spine** (one text-free bar: leg
+  colour segments sized by nights, per-night notches, draggable inner grips to
+  move a night between adjacent cities, and **end pills** — a date + ‹ › chevrons
+  — that add/remove a day at each end via `resizeTripStart`/`resizeTripEnd`) +
+  collapsed Flights bar + readable **city cards** (one per leg: colour dot, name,
+  nights, dates, hotel). Click a leg segment (or its card) → the page **focuses**
+  that city: a header, its day columns (the dated
   entries, color-keyed + icon-tagged), and one **bucket** (undated want-list) with
   [GatherBucket](../components/GatherBucket.jsx) (browse the pois cache, ranked by
   rating × log(reviews)), ＋ add your own, and **Lay out →**. Replaces the old
@@ -301,17 +306,32 @@ the header and the panel shows **one day at a time** (the deck's "Today" view):
 not navigation — defaults to the first day. Completes the responsive work #35
 began (the earlier commit shipped the responsive CSS for the other surfaces).
 
-## TripWindow — draggable leg boundaries (#22)
+## TripWindow — the spine: inner grips + end pills (#22)
 
-The Plan tab's calendar strip is now interactive. The boundary between two
-date-adjacent legs is a draggable handle (`components/TripWindow.jsx`): drag it
-(PointerSensor, 3px activation) or focus it and press ←/→ to move days from one
-leg to its neighbour. The trip's start/end stay fixed and only the two touching
-legs change `arrive`/`depart` — **no cascade**. Moves snap to whole days
-(1 cell = 1 day, measured off the legs-row width) and clamp so neither leg drops
-below one day. A live preview re-renders the segments during the drag;
-`onDragEnd` (or the arrow nudge) persists the adjusted `legs` via
-`TripProvider.updateTripFrame`. Unblocks #34 (variations over a forked range).
+The Plan tab's window is one text-free **spine** bar (`components/TripWindow.jsx`)
+with two distinct edit gestures, deliberately different so the wrong one isn't
+easy:
+
+- **Inner grips** — between two date-adjacent legs, a draggable handle (drag with
+  PointerSensor 3px activation, or focus + ←/→) moves **one night** from one leg
+  to its neighbour. The trip's start/end stay fixed and only the two touching
+  legs change `arrive`/`depart` — **no cascade**. Moves snap to whole days
+  (1 cell = 1 day, measured off the legs-row width) and clamp so neither leg
+  drops below one day (`shiftLegBoundary`).
+- **End pills** — each outer end is a date flanked by ‹ › chevrons that **click**
+  (not drag — dragging off the edge is the wrong gesture) to add/remove a day at
+  that end, growing/shrinking the first/last leg (`resizeTripStart` /
+  `resizeTripEnd`, with a one-day floor that disables the shortening chevron).
+
+A live preview re-renders the segments during a grip drag; commits persist the
+adjusted `legs` (and `startDate`/`endDate` for resizes) via
+`TripProvider.updateTripFrame`. The readable per-city detail (nights, dates,
+hotel) lives in the **city cards** below the bar, not on it. Unblocks #34
+(variations over a forked range).
+
+> Other trip docs (`trip-planner-ux.md`, `trip-planner-components.md`,
+> `trip-planner-critique.md`) still describe the earlier date-ribbon / stay-bar
+> window and want a reconciliation pass.
 
 Verified in-browser on the Slovenia trip: 2 handles between Ljubljana/Bled/Piran;
 a pointer drag previewed then committed Bled 4n→6n / Piran 5n→3n; the keyboard

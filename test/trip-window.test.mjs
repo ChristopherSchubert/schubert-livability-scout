@@ -2,7 +2,7 @@
 // arithmetic + the clamp that keeps any leg from vanishing — without a DOM.
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { addDays, daysBetween, legBoundaries, clampShift, shiftLegBoundary } from "../lib/trip-window.js";
+import { addDays, daysBetween, legBoundaries, clampShift, shiftLegBoundary, resizeTripStart, resizeTripEnd } from "../lib/trip-window.js";
 
 // The real Slovenia legs: Ljubljana 2n, Bled 4n, Piran 5n, all date-adjacent.
 const LEGS = [
@@ -56,4 +56,32 @@ test("non-adjacent or out-of-range boundary is a no-op", () => {
   const { legs, shift } = shiftLegBoundary(LEGS, 9, 1);
   assert.equal(shift, 0);
   assert.equal(legs, LEGS); // unchanged array returned
+});
+
+test("resizeTripStart: -1 starts a day earlier (first leg grows), +1 a day later", () => {
+  const earlier = resizeTripStart("2026-05-15", LEGS, -1);
+  assert.equal(earlier.startDate, "2026-05-14");
+  assert.equal(earlier.legs[0].arrive, "2026-05-14"); // Ljubljana 2n → 3n
+  assert.equal(earlier.legs[1].arrive, "2026-05-17"); // others untouched
+
+  const later = resizeTripStart("2026-05-15", LEGS, 1);
+  assert.equal(later.startDate, "2026-05-16");
+  assert.equal(later.legs[0].arrive, "2026-05-16"); // Ljubljana 2n → 1n
+});
+
+test("resizeTripEnd: +1 ends a day later (last leg grows), -1 a day earlier", () => {
+  const later = resizeTripEnd("2026-05-25", LEGS, 1);
+  assert.equal(later.endDate, "2026-05-26");
+  assert.equal(later.legs[2].depart, "2026-05-26"); // Piran 5n → 6n
+
+  const earlier = resizeTripEnd("2026-05-25", LEGS, -1);
+  assert.equal(earlier.endDate, "2026-05-24");
+  assert.equal(earlier.legs[2].depart, "2026-05-24"); // Piran 5n → 4n
+});
+
+test("resize floors: can't shorten an edge leg below one day", () => {
+  const oneDayFirst = [{ name: "A", arrive: "2026-05-15", depart: "2026-05-15" }, LEGS[1], LEGS[2]];
+  assert.equal(resizeTripStart("2026-05-15", oneDayFirst, 1), null); // start-later would erase leg A
+  const oneDayLast = [LEGS[0], LEGS[1], { name: "Z", arrive: "2026-05-21", depart: "2026-05-21" }];
+  assert.equal(resizeTripEnd("2026-05-21", oneDayLast, -1), null);   // end-earlier would erase leg Z
 });

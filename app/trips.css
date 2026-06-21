@@ -6,6 +6,14 @@
 /* Phase 1: day-by-day agenda + EntryEditor keystone.             */
 /* ============================================================== */
 .tw-wrap { max-width: 920px; margin: 0 auto; padding: 1.4rem 1.2rem 5rem; }
+/* The Plan route carries a day-board (a row of fixed 240px day columns) that
+   needs more room than the 920px reading column. Widen just that route so the
+   summary, the window bar, and the day-board all share one width and align —
+   a 5-day city then keeps all its days on one row. `width: 100%` is required:
+   .tw-wrap is `margin: 0 auto` inside a column flex, so without it the wrap
+   shrinks to its content (an auto-fill grid has no intrinsic width to push it
+   wider) and collapses back to the narrow column. Other trip tabs stay 920. */
+.tw-wrap:has(.tw-plan) { max-width: 1320px; width: 100%; }
 .tw-loading, .tw-empty { color: var(--muted); font-family: var(--font-ui); font-size: .9rem; }
 .tw-head { border-bottom: 1px solid var(--border); padding-bottom: .9rem; margin-bottom: 1.1rem; }
 .tw-crumb { font-family: var(--font-ui); font-size: .72rem; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin: 0 0 .35rem; }
@@ -206,16 +214,15 @@
 .tw-focus-head b { font-family: var(--font-display); font-size: 1.2rem; }
 .tw-focus-head .tw-meta { font-family: var(--font-ui); font-size: .8rem; color: var(--muted); margin: 0; }
 
-/* The day-board breaks out of the 920px reading column (.tw-wrap) to use the
-   full canvas width, so a 4- or 5-day city keeps all its days on one row
-   instead of wrapping into dead space beside the prose. Centered, capped to
-   the viewport so it never forces a horizontal scrollbar. */
-.tw-daycols-wrap { position: relative; left: 50%; transform: translateX(-50%); width: min(1280px, calc(100vw - 3rem)); margin: .6rem 0; padding-bottom: .2rem; }
-/* A day is a fixed-width unit, identical in every city. Cards wrap to a new
-   row (calendar-style) only when the canvas truly runs out of width — never
-   by stretching to fill or scrolling sideways. So 2-day and 5-day cities
-   show day columns of exactly the same size. */
-.tw-daycols { display: grid; gap: .5rem; grid-template-columns: repeat(auto-fill, var(--tw-daycol-w, 240px)); justify-content: center; }
+.tw-daycols-wrap { margin: .6rem 0; padding-bottom: .2rem; }
+/* A day is a fixed-width unit, identical in every city. Columns are left-
+   aligned and wrap to a new row (calendar-style) only when the view truly
+   runs out of width — never stretched to fill or scrolled sideways. So a
+   2-day and a 5-day city show day columns of exactly the same size. */
+.tw-daycols { display: grid; gap: .5rem; grid-template-columns: repeat(auto-fill, var(--tw-daycol-w, 240px)); justify-content: start; }
+/* On phones the fixed 240px column leaves dead space and stacks awkwardly —
+   give each day the full width instead (one day per row, full-bleed card). */
+@media (max-width: 640px) { .tw-daycols { grid-template-columns: 1fr; } }
 .tw-daycol { border: 1px solid var(--border); border-radius: 9px; background: var(--panel); padding: .45rem; min-width: 0; }
 .tw-dh { display: flex; justify-content: space-between; align-items: baseline; gap: .25rem; font-size: .72rem; font-weight: 700; margin-bottom: .35rem; }
 .tw-dh small { font-weight: 400; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; font-size: .62rem; }
@@ -227,6 +234,13 @@
 .tw-mini { position: relative; flex: 1 1 160px; min-width: 150px; max-width: 240px; background: var(--panel); border: 1px solid var(--border); border-left: 4px solid var(--cat, var(--border)); border-radius: 7px; padding: .4rem .55rem; cursor: pointer; }
 .tw-daycol .tw-mini { flex: none; max-width: none; margin-bottom: .35rem; padding: .3rem .45rem; }
 .tw-mini b { font-weight: 600; font-size: .82rem; overflow-wrap: anywhere; }
+/* Day card: icon in its own column so a wrapped title hangs-indents under the
+   first text line (not under the icon), and the diet chip always drops to its
+   own row below the title instead of tacking onto wherever the text ends. */
+.tw-daycol .tw-mini b { display: flex; align-items: flex-start; gap: .32rem; }
+.tw-daycol .tw-mini .tw-mini-i { flex: none; }
+.tw-daycol .tw-mini .tw-mini-t { min-width: 0; overflow-wrap: anywhere; }
+.tw-daycol .tw-mini .tw-screen { margin-top: .28rem; }
 .tw-mini small { display: block; color: var(--muted); font-size: .68rem; margin-top: .1rem; }
 .tw-mini.cat-meal { --cat: #9a5a16; }
 .tw-mini.cat-activity { --cat: #0d4c44; }
@@ -248,22 +262,54 @@
 .tw-toolrow { display: flex; gap: .5rem; align-items: center; flex-wrap: wrap; margin-top: .6rem; }
 
 /* TripWindow — date ribbon + leg segments */
-.twn { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; background: var(--panel); }
-.twn-ribbon { display: grid; border-bottom: 1px solid var(--border); }
-.twn-cell { text-align: center; padding: .35rem .1rem; border-left: 1px solid var(--border); font-family: var(--font-ui); }
-.twn-cell:first-child { border-left: 0; }
-.twn-cell.we { background: #faf4e6; }
-.twn-mo { display: block; font-family: var(--font-display); font-style: italic; font-size: .64rem; color: var(--muted); height: .9em; }
-.twn-dow { display: block; font-size: .58rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
-.twn-day { display: block; font-size: .9rem; font-variant-numeric: tabular-nums; font-weight: 600; }
-.twn-legs { display: grid; padding: .4rem .15rem; gap: 3px; min-height: 2rem; position: relative; }
-/* Draggable leg boundary (#22): a thin grip on the grid line between two legs */
-.twn-bound { position: absolute; top: .2rem; bottom: .2rem; width: 16px; transform: translateX(-50%); background: none; border: none; padding: 0; cursor: ew-resize; z-index: 4; display: flex; align-items: center; justify-content: center; touch-action: none; }
-.twn-bound-grip { width: 3px; height: 70%; background: var(--text); border-radius: 2px; opacity: .35; transition: opacity .12s, background .12s; }
-.twn-bound:hover .twn-bound-grip, .twn-bound.dragging .twn-bound-grip, .twn-bound:focus-visible .twn-bound-grip { opacity: .95; background: var(--accent); width: 4px; }
-.twn-bound:focus-visible { outline: none; }
-.twn-leg { display: flex; align-items: center; justify-content: center; gap: .25rem; font-size: .76rem; font-weight: 600; color: #fff; background: var(--leg, var(--accent)); border-radius: 6px; padding: .2rem .4rem; white-space: nowrap; overflow: hidden; }
-.twn-leg small { font-weight: 400; opacity: .8; }
+/* The trip spine: ONE bar (text-free colour segments + per-night notches +
+   drag grips) flanked by two end-pills. Readable city detail lives in the
+   cards below (.tw-citycards), so the bar never crams text. */
+.twn { margin: 0; }
+.twn-barrow { display: flex; align-items: stretch; gap: 7px; height: 30px; }
+
+/* End pill — click a chevron to add/remove a day at this end of the trip.
+   Left chevron = a day earlier, right chevron = a day later (both ends). */
+.twn-end { flex: none; display: flex; align-items: center; gap: 1px; }
+.twn-end-date { text-align: center; line-height: 1.02; padding: 0 3px; min-width: 1.5rem; }
+.twn-end-date small { display: block; font-family: var(--font-ui); font-size: .58rem; text-transform: uppercase; letter-spacing: .03em; color: var(--muted); }
+.twn-end-date b { display: block; font-size: .82rem; font-variant-numeric: tabular-nums; font-weight: 600; }
+.twn-end-chev { width: 18px; height: 30px; padding: 0; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border); background: var(--panel); color: var(--muted); font-size: 1rem; line-height: 1; cursor: pointer; border-radius: 6px; transition: background .12s, color .12s, border-color .12s; }
+.twn-end-chev:hover:not(:disabled) { background: var(--accent); color: #fff; border-color: var(--accent); }
+.twn-end-chev:disabled { opacity: .28; cursor: default; }
+
+/* The bar. overflow:hidden rounds the outer segment corners + clips notches. */
+.twn-legs { flex: 1 1 0; display: grid; position: relative; height: 30px; border-radius: 7px; overflow: hidden; }
+.twn-seg { border: 0; padding: 0; margin: 0; cursor: pointer; background: var(--leg, var(--accent)); transition: filter .12s; }
+.twn-seg:hover { filter: brightness(1.09); }
+.twn-seg.on { box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .92); z-index: 1; }
+.twn-seg:focus-visible { outline: 2px solid var(--text); outline-offset: -2px; z-index: 2; }
+.twn-notches { position: absolute; inset: 0; pointer-events: none; }
+
+/* Inner drag grip between two date-adjacent legs (move a night). */
+.twn-grip { position: absolute; top: 0; bottom: 0; width: 18px; transform: translateX(-50%); background: none; border: 0; padding: 0; cursor: ew-resize; z-index: 4; display: flex; align-items: center; justify-content: center; touch-action: none; }
+.twn-grip-dots { width: 13px; height: 21px; border-radius: 5px; background: var(--panel); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; transition: border-color .12s; }
+.twn-grip-dots::before { content: ""; width: 3px; height: 9px; border-left: 1px solid var(--muted); border-right: 1px solid var(--muted); }
+.twn-grip:hover .twn-grip-dots, .twn-grip.dragging .twn-grip-dots, .twn-grip:focus-visible .twn-grip-dots { border-color: var(--accent); }
+.twn-grip:hover .twn-grip-dots::before, .twn-grip.dragging .twn-grip-dots::before, .twn-grip:focus-visible .twn-grip-dots::before { border-color: var(--accent); }
+.twn-grip:focus-visible { outline: none; }
+
+/* City cards under the bar — readable detail, click to plan. Each row sheds
+   content as it narrows (dates → nights → hotel); the city name never drops. */
+.tw-citycards { display: flex; flex-direction: column; gap: 5px; margin: .7rem 0 0; }
+.tw-citycard { container-type: inline-size; }
+.tw-citycard-in { display: flex; align-items: center; gap: 8px; min-width: 0; width: 100%; text-align: left; background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: .42rem .8rem; cursor: pointer; transition: border-color .12s, background .12s; }
+.tw-citycard-in:hover { border-color: var(--accent); background: #f9fdf9; }
+.tw-citycard.on .tw-citycard-in { border-color: var(--accent); border-width: 1.5px; padding: calc(.42rem - .5px) calc(.8rem - .5px); }
+.tw-citycard-dot { width: 9px; height: 9px; border-radius: 50%; flex: none; background: var(--leg, var(--accent)); }
+.tw-citycard-name { font-size: .92rem; font-weight: 600; white-space: nowrap; }
+.tw-citycard-meta { font-size: .78rem; color: var(--muted); white-space: nowrap; }
+.tw-citycard-hotel { margin-left: auto; font-size: .78rem; color: var(--muted); display: inline-flex; align-items: center; gap: 5px; min-width: 0; }
+.tw-citycard-hotel span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tw-citycard-hotel.empty { color: var(--accent); }
+@container (max-width: 430px) { .tw-citycard-dates { display: none; } }
+@container (max-width: 320px) { .tw-citycard-nights { display: none; } }
+@container (max-width: 220px) { .tw-citycard-hotel { display: none; } }
 
 /* Book tab */
 .bk { display: flex; flex-direction: column; gap: 1.6rem; }
@@ -485,8 +531,6 @@
   .tw-bucket-head { gap: .4rem; }
   .tw-layout { margin-left: 0; }
   .tw-mini, .gb-card { flex: 1 1 100% !important; max-width: none; min-height: 44px; }
-  .twn-day { font-size: .8rem; }
-  .twn-dow, .twn-mo { font-size: .52rem; }
   /* editor + composer go full-bleed */
   .ee-sheet { width: 100%; }
   .tc-sheet { width: 96%; padding: 1rem; }
