@@ -346,8 +346,12 @@ cold-start trip-name anchor) — a result with no center yields no chip
 the scout tray (`legs ∪ chips`), so a trip tagged "Hudson River Valley" grounds
 its suggestions there even before any leg is added.
 
-Follow-ups on #79: the cross-trip `/trips` region filter, and optional
-auto-seeding a leg's state as a `source: "leg"` chip.
+The **`/trips` index** ([TripsIndex](../components/TripsIndex.jsx)) shows each
+trip's region chips and a filter bar of every distinct tag — click one to show
+only trips carrying it ("All" clears). 
+
+Remaining follow-up on #79: optional auto-seeding a leg's state as a
+`source: "leg"` chip (the styling + filter already support it).
 
 Verified in-browser on the Slovenia trip: 2 handles between Ljubljana/Bled/Piran;
 a pointer drag previewed then committed Bled 4n→6n / Piran 5n→3n; the keyboard

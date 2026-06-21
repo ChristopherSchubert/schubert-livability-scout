@@ -180,6 +180,23 @@
 .tw-region-kind { font-family: var(--font-ui); font-size: .6rem; text-transform: uppercase; letter-spacing: .08em; padding: .1rem .4rem; border-radius: 100px; }
 .tw-region-kind.kind-region { color: #1d4477; background: #e1ecf7; }
 .tw-region-kind.kind-state { color: var(--muted); background: var(--panel-strong, #f1ead9); }
+
+/* Cross-trip region filter bar on /trips (#79). */
+.tw-region-filter { display: flex; flex-wrap: wrap; gap: .35rem; align-items: center; margin: 0 0 1.1rem; }
+.tw-region-filter-chip {
+  font-family: var(--font-ui); font-size: .74rem; font-weight: 600; white-space: nowrap;
+  border-radius: 100px; padding: .22rem .75rem; cursor: pointer;
+  color: var(--muted); background: transparent; border: 1px solid var(--border);
+  transition: filter .1s, background .1s, border-color .1s, color .1s;
+}
+.tw-region-filter-chip.kind-region { color: #1d4477; background: #e1ecf7; border-color: #bcd2ea; }
+.tw-region-filter-chip.kind-state { color: var(--muted); background: var(--panel-strong, #f1ead9); border-color: var(--border); }
+.tw-region-filter-chip:hover { filter: brightness(.96); }
+.tw-region-filter-chip.on { color: #fff; background: var(--accent); border-color: var(--accent); }
+
+/* Read-only region chips on a trip card. */
+.tw-card-regions { list-style: none; display: flex; flex-wrap: wrap; gap: .3rem; padding: 0; margin: .55rem 0 0; }
+.tw-region-chip-static { padding: .15rem .55rem; font-size: .68rem; }
 .tw-citytray-add { font-family: var(--font-ui); font-size: .74rem; font-weight: 600; color: var(--muted); background: var(--panel); border: 1px dashed var(--border); border-radius: 100px; padding: .22rem .75rem; cursor: pointer; white-space: nowrap; }
 .tw-citytray-add:hover:not(:disabled) { color: var(--accent); border-color: var(--accent); }
 .tw-citytray-add:disabled { cursor: not-allowed; opacity: .6; }

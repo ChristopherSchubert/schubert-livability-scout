@@ -5,7 +5,7 @@
 // the signature "where does this go" signal), a human date range, nights, and
 // who's going. Same paper/Fraunces/green language as the rest of the app, so
 // the landing page reads as designed, not as a debug list.
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import AppShell from "./AppShell";
 import { useTrips } from "./TripProvider";
@@ -61,6 +61,13 @@ function TripCard({ trip }) {
         {meta.join("  ·  ")}
         {diet.length ? <em className="tw-card-diet"> · {diet.join(" / ")}</em> : null}
       </p>
+      {(trip.regions || []).length ? (
+        <ul className="tw-card-regions">
+          {trip.regions.map((r, i) => (
+            <li key={`${r.label}-${i}`} className={`tw-region-chip tw-region-chip-static kind-${r.kind}`}>{r.label}</li>
+          ))}
+        </ul>
+      ) : null}
     </Link>
   );
 }
@@ -68,7 +75,33 @@ function TripCard({ trip }) {
 export default function TripsIndex() {
   const { trips, hydrated } = useTrips();
   const [composing, setComposing] = useState(false);
-  const count = trips.length;
+  const [regionFilter, setRegionFilter] = useState(null); // region label, or null = all
+
+  // Distinct region tags across all trips (#79) — the cross-trip filter set.
+  // Deduped by label (case-insensitive), keeping the first kind seen.
+  const allRegions = useMemo(() => {
+    const seen = new Map();
+    for (const t of trips) for (const r of t.regions || []) {
+      const key = r.label?.toLowerCase();
+      if (key && !seen.has(key)) seen.set(key, { label: r.label, kind: r.kind });
+    }
+    return [...seen.values()].sort((a, b) => a.label.localeCompare(b.label));
+  }, [trips]);
+
+  const shown = useMemo(() => (
+    regionFilter
+      ? trips.filter((t) => (t.regions || []).some((r) => r.label.toLowerCase() === regionFilter.toLowerCase()))
+      : trips
+  ), [trips, regionFilter]);
+
+  const total = trips.length;
+  const meta = !hydrated
+    ? "Loading…"
+    : total === 0
+      ? "No trips yet"
+      : regionFilter
+        ? `${shown.length} of ${total} ${total === 1 ? "trip" : "trips"} · in ${regionFilter}`
+        : `${total} ${total === 1 ? "trip" : "trips"}`;
   return (
     // Wrapped in the global AppShell (#65) so /trips has the same top nav as the
     // rest of the app — it was a dead-end (no way back to Board/Planning/…).
@@ -77,22 +110,43 @@ export default function TripsIndex() {
         <header className="tw-head tw-index-head">
           <div>
             <h1>Trips</h1>
-            <p className="tw-meta">
-              {!hydrated ? "Loading…" : count === 0 ? "No trips yet" : `${count} ${count === 1 ? "trip" : "trips"}`}
-            </p>
+            <p className="tw-meta">{meta}</p>
           </div>
           <button className="ee-done" onClick={() => setComposing(true)}>＋ New trip</button>
         </header>
+
+        {/* Cross-trip region/state filter (#79) — only when tags exist. */}
+        {hydrated && allRegions.length > 0 ? (
+          <div className="tw-region-filter" role="group" aria-label="Filter trips by region">
+            <button type="button" className={`tw-region-filter-chip${regionFilter === null ? " on" : ""}`}
+                    onClick={() => setRegionFilter(null)} aria-pressed={regionFilter === null}>All</button>
+            {allRegions.map((r) => {
+              const on = regionFilter?.toLowerCase() === r.label.toLowerCase();
+              return (
+                <button key={r.label} type="button"
+                        className={`tw-region-filter-chip kind-${r.kind}${on ? " on" : ""}`}
+                        aria-pressed={on}
+                        onClick={() => setRegionFilter(on ? null : r.label)}>{r.label}</button>
+              );
+            })}
+          </div>
+        ) : null}
+
         {!hydrated ? (
           <p className="tw-loading">Loading…</p>
-        ) : count === 0 ? (
+        ) : total === 0 ? (
           <div className="tw-trip-empty">
             <p>No trips yet.</p>
             <button className="ee-done" onClick={() => setComposing(true)}>＋ Start your first trip</button>
           </div>
+        ) : shown.length === 0 ? (
+          <div className="tw-trip-empty">
+            <p>No trips tagged <strong>{regionFilter}</strong>.</p>
+            <button className="ee-done" onClick={() => setRegionFilter(null)}>Show all trips</button>
+          </div>
         ) : (
           <div className="tw-trip-grid">
-            {trips.map((t) => <TripCard key={t.id} trip={t} />)}
+            {shown.map((t) => <TripCard key={t.id} trip={t} />)}
           </div>
         )}
         {composing ? <TripComposer onClose={() => setComposing(false)} /> : null}
