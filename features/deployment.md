@@ -6,25 +6,24 @@ How Livability Scout gets from a `git push` to the live site your wife sees.
 
 - **Host: Vercel.** Confirmed by the response headers on the live site
   (`server: Vercel`, `x-vercel-id`, `x-vercel-cache`).
-- **URLs are being migrated** to a clean `schubert-travel` naming, in two
-  stages. Today the app runs on Vercel-assigned `.vercel.app` hosts; once the
-  `schubertfamily.com` domain registration completes, the custom domains take
-  over. Both keep serving the same deployment through the transition.
-
-  | Role | Today (`.vercel.app`) | Once DNS lands (custom) |
-  |---|---|---|
-  | **Production** (`main`) | `https://schubert-travel.vercel.app` | `https://travel.schubertfamily.com` |
-  | **Preprod** (`preview`) | `https://schubert-travel-preview.vercel.app` | `https://travel-preview.schubertfamily.com` |
-
-  The older `https://schubert-livability-scout.vercel.app` (the GitHub repo's
-  `homepage` field) still resolves during the transition; retire it once
-  `schubert-travel` is the settled name and update `homepage` to match.
+- **Production URL: `https://travel.schubertfamily.com`** (custom domain, live).
+  The Vercel-assigned `https://schubert-travel.vercel.app` still resolves and
+  serves the same deployment — keep it as a fallback / for previews.
+- **Preprod URL: `https://schubert-travel-preview.vercel.app`** (pinned in
+  Vercel to the `preview` branch). The custom `travel-preview.schubertfamily.com`
+  CNAME hasn't been added at GoDaddy yet — when it lands, point Vercel at it the
+  same way the prod domain works today.
+- The older `https://schubert-livability-scout.vercel.app` (the GitHub repo's
+  `homepage` field) still resolves; retire it now that the `travel`/`schubert-travel`
+  naming is settled and update `homepage` to match.
 - **Repo:** `ChristopherSchubert/schubert-livability-scout` (GitHub, public).
 
-### Custom domains (pending DNS)
+### Custom domains
 
 Both custom domains are subdomains of `schubertfamily.com`, whose DNS lives at
-the **GoDaddy** registrar (not Vercel). Each is one `CNAME`:
+the **GoDaddy** registrar (not Vercel). Each is one `CNAME`. `travel` is live;
+`travel-preview` is the still-pending preprod CNAME (add at GoDaddy + Vercel
+when ready):
 
 | Type | Name (host) | Value | Vercel → Git Branch |
 |---|---|---|---|
@@ -161,17 +160,16 @@ allowlist should carry both today's `.vercel.app` hosts and the future custom
 domains — Supabase ignores entries that aren't in use, so listing all of them is
 safe and means nothing breaks at cutover.
 
-**Site URL:** `https://schubert-travel.vercel.app` today; switch to
-`https://travel.schubertfamily.com` once that DNS validates.
+**Site URL:** `https://travel.schubertfamily.com` (the custom domain is live).
 
 **Redirect URLs** allowlist:
 
-- `https://schubert-travel.vercel.app` (production, today)
-- `https://schubert-travel-preview.vercel.app` (preprod, today)
-- `https://travel.schubertfamily.com` (production, after DNS)
-- `https://travel-preview.schubertfamily.com` (preprod, after DNS)
+- `https://travel.schubertfamily.com` (production, live)
+- `https://schubert-travel.vercel.app` (Vercel host / previews fallback)
+- `https://schubert-travel-preview.vercel.app` (preprod, until the custom domain lands)
+- `https://travel-preview.schubertfamily.com` (preprod, after DNS — add now to save a step at cutover)
 - `https://schubert-livability-scout.vercel.app` (legacy host, until retired)
-- `http://localhost:3000` (dev)
+- `http://localhost:38520` (dev; this project's claimed port — see CLAUDE.md)
 
 If sign-in links bounce to an error, check that allowlist first.
 
@@ -179,7 +177,7 @@ If sign-in links bounce to an error, check that allowlist first.
 
 - **Is the latest push live yet?** The served HTML / assets update when the
   build finishes. Quick smell test for "did my CSS/font work ship":
-  `curl -s https://schubert-travel.vercel.app | grep -oE 'Fraunces|auth-scene'`
+  `curl -s https://travel.schubertfamily.com | grep -oE 'Fraunces|auth-scene'`
   (the root route is the auth gate, so workspace-page markup won't appear in the
   SSR HTML — it's client-rendered behind auth).
 - **"The live site looks unchanged" almost always means** the deploy hasn't
