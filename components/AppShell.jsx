@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { STAGES, citySlug, cityStage } from "../lib/planner-data";
+import { useAuth } from "./AuthGate";
 import { usePlanner } from "./PlannerProvider";
 import { useTrips } from "./TripProvider";
 
@@ -205,7 +206,7 @@ function TopBar({ activeMode }) {
         })}
       </nav>
 
-      <BackupMenu
+      <AccountMenu
         onExport={() => {
           const blob = new Blob([exportPlanner()], { type: "application/json" });
           const url = URL.createObjectURL(blob);
@@ -236,16 +237,63 @@ function SavePill({ saveState, hydrated }) {
   return <span className="save-pill saved" title="Saved to the cloud">{label}</span>;
 }
 
-function BackupMenu({ onExport }) {
+// Top-right account control: a real avatar (Google photo, or initials on the
+// accent tint as fallback) opening a menu with the signed-in identity, the
+// planner backup export, and Sign out. (#82 — there was no sign-out anywhere.)
+function AccountMenu({ onExport }) {
+  const { displayName, email, avatarUrl, signOut } = useAuth();
   const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+
+  // Close on outside click or Escape — a menu pinned to app chrome shouldn't
+  // need a precise mouse-leave to dismiss.
+  useEffect(() => {
+    if (!open) return;
+    const onDoc = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    const onKey = (e) => { if (e.key === "Escape") setOpen(false); };
+    document.addEventListener("mousedown", onDoc);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDoc);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
+
+  const initials = (displayName || "?").trim().split(/\s+/).map((w) => w[0]).slice(0, 2).join("").toUpperCase();
+  // referrerPolicy=no-referrer: Google's lh3 avatar CDN 403s requests that send
+  // a referrer, which would otherwise break the photo on our domain.
+  const avatar = avatarUrl
+    ? <img className="account-avatar" src={avatarUrl} alt="" referrerPolicy="no-referrer" />
+    : <span className="account-initials" aria-hidden="true">{initials}</span>;
+
+  // Reuse the backup-menu structural classes (positioning + the responsive /
+  // scroll-condense chrome lives on them in workspace.css); account-* classes
+  // add only the avatar + identity visuals.
   return (
-    <div className={`backup-menu${open ? " open" : ""}`}>
-      <button type="button" className="backup-trigger" onClick={() => setOpen((value) => !value)} aria-expanded={open}>
-        ⋯
+    <div className="backup-menu account-menu" ref={ref}>
+      <button
+        type="button"
+        className="backup-trigger account-trigger"
+        onClick={() => setOpen((value) => !value)}
+        aria-haspopup="menu"
+        aria-expanded={open}
+        aria-label={`Account: ${displayName}`}
+        title={displayName}
+      >
+        {avatar}
       </button>
       {open ? (
-        <div className="backup-pop" role="menu" onMouseLeave={() => setOpen(false)}>
-          <button type="button" onClick={() => { setOpen(false); onExport(); }}>Download backup</button>
+        <div className="backup-pop account-pop" role="menu">
+          <div className="account-id">
+            {avatar}
+            <div className="account-id-text">
+              <strong>{displayName}</strong>
+              {email ? <span title={email}>{email}</span> : null}
+            </div>
+          </div>
+          <div className="account-sep" role="separator" />
+          <button type="button" role="menuitem" onClick={() => { setOpen(false); onExport(); }}>Download backup</button>
+          <button type="button" role="menuitem" className="account-signout" onClick={() => { setOpen(false); signOut(); }}>Sign out</button>
         </div>
       ) : null}
     </div>

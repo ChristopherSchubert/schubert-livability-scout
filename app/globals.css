@@ -1349,6 +1349,58 @@ button:hover, .button-link:hover {
 .backup-import input { font-size: 0.85rem; }
 .backup-danger { color: #a13e1f; }
 
+/* Account menu (#82) — avatar trigger + identity header layered onto the
+   backup-menu structure. The trigger becomes a clipped circle holding the
+   Google photo, or initials on the accent tint when there's no photo. */
+.account-trigger {
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent-soft);
+  border: 1px solid var(--border);
+}
+.account-trigger:hover { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.account-avatar { width: 100%; height: 100%; object-fit: cover; display: block; }
+.account-initials {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 0.82rem;
+  letter-spacing: 0.02em;
+  color: var(--accent);
+}
+.account-pop { width: 244px; }
+.account-id {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.3rem 0.45rem 0.5rem;
+}
+.account-id .account-avatar,
+.account-id .account-initials {
+  width: 38px;
+  height: 38px;
+  flex: none;
+  border-radius: 999px;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent-soft);
+  font-size: 0.95rem;
+}
+.account-id-text { display: grid; gap: 0.05rem; min-width: 0; }
+.account-id-text strong { font-size: 0.95rem; line-height: 1.2; }
+.account-id-text span {
+  font-size: 0.8rem;
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.account-sep { height: 1px; background: var(--border); margin: 0.15rem 0; }
+.account-signout { color: var(--accent); font-weight: 600; }
+
 /* City context strip ----------------------------------------------------- */
 /* Stacks naturally inside .sticky-header below the topbar — no own offset. */
 .city-context {

@@ -50,9 +50,12 @@ export default function AuthGate({ children }) {
   const displayName = user?.user_metadata?.full_name
     || user?.email?.split("@")[0]
     || "you";
+  // Google sign-in populates the photo under avatar_url (some providers use
+  // picture); null for the magic-link/dev user, which falls back to initials.
+  const avatarUrl = user?.user_metadata?.avatar_url || user?.user_metadata?.picture || null;
 
   return (
-    <AuthContext.Provider value={{ user, userId: user.id, displayName, signOut: () => getSupabase().auth.signOut() }}>
+    <AuthContext.Provider value={{ user, userId: user.id, displayName, email: user.email || null, avatarUrl, signOut: () => getSupabase().auth.signOut() }}>
       {children}
     </AuthContext.Provider>
   );
