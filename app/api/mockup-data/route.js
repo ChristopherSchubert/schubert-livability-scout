@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { connect } from "../../../lib/measurers/_db.js";
+import { createClient } from "@supabase/supabase-js";
 import { rowToCity } from "../../../lib/city-row.js";
 import { buildCityDetailView, buildHomebaseView } from "../../../lib/city-detail-view.js";
 
@@ -11,30 +11,58 @@ import { buildCityDetailView, buildHomebaseView } from "../../../lib/city-detail
 // the same shape in-process via lib/city-detail-view.js, so both stay in lock-
 // step — the shaping lives in exactly one place now.
 //
-// Server-side only — uses the direct pg connection (lib/measurers/_db.js),
-// so RLS is bypassed and no auth is required from the browser. That's
-// appropriate: cities table holds non-PII shared candidate data, and
-// nothing here is mutating.
+// Server-side only — uses the Supabase service-role key (SUPABASE_SECRET_KEY,
+// .env.local + Vercel env, never in the bundle) so it bypasses the `cities`
+// RLS (authed-only select) without exposing a public read policy. The cities
+// table holds non-PII shared candidate data and nothing here mutates, so a
+// server-mediated read is appropriate. Falls back to the publishable key for
+// dev convenience (returns 503 with a clear message if neither is set).
+// (#97 — was using lib/measurers/_db.js which reads the macOS Keychain;
+//  Vercel has no `security` binary, so prod threw `spawnSync security ENOENT`.)
 
 const HOMEBASE_SLUG = "allison-park-pa";
 const DEFAULT_SLUG = "newport-ri";
 
 export const dynamic = "force-dynamic";
 
+const CORS = {
+  "Cache-Control": "no-store",
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "GET, OPTIONS",
+};
+
+export async function OPTIONS() {
+  return new Response(null, { status: 204, headers: CORS });
+}
+
 export async function GET(request) {
   const url = new URL(request.url);
   const slug = url.searchParams.get("slug") || DEFAULT_SLUG;
 
-  let client;
-  try {
-    client = await connect();
-    const { rows } = await client.query(
-      `select * from cities where slug = any($1::text[])`,
-      [[slug, HOMEBASE_SLUG]]
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  // Prefer the service-role key (bypasses RLS); fall back to the publishable
+  // key for local probing. In prod the publishable key returns [] because
+  // cities RLS gates anon reads — set SUPABASE_SECRET_KEY on Vercel.
+  const key = process.env.SUPABASE_SECRET_KEY
+    || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+    || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!supabaseUrl || !key) {
+    return NextResponse.json(
+      { error: "Server not configured: NEXT_PUBLIC_SUPABASE_URL + SUPABASE_SECRET_KEY required." },
+      { status: 503, headers: CORS },
     );
-    const bySlug = Object.fromEntries(rows.map((r) => [r.slug, r]));
+  }
+
+  try {
+    const sb = createClient(supabaseUrl, key, { auth: { persistSession: false } });
+    const { data: rows, error } = await sb
+      .from("cities")
+      .select("*")
+      .in("slug", [slug, HOMEBASE_SLUG]);
+    if (error) throw error;
+    const bySlug = Object.fromEntries((rows || []).map((r) => [r.slug, r]));
     if (!bySlug[slug]) {
-      return NextResponse.json({ error: `No city with slug "${slug}"` }, { status: 404 });
+      return NextResponse.json({ error: `No city with slug "${slug}"` }, { status: 404, headers: CORS });
     }
     const city = rowToCity(bySlug[slug]);
     const homebaseRow = bySlug[HOMEBASE_SLUG];
@@ -45,20 +73,8 @@ export async function GET(request) {
       homebase: homebaseRow
         ? buildHomebaseView(rowToCity(homebaseRow), { slug: HOMEBASE_SLUG })
         : null,
-    }, {
-      // CORS — the static-server preview at :8765 fetches this from a
-      // different origin during design iteration. The route is read-only
-      // and exposes only non-PII shared candidate data, so wide-open is
-      // fine. Cache-Control keeps every request fresh.
-      headers: {
-        "Cache-Control": "no-store",
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "GET, OPTIONS",
-      },
-    });
+    }, { headers: CORS });
   } catch (err) {
-    return NextResponse.json({ error: err.message || String(err) }, { status: 500 });
-  } finally {
-    if (client) await client.end().catch(() => {});
+    return NextResponse.json({ error: err.message || String(err) }, { status: 500, headers: CORS });
   }
 }

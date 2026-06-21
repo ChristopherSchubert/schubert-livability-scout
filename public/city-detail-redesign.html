@@ -2253,13 +2253,17 @@
     // Slug comes from ?slug=... in the URL, defaulting to newport-ri.
     const params = new URLSearchParams(window.location.search);
     const slug = params.get('slug') || 'newport-ri';
-    // The API runs on the Next dev server (:3000) and accepts CORS from
-    // anywhere. When the mockup is served from any other origin (the
-    // static preview at :8765, an `open file://` test, etc.), we still
-    // resolve to the same Supabase-backed data.
-    const apiBase = (window.location.port && window.location.port !== '3000')
-      ? `${window.location.protocol}//${window.location.hostname}:3000`
-      : '';
+    // The API ships as part of the Next app and accepts CORS from anywhere.
+    // When the mockup is served BY the Next app (prod, or `npm run dev`), use
+    // a relative URL — same-origin. When it's loaded standalone (the static
+    // preview server, an `open file://` test, etc.), fall back to the project's
+    // dev port (38520 — see CLAUDE.md port block). Override with ?api=URL.
+    const overrideApi = params.get('api');
+    const DEV_API_ORIGIN = 'http://localhost:38520';
+    const servedByNext = window.location.port === '' || window.location.port === '38520';
+    const apiBase = overrideApi
+      ? overrideApi.replace(/\/$/, '')
+      : (servedByNext ? '' : DEV_API_ORIGIN);
     const SNAPSHOT = await fetch(`${apiBase}/api/mockup-data?slug=${encodeURIComponent(slug)}`)
       .then((r) => r.ok ? r.json() : null)
       .catch(() => null);
