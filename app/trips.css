@@ -148,8 +148,7 @@
   border-radius: 100px; padding: .2rem .35rem .2rem .7rem; white-space: nowrap;
 }
 .tw-region-chip.kind-region { color: #1d4477; background: #e1ecf7; border: 1px solid #bcd2ea; }
-.tw-region-chip.kind-state, .tw-region-chip.from-leg { color: var(--muted); background: var(--panel-strong, #f1ead9); border: 1px solid var(--border); }
-.tw-region-src { font-weight: 500; opacity: .8; }
+.tw-region-chip.kind-state { color: var(--muted); background: var(--panel-strong, #f1ead9); border: 1px solid var(--border); }
 .tw-region-x {
   border: none; background: transparent; cursor: pointer; color: inherit;
   font-size: 1rem; line-height: 1; padding: 0 .15rem; border-radius: 100px; opacity: .65;

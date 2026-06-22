@@ -6,8 +6,7 @@ import { isGeographicPlace, regionKind } from "../lib/places";
 // Trip-level geographic tags (#79): region/state chips that describe the trip
 // and power the cross-trip filter + the Plan-tab suggestion anchor. Adding a
 // chip geocodes free text via /api/places/search and keeps only geographic
-// results; a result with no center yields no chip (never-invent). Chips derived
-// from a city leg's state carry `source: "leg"` and read "· from leg".
+// results; a result with no center yields no chip (never-invent).
 export default function TripRegions({ regions = [], onChange }) {
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
@@ -52,9 +51,8 @@ export default function TripRegions({ regions = [], onChange }) {
     <div className="tw-regions">
       <ul className="tw-region-chips">
         {regions.map((r, i) => (
-          <li key={`${r.label}-${i}`} className={`tw-region-chip kind-${r.kind}${r.source === "leg" ? " from-leg" : ""}`}>
+          <li key={`${r.label}-${i}`} className={`tw-region-chip kind-${r.kind}`}>
             <span className="tw-region-label">{r.label}</span>
-            {r.source === "leg" ? <small className="tw-region-src">· from leg</small> : null}
             <button type="button" className="tw-region-x" onClick={() => removeChip(i)} aria-label={`Remove ${r.label}`}>×</button>
           </li>
         ))}
