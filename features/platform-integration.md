@@ -180,13 +180,11 @@ callsites (4 API routes + `lib/image-manifest.js` + `scripts/hero-audit.mjs`).
 
 **Depends on:** interlock #2 (travel schema on Data API). Back up `schubert-travel` first.
 
-**Files:** Create `supabase/migrations/0024_travel_schema.sql`.
+**Files:** `supabase/migrations/0024_travel_schema.sql`.
 
-- [ ] `pg_dump` all data from `schubert-travel` (schema + data) — archive it.
-- [ ] Author `0023`: `create schema if not exists travel;` then create every Travel table (cities, pois, poi_positions, the 7 per-user tables, walkthrough_feedback, etc.) in `travel`, porting the bodies of migrations 0001–0022. Keep RLS **off/old** for now; identity rewrite is Ticket 3.
-- [ ] Apply `0023` to `schubert-family` (local-stack-verified first).
-- [ ] Migrate data: load the non-user reference data (cities, pois, poi_positions, walkthrough_feedback) into `travel.*`. Per-user rows (`felt_surveys`, `baseline_ratings`, etc.) load with their **old** `schubert-travel` `user_id`s for now; Ticket 3 remaps them.
-- [ ] **Verify:** row counts match the `schubert-travel` source for every table (`select count(*)` parity).
+- [x] **Schema ported + applied (2026-06-22).** `0024_travel_schema.sql` creates `travel` + all **13** live tables (the 11 in `schema.sql` **plus** `cities.matrix` and the two cache tables `nominatim_cache` / `external_cache` that `schema.sql` had drifted from — authored from the live `schubert-travel.public` schema, not `schema.sql`). Applied to `schubert-family` via the Supabase MCP. `profiles.id` is a bare uuid (the `auth.users` FK is dropped so old user_ids load; identity is #90); RLS left disabled (deferred to #90); intra-`travel` FKs preserved. Verified: 13 `travel.*` tables exist, 0 rows.
+- [ ] **Data copy — BLOCKED on DB credentials (discovered 2026-06-22).** The "copy via MCP `execute_sql` generated INSERTs, no password needed" assumption is **empirically false**: MCP `execute_sql` has an output token cap that even **28 small rows (trips/baseline/etc.) exceed (78 KB)**, and `pois` is **18,393 rows**. A server-side `postgres_fdw`/`dblink` or `pg_dump | psql` bulk copy is the only viable path, and all of those need **travel's DB password** (`supabase-db-password`, currently **absent**) plus **family's** (`supabase-family-db-password`, the #92 slot, absent). → Add both to the Keychain, then run a local streaming upsert copy (idempotent on PK). The `pg_dump` backup bullet is covered by Supabase's managed daily backup of `schubert-travel` (owner-approved 2026-06-22), since this work never writes to it.
+- [ ] **Verify:** row counts match the `schubert-travel` source for every table (`select count(*)` parity) — after the data copy.
 
 **Acceptance:**
 - [ ] `schubert-family.travel` has every Travel table with row-count parity to `schubert-travel`.
