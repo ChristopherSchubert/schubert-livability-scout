@@ -76,14 +76,16 @@ semantics), not eyeballed.
   `components/AppShell.jsx`, `app/workspace.css`. Remaining #6 targets (Board
   `.advance` buttons 22px, the calibration checkbox 13×13, Filters 31px) move
   to Phase 4.
-- **Phase 2 — Ranking** ✅ (#2): at ≤640px the 9-column table reflows (pure CSS,
-  `display` swap + `data-label` chip labels) to self-contained cards — rank +
-  thumbnail + name on line 1, then axis/Overall/Visit-now scores as a wrapping
-  row of labeled chips with Overall emphasized. All 9 scores now visible (was 2
-  of 9); table width 843px → 342px, no overflow. Desktop keeps the sortable
-  table. Files: `components/Calibrate.jsx`, `app/workspace.css`.
+- **Phase 2 — Compare (was Ranking)** ✅ (#2): at ≤640px the table reflows (pure
+  CSS, `display` swap + `data-label` chip labels) to self-contained cards.
+  Reframed 2026-06-21 (#68) to be timing-first: thumbnail + name on line 1, the
+  full-width **year sparkline** on line 2, then **Great in [month]** + axis +
+  Fit scores as a wrapping row of labeled chips (`order` puts the timing chip
+  first, Fit last). All scores visible (the desktop columns would clip
+  off-screen otherwise). Desktop keeps the sortable table. Files:
+  `components/Calibrate.jsx`, `components/YearSparkline.jsx`, `app/workspace.css`.
   **Follow-up:** the column-header sort is `display:none` on mobile, so the only
-  mobile sort is the default Overall-desc (which IS the ranking) + the
+  mobile sort is the default great-in-[month]-desc + the month selector +
   search/filters. A mobile sort control (dropdown) is deferred — see follow-ups.
 - **Phase 3 — City-detail overflow + Board** ✅ (#4; #5 decided-keep):
   city-detail horizontal overflow gone (24px → 1px sub-pixel). Three fixes at

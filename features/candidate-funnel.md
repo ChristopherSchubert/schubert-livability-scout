@@ -1,6 +1,6 @@
-# Candidate funnel — Board ⇄ Ranking
+# Places overview — Board ⇄ Compare
 
-Two lenses on the **same** candidate set, switched by a shared toggle:
+Two lenses on the **same** set of places, switched by a shared toggle:
 
 - **Board** (`/board`, [`FunnelBoard.jsx`](../components/FunnelBoard.jsx)) — a
   5-stage kanban (Backlog → Planning → Planned → Visited → Assessed). Drag a
@@ -31,11 +31,23 @@ Two lenses on the **same** candidate set, switched by a shared toggle:
     fragment of the move hint is hidden on coarse pointers
     (`@media (hover: none)`), and an empty gated column reads "Set from a
     city's page" instead of a false "Drop a card here".
-- **Ranking** (`/ranking`, [`Calibrate.jsx`](../components/Calibrate.jsx)) — a
-  sortable table of the same cities with per-axis columns, an Overall column
-  (weights **learned** from the owner's gut via `learnedAxisWeights`), and a
-  Visit-now column. Click a column header to sort; shift-click adds a
-  secondary sort.
+- **Compare** (`/ranking`, [`Calibrate.jsx`](../components/Calibrate.jsx)) — a
+  sortable table of the same places, organized around **when** each one is good
+  to visit (#68). A **"Best to visit in [month]"** selector (`filters.nowMonth`
+  / `setNowMonth`) drives the primary **"Great in [month]"** column
+  (`visitNowScore` — that month's climate comfort plus a don't-miss-it nudge
+  when the next two months drop) and a compact 12-month **year sparkline**
+  ([`YearSparkline.jsx`](../components/YearSparkline.jsx); tested in
+  [`test/components/YearSparkline.test.jsx`](../test/components/YearSparkline.test.jsx))
+  showing each place's year-shape with the selected month solid and the Prime
+  window outlined. The five per-axis columns and the **Fit** column (a weighted
+  average; weights **learned** from the owner's gut via `learnedAxisWeights`)
+  stay as honest, sortable signals — Fit is de-emphasized (one signal, not a
+  verdict), and the old `#` rank ordinal is gone. Default sort is by the
+  timing column; click any header to re-sort, shift-click adds a secondary
+  sort. The route stays `/ranking` (no broken links); only the label/voice
+  changed. On a phone the table reflows to cards (place → sparkline → great-in
+  → axes → Fit); see [mobile.md](mobile.md).
 
 ## Shared filter system
 
@@ -51,9 +63,9 @@ header).
 
 ## Shared header ([`components/FunnelHeader.jsx`](../components/FunnelHeader.jsx))
 
-Both views render an **identical** compact header (eyebrow "Candidates" + h1
-"Every candidate" + a one-line `meta`). This exists because Board used to
-carry a tall editorial header while Ranking had none, so switching views
+Both views render an **identical** compact header (eyebrow "Places" + h1
+"Every place" + a one-line `meta`). This exists because Board used to
+carry a tall editorial header while Compare had none, so switching views
 jumped the ViewToggle and all content ~124px vertically (2026-06-09: the owner
 flagged that toggling "moves"). With the same header on both, the controls bar
 + toggle sit at the same Y on each page → no shift. The title was also
@@ -64,14 +76,16 @@ Keep the `meta` to one line on both views so the header heights stay equal.
 
 ## View toggle ([`components/ViewToggle.jsx`](../components/ViewToggle.jsx))
 
-The Board/Ranking switch. Originally two bare words that didn't read as
+The Board/Compare switch. Originally two bare words that didn't read as
 interactive (2026-06-09: the owner couldn't tell it was a toggle). Now a
 single shared component: a "VIEW" eyebrow label, a segmented pill, an icon per
-segment (kanban columns for Board, ranked bars for Ranking), the active
-segment raised (white + shadow + accent icon), and a hover/focus lift on the
-inactive one so it clearly reads as a clickable alternate view. Styles in
+segment (kanban columns for Board, a calendar for Compare — the view is
+organized by when a place is good), the active segment raised (white + shadow +
+accent icon), and a hover/focus lift on the inactive one so it clearly reads as
+a clickable alternate view. Styles in
 [`app/workspace.css`](../app/workspace.css) (`.view-toggle*`). Extracted so the
-two pages can't drift; pass `active="board"` / `active="ranking"`.
+two pages can't drift; pass `active="board"` / `active="ranking"` (the id/route
+stay `ranking`, the label reads "Compare").
 
 ## Voice: vacation app, not a decision tool (#68)
 
@@ -92,11 +106,15 @@ renamed to `VisitReview`, `VisitReviewRoute`, `LookingBackArchive`,
 `REVISIT_OUTCOMES`, and `revisitLabel`. The stored `decision` field and
 `decision-chip` CSS class stay — renaming them needs a migration.)
 
-Open, owner's call (left on #68): the **Ranking spreadsheet + per-axis
-"minimum scores" sliders** are the most rank-and-decide-flavored surface
-left. They're functional and were kept as-is rather than removed under the
-new framing — a product decision, not a copy fix. (2026-06-13: CLAUDE.md's
-header has now been rewritten to the vacation/exploration framing.)
+Resolved (2026-06-21, #68): the owner's call on the **Ranking spreadsheet +
+per-axis "minimum scores" sliders** — *"integrate timing/seasonality, and
+reframe a bit. But this is such good data."* So the data was kept, not removed,
+and the leaderboard framing was softened into the **Compare** view above:
+timing promoted to first-class (month selector + "Great in [month]" + year
+sparkline), Fit de-emphasized as one signal, the `#` rank ordinal dropped, and
+the label/voice moved from "Ranking" to "Compare." The "minimum scores" filter
+sliders stay — they're a discovery filter, not a verdict. (2026-06-13:
+CLAUDE.md's header was rewritten to the vacation/exploration framing.)
 
 ## Status
 

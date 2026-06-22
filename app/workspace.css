@@ -237,13 +237,42 @@
   line-height: 1.2;
 }
 .rt-city span { color: var(--muted); font-size: 0.8rem; line-height: 1.3; }
+/* Fit is one signal among several now, not the verdict — legible, not dominant (#68). */
 .rt-overall {
   font-family: var(--font-display);
-  font-variation-settings: "opsz" 90, "SOFT" 40, "wght" 600;
-  font-size: 1.5rem;
-  color: var(--accent);
+  font-variation-settings: "opsz" 60, "SOFT" 40, "wght" 540;
+  font-size: 1.1rem;
+  color: #6f6244;
 }
 .rt-empty { color: var(--muted); padding: 2rem 0.5rem; }
+
+/* "Great in [month]" is the primary, timing-first column — give its score chip
+   a touch more presence than the axis chips so the eye lands on it first. */
+.rt-when .rt-score { font-size: 1.02rem; padding: 0.18rem 0.5rem; }
+
+/* Year sparkline — a compact echo of the city page's vw-strip (#68). 12 bars,
+   the compared month solid, Prime/Off-season outlined. Detail lives on the
+   city page; here it's just "what shape is this place's year." */
+.rt-spark-col { width: 128px; }
+.rank-table th.rt-spark-col { cursor: default; }
+.rt-spark {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 30px;
+  width: 116px;
+}
+.rt-spark-bar {
+  flex: 1 1 0;
+  min-height: 2px;
+  background: var(--accent-soft);
+  border-radius: 2px 2px 0 0;
+}
+.rt-spark-bar.sel { background: var(--accent); }
+.rt-spark-bar.prime { outline: 1.5px solid var(--accent); outline-offset: -1.5px; }
+.rt-spark-bar.offseason { outline: 1.5px solid var(--stage-decide); outline-offset: -1.5px; }
+.rt-spark-bar.na { background: #ece4d3; }
+.rt-spark-empty { color: #b3a890; }
 .weight-note {
   background: var(--panel-strong);
   border: 0;
@@ -674,15 +703,14 @@
   .city-context-nav::-webkit-scrollbar { display: none; }
   .city-context-tab { font-size: 0.64rem; padding-left: 0.45rem; padding-right: 0.45rem; white-space: nowrap; }
 
-/* ── Ranking table → card list (Phase 2, features/mobile.md) ──────────────────
-   The 9-column table is 843px wide; on a phone all 6 score columns are clipped
-   off-screen, so the ranking shows names with no scores — the whole point of
-   the view is invisible. At phone width the table reflows to self-contained
-   cards: rank + city on line 1, then the axis/Overall/Visit-now scores as a
-   wrapping row of labeled chips (the hidden <thead> labels are restored per
-   chip via data-label). No JS, no markup change beyond data-label; sort logic
-   is intact (default Overall-desc IS the ranking). A mobile sort control is a
-   tracked follow-up. */
+/* ── Compare table → card list (features/mobile.md; reframed #68) ─────────────
+   On a phone the wide table would clip its score columns off-screen, so it
+   reflows to self-contained cards: the place (thumb/name/zone) on line 1, the
+   year sparkline on line 2, then "Great in [month]" + axis + Fit scores as a
+   wrapping row of labeled chips (the hidden <thead> labels restored per chip
+   via data-label). No JS, no markup change beyond data-label; sort logic is
+   intact (default great-in-month-desc). A mobile sort control is a tracked
+   follow-up. */
 @media (max-width: 640px) {
   .rank-table-wrap { overflow-x: visible; }
   .rank-table,
@@ -704,29 +732,37 @@
   /* `tbody td` to outrank the desktop `.rank-table tbody td` border/padding. */
   .rank-table tbody td { display: block; padding: 0; border: none; }
 
-  /* Line 1: rank numeral + city (thumb/name/zone). rt-city basis ~100% forces
-     the score chips to wrap onto the next line. */
-  .rank-table td.rt-rank {
-    flex: 0 0 auto;
-    width: 1.9rem;
-    font-size: 1.5rem;     /* keep at 24px so the muted numeral counts as WCAG large text */
-    text-align: center;
-    line-height: 1;
-  }
+  /* Line 1: the place (thumb/name/zone), full width so chips wrap below it. */
   .rank-table tbody td.rt-city {
-    flex: 1 1 calc(100% - 2.8rem);
+    flex: 1 1 100%;
     min-width: 0;          /* override the desktop min-width:260px so it shrinks */
   }
 
-  /* Line 2+: labeled score chips, ~3–4 per row, wrapping. */
+  /* Line 2: the year sparkline, full width with its label. */
+  .rank-table td.rt-spark-col {
+    flex: 1 1 100%;
+    width: auto;
+  }
+  .rank-table td.rt-spark-col::before {
+    content: attr(data-label);
+    display: block;
+    font-size: 0.56rem;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--muted);
+    margin-bottom: 3px;
+  }
+  .rank-table td.rt-spark-col .rt-spark { width: 100%; height: 34px; }
+
+  /* Line 3+: labeled score chips, ~3–4 per row, wrapping. */
+  .rank-table td.rt-when,
   .rank-table td.rt-axis,
-  .rank-table td.rt-visitnow,
   .rank-table td.rt-overall {
     flex: 1 0 auto;
     min-width: 3.4rem;
   }
+  .rank-table td.rt-when::before,
   .rank-table td.rt-axis::before,
-  .rank-table td.rt-visitnow::before,
   .rank-table td.rt-overall::before {
     content: attr(data-label);
     display: block;
@@ -737,14 +773,13 @@
     margin-bottom: 3px;
     white-space: nowrap;
   }
-  /* Overall is the sort key — give it weight, not just another faint chip. */
-  .rank-table td.rt-overall {
-    font-size: 1.15rem;
-    color: var(--accent);
-  }
-  /* Drop the desktop visit-now separator stub; the chip label already sets it
-     apart, and a short floating vertical rule reads as an accident on a card. */
-  .rank-table tbody td.rt-visitnow { border-left: none; }
+  /* Card order: place → year sparkline → great-in-month → axes → fit. The
+     timing chip leads the score row; Fit trails as one signal among several. */
+  .rank-table td.rt-city { order: 0; }
+  .rank-table td.rt-spark-col { order: 1; }
+  .rank-table td.rt-when { order: 2; }
+  .rank-table td.rt-axis { order: 3; }
+  .rank-table td.rt-overall { order: 4; }
 }
 
 /* ── Planned-trips cards (Phase 5, features/mobile.md) ────────────────────────

@@ -1,8 +1,10 @@
 "use client";
 
-// Board ⇄ Ranking view switch — the two lenses on the same candidate set.
+// Board ⇄ Compare view switch — the two lenses on the same set of places.
 // Shared so the two pages can't drift (icons, labels, a11y wiring live once).
-// Pass the active view id ("board" | "ranking").
+// Pass the active view id ("board" | "ranking"). The id/route stay "ranking"
+// (no broken links) but the label reads "Compare" — the view sorts/filters
+// places to explore by when they're good, not a ranking toward a verdict (#68).
 
 import Link from "next/link";
 import { useRef } from "react";
@@ -19,20 +21,22 @@ function BoardIcon() {
   );
 }
 
-function RankingIcon() {
-  // ranked bars (decreasing)
+function CompareIcon() {
+  // a small calendar grid — Compare is organized by when a place is good
   return (
     <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">
-      <rect x="1" y="2" width="12" height="2.4" rx="1.2" fill="currentColor" />
-      <rect x="1" y="5.8" width="8.5" height="2.4" rx="1.2" fill="currentColor" />
-      <rect x="1" y="9.6" width="5" height="2.4" rx="1.2" fill="currentColor" />
+      <rect x="1.2" y="2.2" width="11.6" height="10.4" rx="1.6" fill="none" stroke="currentColor" strokeWidth="1.3" />
+      <line x1="1.2" y1="5.2" x2="12.8" y2="5.2" stroke="currentColor" strokeWidth="1.3" />
+      <line x1="4" y1="1" x2="4" y2="3.2" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+      <line x1="10" y1="1" x2="10" y2="3.2" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+      <rect x="6.2" y="7" width="2.4" height="2.4" rx="0.5" fill="currentColor" />
     </svg>
   );
 }
 
 const VIEWS = [
   { id: "board", href: "/board", label: "Board", Icon: BoardIcon },
-  { id: "ranking", href: "/ranking", label: "Ranking", Icon: RankingIcon },
+  { id: "ranking", href: "/ranking", label: "Compare", Icon: CompareIcon },
 ];
 
 export default function ViewToggle({ active }) {
@@ -55,7 +59,7 @@ export default function ViewToggle({ active }) {
   }
 
   return (
-    <div className="view-toggle" role="tablist" aria-label="Switch candidate view">
+    <div className="view-toggle" role="tablist" aria-label="Switch place view">
       <span className="view-toggle-label" aria-hidden="true">View</span>
       {VIEWS.map(({ id, href, label, Icon }, index) => {
         const isActive = id === active;

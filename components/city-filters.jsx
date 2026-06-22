@@ -85,7 +85,7 @@ export function useCityFilters() {
   const [axisMins, setAxisMins] = useState({});
   const [visitNowMin, setVisitNowMin] = useState(0);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [nowMonth] = useState(() => new Date().getMonth());
+  const [nowMonth, setNowMonth] = useState(() => new Date().getMonth());
 
   const axisMinActive = Object.values(axisMins).filter((v) => v > 0).length;
   const activeFilterCount =
@@ -116,7 +116,7 @@ export function useCityFilters() {
     visitNowMin, setVisitNowMin,
     drawerOpen, setDrawerOpen,
     activeFilterCount, clearFilters,
-    nowMonth,
+    nowMonth, setNowMonth,
   };
 }
 

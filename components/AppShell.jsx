@@ -7,13 +7,13 @@ import { useAuth } from "./AuthGate";
 import { usePlanner } from "./PlannerProvider";
 import { useTrips } from "./TripProvider";
 
-// Top-nav workflow modes. The home is "Board" (every candidate by stage);
-// "Ranking" is a view toggle on the Board page, not a separate tab. The other
+// Top-nav workflow modes. The home is "Board" (every place by stage);
+// "Compare" is a view toggle on the Board page, not a separate tab. The other
 // tabs are the purpose-built stage workspaces. Stage IDs from STAGES drive the
 // city metadata (badges, context strip color).
 const NAV_MODES = [
-  { id: "board",    href: "/board",    label: "Board",    help: "Every candidate, by stage.", stageId: null },
-  { id: "planning", href: "/planning", label: "Planning", help: "Rank candidates and plan each trip's best week.", stageId: "planning" },
+  { id: "board",    href: "/board",    label: "Board",    help: "Every place, by stage.", stageId: null },
+  { id: "planning", href: "/planning", label: "Planning", help: "Plan each trip's best week to visit.", stageId: "planning" },
   { id: "planned",  href: "/planned",  label: "Planned",  help: "Trips with committed dates.", stageId: "planned" },
   { id: "visited",  href: "/visited",  label: "Visited",  help: "Back from a trip, awaiting the survey.", stageId: "visited" },
   { id: "assessed", href: "/assessed", label: "Assessed", help: "Where each visit landed — going back, or not.", stageId: "assessed" },

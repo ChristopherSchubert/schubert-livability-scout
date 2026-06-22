@@ -6,8 +6,10 @@ import {
   MONTHS,
   calibrateAxes,
   cityImageQuery,
+  cityVisitWindow,
   citySlug,
   learnedAxisWeights,
+  monthlyComfortScores,
   visitNowScore,
   weightedAxisScore,
 } from "../lib/planner-data";
@@ -16,6 +18,7 @@ import FunnelHeader from "./FunnelHeader";
 import { WorkspaceLoading } from "./Loading";
 import { appendBust, resolveImage, usePlanner } from "./PlannerProvider";
 import ViewToggle from "./ViewToggle";
+import YearSparkline from "./YearSparkline";
 import {
   CityFilterDrawer,
   CityFiltersBar,
@@ -27,22 +30,26 @@ import {
 } from "./city-filters";
 
 /**
- * Calibrate — sortable, filterable ranking table.
+ * Compare — a sortable, filterable table of places to explore, organized around
+ * WHEN each one is good to visit (#68). This is a vacation app, not a decision
+ * tool, so the view doesn't rank places toward a verdict: it leads with "great
+ * in [month]" (climate comfort + a don't-miss-it nudge) and a 12-month
+ * sparkline showing each place's year-shape. Pick the month you're thinking of
+ * travelling and the table reorders to what's lovely then.
  *
- * Columns are the five measured axes (each an absolute 0–10 from the cited
- * metrics) plus an Overall = weighted average and a Visit-now (this month's
- * climate comfort, informational only). Sort by clicking any header; SHIFT-
- * click to add a secondary sort. The Overall weights are LEARNED from the
- * owner's gut once ≥6 places are rated; until then the axes count equally.
+ * The measured axis columns and the learned "Fit" (a weighted average of the
+ * five axes, weights LEARNED from the owner's gut once ≥6 places are rated) stay
+ * as honest signals you can sort by — Fit is one lens among several, not the
+ * answer. Sort by clicking any header; SHIFT-click adds a secondary sort.
  *
- * Filters live in a slide-in drawer to keep the toolbar light — the same
- * drawer is reused on the Board (see components/city-filters.jsx).
+ * Filters live in a slide-in drawer to keep the toolbar light — the same drawer
+ * is reused on the Board (see components/city-filters.jsx).
  */
 export default function Calibrate() {
   const router = useRouter();
   const { planner, imageState, hydrated } = usePlanner();
   const filters = useCityFilters();
-  const [sort, setSort] = useState([{ key: "overall", dir: "desc" }]);
+  const [sort, setSort] = useState([{ key: "visitnow", dir: "desc" }]);
   const [hideCalibration, setHideCalibration] = useState(true);
 
   const calCount = planner.cities.filter((c) => c.isCalibration).length;
@@ -52,11 +59,19 @@ export default function Calibrate() {
   const equalWeights = useMemo(() => Object.fromEntries(calibrateAxes.map(([k]) => [k, 1])), []);
   const weights = learned.weights || equalWeights;
 
-  const cityRows = useMemo(() => visibleCities.map((cityItem) => ({
-    ...augmentCityForFilters(cityItem),
-    overall: weightedAxisScore(cityItem, weights),
-    visitNow: visitNowScore(cityItem, filters.nowMonth),
-  })), [visibleCities, weights, filters.nowMonth]);
+  const cityRows = useMemo(() => visibleCities.map((cityItem) => {
+    const win = cityVisitWindow(cityItem);
+    return {
+      ...augmentCityForFilters(cityItem),
+      overall: weightedAxisScore(cityItem, weights),
+      visitNow: visitNowScore(cityItem, filters.nowMonth),
+      series: monthlyComfortScores(cityItem),
+      // Mark the recommended Prime window on the sparkline. Off-season's
+      // detail (and its colour key) lives on the city page's fuller strip —
+      // a third tick crowds a 116px chart and reads as a stray mark (#68).
+      primeIdx: win?.prime?.idx ?? null,
+    };
+  }), [visibleCities, weights, filters.nowMonth]);
 
   const options = useMemo(() => availableFilterOptions(cityRows), [cityRows]);
 
@@ -100,22 +115,37 @@ export default function Calibrate() {
     return sort.length > 1 ? ` ${arr}${i + 1}` : ` ${arr}`;
   }
 
+  const monthName = MONTHS[filters.nowMonth];
+
   return (
     <AppShell activeMode="board">
       <FunnelHeader
         meta={
           !hydrated
             ? "Loading…"
-            : `${rows.length} of ${cityRows.length} candidates${filters.activeFilterCount > 0 ? " match filters" : ""}`
+            : `${rows.length} of ${cityRows.length} places${filters.activeFilterCount > 0 ? " match filters" : ""}`
         }
       />
       <section className="rank-controls">
         <ViewToggle active="ranking" />
+        <label className="rank-month">
+          <span className="rank-month-label">Best to visit in</span>
+          <select
+            className="rank-month-select"
+            value={filters.nowMonth}
+            onChange={(e) => filters.setNowMonth(Number(e.target.value))}
+            aria-label="Month to compare visit comfort"
+          >
+            {MONTHS.map((m, i) => (
+              <option key={m} value={i}>{m}</option>
+            ))}
+          </select>
+        </label>
         <input
           type="search"
           className="rank-search"
-          placeholder="Search city name…"
-          aria-label="Search city name"
+          placeholder="Search a place…"
+          aria-label="Search place name"
           value={filters.query}
           onChange={(e) => filters.setQuery(e.target.value)}
         />
@@ -124,12 +154,12 @@ export default function Calibrate() {
         {calCount > 0 ? (
           <label className="rank-toggle">
             <input type="checkbox" checked={hideCalibration} onChange={(e) => setHideCalibration(e.target.checked)} />
-            Hide calibration ({calCount})
+            Hide reference places ({calCount})
           </label>
         ) : null}
       </section>
 
-      {!hydrated ? <WorkspaceLoading label="Loading cities…" /> : (
+      {!hydrated ? <WorkspaceLoading label="Loading places…" /> : (
       <section className="rank-table-wrap">
         <div className="rank-count">
           <WeightNote learned={learned} />
@@ -137,28 +167,29 @@ export default function Calibrate() {
         <table className="rank-table">
           <thead>
             <tr>
-              <th className="rt-rank">#</th>
-              <th className="rt-city sortable" onClick={(e) => clickSort("city", e)}>City{sortBadge("city")}</th>
+              <th className="rt-city sortable" onClick={(e) => clickSort("city", e)}>Place{sortBadge("city")}</th>
+              <th className="rt-when sortable" onClick={(e) => clickSort("visitnow", e)} title={`How good ${monthName} is to visit: climate comfort that month, nudged up when the next two months get worse so you don't miss a prime window.`}>
+                Great in {monthName}{sortBadge("visitnow")}
+              </th>
+              <th className="rt-spark-col">Year</th>
               {calibrateAxes.map(([key, label]) => (
                 <th key={key} className="rt-axis sortable" onClick={(e) => clickSort(key, e)} title={label}>
                   {shortAxisLabel(label)}{sortBadge(key)}
                   {learned.weights ? <span className="rt-weight">×{(weights[key] ?? 1).toFixed(1)}</span> : null}
                 </th>
               ))}
-              <th className="rt-overall sortable" onClick={(e) => clickSort("overall", e)}>Overall{sortBadge("overall")}</th>
-              <th className="rt-visitnow sortable" onClick={(e) => clickSort("visitnow", e)} title="How good this month is to visit: climate comfort now, nudged up when the next two months get worse. Not part of the fit score.">
-                Visit now<span className="rt-weight">{MONTHS[filters.nowMonth]}</span>{sortBadge("visitnow")}
+              <th className="rt-overall sortable" onClick={(e) => clickSort("overall", e)} title="Fit: weighted average of the five measured axes (weights learned from your gut scores). One signal among several — not a verdict.">
+                Fit{sortBadge("overall")}
               </th>
             </tr>
           </thead>
           <tbody>
-            {rows.map((row, i) => {
+            {rows.map((row) => {
               const slug = citySlug(row.cityItem);
               const heroQuery = cityImageQuery(row.cityItem.name, row.cityItem.stayZone, row.cityItem.heartIntersection);
               const heroSrc = appendBust(resolveImage(row.cityItem.heroImage, heroQuery, imageState), imageState.version);
               return (
                 <tr key={row.cityItem.id} className="rt-row" onClick={() => router.push(`/cities/${slug}`)}>
-                  <td className="rt-rank">{i + 1}</td>
                   <td className="rt-city">
                     <div className="rt-city-inner">
                       {heroSrc ? (
@@ -172,16 +203,19 @@ export default function Calibrate() {
                       </div>
                     </div>
                   </td>
+                  <td className="rt-when" data-label={`Great in ${monthName}`}><ScoreCell value={row.visitNow} /></td>
+                  <td className="rt-spark-col" data-label="Year">
+                    <YearSparkline series={row.series} selectedMonth={filters.nowMonth} primeIdx={row.primeIdx} />
+                  </td>
                   {calibrateAxes.map(([key, label]) => (
                     <td key={key} className="rt-axis" data-label={shortAxisLabel(label)}><ScoreCell value={row.roll[key]} /></td>
                   ))}
-                  <td className="rt-overall" data-label="Overall">{row.overall != null ? row.overall.toFixed(2) : "—"}</td>
-                  <td className="rt-visitnow" data-label="Visit now"><ScoreCell value={row.visitNow} /></td>
+                  <td className="rt-overall" data-label="Fit">{row.overall != null ? row.overall.toFixed(2) : "—"}</td>
                 </tr>
               );
             })}
             {rows.length === 0 ? (
-              <tr><td colSpan={2 + calibrateAxes.length + 2} className="rt-empty">No cities match these filters.</td></tr>
+              <tr><td colSpan={4 + calibrateAxes.length} className="rt-empty">No places match these filters.</td></tr>
             ) : null}
           </tbody>
         </table>
@@ -203,7 +237,7 @@ function WeightNote({ learned }) {
   if (learned.weights) {
     return (
       <span className="weight-note-inline" title={`Learned from ${learned.n} surveyed visits (cities with a Gut score)`}>
-        {"Weights learned: "}
+        {"Fit weights learned: "}
         {calibrateAxes.map(([k, l], i) => (
           <span key={k}>{i ? " · " : ""}{shortAxisLabel(l)}×{(learned.weights[k] ?? 1).toFixed(1)}</span>
         ))}
@@ -211,8 +245,8 @@ function WeightNote({ learned }) {
     );
   }
   return (
-    <span className="weight-note-inline" title="Survey visited cities (give each a Gut score) so Overall can learn which axes predict your gut.">
-      {`Axes equal-weighted (${learned.n}/${learned.need} surveyed)`}
+    <span className="weight-note-inline" title="Survey visited cities (give each a Gut score) so Fit can learn which axes predict your gut.">
+      {`Fit axes equal-weighted (${learned.n}/${learned.need} surveyed)`}
     </span>
   );
 }

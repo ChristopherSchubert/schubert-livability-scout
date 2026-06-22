@@ -3124,6 +3124,11 @@ button:hover, .button-link:hover {
 .rank-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.6rem; margin: 0; padding: 0.55rem 0.7rem; background: #fffdf8; border: 1px solid var(--border); border-radius: 12px; }
 .rank-search { flex: 0 1 260px; min-width: 180px; padding: 0.45rem 0.7rem; border: 1px solid var(--border); border-radius: 8px; font: inherit; background: #fbf6ea; }
 .rank-search:focus { outline: none; border-color: var(--accent); background: #fffdf8; }
+/* Month selector — drives the "Great in [month]" column + sparkline highlight (#68) */
+.rank-month { display: inline-flex; align-items: center; gap: 0.45rem; font-size: 0.82rem; color: var(--muted); }
+.rank-month-label { white-space: nowrap; }
+.rank-month-select { font: inherit; font-size: 0.85rem; padding: 0.4rem 0.55rem; border: 1px solid var(--border); border-radius: 8px; background: #fbf6ea; color: var(--text); cursor: pointer; }
+.rank-month-select:focus { outline: none; border-color: var(--accent); background: #fffdf8; }
 .rank-filters-btn { display: inline-flex; align-items: center; gap: 0.4rem; background: #fbf6ea; border: 1px solid var(--border); padding: 0.4rem 0.75rem; border-radius: 8px; font: inherit; font-size: 0.85rem; cursor: pointer; color: var(--text); }
 .rank-filters-btn:hover { border-color: var(--accent); color: var(--accent); }
 .rank-filters-btn.has-active { background: #f1f7f2; border-color: #cfe3d5; color: #2c6a3f; }
