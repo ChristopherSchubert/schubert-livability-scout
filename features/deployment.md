@@ -11,12 +11,12 @@ How Livability Scout gets from a `git push` to the live site your wife sees.
   serves the same deployment — keep it as a fallback / for previews.
 - **Preprod URL: `https://travel-preview.schubertfamily.com`** (custom domain,
   live; pinned in Vercel to the `preview` branch).
-  **Today** (2026-06-21): currently double-gated — Vercel Deployment Protection
-  wall (401) **plus** the app's own Google sign-in. **Decision in flight:** owner
-  decided to drop the Vercel wall so preprod matches prod's single Google-only
-  gate; flip is pending in Vercel → Settings → Deployment Protection (toggle
-  Vercel Authentication off, or scope to "Only Production Deployments"). After
-  the flip, preprod reads `200` (the sign-in screen). ⚠️ Prod and preprod share
+  **As of 2026-06-22: single-gated via Google sign-in, matching prod.** The
+  Vercel Deployment Protection wall was dropped (`ssoProtection` set to `null`
+  on the `travel` project via the Vercel API; was `all_except_custom_domains`),
+  so preprod now reads `200` (the sign-in screen), not `401`. Reversible: set
+  `ssoProtection` back to `{"deploymentType":"all_except_custom_domains"}` (or
+  re-enable in Vercel → Settings → Deployment Protection). ⚠️ Prod and preprod share
   the same Supabase project, so a preprod sign-in writes to real user data —
   keep AuthGate intact when soaking risky changes; a broken AuthGate on preprod
   would be world-readable. The `.vercel.app` host
