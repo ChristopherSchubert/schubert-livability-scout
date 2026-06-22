@@ -29,12 +29,12 @@ import {
  * FunnelBoard — kanban over the funnel stages.
  *
  * Each stage is a drop column; cards are draggable between them (drops call
- * setCityStage). Calibration/reference places are hidden by default (toggle to
- * show). Cards are compact so 60+ candidates don't crowd; ranking inside each
- * column is by the measured Overall score, same engine as Calibrate.
+ * setCityStage). Reference places are hidden by default (toggle in the Filters
+ * pane). Cards are compact so 60+ places don't crowd; order inside each
+ * column is by the measured fit score, same engine as Compare.
  *
  * Filters reuse the shared drawer/chips/sliders from components/city-filters
- * so Board and Ranking offer the same vocabulary (region/state/chips/axis
+ * so Board and Compare offer the same vocabulary (region/state/chips/axis
  * minimums) without duplicated state or UI.
  */
 const EQUAL_WEIGHTS = { setting: 1, aliveness: 1, fabric: 1, realness: 1, january: 1 };
@@ -122,34 +122,27 @@ export default function FunnelBoard({ focusStage }) {
             {!hydrated
               ? "Loading…"
               : focusStage
-              ? `${totalForFocus} ${totalForFocus === 1 ? "city" : "cities"} in ${STAGES.find((stage) => stage.id === focusStage)?.label}`
-              : `${filteredCities.length} of ${planner.cities.filter((c) => !hideCalibration || !c.isCalibration).length} candidates`}
+              ? `${totalForFocus} ${totalForFocus === 1 ? "place" : "places"} in ${STAGES.find((stage) => stage.id === focusStage)?.label}`
+              : `${filteredCities.length} of ${planner.cities.filter((c) => !hideCalibration || !c.isCalibration).length} places`}
             {hydrated ? <span className="funnel-meta-hint"> · <span className="hint-drag">drag or </span>use the buttons to move · open a card for the rest</span> : null}
           </>
         }
       />
 
-      <section className="rank-controls" aria-label="Filter candidates">
+      <section className="rank-controls" aria-label="Filter places">
         <ViewToggle active="board" />
         <input
           type="search"
           className="rank-search"
           value={filters.query}
           onChange={(e) => filters.setQuery(e.target.value)}
-          placeholder="Search city name…"
-          aria-label="Search city name"
+          placeholder="Search a place…"
+          aria-label="Search place name"
         />
         <CityFiltersBar filters={filters} />
-        <span className="rank-controls-spacer" />
-        {calCount > 0 ? (
-          <label className="rank-toggle">
-            <input type="checkbox" checked={hideCalibration} onChange={(e) => setHideCalibration(e.target.checked)} />
-            Hide calibration ({calCount})
-          </label>
-        ) : null}
       </section>
 
-      {!hydrated ? <WorkspaceLoading label="Loading candidates…" /> : (
+      {!hydrated ? <WorkspaceLoading label="Loading places…" /> : (
       <section className="funnel-grid">
           {visibleStages.map((stage) => {
             const cities = grouped[stage.id] || [];
@@ -197,7 +190,13 @@ export default function FunnelBoard({ focusStage }) {
       </section>
       )}
 
-      <CityFilterDrawer filters={filters} options={options} />
+      <CityFilterDrawer
+        filters={filters}
+        options={options}
+        hideCalibration={hideCalibration}
+        setHideCalibration={setHideCalibration}
+        calCount={calCount}
+      />
     </AppShell>
   );
 }
