@@ -194,7 +194,9 @@ callsites (4 API routes + `lib/image-manifest.js` + `scripts/hero-audit.mjs`).
 
 **Depends on:** Ticket 2 + interlock #4 (Chris/Janice in `platform.member`). **The load-bearing ticket.**
 
-**Files:** Create `0025_member_mirror.sql`, `0026_repoint_fks.sql`, `0027_rls_current_member.sql`.
+**Files:** `0025_member_mirror.sql`, `0026_repoint_fks.sql`, `0027_rls_current_member.sql` — **all authored + applied to schubert-family 2026-06-22** (via MCP; DDL needs no DB password).
+
+> **Status (2026-06-22): DDL done & verified.** `travel.member` seeded from `platform.member` (Chris + Janice, same household); `travel.profiles` dropped; all **6** owner FKs re-point at `travel.member`; RLS enabled on all 13 tables (0 disabled); **34 policies** ported from the *live* schubert-travel set (not `schema.sql`, which had drifted), with **19** owner-scoped quals resolving via `(select platform.current_member_id())` and **0 leftover `auth.uid()`**. The row remap is a no-op now (per-user tables empty — #89 data copy is credential-blocked and lands after #90; it must insert per-user rows already mapped old-uid→`member.id`). The live two-session isolation test (acceptance ⤵) needs real member sessions + data, so it runs at cutover (#94) with #91 auth + the #89 copy.
 
 - [ ] `0024`: create the mirror + sync.
 ```sql
