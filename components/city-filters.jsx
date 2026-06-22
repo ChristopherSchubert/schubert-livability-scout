@@ -189,7 +189,11 @@ function ActiveFilterChips({ filters }) {
   );
 }
 
-export function CityFilterDrawer({ filters, options }) {
+// `hideCalibration` / `setHideCalibration` / `calCount` are optional — when a
+// caller passes them, the drawer renders a "Reference places" toggle (the
+// Compare view moved it off the controls bar into the pane, 2026-06-21). Pages
+// that don't pass them (e.g. the Board) simply don't show the section.
+export function CityFilterDrawer({ filters, options, hideCalibration, setHideCalibration, calCount = 0 }) {
   if (!filters.drawerOpen) return null;
   const toggleSetItem = (setter) => (value) => setter((prev) => {
     const next = new Set(prev);
@@ -214,6 +218,19 @@ export function CityFilterDrawer({ filters, options }) {
         </header>
 
         <div className="filter-drawer-body">
+          {setHideCalibration ? (
+            <FilterSection title="Reference places">
+              <label className="filter-check">
+                <input
+                  type="checkbox"
+                  checked={hideCalibration}
+                  onChange={(e) => setHideCalibration(e.target.checked)}
+                />
+                Hide reference places{calCount ? ` (${calCount})` : ""}
+              </label>
+            </FilterSection>
+          ) : null}
+
           {options.availableRegions.length > 0 ? (
             <FilterSection title="Region" count={filters.regions.size}>
               <div className="filter-pill-row">

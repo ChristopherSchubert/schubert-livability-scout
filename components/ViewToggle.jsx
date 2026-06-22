@@ -60,7 +60,6 @@ export default function ViewToggle({ active }) {
 
   return (
     <div className="view-toggle" role="tablist" aria-label="Switch place view">
-      <span className="view-toggle-label" aria-hidden="true">View</span>
       {VIEWS.map(({ id, href, label, Icon }, index) => {
         const isActive = id === active;
         return (

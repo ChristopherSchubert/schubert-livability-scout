@@ -138,29 +138,22 @@
   display: inline-flex;
   align-items: center;
   gap: 2px;
-  padding: 3px;
+  padding: 2px;
   background: #f0ead9;
   border: 1px solid var(--border);
-  border-radius: 10px;
-  margin: 0 0.5rem 0 0;
-}
-.view-toggle-label {
-  font-size: 0.6rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  font-weight: 700;
-  color: var(--muted);
-  padding: 0 0.4rem 0 0.35rem;
+  border-radius: 9px;
+  margin: 0 0.35rem 0 0;
+  flex: 0 0 auto;
 }
 .view-toggle-tab {
   display: inline-flex;
   align-items: center;
-  gap: 0.38rem;
+  gap: 0.32rem;
   font-family: var(--font-display);
   font-variation-settings: "opsz" 40, "SOFT" 60, "wght" 500;
-  font-size: 0.95rem;
-  padding: 0.28rem 0.72rem;
-  border-radius: 8px;
+  font-size: 0.82rem;
+  padding: 0.22rem 0.55rem;
+  border-radius: 7px;
   color: var(--muted);
   text-decoration: none;
   line-height: 1.3;

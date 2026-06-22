@@ -84,9 +84,12 @@ semantics), not eyeballed.
   first, Fit last). All scores visible (the desktop columns would clip
   off-screen otherwise). Desktop keeps the sortable table. Files:
   `components/Calibrate.jsx`, `components/YearSparkline.jsx`, `app/workspace.css`.
-  **Follow-up:** the column-header sort is `display:none` on mobile, so the only
-  mobile sort is the default great-in-[month]-desc + the month selector +
-  search/filters. A mobile sort control (dropdown) is deferred — see follow-ups.
+  **Mobile sort** ✅ (2026-06-21): the column-header sort is `display:none` when
+  the table reflows to cards, so a phone-only `SortControl` dropdown
+  (`.rank-sort-mobile`, hidden ≥640px) sits in the controls bar — options are
+  Great in [month] / each axis / Fit / Place. Selecting one replaces the
+  (desktop multi-key) sort with a single key. The "hide reference places" toggle
+  also moved off the controls bar into the Filters pane.
 - **Phase 3 — City-detail overflow + Board** ✅ (#4; #5 decided-keep):
   city-detail horizontal overflow gone (24px → 1px sub-pixel). Three fixes at
   ≤640px in `app/city-detail.css`: hero `.meta` chips now wrap (flex-wrap +

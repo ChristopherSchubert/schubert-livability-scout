@@ -57,32 +57,31 @@ button (with active-count), a slide-in drawer (region / state / chip
 vocabulary / per-axis minimum sliders / visit-now minimum), an active-filter
 chip strip, and a search box. **The Planning backlog reuses this same system**
 — see [trip-planner.md](trip-planner.md). Don't build per-screen filter UI;
-extend this module. A shared `SortControl` dropdown also lives here (used by
-the backlog; Board/Ranking don't need it since they sort by stage / column
-header).
+extend this module. The drawer also takes optional
+`hideCalibration`/`setHideCalibration`/`calCount` props — when passed (Compare
+does, 2026-06-21), it renders a "Reference places" toggle at the top of the
+pane instead of a checkbox cluttering the controls bar. A shared `SortControl`
+dropdown also lives here (the backlog; and Compare on mobile — see below).
 
 ## Shared header ([`components/FunnelHeader.jsx`](../components/FunnelHeader.jsx))
 
-Both views render an **identical** compact header (eyebrow "Places" + h1
-"Every place" + a one-line `meta`). This exists because Board used to
-carry a tall editorial header while Compare had none, so switching views
-jumped the ViewToggle and all content ~124px vertically (2026-06-09: the owner
-flagged that toggling "moves"). With the same header on both, the controls bar
-+ toggle sit at the same Y on each page → no shift. The title was also
-shrunk (`.funnel-header h1` scoped override in
-[`workspace.css`](../app/workspace.css)) since it ate a lot of space. The
-disabled "+ Add candidate" button was dropped (it was paused/non-functional).
-Keep the `meta` to one line on both views so the header heights stay equal.
+Both views render an **identical** one-line `meta` (the count, e.g. "113 of 113
+places"). The big "Every place" editorial title + eyebrow were dropped
+(2026-06-21, owner: redundant above the controls) — `FunnelHeader` returns
+`null` when `meta` is empty. It stays a shared component so the controls bar +
+toggle sit at the same Y on Board and Compare → toggling doesn't shift content
+(2026-06-09: the owner flagged that toggling "moved"). Keep `meta` to one line.
 
 ## View toggle ([`components/ViewToggle.jsx`](../components/ViewToggle.jsx))
 
 The Board/Compare switch. Originally two bare words that didn't read as
 interactive (2026-06-09: the owner couldn't tell it was a toggle). Now a
-single shared component: a "VIEW" eyebrow label, a segmented pill, an icon per
-segment (kanban columns for Board, a calendar for Compare — the view is
-organized by when a place is good), the active segment raised (white + shadow +
-accent icon), and a hover/focus lift on the inactive one so it clearly reads as
-a clickable alternate view. Styles in
+compact segmented pill: an icon per segment (kanban columns for Board, a
+calendar for Compare — the view is organized by when a place is good), the
+active segment raised (white + shadow + accent icon), and a hover/focus lift on
+the inactive one so it clearly reads as a clickable alternate view. The "VIEW"
+eyebrow label and extra padding were dropped (2026-06-21, owner: shorter/less
+wide). Styles in
 [`app/workspace.css`](../app/workspace.css) (`.view-toggle*`). Extracted so the
 two pages can't drift; pass `active="board"` / `active="ranking"` (the id/route
 stay `ranking`, the label reads "Compare").

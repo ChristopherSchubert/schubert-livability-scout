@@ -22,6 +22,7 @@ import YearSparkline from "./YearSparkline";
 import {
   CityFilterDrawer,
   CityFiltersBar,
+  SortControl,
   applyCityFilters,
   augmentCityForFilters,
   availableFilterOptions,
@@ -117,6 +118,18 @@ export default function Calibrate() {
 
   const monthName = MONTHS[filters.nowMonth];
 
+  // Mobile sort: the sortable column headers are hidden when the table reflows
+  // to cards, so a phone needs an explicit dropdown (#68). Single-key on mobile
+  // is plenty; selecting one replaces the (desktop multi-key) sort.
+  const sortKey = sort[0]?.key ?? "visitnow";
+  const sortOptions = [
+    { id: "visitnow", label: `Great in ${monthName}` },
+    ...calibrateAxes.map(([k, l]) => ({ id: k, label: shortAxisLabel(l) })),
+    { id: "overall", label: "Fit" },
+    { id: "city", label: "Place (A–Z)" },
+  ];
+  const chooseSort = (id) => setSort([{ key: id, dir: id === "city" ? "asc" : "desc" }]);
+
   return (
     <AppShell activeMode="board">
       <FunnelHeader
@@ -149,21 +162,14 @@ export default function Calibrate() {
           value={filters.query}
           onChange={(e) => filters.setQuery(e.target.value)}
         />
+        <span className="rank-sort-mobile">
+          <SortControl value={sortKey} onChange={chooseSort} options={sortOptions} />
+        </span>
         <CityFiltersBar filters={filters} />
-        <span className="rank-controls-spacer" />
-        {calCount > 0 ? (
-          <label className="rank-toggle">
-            <input type="checkbox" checked={hideCalibration} onChange={(e) => setHideCalibration(e.target.checked)} />
-            Hide reference places ({calCount})
-          </label>
-        ) : null}
       </section>
 
       {!hydrated ? <WorkspaceLoading label="Loading places…" /> : (
       <section className="rank-table-wrap">
-        <div className="rank-count">
-          <WeightNote learned={learned} />
-        </div>
         <table className="rank-table">
           <thead>
             <tr>
@@ -222,7 +228,13 @@ export default function Calibrate() {
       </section>
       )}
 
-      <CityFilterDrawer filters={filters} options={options} />
+      <CityFilterDrawer
+        filters={filters}
+        options={options}
+        hideCalibration={hideCalibration}
+        setHideCalibration={setHideCalibration}
+        calCount={calCount}
+      />
     </AppShell>
   );
 }
@@ -231,22 +243,4 @@ function ScoreCell({ value }) {
   if (value == null) return <span className="rt-na">—</span>;
   const hue = Math.round(value * 12);
   return <span className="rt-score" style={{ background: `hsl(${hue} 55% 92%)`, color: `hsl(${hue} 45% 30%)` }}>{value.toFixed(1)}</span>;
-}
-
-function WeightNote({ learned }) {
-  if (learned.weights) {
-    return (
-      <span className="weight-note-inline" title={`Learned from ${learned.n} surveyed visits (cities with a Gut score)`}>
-        {"Fit weights learned: "}
-        {calibrateAxes.map(([k, l], i) => (
-          <span key={k}>{i ? " · " : ""}{shortAxisLabel(l)}×{(learned.weights[k] ?? 1).toFixed(1)}</span>
-        ))}
-      </span>
-    );
-  }
-  return (
-    <span className="weight-note-inline" title="Survey visited cities (give each a Gut score) so Fit can learn which axes predict your gut.">
-      {`Fit axes equal-weighted (${learned.n}/${learned.need} surveyed)`}
-    </span>
-  );
 }
