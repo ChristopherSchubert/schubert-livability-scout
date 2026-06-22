@@ -281,16 +281,17 @@ create policy "trip_entries insert own" on travel.trip_entries for insert to aut
 
 **Depends on:** Ticket 3 (member/household) + interlock #5 (signing key/token).
 
-**Files:** Create `app/api/feed/route.js`, `lib/feed.js`, `test/feed.test.mjs`.
+**Files:** `app/api/feed/route.js`, `lib/feed.js`, `lib/feed-token.js`, `test/feed.test.mjs`.
 
-- [ ] `lib/feed.js`: pure `tripsToCards(trips, { memberByTrip })` → cards matching `feed-contract.ts`: `{ key:'trip:<id>', kind:'countdown', title:'Trip to <name>', body:'<n> days away', event_at:start_date, deep_link:'<HUB or app>/trips/<id>', member_id: <member uuid | null=household-wide>, priority }`. ~1 card/trip. Summaries only — never raw rows.
-- [ ] **Test first** (`test/feed.test.mjs`): assert each card has non-empty `key`/`title`, `kind` ∈ enum, `member_id` is a uuid-or-null, `event_at` ISO — i.e. mirror `check-feed.mjs`'s assertions on sample trips.
-- [ ] `app/api/feed/route.js`: verify `Authorization: Bearer <token>` HS256 against `FEED_SERVICE_TOKEN_SIGNING_KEY`; reject tokenless calls; query the household's trips via `current_household_id()`; return `{ cards }`.
-- [ ] **Verify:** `node conformance/check-feed.mjs <preview-url>/api/feed <service-token>` exits 0 against a Travel preview.
+- [x] **`lib/feed.js` (P1, done 2026-06-22):** pure `tripToFeedCard(trip, { now, memberId, baseUrl })` + `feedFromTrips(trips, opts)` → contract-v1 cards. `key:'travel:trip:<id>'`; `kind` phased off dates (upcoming→`countdown` w/ "in N days"+`event_at`; ongoing→`status`; past→`summary`; undated→`status`); `title` via `tripDisplayName`; `body` a stop summary ("3 stops: A → B → C"); `deep_link` `<base>/trips/<id>`; `member_id` defaults null=household-wide. Summaries only — leak-tested (no entries/legs/travelers in the card).
+- [x] **Test-first (`test/feed.test.mjs`, done):** 8 tests mirroring `check-feed.mjs`'s card rules + HS256 verify (valid/missing/tampered/wrong-key/expired/`alg:none`/no-key). Verified the real payload too: live 3 trips → 3 contract-valid cards, 0 invalid.
+- [x] **HS256 verify (P2, done) — `lib/feed-token.js`:** `verifyServiceToken(authHeader, key, {now})` via `node:crypto` HMAC (no JWT dep), constant-time compare, `alg=HS256` + `exp`/`nbf` checks, fails closed.
+- [x] **`app/api/feed/route.js` (done):** verifies the Bearer token against `FEED_SERVICE_TOKEN_SIGNING_KEY` (tokenless/bad → 401, verified on the dev server); queries trips (service-role) → `{ cards }`. **Household scope + per-card `member_id` await identity #90** (`current_household_id()`); the `travel`-schema source re-point is Ticket 4 (#91). Note: `FEED_SERVICE_TOKEN_SIGNING_KEY` is deliberately **not** in the boot validator (a missing local key yields 401, not a boot failure).
+- [ ] **Verify:** `node conformance/check-feed.mjs <preview-url>/api/feed <service-token>` exits 0 — needs the deployed preview + the issued service token (not held locally). Run post-deploy.
 
 **Acceptance:**
-- [ ] `/api/feed` returns contract-valid cards (~1/trip), rejects tokenless calls, passes `check-feed.mjs`.
-- [ ] No raw data in any card (summaries only).
+- [x] `/api/feed` returns contract-valid cards (~1/trip), rejects tokenless calls. (`check-feed.mjs` green pending deploy+token.)
+- [x] No raw data in any card (summaries only) — leak-tested.
 
 ## Ticket 7 — Cutover verification (no retirement)
 
