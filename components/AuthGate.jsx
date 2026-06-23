@@ -21,15 +21,27 @@ export default function AuthGate({ children }) {
   useEffect(() => {
     if (!isSupabaseConfigured()) { setStatus("unconfigured"); return; }
     const sb = getSupabase();
-    sb.auth.getSession().then(({ data }) => {
-      setUser(data.session?.user || null);
-      setStatus(data.session ? "in" : "out");
-    });
-    const { data: sub } = sb.auth.onAuthStateChange((_e, session) => {
-      setUser(session?.user || null);
-      setStatus(session ? "in" : "out");
-    });
-    return () => sub.subscription.unsubscribe();
+    let active = true;
+
+    // #91 (epic #84): on a session, ensure the platform member + the local
+    // travel.member mirror exist BEFORE admitting to the app — every per-user
+    // read/write resolves through current_member_id(), which needs the mirror.
+    // A non-member (or a sync failure) is not admitted.
+    async function resolve(session) {
+      if (!session) { if (active) { setUser(null); setStatus("out"); } return; }
+      try {
+        await sb.schema("platform").rpc("reconcile_member");
+        await sb.schema("travel").rpc("sync_current_member");
+      } catch {
+        if (active) { setUser(null); setStatus("out"); }
+        return;
+      }
+      if (active) { setUser(session.user); setStatus("in"); }
+    }
+
+    sb.auth.getSession().then(({ data }) => resolve(data.session));
+    const { data: sub } = sb.auth.onAuthStateChange((_e, session) => { resolve(session); });
+    return () => { active = false; sub.subscription.unsubscribe(); };
   }, []);
 
   if (status === "loading") {

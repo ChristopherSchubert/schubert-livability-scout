@@ -34,7 +34,7 @@ export async function POST(req) {
   const sb = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
-    { auth: { persistSession: false } },
+    { auth: { persistSession: false }, db: { schema: "travel" } },
   );
   const { error } = await sb.from("walkthrough_feedback").insert({
     slide, phase, note,

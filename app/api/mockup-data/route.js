@@ -53,7 +53,7 @@ export async function GET(request) {
   }
 
   try {
-    const sb = createClient(supabaseUrl, key, { auth: { persistSession: false } });
+    const sb = createClient(supabaseUrl, key, { auth: { persistSession: false }, db: { schema: "travel" } });
     const { data: rows, error } = await sb
       .from("cities")
       .select("*")

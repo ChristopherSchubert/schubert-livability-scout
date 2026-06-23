@@ -36,7 +36,7 @@ export async function GET(request) {
     );
   }
 
-  const sb = createClient(url, key, { auth: { persistSession: false } });
+  const sb = createClient(url, key, { auth: { persistSession: false }, db: { schema: "travel" } });
   const { data, error } = await sb
     .from("trips")
     .select("*")

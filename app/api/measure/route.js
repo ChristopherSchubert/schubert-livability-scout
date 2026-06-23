@@ -70,6 +70,7 @@ export async function POST(request) {
     const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
     const supabase = createClient(url, key, {
       auth: { persistSession: false },
+      db: { schema: "travel" },
       global: token ? { headers: { Authorization: `Bearer ${token}` } } : {},
     });
 
