@@ -279,6 +279,8 @@ create policy "trip_entries insert own" on travel.trip_entries for insert to aut
 - [ ] The pipeline connects to `schubert-family.travel` and reads/writes a city row.
 - [ ] Keychain holds the new password; CLAUDE.md "two secret stores" note updated.
 
+
+> **Status (2026-06-22): DONE & verified.** `lib/measurers/_db.js` re-pointed to the schubert-family pooler (`aws-1-us-east-1`, user `postgres.cigsjmoornigndaygqua`), `options: -c search_path=travel`, password from the **`supabase-family-db-password`** Keychain slot (NOT travel's). Verified: connects → `current_schema=travel`, reads `Newport, RI` (122 cities in scope), write succeeds. Measurement is local-only so new runs land in family.travel; the live app sees them after the #91 flip. (CLAUDE.md's two-secret note should pick this up when its uncommitted WIP lands — left untouched here to keep commits narrow.)
 ## Ticket 6 — `GET /api/feed` + token verification + conformance
 
 **Depends on:** Ticket 3 (member/household) + interlock #5 (signing key/token).
