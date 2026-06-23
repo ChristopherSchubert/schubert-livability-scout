@@ -17,6 +17,7 @@ export function useAuth() {
 export default function AuthGate({ children }) {
   const [status, setStatus] = useState("loading"); // loading | out | in
   const [user, setUser] = useState(null);
+  const [memberId, setMemberId] = useState(null); // platform member uuid (#90) — the per-user data owner key, NOT auth.uid()
 
   useEffect(() => {
     if (!isSupabaseConfigured()) { setStatus("unconfigured"); return; }
@@ -28,15 +29,22 @@ export default function AuthGate({ children }) {
     // read/write resolves through current_member_id(), which needs the mirror.
     // A non-member (or a sync failure) is not admitted.
     async function resolve(session) {
-      if (!session) { if (active) { setUser(null); setStatus("out"); } return; }
+      if (!session) { if (active) { setUser(null); setMemberId(null); setStatus("out"); } return; }
+      let mid = null;
       try {
         await sb.schema("platform").rpc("reconcile_member");
-        await sb.schema("travel").rpc("sync_current_member");
+        const { data, error } = await sb.schema("travel").rpc("sync_current_member");
+        if (error) throw error;
+        const member = Array.isArray(data) ? data[0] : data; // returns the travel.member row
+        mid = member?.id || null;
+        if (!mid) throw new Error("no member id from sync_current_member");
       } catch {
-        if (active) { setUser(null); setStatus("out"); }
+        if (active) { setUser(null); setMemberId(null); setStatus("out"); }
         return;
       }
-      if (active) { setUser(session.user); setStatus("in"); }
+      // userId IS the platform member id (#90) — every per-user query keys off it,
+      // not auth.uid() (the two differ; the migrated data is owned by member.id).
+      if (active) { setUser(session.user); setMemberId(mid); setStatus("in"); }
     }
 
     sb.auth.getSession().then(({ data }) => resolve(data.session));
@@ -67,7 +75,7 @@ export default function AuthGate({ children }) {
   const avatarUrl = user?.user_metadata?.avatar_url || user?.user_metadata?.picture || null;
 
   return (
-    <AuthContext.Provider value={{ user, userId: user.id, displayName, email: user.email || null, avatarUrl, signOut: () => getSupabase().auth.signOut() }}>
+    <AuthContext.Provider value={{ user, userId: memberId, displayName, email: user.email || null, avatarUrl, signOut: () => getSupabase().auth.signOut() }}>
       {children}
     </AuthContext.Provider>
   );
