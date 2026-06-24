@@ -82,8 +82,11 @@ list). Conversation then pivoted twice:
   rebrand + year-shape + auto worst-month-per-direction. **Still open — blocked
   on a methodology proposal** (it's a measurement-design call, not code).
 
-**Next move:** (b) draft a January-axis methodology proposal. Soft follow-up:
-reposition the Litchfield pin (landed off the Green).
+**Next move:** (b) draft a January-axis methodology proposal. ~~Soft follow-up:
+reposition the Litchfield pin (landed off the Green).~~ **DONE (2026-06-24)** —
+pin moved from `41.7455,-73.19536` (~180m SW of the Green) to the OSM Town
+Green centroid `41.7471,-73.1909` (relation 13659209) directly in
+`travel.cities`.
 
 ## 5. City "why" quality audit — DONE (2026-06-03)
 
