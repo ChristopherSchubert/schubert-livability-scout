@@ -6,7 +6,7 @@
 // chapter was spending two full rows per POI type.
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { axesSnapshot } from "../lib/city-detail-view.js";
+import { axesSnapshot, buildHomebaseView } from "../lib/city-detail-view.js";
 
 const dp = (value) => ({ value, asOf: "2026-06-13", source: "test" });
 
@@ -39,4 +39,51 @@ test("no legacy partner present → weighted row has no legacy sub-stat", () => 
   const cafeScore = rows.find((m) => m.key === "cafe_score");
   assert.ok(cafeScore);
   assert.equal(cafeScore.legacy, undefined);
+});
+
+// ── buildHomebaseView: the Allison-Park reference contract for Chapter IV (#84,
+// baseline-comparison feature). Locks the never-invent rule: missing measurements
+// at home must NOT surface as fake zeros in the comparison map; the key is just
+// absent so MetricRow renders no reference line.
+test("buildHomebaseView: returns null when no homebase city is supplied", () => {
+  assert.equal(buildHomebaseView(null), null);
+  assert.equal(buildHomebaseView(undefined), null);
+});
+
+test("buildHomebaseView: exposes a metrics map keyed by metric key", () => {
+  const home = { name: "Allison Park, PA", measuredMetrics: { cafe_score: dp(0.8), walk_score: dp(28) } };
+  const hb = buildHomebaseView(home, { slug: "allison-park-pa" });
+  assert.equal(hb.name, "Allison Park, PA");
+  assert.equal(hb.slug, "allison-park-pa");
+  assert.ok(hb.metrics, "metrics map must be present");
+  assert.equal(hb.metrics.cafe_score.value, 0.8);
+  assert.equal(hb.metrics.walk_score.value, 28);
+});
+
+test("buildHomebaseView: unmeasured metrics produce no fake zeros (honest blanks)", () => {
+  const home = { name: "Allison Park, PA", measuredMetrics: { cafe_score: dp(0.8) } };
+  const hb = buildHomebaseView(home);
+  // cafe_score is measured at home — present with the real value
+  assert.equal(hb.metrics.cafe_score.value, 0.8);
+  // bar_score, rest_score, walk_score etc. were NOT measured → no fabricated 0
+  assert.equal(hb.metrics.bar_score?.value ?? null, null);
+  assert.equal(hb.metrics.walk_score?.value ?? null, null);
+  // The keys may exist (snapshot shape) but the value must be null, never 0
+  for (const m of Object.values(hb.metrics)) {
+    if (m.key !== "cafe_score") {
+      assert.notEqual(m.value, 0, `${m.key} must not surface as a fake 0`);
+    }
+  }
+});
+
+test("buildHomebaseView: carries climate window alongside the metrics map", () => {
+  const home = {
+    name: "Allison Park, PA",
+    visitClimate: Array.from({ length: 12 }, (_, i) => ({ hi: 30 + i * 5, lo: 20 + i * 4, precipDays: 8, daylightHr: 10 })),
+    measuredMetrics: {},
+  };
+  const hb = buildHomebaseView(home);
+  assert.equal(hb.visitClimate.length, 12, "climate window passed through");
+  assert.ok(hb.extremes, "climate extremes computed for Chapter V deltas");
+  assert.ok(hb.metrics, "metrics map present even when measurements are empty");
 });
