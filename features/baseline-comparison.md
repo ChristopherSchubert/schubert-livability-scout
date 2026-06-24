@@ -30,18 +30,16 @@ through the only ground truth the owner has.
 
 - **Felt-score home reference**: live. The Slovenia 0–10 survey anchors its
   familiar-home end at Allison Park.
-- **"Delta vs Allison Park" visual pattern**: only in the mockup. The
-  live city detail page does not show side-by-side or delta visuals.
+- **"Delta vs Allison Park" visual pattern**: **live across Chapters IV & V**
+  as of 2026-06-24 (commit `e63a63e`). The When-to-go chapter shows climate
+  extremes with the home reference; the By-the-numbers chapter renders each
+  metric with `Allison Park · X` italicized underneath the value plus a small
+  tick on the bar at home's 0–100 position so the candidate-vs-home delta
+  reads at a glance. Honest blanks preserved — no fake zeros where home
+  hasn't been measured for a metric (the reference line is simply omitted).
 
 ## TODOs / future direction
 
-- **Wire delta visuals into the live detail page.** Mockup chapters 4
-  and 5 are full of "Newport vs Allison Park" comparisons (numeric
-  deltas, hatched reference bars, baseline-anchored axes). Live route
-  shows neither.
-- **Extend beyond visit window.** Mockup only does it for climate; the
-  by-the-numbers chapter (the metric taxonomy) is a natural fit too —
-  every metric shown with its Allison Park reference value.
 - **Calibration-place picker.** Hard-coded to Allison Park today. If
   the owner moves or wants to A/B against a different anchor (e.g.
   Shadyside as a more urban baseline), make it a setting on
