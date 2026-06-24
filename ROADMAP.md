@@ -2,23 +2,25 @@
 
 **Maintained by:** the product-manager / steward role (read/plan; propose-only on
 issues — does not edit app code or close the writer's work).
-**Last synthesized:** 2026-06-14.
+**Last synthesized:** 2026-06-24.
 
 This is the durable backlog synthesis. The live queue is GitHub Issues
 (`gh issue list`); this doc is the *why and the sequence* behind it. When the
 queue and this doc disagree, the queue is truth — re-synthesize here.
 
-## Current state (2026-06-14)
+## Current state (2026-06-24)
 
-- **Measurement coverage:** 119/122 places fully measured. The only real gap is
-  `median_price_usd` for the 3 Slovenia anchors (Bled / Ljubljana / Piran);
-  honest `null` is acceptable per the one rule.
-- **Shipping velocity:** high. Trip Planner, Journal, Magazine detail, mobile
-  Phase 0, the Google-only auth refactor, and the POI cost gate all landed in
-  the ~2 weeks ending 2026-06-13. The QA-audit batch (#62–#78) closed in one
-  push on 2026-06-13.
-- **Open queue:** small (#68, #75, #79, #82, #83, #84) plus two audit-drift bugs
-  filed 2026-06-14 (#85, #86).
+- **Family-hub integration (#84) DONE.** Prod `travel.schubertfamily.com` runs
+  on the shared `schubert-family.travel` schema; identity via platform
+  `current_member_id()`; feed conformance green in production (`check-feed.mjs`
+  CONFORMANT). All 7 spine tickets closed (#88–#94). `schubert-travel` left
+  untouched as rollback; retirement is owner-only and deferred.
+- **Measurement coverage:** unchanged from prior sync — 119/122 fully measured;
+  remaining gap is `median_price_usd` for the 3 Slovenia anchors (honest `null`
+  is acceptable per the one rule).
+- **Open queue:** **very small** — just #95 (family-hub palette, deferred
+  post-cutover) and #101 (cross-domain SSO cookie follow-up; commit already
+  landed, awaiting verification close). No bugs, no audit drift outstanding.
 
 ### City counts — the 78 vs 122 reconciliation
 
@@ -40,43 +42,39 @@ session log, not a live figure.
 
 Ranked value × applicability × readiness ÷ effort, bugs first.
 
-> **Top priority (owner directive, 2026-06-14):** the **#84 family-hub platform
-> integration** epic is now #1 — it gets knocked out before any other in-flight
-> work. Plan: [features/platform-integration.md](features/platform-integration.md);
-> children #88–#94; dependency DAG + platform interlocks on #84. It's an auth +
-> production-DB migration, gated on owner sign-off and platform-side deliverables.
-> **Phasing decided** (platform steward, 2026-06-14): **(A) all-in-one now** — plan
-> #88–#94 accepted as written; interlocks tracked as platform `schubert-family#19`.
-> **#88 (env validator) ✅ shipped + closed** (`c8a4283`, 2026-06-21) — `lib/env.js`
-> boot-validates required env via `instrumentation.js`; anon-key fallback dropped.
-> `NEXT_PUBLIC_HUB_URL` = `https://schubertfamily.com` (apex; set in Vercel + `.env.local`).
-> The `travel` schema is **created + exposed** (verified 2026-06-21 via PGRST205), so **#89
-> is next** — gated only on a **seated writer + the `schubert-family` DB password (Keychain)
-> + owner go to apply migrations to the shared DB**. ✅ Auth+DB go **confirmed by the owner**
-> (2026-06-14), absolute condition: **never delete `schubert-travel`** (copy-only; rollback).
-> Critical path: ~~#88~~ → **#89** → #90 → {#91, #93} → #94 (#92 parallel after #89).
-> Details + next-writer checklist in the [[project_family_hub_integration]] memory.
+> **#84 family-hub integration: DONE (2026-06-22).** Prod cutover live, feed
+> conformance green, all 7 spine tickets closed. The "top priority" slot is
+> now open — see "What's next" below.
 
-### Recently shipped — verified in commits (2026-06-14 → 21)
-✅ **#88 env/config + zod boot validator (`c8a4283`) — first #84 child shipped** ·
-#85 tooltip provenance (`bc0d4f7`) · #86 E2E teardown (`76fd65a`) · #82 account menu
-(`81192e1`) · #79 region/state trip chips (`990cff3`/`2cf9d5a`/`d3498e2`) · #97
-`/api/mockup-data` 500 (`db1fd3e` — was a Keychain-pg client that can't run on Vercel;
-moved to the service role) · #96 prod-login incident (dashboard: Google client secret +
-Site URL on `schubert-travel`; verified clean Google logins for both users 2026-06-21).
+### Recently shipped — verified in commits (2026-06-14 → 24)
+✅ **#84 family-hub integration epic CLOSED** — #88 env/boot validator (`c8a4283`)
+· #89 schema port + data migration (`521cc46`/`9179595`) · #90 identity/RLS via
+`current_member_id()` (`611ed67`) · #91 app/auth/realtime re-point + member.id-as-userId
+fix (`ad4c7c3`/`599a2c5`) · #92 measurement pipeline → schubert-family (`bbfebf3`) ·
+#93 GET /api/feed + HS256 + conformance green in prod · #94 cutover verified.
+Plus: #98 dead from-leg chip (`1a1fb40`), #100 board/visited/assessed reframe voice
+(`540be41`), #75 mockup retirement (`dcb5873`/`e40cd6e`), and the prior batch
+(#85/#86/#82/#79/#96/#97).
 
-### Open queue (all *after* the #84 epic)
-1. **#68 — Reframe cleanup** *(north star)*. Residual decision-tool/verdict language.
-   The 2026-06-13 repo-wide purge (`7cc682b`) didn't get everything; #68 is the inventory
-   of what remains. CLAUDE.md still carries old framing **and the stale prod URL**
-   (`schubert-livability-scout.vercel.app` → should be `travel.schubertfamily.com`) — fix
-   in the same pass. (Fold in the #67 residual baseline-copy nit.)
-2. **#75 — Repo hygiene** *(scoped)*. Safe parts (dotfile triage, `.gitignore` gaps, dead
-   `MapEmbed`/`MapPicker`). ⚠️ Do **not** blind-move the live `public/*.html` mockups
-   (wired to APIs). See the grooming comment on #75.
-3. **#83 — Account settings surface**. The menu (#82) shipped; this is the panel it opens.
-   Design via `design:*`.
-4. **#95 — Family-hub colour system** *(FYI / optional alignment)*.
+### Open queue
+1. **#101 — Cross-domain SSO cookie.** Commit `a12d0f0` already landed
+   (`NEXT_PUBLIC_COOKIE_DOMAIN`-driven `cookieOptions.domain`); only the live
+   "signed-in on hub, opening travel skips re-login" verification remains.
+2. **#95 — Family-hub colour system** *(FYI / optional alignment)*. Deferred
+   post-cutover; revisit when there's appetite for the visual continuity pass.
+
+### What's next (steward synthesis)
+With #84 done, the natural next focuses, ranked by leverage:
+- **Verify #101 SSO** and close it — small, finishes the cutover tail.
+- **Resume the measurement-coverage work** that was paused for #84 (the
+  3 Slovenia-anchor `median_price_usd` gap; the January-axis methodology
+  question — see "Decisions only the owner can make" below).
+- **Continue the reframe consistency** — #68 closed, but a watch for residual
+  decision-tool/verdict language as new surfaces ship is worth a periodic sweep.
+- **The Janice/walkthrough-deck follow-ups** absorbed into the codebase
+  (deck retired; route `/api/walkthrough-feedback` is a cleanup candidate per
+  the archive README — small follow-up issue welcome if it bothers anyone).
+No epic is queued; this is genuinely a clear runway moment.
 
 ## Decisions only the owner can make
 
@@ -89,11 +87,10 @@ These gate sequencing and can't be resolved from code or convention:
 2. **Slovenia trio price data** — build an EU price adapter (extend the SURS
    PxWeb path already used for ownership %) to fill `median_price_usd`, or leave
    it honest-`null`? Pure effort-vs-value call; null is acceptable.
-3. **#84 platform integration** — ✅ resolved 2026-06-14: now-priority (top of
-   queue). Contract questions answered by the platform steward; implementation
-   plan + children #88–#94 filed. Remaining owner gates: explicit sign-off on the
-   auth handoff + DB migration before any code; `schubert-travel` retirement stays
-   owner-only and deferred.
+3. **#84 platform integration** — ✅ **DONE 2026-06-22.** Prod is live on
+   `schubert-family.travel`; feed conformance green. Open owner item:
+   **`schubert-travel` retirement** — stays owner-only and deferred per the
+   contract; no Claude action.
 
 ## Acceptance audit — 2026-06-14
 
