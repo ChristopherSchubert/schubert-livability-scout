@@ -14,7 +14,7 @@ import HorizonStrip from "./HorizonStrip";
 // becomes a horizontal swipe carousel (one axis per panel, CSS scroll-snap)
 // with a tappable chip row + dots for navigation. The switcher/dots are
 // display:none on desktop; the carousel CSS only applies at <=640px.
-export default function ChapterData({ axes, horizonFeatures }) {
+export default function ChapterData({ axes, horizonFeatures, homebase }) {
   const list = axes || [];
   const trackRef = useRef(null);
   const [active, setActive] = useState(0);
@@ -74,6 +74,8 @@ export default function ChapterData({ axes, horizonFeatures }) {
               <MetricRow
                 key={m.key}
                 m={m}
+                homeRef={homebase?.metrics?.[m.key] || null}
+                homeName={homebase?.name || null}
                 addon={
                   m.key === "mtn_horizon_pct" && horizonFeatures ? (
                     <HorizonStrip horizon={horizonFeatures} />
@@ -97,7 +99,18 @@ export default function ChapterData({ axes, horizonFeatures }) {
   );
 }
 
-function MetricRow({ m, addon }) {
+function MetricRow({ m, addon, homeRef, homeName }) {
+  // Home reference (Allison Park) — honest blank when home hasn't been measured
+  // for this metric (no key, no value, no count) so we never render a fake 0.
+  // POI rows compare counts; numeric rows compare formatted values. The bar
+  // also gets a small tick at home's 0–100 position so the delta is visible.
+  const hasHomeRef =
+    homeRef && (homeRef.count?.total != null || homeRef.value != null);
+  const homeText = !hasHomeRef
+    ? null
+    : homeRef.count?.total != null
+      ? `${homeRef.count.total}`
+      : formatMetricNumber(homeRef);
   return (
     <div className="metric">
       <div className="metric-top">
@@ -129,7 +142,15 @@ function MetricRow({ m, addon }) {
       {m.tagline ? <div className="metric-tagline">{m.tagline}</div> : null}
       <div className="metric-bar">
         <span style={{ width: m.barPct != null ? `${m.barPct}%` : 0, background: m.barColor || undefined }} />
+        {hasHomeRef && homeRef.barPct != null ? (
+          <i className="metric-home-tick" style={{ left: `${homeRef.barPct}%` }} aria-hidden="true" />
+        ) : null}
       </div>
+      {hasHomeRef ? (
+        <div className="metric-home-ref" title={`${homeName} · ${homeText}`}>
+          <span>{homeName}</span> · <strong>{homeText}</strong>
+        </div>
+      ) : null}
       {addon}
       {m.source ? <div className="metric-source" title={m.source}>{m.source}</div> : null}
     </div>

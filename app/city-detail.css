@@ -647,12 +647,41 @@
       height: 3px;
       background: var(--hair);
       border-radius: 0;
-      overflow: hidden;
+      /* a hair taller bleed so the home-tick can extend ±2px above/below */
+      overflow: visible;
+      position: relative;
       margin-top: 0.4rem;
     }
 /* Fill color is set per-bar (inline) from the metric's 0–10 goodness score —
    see metricBarColor() in lib/metrics.js. --accent is only the empty fallback. */
 .cd-root .metric-bar > span { display: block; height: 100%; background: var(--accent); }
+/* Home (Allison Park) marker on the bar — a small vertical tick at the home
+   value's 0–100 position so the eye reads the candidate-vs-home delta directly.
+   Inline `left: X%` driven by homeRef.barPct in ChapterData. */
+.cd-root .metric-home-tick {
+      position: absolute;
+      top: -3px;
+      bottom: -3px;
+      width: 2px;
+      transform: translateX(-1px);
+      background: var(--ink-mute);
+      opacity: 0.85;
+      border-radius: 1px;
+      pointer-events: none;
+    }
+/* Home reference line under the value ("Allison Park · 0.8") — same compact,
+   italicized treatment as the climate "Allison Park · 21°F" line in ChapterWhen
+   so the two chapters speak the same language. */
+.cd-root .metric-home-ref {
+      margin-top: 0.18rem;
+      color: var(--ink-mute);
+      font-family: 'Fraunces', serif;
+      font-style: italic;
+      font-variation-settings: "opsz" 14, "wght" 400;
+      font-size: 0.78rem;
+      line-height: 1.35;
+    }
+.cd-root .metric-home-ref strong { font-style: normal; font-weight: 600; color: var(--ink); }
 .cd-root .metric-tagline {
       margin-top: 0.18rem;
       color: var(--ink-mute);
