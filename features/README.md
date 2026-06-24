@@ -15,22 +15,22 @@ docs are worse than no feature docs.
 | Feature | File | Status |
 |---|---|---|
 | Onboarding a new city | [city-onboarding.md](city-onboarding.md) | documented |
-| Magazine-format city detail (redesign) | [magazine-detail.md](magazine-detail.md) | stub — wire-up pending |
-| Why prose (why / if-wins / if-fails) | [why-prose.md](why-prose.md) | stub |
-| Stay-zone map + boundary | [stay-zone-map.md](stay-zone-map.md) | stub — data live, polygon UI pending |
+| Magazine-format city detail (redesign) | [magazine-detail.md](magazine-detail.md) | live — six chapters wired (Scene · Why · Where · By the numbers · When to go · Six blocks) |
+| Why prose (why / if-wins / if-fails) | [why-prose.md](why-prose.md) | live (renders in Chapter II) |
+| Stay-zone map + boundary | [stay-zone-map.md](stay-zone-map.md) | live — polygon + plateau-decay disk + walkability field card render in Chapter III |
 | Walking core (plateau-decay measurement field + full-screen view) | [walking-core.md](walking-core.md) | documented; rolled out 2026-06-08 |
 | Measurer pipeline (objective data → Supabase) | [measurer-pipeline.md](measurer-pipeline.md) | documented; per-key coverage in [METRICS_COMPLETION.md](../METRICS_COMPLETION.md) |
 | Chips (city attribute strip) | [chips.md](chips.md) | documented |
-| Visit window (Prime + Off-season months) | [visit-window.md](visit-window.md) | stub — live but mockup adds year-shape + curves |
+| Visit window (Prime + Off-season months) | [visit-window.md](visit-window.md) | live — Chapter V renders the year-shape curve (climate + crowd + visit-score) with Prime/Off-season markers |
 | Trip planner — cross-city *when-to-go* swim-lane (distinct from the deck, see ▼ Trip planning) | [trip-planner.md](trip-planner.md) | live at `/planning/calendar` |
-| Baseline comparison (vs Allison Park) | [baseline-comparison.md](baseline-comparison.md) | stub — only in mockup |
-| Six blocks (curated walk list) | [six-blocks.md](six-blocks.md) | stub — data live, UI pending |
+| Baseline comparison (vs Allison Park) | [baseline-comparison.md](baseline-comparison.md) | live — Allison Park reference + bar tick under every metric in Chapter IV; climate deltas in Chapter V |
+| Six blocks (curated walk list) | [six-blocks.md](six-blocks.md) | live — Chapter VI renders six numbered cards with mini-maps + blurbs |
 | Deployment (Vercel auto-deploy from `main`) | [deployment.md](deployment.md) | documented |
 | Account surface (top-right menu: identity, backup, sign-out) | [account.md](account.md) | live (#82/#83) |
-| Family-hub platform integration (#84 epic) | [platform-integration.md](platform-integration.md) | implementation plan — not started |
-| Candidate funnel (Board ⇄ Ranking + shared filters + ViewToggle) | [candidate-funnel.md](candidate-funnel.md) | stub — created 2026-06-09 |
-| Funnel board (5-stage kanban) | [candidate-funnel.md](candidate-funnel.md) | stub |
-| Calibrate (weighted ranking + learned weights) | [candidate-funnel.md](candidate-funnel.md) | stub |
+| Family-hub platform integration (#84 epic) | [platform-integration.md](platform-integration.md) | **complete (2026-06-22)** — prod runs on `schubert-family.travel`; conformance green |
+| Places overview (Board ⇄ Compare + shared filters + ViewToggle) | [candidate-funnel.md](candidate-funnel.md) | live; reframed 2026-06-22 (timing-first Compare view) |
+| Funnel board (5-stage kanban) | [candidate-funnel.md](candidate-funnel.md) | live |
+| Compare view (sortable table; learned-weights Fit, year sparkline, "Great in [month]") | [candidate-funnel.md](candidate-funnel.md) | live at `/ranking` |
 | Visit plan (per-city trip setup, days, checklists) | [visit-plan.md](visit-plan.md) | documented; redesign 2026-06-09 |
 | Mobile / responsive (phone parity + a11y) | [mobile.md](mobile.md) | in progress — Phase 0 landed 2026-06-09 |
 | Decide questionnaire (post-visit survey) | _todo_ | undocumented |
