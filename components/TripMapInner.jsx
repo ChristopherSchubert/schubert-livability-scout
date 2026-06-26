@@ -15,7 +15,7 @@ import { placeableStops } from "../lib/trip-frame";
 import { CAT_COLOR } from "./atoms";
 
 // Matches TripWindow.jsx — the canonical palette for leg identity.
-const LEG_COLORS = ["#0d4c44", "#2e5482", "#9a5a16", "#665285", "#6b6358"];
+const LEG_COLORS = ["#15512f", "#2e5482", "#9a5a16", "#665285", "#6b6358"];
 
 // FitBounds — fits or re-fits the map to a set of [lat, lon] points. Keyed on
 // content so re-renders caused by parent state don't snap the view back (#57).

@@ -82,7 +82,7 @@ export default function WhereMap({ lat, lon, boundary, poiPositions = [] }) {
           <Circle
             center={center}
             radius={PLATEAU}
-            pathOptions={{ color: "#0d4c44", weight: 3, opacity: 0.9, fillColor: "#0d4c44", fillOpacity: 0.10 }}
+            pathOptions={{ color: "#15512f", weight: 3, opacity: 0.9, fillColor: "#15512f", fillOpacity: 0.10 }}
           />
           {/* 10-min reference shed at 800 m — dashed ochre. */}
           <Circle
@@ -94,7 +94,7 @@ export default function WhereMap({ lat, lon, boundary, poiPositions = [] }) {
           <Circle
             center={center}
             radius={MAX_RADIUS}
-            pathOptions={{ color: "#0d4c44", weight: 2, opacity: 0.75, fill: false, dashArray: "5 5" }}
+            pathOptions={{ color: "#15512f", weight: 2, opacity: 0.75, fill: false, dashArray: "5 5" }}
           />
 
           {/* POI dots, opacity = w(d). Skips anything past the cutoff (already
@@ -117,8 +117,8 @@ export default function WhereMap({ lat, lon, boundary, poiPositions = [] }) {
             ))}
 
           {/* Visit-center pin — double ring so it reads at every zoom. */}
-          <CircleMarker center={center} radius={18} pathOptions={{ color: "#0d4c44", weight: 1, opacity: 0.4, fillColor: "#fbf6ea", fillOpacity: 0.9 }} />
-          <CircleMarker center={center} radius={10} pathOptions={{ color: "#fbf6ea", weight: 4, fillColor: "#0d4c44", fillOpacity: 1 }} />
+          <CircleMarker center={center} radius={18} pathOptions={{ color: "#15512f", weight: 1, opacity: 0.4, fillColor: "#fbf6ea", fillOpacity: 0.9 }} />
+          <CircleMarker center={center} radius={10} pathOptions={{ color: "#fbf6ea", weight: 4, fillColor: "#15512f", fillOpacity: 1 }} />
         </>
       ) : null}
       <FitView polys={polys} center={hasPin ? center : null} />

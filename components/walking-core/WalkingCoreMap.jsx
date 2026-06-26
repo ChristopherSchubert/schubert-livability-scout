@@ -63,7 +63,7 @@ export default function WalkingCoreMap({ cityItem }) {
       <Circle
         center={center}
         radius={PLATEAU}
-        pathOptions={{ color: "#0d4c44", weight: 3, opacity: 0.9, fillColor: "#0d4c44", fillOpacity: 0.10 }}
+        pathOptions={{ color: "#15512f", weight: 3, opacity: 0.9, fillColor: "#15512f", fillOpacity: 0.10 }}
       />
       {/* 10-min reference ring. */}
       <Circle
@@ -75,7 +75,7 @@ export default function WalkingCoreMap({ cityItem }) {
       <Circle
         center={center}
         radius={MAX_RADIUS}
-        pathOptions={{ color: "#0d4c44", weight: 2, opacity: 0.75, fill: false, dashArray: "5 5" }}
+        pathOptions={{ color: "#15512f", weight: 2, opacity: 0.75, fill: false, dashArray: "5 5" }}
       />
 
       {/* POI dots with weight-opacity. A null/NaN coordinate (partial cache

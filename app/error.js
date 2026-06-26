@@ -18,7 +18,7 @@ export default function GlobalError({ error, reset }) {
       </p>
       {error?.digest ? <p style={{ color: "var(--muted, #999)", fontSize: ".72rem" }}>ref: {error.digest}</p> : null}
       <div style={{ marginTop: "1.2rem", display: "flex", gap: ".6rem", justifyContent: "center" }}>
-        <button onClick={() => reset()} style={{ border: "1px solid var(--accent, #0d4c44)", background: "var(--accent, #0d4c44)", color: "#fff", borderRadius: 100, padding: ".4rem 1.1rem", cursor: "pointer", fontWeight: 600 }}>Try again</button>
+        <button onClick={() => reset()} style={{ border: "1px solid var(--accent, #15512f)", background: "var(--accent, #15512f)", color: "#fff", borderRadius: 100, padding: ".4rem 1.1rem", cursor: "pointer", fontWeight: 600 }}>Try again</button>
         <a href="/trips" style={{ border: "1px solid var(--border, #ccc)", borderRadius: 100, padding: ".4rem 1.1rem", color: "inherit" }}>Back to Trips</a>
       </div>
     </div>

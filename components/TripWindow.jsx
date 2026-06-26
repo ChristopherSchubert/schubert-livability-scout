@@ -20,7 +20,7 @@ import {
 } from "../lib/trip-window";
 import { useTrips } from "./TripProvider";
 
-export const LEG_COLORS = ["#0d4c44", "#2e5482", "#9a5a16", "#665285", "#6b6358"];
+export const LEG_COLORS = ["#15512f", "#2e5482", "#9a5a16", "#665285", "#6b6358"];
 const DOW = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 function dayNum(ymd) { return ymd ? String(+ymd.slice(8, 10)) : ""; }

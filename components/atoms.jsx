@@ -8,7 +8,7 @@
 import { MARKER_TYPES, mealVegState } from "../lib/trip";
 
 export const CAT_ICON = { travel: "🚆", meal: "🍴", activity: "🥾", stay: "🛏", errand: "🧾" };
-export const CAT_COLOR = { meal: "#9a5a16", activity: "#0d4c44", travel: "#2e5482", stay: "#665285", errand: "#6b6358" };
+export const CAT_COLOR = { meal: "#9a5a16", activity: "#15512f", travel: "#2e5482", stay: "#665285", errand: "#6b6358" };
 const STATUS_LABEL = { booked: "booked", reserved: "held", toBook: "to book", none: "" };
 
 // The little glyph for a category. `cat` falls back to a neutral dot.

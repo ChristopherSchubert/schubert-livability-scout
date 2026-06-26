@@ -9,8 +9,22 @@
   --border: #d8ccb8;        /* hair */
   --text: #1b1814;          /* ink */
   --muted: #6b6358;         /* ink-mute — darkened 2026-06-09 so muted text clears WCAG AA 4.5:1 on all three paper tones (was #7a7268 = 4.39:1 on cream, a fail). See features/mobile.md. */
-  --accent: #0d4c44;        /* deep green */
-  --accent-soft: #d2e6e1;
+  /* Forest accent — aligned to the family-hub crest palette (#95, 2026-06-25).
+     Was #0d4c44 (teal-leaning); hub-locked is #15512f (warmer forest from the
+     engraved Newfoundland-in-shield) so the front door + Travel sit in the
+     same key. Touches ~280 var(--accent) sites in one swap. Light tones only;
+     the locked dark palette is out of scope (Travel has no dark-mode infra). */
+  --accent: #15512f;
+  --accent-soft: #e4efe6;
+  --on-accent: #f4f0e7;     /* text/iconography on filled accent surfaces */
+
+  /* Status / severity ramp — hub spec (#95). Reserved for future use; doesn't
+     repaint the existing funnel stage colors below (those are domain stages,
+     not severity). */
+  --status-on-track:  #3cc879;
+  --status-warning:   #e2cc69;
+  --status-issue:     #d0523e;
+  --status-emergency: #a3292d;
   --shadow: 0 10px 30px rgba(41, 33, 19, 0.06);
   --radius: 14px;
   /* Editorial type system, shared with the magazine page. */

@@ -26,7 +26,7 @@ const TripMap = dynamic(() => import("./TripMapInner"), { ssr: false, loading: (
 
 // Leg palette — same as TripWindow, so the Days rail's per-day tint reads as the
 // same legs as the Plan window.
-const LEG_COLORS = ["#0d4c44", "#2e5482", "#9a5a16", "#665285", "#6b6358"];
+const LEG_COLORS = ["#15512f", "#2e5482", "#9a5a16", "#665285", "#6b6358"];
 
 function money(map) {
   return Object.entries(map || {}).map(([c, n]) => `${c === "EUR" ? "€" : c + " "}${n}`).join(" · ") || "—";

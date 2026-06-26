@@ -14,7 +14,7 @@
   --ink:        #1b1814;
   --ink-soft:   #2c2823;
   --ink-mute:   #7a7268;
-  --accent:     #0d4c44;
+  --accent:     #15512f;  /* hub-aligned forest (#95) */
   --accent-2:   #1e7a6e;
   --warn:       #a23a30;
   --hair:       rgba(27, 24, 20, 0.14);
@@ -425,7 +425,7 @@
       font-size: 0.7rem;
       flex: 0 0 auto;
     }
-.cd-root .candidate-list li.selected .rank { background: #0d4c44; }
+.cd-root .candidate-list li.selected .rank { background: #15512f; }
 .cd-root .candidate-list .main {
       display: flex;
       flex-direction: column;

@@ -72,8 +72,8 @@ export default function ChapterWhen({ view, homebase }) {
           <svg viewBox="0 0 1080 320" preserveAspectRatio="none" role="img" aria-label="Monthly climate comfort vs tourist crowd density">
             <defs>
               <linearGradient id="comfortGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#0d4c44" stopOpacity="0.32" />
-                <stop offset="100%" stopColor="#0d4c44" stopOpacity="0.06" />
+                <stop offset="0%" stopColor="#15512f" stopOpacity="0.32" />
+                <stop offset="100%" stopColor="#15512f" stopOpacity="0.06" />
               </linearGradient>
               <linearGradient id="crowdGrad" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor="#a23a30" stopOpacity="0.30" />
