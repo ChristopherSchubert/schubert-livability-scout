@@ -354,8 +354,9 @@ click-to-sort table — neither needs a dropdown). It uses the shared
 `SortControl` dropdown (added to `city-filters.jsx` so any future list view
 can reuse it) fed planner-specific options from module-level `BACKLOG_SORTS`:
 four **Best week · {season}** options (Spring / Summer / Fall / Winter), then
-**Overall** (`weightedAxisScore`, 0–10), the **5 axes** (Setting / Aliveness /
-Fabric / Realness / Year-round, off `axisRollup`), **Gut score** (`feltScore`),
+**Overall** (`weightedAxisScore`, 0–10), the **4 scored axes** (Setting / Aliveness /
+Fabric / Realness, off `axisRollup` — Off-season is `excludeFromScoring`, #105),
+**Gut score** (`feltScore`),
 and **Name A–Z**. Score sorts are descending with unmeasured values (`null`,
 never a fake 0 — the no-invented-data rule) last and ties broken by name.
 Default is the season we're in now (`best-${current season}`). Session-local,
@@ -407,7 +408,7 @@ Design rules that matter:
 
 Verified in-browser: popover renders the full payload (e.g. San Francisco
 (Noe Valley) → Setting 3.5 / Aliveness 6.4 / Fabric 7.1 / Realness 5.8 /
-Year-round 9.0, chips Coastal·Walkable·Historic·Compact, "Best in Summer ·
+Off-season 9.0, chips Coastal·Walkable·Historic·Compact, "Best in Summer ·
 visit score 85", trimmed why) at a clamped viewport position; no console
 errors.
 

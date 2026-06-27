@@ -2,8 +2,9 @@
 
 Two diagnostic trips computed per city from climate normals + crowd
 season: **Prime** (the month that's comfortable *after* crowds thin) and
-**Off-season** (the coldest month — the January test made literal). A
-candidate should pass both before it advances.
+**Off-season** (the coldest month — how bad the off-season is, when
+everything thins out). Vacation scoring no longer weights the off-season
+axis (#105); this view stays as informational context.
 
 ## Crowd-season source cascade (current)
 
