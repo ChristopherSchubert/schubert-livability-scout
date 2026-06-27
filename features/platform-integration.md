@@ -1,10 +1,11 @@
 # Family-Hub Platform Integration — Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development
-> or superpowers:executing-plans to implement, task-by-task, with review checkpoints.
-> Steps use checkbox (`- [ ]`) syntax. **This is an auth + production-DB migration:
-> nothing here runs without the owner's explicit sign-off, and the cutover steps
-> interlock with platform-side deliverables (see "Platform interlocks").**
+> **Status: ✅ COMPLETE (2026-06-22).** Prod runs on `schubert-family.travel`;
+> identity through the platform `member` mirror; feed conformance green in
+> production. All ticket-children closed (#88 / #89 / #90 / #91 / #92 / #93 /
+> #94) + #95 palette + #101 cross-domain SSO. Epic #84 closed. This document
+> stays as the implementation-history record; if the contract evolves and
+> needs another pass, file a new epic against the active hub contract.
 
 **Goal:** Adopt the `schubert-family` platform contract (#84) — consolidate Travel's
 database into a `travel` schema in the shared Supabase project, move identity onto the

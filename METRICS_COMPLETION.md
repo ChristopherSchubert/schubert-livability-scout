@@ -74,7 +74,11 @@ Auxiliary fields (not in `measured_metrics`):
 ### Remaining gaps
 
 - **`median_price_usd` (3 missing)** — Bled, Ljubljana, Piran. No pan-EU
-  price registry; would need a per-country adapter (Slovenia: GURS ETN).
+  price registry. **Resolved 2026-06-27 (#104) as honest-null** — the
+  owner chose accept-the-blank over building a per-country adapter
+  (`scripts/.audit-metrics.mjs` won't flag these). Same applies to the
+  other three US-only Census metrics on those rows
+  (`price_to_income_ratio`, `walk_transit_commute_pct`, `pre1940_pct`).
 - **`population_total`** — RESOLVED (122/122). Bled/Ljubljana/Piran now use
   the Eurostat GISCO LAU municipality population the `eurostat_lau` measurer
   already fetched for `core_density`.
@@ -111,20 +115,22 @@ A city is complete when **every metric in `metricTaxonomy`** ([lib/planner-data.
 - Calibrate can learn weights from a regression that isn't crippled by NaNs
 
 **119/122 cities are fully complete.** The remaining 3 are the Slovenian
-trio for `median_price_usd` (no pan-EU price registry).
+trio for `median_price_usd` — **accepted as honest-null** per #104 (no
+pan-EU price registry; built-the-adapter was the alternative, owner
+chose not-to). Coverage is effectively closed for the US metric set.
 
 ---
 
 ## Backfill plan (priority order)
 
-### 1. EU price adapter (3 SI cities)
+### ~~1. EU price adapter (3 SI cities)~~ — CLOSED 2026-06-27 (#104)
 
-Bled, Ljubljana, Piran lack `median_price_usd` (and the three derived US-only
-Census metrics) because the US Census paths don't apply. `population_total` is
-already resolved via Eurostat GISCO LAU. Needs a SURS PxWeb price adapter
-(table 0861102 already used for `owner_occ_pct` — extend for price).
+Owner chose to accept the Slovenia trio's `median_price_usd` /
+`price_to_income_ratio` / `walk_transit_commute_pct` / `pre1940_pct` as
+honest blanks rather than build a SURS PxWeb / EU registry adapter. The
+metric taxonomy notes these as US-only by design.
 
-### 2. Crowd season pipeline replacement
+### 1. Crowd season pipeline replacement
 
 Google Trends rate-limits bulk runs; only 3/122 cities sit on the Trends
 tier, with a 15-city upgrade batch running 2026-06-08 (`measure-crowd-season.py`,
