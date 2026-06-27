@@ -113,6 +113,17 @@
 .wc-map .leaflet-tile-pane img {
   filter: saturate(0.88) sepia(0.06) contrast(1.04);
 }
+/* Dark-mode tile flip — matches the city-detail page pattern. Both the explicit
+   data-theme override and the OS-preference fallback (gated on
+   :not([data-theme="light"]) so a user who picked Light keeps Light). */
+[data-theme="dark"] .wc-map .leaflet-tile-pane img {
+  filter: invert(0.92) hue-rotate(180deg) saturate(0.6) brightness(0.95);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .wc-map .leaflet-tile-pane img {
+    filter: invert(0.92) hue-rotate(180deg) saturate(0.6) brightness(0.95);
+  }
+}
 .wc-map-empty {
   position: absolute;
   inset: 0;

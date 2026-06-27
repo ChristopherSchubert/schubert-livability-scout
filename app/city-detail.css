@@ -34,9 +34,29 @@
 /* Magazine page in dark mode — same hub crest dark palette as the dashboard,
    plus map tints that read on a near-black ground (the cream map-land would be
    blinding). Hairlines flip to a faint warm-white so they still separate
-   sections without looking like cracks. (#95 follow-up: dark theme.) */
+   sections without looking like cracks. (#95 follow-up: dark theme.)
+
+   Pattern mirrors globals.css: an explicit [data-theme="dark"] override
+   (set by ThemeToggle + cookie), plus an OS-preference fallback gated on
+   :not([data-theme="light"]) so a user who picked "Light" still gets light
+   even when the OS is dark. */
+[data-theme="dark"] .cd-root {
+  --paper:      #100f11;
+  --paper-deep: #161417;
+  --ink:        #e9e3d3;
+  --ink-soft:   #d0c8b4;
+  --ink-mute:   #aca596;
+  --accent:     #5f8c66;
+  --accent-2:   #4a8f86;
+  --warn:       #bc5d52;
+  --hair:       rgba(233, 227, 211, 0.14);
+  --hair-soft:  rgba(233, 227, 211, 0.06);
+  --map-land:   #1f1c1a;
+  --map-water:  #1d2730;
+  --map-street: #2a2724;
+}
 @media (prefers-color-scheme: dark) {
-  .cd-root {
+  :root:not([data-theme="light"]) .cd-root {
     --paper:      #100f11;
     --paper-deep: #161417;
     --ink:        #e9e3d3;
@@ -1174,6 +1194,21 @@
 .cd-root .walk-leaflet .leaflet-tile-pane img {
       filter: saturate(0.88) sepia(0.06) contrast(1.04) brightness(1.0);
     }
+/* Dark-mode tile flip — invert turns cream OSM tiles into a near-black ground;
+   hue-rotate corrects the water/road tints (otherwise blues invert to orange);
+   slight desaturation/brightness so colors don't pop on the dark editorial.
+   Applied to all three Leaflet surfaces (block mini-maps, where-map, walking
+   core) under both the data-theme override and the OS-preference fallback. */
+[data-theme="dark"] .cd-root .walk-leaflet .leaflet-tile-pane img,
+[data-theme="dark"] .cd-root .leaflet-where .leaflet-tile-pane img {
+  filter: invert(0.92) hue-rotate(180deg) saturate(0.6) brightness(0.95);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .cd-root .walk-leaflet .leaflet-tile-pane img,
+  :root:not([data-theme="light"]) .cd-root .leaflet-where .leaflet-tile-pane img {
+    filter: invert(0.92) hue-rotate(180deg) saturate(0.6) brightness(0.95);
+  }
+}
 .cd-root .walk-leaflet .leaflet-control-attribution { display: none; }
 /* Click overlay sits above the tiles so the whole card deep-links to Maps. */
 .cd-root .walk-leaflet-link { position: absolute; inset: 0; z-index: 400; }
