@@ -52,11 +52,13 @@ is complete on every track.
 | Realness | `median_price_usd` | 119/122 | US Census ACS (B25077) | `scripts/onboard.mjs --measurer census`. EU coverage: no pan-EU equivalent — needs per-country price registries (Slovenia: GURS ETN; France: DVF; UK: HMRC Price Paid) |
 | Realness | `price_to_income_ratio` | 119/122 | US Census ACS (B25077 ÷ B19013), capped at 50 | `scripts/onboard.mjs --measurer census`. US-only (depends on `median_price_usd`) |
 | _helper_ | `median_income_usd` | 119/122 | US Census ACS (B19013) | `scripts/onboard.mjs --measurer census`. Stored to compose `price_to_income_ratio`; not a taxonomy metric itself |
-| Year-round | `pleasant_days` | 122/122 | Open-Meteo archive 2019–2023 | `scripts/onboard.mjs --measurer climate` |
-| Year-round | `days_below_freeze` | 122/122 | Open-Meteo archive | `scripts/onboard.mjs --measurer climate` |
-| Year-round | `hot_days` | 122/122 | Open-Meteo archive | `scripts/onboard.mjs --measurer climate` |
-| Year-round | `clear_days` | 122/122 | Open-Meteo archive | `scripts/onboard.mjs --measurer climate` |
-| Year-round | `snowfall_in_yr` | 122/122 | NOAA NCEI 1991-2020 Normals (US, when a station within 60 km carries `ANN-SNOW-NORMAL`); Open-Meteo archive ERA5 2019-2023 (global fallback) | `scripts/onboard.mjs --measurer snowfall,snowfall_open_meteo` |
+| Off-season ¹ | `pleasant_days` | 122/122 | Open-Meteo archive 2019–2023 | `scripts/onboard.mjs --measurer climate` |
+| Off-season ¹ | `days_below_freeze` | 122/122 | Open-Meteo archive | `scripts/onboard.mjs --measurer climate` |
+| Off-season ¹ | `hot_days` | 122/122 | Open-Meteo archive | `scripts/onboard.mjs --measurer climate` |
+| Off-season ¹ | `clear_days` | 122/122 | Open-Meteo archive | `scripts/onboard.mjs --measurer climate` |
+| Off-season ¹ | `snowfall_in_yr` | 122/122 | NOAA NCEI 1991-2020 Normals (US, when a station within 60 km carries `ANN-SNOW-NORMAL`); Open-Meteo archive ERA5 2019-2023 (global fallback) | `scripts/onboard.mjs --measurer snowfall,snowfall_open_meteo` |
+
+¹ **Off-season** (renamed from "Year-round", #105 — 2026-06-27) is `excludeFromScoring: true` in the metric taxonomy and does **not** roll into the vacation Fit composite. The measurements stay populated and visible on the city detail page as informational context ("how bad is the off season"). A future livability-decision mode would re-weight it. Internal taxonomy key kept as `axis: "january"` to avoid a survey-data migration.
 
 Auxiliary fields (not in `measured_metrics`):
 

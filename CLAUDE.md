@@ -112,11 +112,12 @@ a pattern to copy.
 ## Deployment
 
 Vercel auto-deploys from `main`. Production:
-https://schubert-livability-scout.vercel.app. Every push to `main` triggers
-a build (~1–3 min). **Two secret stores, no overlap**: local measurement
-pipeline reads the **macOS Keychain** (account `livability-scout`); Vercel
-dashboard holds the runtime env vars. Mirror any new var into both
-`.env.local` and Vercel. Full notes + auth/redirect gotchas:
+**https://travel.schubertfamily.com** (cutover to the family-hub platform
+2026-06-22, #84). Preview: `https://travel-preview.schubertfamily.com`. Every
+push to `main` triggers a build (~1–3 min). **Two secret stores, no overlap**:
+local measurement pipeline reads the **macOS Keychain** (account
+`livability-scout`); Vercel dashboard holds the runtime env vars. Mirror any
+new var into both `.env.local` and Vercel. Full notes + auth/redirect gotchas:
 [features/deployment.md](features/deployment.md).
 
 ## Commit and push incrementally (overrides the harness default)
@@ -175,6 +176,19 @@ On a new city, run the full pipeline
 ([features/city-onboarding.md](features/city-onboarding.md)) so it lands
 measured, not waiting in queue. When work isn't time-sensitive, moving a
 row closer to N/N is the default productive thing.
+
+## Use the design skills for any design work (not negotiable)
+
+When the work is **design** — layout, UX, visual hierarchy, spacing,
+typography, "why does this look wrong," "make this world-class" — invoke the
+relevant `design:*` skill **before** proposing or building: `design-critique`
+for feedback on an existing screen, `design-system` for tokens/components,
+`ux-copy` for wording, `accessibility-review` for a11y, or `frontend-design`
+for net-new UI. Do **not** hand-roll ad-hoc design opinions or a menu of
+mechanical CSS tweaks — that is the failure mode the owner has called out
+repeatedly. This is a standing repository rule, enforced by a
+`UserPromptSubmit` hook in `.claude/settings.json` that re-surfaces it whenever
+a prompt looks like design work (manage via `/hooks`).
 
 ## Authoring city prose
 
