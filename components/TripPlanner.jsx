@@ -68,7 +68,7 @@ const BACKLOG_SORTS = [
   { id: "aliveness", label: "Aliveness",  kind: "axis", axis: "aliveness" },
   { id: "fabric",    label: "Fabric",     kind: "axis", axis: "fabric" },
   { id: "realness",  label: "Realness",   kind: "axis", axis: "realness" },
-  { id: "january",   label: "Year-round", kind: "axis", axis: "january" },
+  { id: "january",   label: "Off-season", kind: "axis", axis: "january" },
   { id: "gut",       label: "Gut score",  kind: "gut" },
   { id: "name",      label: "Name A–Z",   kind: "name" },
 ];

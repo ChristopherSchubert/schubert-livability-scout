@@ -21,15 +21,19 @@ import {
   starterCities,
 } from "../lib/planner-data.js";
 
-test("defaultWeights: 1 per measured axis", () => {
+test("defaultWeights: 1 per scoring axis (#105: Off-season excluded)", () => {
   assert.deepEqual(defaultWeights(), {
-    setting: 1, aliveness: 1, fabric: 1, realness: 1, january: 1,
+    setting: 1, aliveness: 1, fabric: 1, realness: 1,
   });
 });
 
-test("calibrateAxes: the five measured axes, in order", () => {
+test("calibrateAxes: the scoring axes, in order — Off-season is excluded (#105)", () => {
+  // #105: the "january" axis (label: "Off-season") is dropped from the Fit
+  // composite because off-season hardiness isn't a vacation-fit signal. It
+  // still renders on the city detail page (Chapter IV) via metricTaxonomy;
+  // calibrateAxes is the SCORING subset.
   assert.deepEqual(calibrateAxes.map(([k]) => k), [
-    "setting", "aliveness", "fabric", "realness", "january",
+    "setting", "aliveness", "fabric", "realness",
   ]);
   assert.equal(LEARN_MIN_SAMPLES, 6);
 });
