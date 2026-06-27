@@ -101,7 +101,7 @@ export default function WalkingCoreMap({ cityItem }) {
       <CircleMarker
         center={center}
         radius={7}
-        pathOptions={{ color: "#fbf6ea", weight: 2.5, fillColor: "#1b1814", fillOpacity: 1 }}
+        pathOptions={{ color: "var(--bg)", weight: 2.5, fillColor: "#1b1814", fillOpacity: 1 }}
       />
 
       {/* The saved pin, shown separately only when the measurement center moved
@@ -110,7 +110,7 @@ export default function WalkingCoreMap({ cityItem }) {
         <CircleMarker
           center={[lat, lon]}
           radius={5}
-          pathOptions={{ color: "#1b1814", weight: 2, fillColor: "#fbf6ea", fillOpacity: 1, dashArray: "2 2" }}
+          pathOptions={{ color: "#1b1814", weight: 2, fillColor: "var(--bg)", fillOpacity: 1, dashArray: "2 2" }}
         />
       ) : null}
 

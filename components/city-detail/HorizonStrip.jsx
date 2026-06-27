@@ -210,7 +210,7 @@ export default function HorizonStrip({ horizon }) {
                 cy={cy}
                 r={isDom ? 2.1 : 1.5}
                 fill={color}
-                stroke="#fbf6ea"
+                stroke="var(--bg)"
                 strokeWidth={isDom ? 0.6 : 0}
               />
               <title>

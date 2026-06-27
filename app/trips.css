@@ -28,7 +28,7 @@
 .tw-count { margin-left: auto; font-family: var(--font-ui); font-size: .72rem; color: var(--muted); }
 .tw-entries { list-style: none; margin: 0; padding: 0; }
 .tw-entry { display: flex; align-items: baseline; gap: .55rem; padding: .42rem .4rem; border-bottom: 1px dashed var(--border); cursor: pointer; border-radius: 5px; }
-.tw-entry:hover { background: #fffaf0; }
+.tw-entry:hover { background: var(--row-hover); }
 .tw-entry { border-left: 3px solid var(--border); }
 .tw-entry.cat-meal { border-left-color: #9a5a16; }
 .tw-entry.cat-activity { border-left-color: #15512f; }
@@ -102,7 +102,7 @@
 .ee-picker-bar { display: flex; gap: .3rem; }
 .ee-picker-bar input { flex: 1; }
 .ee-result { text-align: left; border: 0; border-bottom: 1px solid var(--border); background: none; padding: .35rem .2rem; cursor: pointer; display: flex; flex-direction: column; }
-.ee-result:hover { background: #fffaf0; }
+.ee-result:hover { background: var(--row-hover); }
 .ee-result small { color: var(--muted); font-size: .72rem; }
 .ee-err { color: #a3431f; font-size: .76rem; margin: 0; }
 .ee-foot { display: flex; align-items: center; margin-top: auto; padding-top: .8rem; border-top: 1px solid var(--border); }
@@ -162,10 +162,10 @@
 .tw-region-add:hover { color: var(--accent); border-color: var(--accent); }
 .tw-region-pop {
   position: absolute; z-index: 30; margin-top: .35rem; width: min(340px, 90vw);
-  background: #fffdf8; border: 1px solid var(--border); border-radius: 12px;
+  background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
   padding: .5rem; box-shadow: var(--shadow);
 }
-.tw-region-input { width: 100%; padding: .5rem .6rem; border: 1px solid var(--border); border-radius: 9px; background: #fffdf8; font: inherit; }
+.tw-region-input { width: 100%; padding: .5rem .6rem; border: 1px solid var(--border); border-radius: 9px; background: var(--panel); font: inherit; }
 .tw-region-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
 .tw-region-hint { font-size: .76rem; color: var(--muted); margin: .4rem .2rem 0; }
 .tw-region-results { list-style: none; padding: 0; margin: .35rem 0 0; display: grid; gap: .15rem; }
@@ -206,7 +206,7 @@
 .tw-citytray-other-input:focus { outline: none; border-color: var(--accent); }
 .tw-citytray-other-results { display: flex; flex-direction: column; gap: .2rem; max-height: 220px; overflow-y: auto; }
 .tw-citytray-other-result { text-align: left; border: 0; border-bottom: 1px solid var(--border); background: none; padding: .35rem .2rem; cursor: pointer; display: flex; flex-direction: column; gap: .05rem; }
-.tw-citytray-other-result:hover { background: #fffaf0; }
+.tw-citytray-other-result:hover { background: var(--row-hover); }
 .tw-citytray-other-result b { font-size: .88rem; }
 .tw-citytray-other-result small { color: var(--muted); font-size: .72rem; }
 @media (max-width: 640px) {
@@ -497,7 +497,7 @@
 .tg-chip { font-size: .6rem; color: #fff; background: var(--c, #6b6358); border: 0; border-radius: 4px; padding: .08rem .3rem; max-width: 100%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; cursor: pointer; }
 .tg-body { position: relative; }
 .tg-line { position: absolute; left: 0; right: 0; height: 1px; background: var(--border); opacity: .5; }
-.tg-block { position: absolute; left: 2px; right: 2px; border: 0; border-left: 3px solid var(--c, #6b6358); background: #fffdf8; border-radius: 3px; padding: 1px 4px; overflow: hidden; text-align: left; cursor: pointer; box-shadow: 0 1px 2px rgba(41,33,19,.08); }
+.tg-block { position: absolute; left: 2px; right: 2px; border: 0; border-left: 3px solid var(--c, #6b6358); background: var(--panel); border-radius: 3px; padding: 1px 4px; overflow: hidden; text-align: left; cursor: pointer; box-shadow: 0 1px 2px rgba(41,33,19,.08); }
 .tg-block:hover { box-shadow: 0 2px 6px rgba(41,33,19,.18); z-index: 2; }
 .tg-block b { display: block; font-size: .64rem; font-weight: 600; line-height: 1.15; overflow: hidden; }
 .tg-block small { display: block; font-size: .58rem; color: var(--muted); overflow: hidden; }
@@ -569,7 +569,7 @@
 .tw-flags li { font-size: .78rem; color: #7c2f12; }
 
 .tw-flight { display: flex; align-items: baseline; gap: .6rem; padding: .4rem .2rem; border-bottom: 1px dashed var(--border); border-left: 3px solid #2e5482; padding-left: .5rem; cursor: pointer; }
-.tw-flight:hover { background: #fffaf0; }
+.tw-flight:hover { background: var(--row-hover); }
 .tw-flight b { font-weight: 600; font-size: .9rem; }
 .tw-clickable { cursor: pointer; }
 .tw-clickable:hover { color: var(--accent); }
@@ -825,7 +825,7 @@
   border-radius: 0 0 7px 7px; padding: .26rem .1rem .22rem; cursor: pointer; font-family: var(--font-ui); line-height: 1.15; }
 .tw-daychip b { font-size: .8rem; font-variant-numeric: tabular-nums; font-weight: 600; color: var(--text); }
 .tw-daychip i { font-style: normal; font-size: .58rem; min-height: .8em; color: var(--muted); }
-.tw-daychip:hover { background: #fffaf0; }
+.tw-daychip:hover { background: var(--row-hover); }
 .tw-daychip.on { background: var(--leg, var(--accent)); }
 .tw-daychip.on b, .tw-daychip.on i { color: #fff; }
 .tw-daychip:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }

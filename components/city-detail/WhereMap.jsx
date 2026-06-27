@@ -117,8 +117,8 @@ export default function WhereMap({ lat, lon, boundary, poiPositions = [] }) {
             ))}
 
           {/* Visit-center pin — double ring so it reads at every zoom. */}
-          <CircleMarker center={center} radius={18} pathOptions={{ color: "#15512f", weight: 1, opacity: 0.4, fillColor: "#fbf6ea", fillOpacity: 0.9 }} />
-          <CircleMarker center={center} radius={10} pathOptions={{ color: "#fbf6ea", weight: 4, fillColor: "#15512f", fillOpacity: 1 }} />
+          <CircleMarker center={center} radius={18} pathOptions={{ color: "#15512f", weight: 1, opacity: 0.4, fillColor: "var(--bg)", fillOpacity: 0.9 }} />
+          <CircleMarker center={center} radius={10} pathOptions={{ color: "var(--bg)", weight: 4, fillColor: "#15512f", fillOpacity: 1 }} />
         </>
       ) : null}
       <FitView polys={polys} center={hasPin ? center : null} />

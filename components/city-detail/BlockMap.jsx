@@ -17,7 +17,7 @@ import { MapContainer, TileLayer, Marker } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
-// App palette (city-detail.css): accent #15512f, paper #fbf6ea, ink #1b1814.
+// App palette (city-detail.css): accent #15512f, paper var(--bg), ink #1b1814.
 const blockPin = L.divIcon({
   className: "block-pin-icon",
   iconSize: [20, 20],
@@ -25,7 +25,7 @@ const blockPin = L.divIcon({
   html:
     '<span style="' +
     "display:block;box-sizing:border-box;width:20px;height:20px;border-radius:50%;" +
-    "background:#15512f;border:3px solid #fbf6ea;" +
+    "background:#15512f;border:3px solid var(--bg);" +
     "box-shadow:0 1px 5px rgba(27,24,20,.55), 0 0 0 6px rgba(21,81,47,.16);" +
     '"></span>',
 });
