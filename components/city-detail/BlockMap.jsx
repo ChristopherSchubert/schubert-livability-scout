@@ -26,7 +26,7 @@ const blockPin = L.divIcon({
     '<span style="' +
     "display:block;box-sizing:border-box;width:20px;height:20px;border-radius:50%;" +
     "background:#15512f;border:3px solid #fbf6ea;" +
-    "box-shadow:0 1px 5px rgba(27,24,20,.55), 0 0 0 6px rgba(13,76,68,.16);" +
+    "box-shadow:0 1px 5px rgba(27,24,20,.55), 0 0 0 6px rgba(21,81,47,.16);" +
     '"></span>',
 });
 

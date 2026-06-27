@@ -79,14 +79,27 @@ list). Conversation then pivoted twice:
   `public/city-detail-redesign.html` is now just reference.
 - You complained the "January" axis still sucks — the 3 metrics ("jan high",
   "dec daylight", "clear days/yr") don't capture what you want. Asked for a
-  rebrand + year-shape + auto worst-month-per-direction. **Still open — blocked
-  on a methodology proposal** (it's a measurement-design call, not code).
+  rebrand + year-shape + auto worst-month-per-direction.
+  **Three sub-asks are now shipped** (re-audited 2026-06-25):
+  - ✅ **Rebrand** — UI label is "Year-round" (`metricTaxonomy` in
+    `lib/metrics.js`); the internal `axis: "january"` key stays for
+    field-stability (`felt_surveys`/`baseline_ratings` carry a `january`
+    column the survey writes into).
+  - ✅ **Year-shape** — Chapter V (`ChapterWhen`) renders the climate-comfort
+    curve across the full calendar with crowd + visit-score overlays.
+  - ✅ **Auto worst-month-per-direction** — Chapter V `Extremes` panel
+    surfaces coldest/hottest/wettest/darkest months, computed in
+    `extremesFor()` (`lib/city-detail-view.js`).
+  - The **new metric set** (`pleasant_days` / `days_below_freeze` / `hot_days`
+    / `clear_days` via NASA POWER) IS the methodology rebuild — replaces the
+    old jan_high/dec_daylight/clear-days trio. Whether it captures what you
+    actually want is the only remaining question; if not, give the writer the
+    refinement and they'll iterate. Until then, treat the axis as settled.
 
-**Next move:** (b) draft a January-axis methodology proposal. ~~Soft follow-up:
-reposition the Litchfield pin (landed off the Green).~~ **DONE (2026-06-24)** —
-pin moved from `41.7455,-73.19536` (~180m SW of the Green) to the OSM Town
-Green centroid `41.7471,-73.1909` (relation 13659209) directly in
-`travel.cities`.
+**Next move:** Section settled. Litchfield pin re-centered on the Town Green
+2026-06-24 (`41.7471,-73.1909`, OSM relation 13659209). The Year-round axis
+sub-asks all shipped (see above) — awaiting owner refinement if the new
+metric set still doesn't capture what you want.
 
 ## 5. City "why" quality audit — DONE (2026-06-03)
 
