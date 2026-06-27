@@ -1,69 +1,189 @@
-/* Palette aligned with the magazine city-detail page (app/city-detail.css):
-   the warm paper/ink scale and the deep-green accent, so the dashboard and the
-   editorial detail page read as one product. Variable NAMES are unchanged so
-   every existing rule keeps working — only the values shifted. */
-:root {
-  --bg: var(--bg);            /* paper */
-  --panel: var(--panel);
-  --panel-strong: var(--panel-strong);  /* paper-deep */
-  --border: #d8ccb8;        /* hair */
-  --text: #1b1814;          /* ink */
-  --muted: #6b6358;         /* ink-mute — darkened 2026-06-09 so muted text clears WCAG AA 4.5:1 on all three paper tones (was #7a7268 = 4.39:1 on cream, a fail). See features/mobile.md. */
-  /* Forest accent — aligned to the family-hub crest palette (#95, 2026-06-25).
-     Was #0d4c44 (teal-leaning); hub-locked is #15512f (warmer forest from the
-     engraved Newfoundland-in-shield) so the front door + Travel sit in the
-     same key. Touches ~280 var(--accent) sites in one swap. Light tones only;
-     the locked dark palette is out of scope (Travel has no dark-mode infra). */
-  --accent: #15512f;
-  --accent-soft: #e4efe6;
-  --on-accent: #f4f0e7;     /* text/iconography on filled accent surfaces */
+/* Schubert Family — locked palette (hub v1, #95).
+   Source of truth: schubert-family/src/app/globals.css (hub PM 2026-06-27).
+   Hub spec ↔ Travel's existing names: --bg/--panel/--text/--border carry
+   1500+ var() uses in components — kept as aliases so existing rules work
+   without a sweep. New code should prefer the canonical hub names
+   (--paper/--surface/--ink/--line). */
+:root,
+[data-theme="light"] {
+  /* base */
+  --paper:         #f4f0e7;
+  --surface:       #fffdf8;
+  --sunk:          #efe9db;
+  --ink:           #1b1a17;
+  --muted:         #5a564d;
+  --faint:         #8b8678;
+  --line:          #e3ddcf;
+  --hair:          #efe9db;
 
-  /* Status / severity ramp — hub spec (#95). Reserved for future use; doesn't
-     repaint the existing funnel stage colors below (those are domain stages,
-     not severity). */
-  --status-on-track:  #3cc879;
-  --status-warning:   #e2cc69;
-  --status-issue:     #d0523e;
-  --status-emergency: #a3292d;
+  /* primary accent — forest */
+  --accent:        #15512f;
+  --accent-soft:   #e4efe6;
+  --on-accent:     #f4f0e7;
+
+  /* app-domain hues (Travel's chrome hue is --travel = blue; hub uses
+     --accent for platform chrome) */
+  --travel:        #2b4f74;
+  --clay:          #9c4327;
+  --blue-bg:       #e7edf3;
+  --clay-bg:       #f3e6df;
+
+  /* secondary accents — available, not yet wired into screens */
+  --slate:         #233d85;
+  --slate-soft:    #e4e6ec;
+  --on-slate:      #f4f0e7;
+  --teal:          #25837d;
+  --teal-soft:     #e4ecec;
+  --on-teal:       #f4f0e7;
+  --stone:         #756048;
+  --stone-soft:    #ebe8e5;
+  --on-stone:      #f4f0e7;
+  --heather:       #732886;
+  --heather-soft:  #ebe4ec;
+  --on-heather:    #f4f0e7;
+
+  /* status — severity ramp green → yellow → red → oxblood */
+  --ok:            #3cc879;
+  --ok-soft:       #e3eee7;
+  --on-ok:         #142e1f;
+  --warn:          #e2cc69;
+  --warn-soft:     #eeece2;
+  --on-warn:       #332d15;
+  --issue:         #d0523e;
+  --issue-soft:    #eee4e3;
+  --on-issue:      #2e1714;
+  --emergency:     #a3292d;
+  --emergency-soft:#eee3e3;
+  --on-emergency:  #f4f0e7;
+
+  /* Legacy aliases — Travel's existing names point at the canonical tokens
+     so every existing rule keeps working. Remove an alias only when the
+     last var() site has migrated to the canonical name. */
+  --bg:            var(--paper);
+  --panel:         var(--surface);
+  --panel-strong:  var(--sunk);
+  --paper-deep:    var(--sunk);
+  --border:        var(--line);
+  --text:          var(--ink);
+  --status-on-track:  var(--ok);
+  --status-warning:   var(--warn);
+  --status-issue:     var(--issue);
+  --status-emergency: var(--emergency);
+
   --shadow: 0 10px 30px rgba(41, 33, 19, 0.06);
   --radius: 14px;
-  /* Translucent paper for backdrop-blurred surfaces (sticky topbar, the city
-     page strip). Dark mode swaps to a near-black equivalent so the blur reads
-     as the ground, not as paper-on-ink. */
-  --paper-blur: var(--paper-blur);
-  /* Row-hover wash — slightly warmer than --panel in light; dark inverts. */
-  --row-hover: var(--row-hover);
-  /* Editorial type system, shared with the magazine page. */
+  --paper-blur: rgba(255, 253, 248, 0.92);  /* surface-tinted for sticky topbars */
+  --row-hover: #f4eddc;
   --font-display: 'Fraunces', Georgia, "Times New Roman", serif;
   --font-ui: 'Inter Tight', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 
-  /* Tell the browser our chrome (form controls, scrollbars, native widgets)
-     can flip with the OS palette. Overridden in dark mode below. */
   color-scheme: light;
 }
 
-/* Dark mode — follows the OS preference (no toggle UI yet). Values are the
-   family-hub locked crest dark palette from schubert-family/docs/mockups/final/
-   _spec.md (#95), so a user with the OS in dark sees the same near-black ink
-   ground across schubertfamily.com and travel.schubertfamily.com. Only the
-   tokens flip — every rule that uses var(--bg)/var(--text)/var(--accent)/etc.
-   updates in one place. Hardcoded paper colors elsewhere get tokenized in the
-   sweep that follows this block. */
+/* Dark mode — locked crest palette (hub PM 2026-06-27). Applied via an
+   explicit data-theme=dark attribute (set by ThemeToggle + cookie) AND as a
+   fallback for OS prefers-color-scheme: dark when no explicit choice. */
+[data-theme="dark"] {
+  /* base */
+  --paper:         #100f11;
+  --surface:       #1a181b;
+  --sunk:          #161417;
+  --ink:           #e9e3d3;
+  --muted:         #aca596;
+  --faint:         #6f6a5d;
+  --line:          #2a2724;
+  --hair:          #211e1c;
+
+  /* primary accent — forest, dark (desaturated, less glow) */
+  --accent:        #5f8c66;
+  --accent-soft:   #19271b;
+  --on-accent:     #0c130d;
+
+  /* app-domain hues */
+  --travel:        #8a9a86;
+  --clay:          #b9936b;
+  --blue-bg:       #1c241c;
+  --clay-bg:       #2a2114;
+
+  /* secondary accents (muted to avoid glow on dark) */
+  --slate:         #6f829f;
+  --slate-soft:    #1a222e;
+  --on-slate:      #0d1116;
+  --teal:          #6e9fa0;
+  --teal-soft:     #192d2e;
+  --on-teal:       #0d1616;
+  --stone:         #998c7a;
+  --stone-soft:    #2d251a;
+  --on-stone:      #14120f;
+  --heather:       #94849f;
+  --heather-soft:  #251d2b;
+  --on-heather:    #130d16;
+
+  /* status */
+  --ok:            #6da284;
+  --ok-soft:       #192e22;
+  --on-ok:         #0d1611;
+  --warn:          #bfaa78;
+  --warn-soft:     #312916;
+  --on-warn:       #16140d;
+  --issue:         #bc5d52;
+  --issue-soft:    #321815;
+  --on-issue:      #160e0d;
+  --emergency:     #9f3236;
+  --emergency-soft:#321516;
+  --on-emergency:  #160d0e;
+
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  --paper-blur: rgba(16, 15, 17, 0.92);
+  --row-hover: #221f23;
+
+  color-scheme: dark;
+}
+
+/* OS-preference fallback when the user hasn't picked explicitly. The
+   ThemeToggle sets data-theme on <html>; this block applies only when that
+   attribute is absent (Tailwind-style :not()). */
 @media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #100f11;
-    --panel: #1a181b;
-    --panel-strong: #161417;
-    --border: #2a2724;
-    --text: #e9e3d3;
-    --muted: #aca596;
-    --accent: #5f8c66;        /* desaturated forest — dark needs less saturation */
-    --accent-soft: #19271b;
-    --on-accent: #0c130d;
-    --status-on-track:  #6da284;
-    --status-warning:   #bfaa78;
-    --status-issue:     #bc5d52;
-    --status-emergency: #9f3236;
+  :root:not([data-theme="light"]) {
+    --paper:         #100f11;
+    --surface:       #1a181b;
+    --sunk:          #161417;
+    --ink:           #e9e3d3;
+    --muted:         #aca596;
+    --faint:         #6f6a5d;
+    --line:          #2a2724;
+    --hair:          #211e1c;
+    --accent:        #5f8c66;
+    --accent-soft:   #19271b;
+    --on-accent:     #0c130d;
+    --travel:        #8a9a86;
+    --clay:          #b9936b;
+    --blue-bg:       #1c241c;
+    --clay-bg:       #2a2114;
+    --slate:         #6f829f;
+    --slate-soft:    #1a222e;
+    --on-slate:      #0d1116;
+    --teal:          #6e9fa0;
+    --teal-soft:     #192d2e;
+    --on-teal:       #0d1616;
+    --stone:         #998c7a;
+    --stone-soft:    #2d251a;
+    --on-stone:      #14120f;
+    --heather:       #94849f;
+    --heather-soft:  #251d2b;
+    --on-heather:    #130d16;
+    --ok:            #6da284;
+    --ok-soft:       #192e22;
+    --on-ok:         #0d1611;
+    --warn:          #bfaa78;
+    --warn-soft:     #312916;
+    --on-warn:       #16140d;
+    --issue:         #bc5d52;
+    --issue-soft:    #321815;
+    --on-issue:      #160e0d;
+    --emergency:     #9f3236;
+    --emergency-soft:#321516;
+    --on-emergency:  #160d0e;
     --shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
     --paper-blur: rgba(16, 15, 17, 0.92);
     --row-hover: #221f23;
@@ -114,6 +234,48 @@ body {
 a { color: inherit; text-decoration: none; }
 button, input, textarea, select {
   font: inherit;
+}
+
+/* Theme picker (#95) — three-segment radio in the account menu.
+   Compact, low-chrome; the active segment fills with --accent-soft. */
+.account-theme {
+  padding: 0.4rem 0.6rem 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.account-theme-label {
+  font-size: 0.72rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.theme-toggle {
+  display: inline-flex;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--sunk);
+}
+.theme-toggle-opt {
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  padding: 0.3rem 0.55rem;
+  font-size: 0.78rem;
+  cursor: pointer;
+  border-radius: 0;
+}
+.theme-toggle-opt + .theme-toggle-opt {
+  border-left: 1px solid var(--line);
+}
+.theme-toggle-opt:hover {
+  color: var(--ink);
+}
+.theme-toggle-opt.is-active {
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 600;
 }
 
 button, .button-link {

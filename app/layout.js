@@ -4,6 +4,7 @@ import "./trips.css";
 import "./trip-planner.css";
 import "./city-detail.css";
 import "./journal.css";
+import { cookies } from "next/headers";
 import AuthGate from "../components/AuthGate";
 import { PlannerProvider } from "../components/PlannerProvider";
 import { TripProvider } from "../components/TripProvider";
@@ -32,8 +33,15 @@ const EMPTY_MANIFEST = { images: {}, choices: {}, version: 0 };
 export default async function RootLayout({ children }) {
   const initialManifest = EMPTY_MANIFEST;
 
+  // Theme — explicit user choice from a cookie wins; otherwise OS preference
+  // (handled in globals.css via @media prefers-color-scheme + :not([data-theme])).
+  // The cookie is read server-side so first paint matches the user's choice,
+  // no flash. Values: "light" | "dark" | (absent → follow OS).
+  const themeCookie = (await cookies()).get("theme")?.value;
+  const dataTheme = themeCookie === "light" || themeCookie === "dark" ? themeCookie : undefined;
+
   return (
-    <html lang="en">
+    <html lang="en" data-theme={dataTheme}>
       <head>
         {/* Fraunces (display) + Inter Tight (UI) power the magazine city-detail
             page (app/city-detail.css). Loaded by literal family name so the

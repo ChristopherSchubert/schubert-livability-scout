@@ -6,6 +6,7 @@ import { STAGES, citySlug, cityStage } from "../lib/planner-data";
 import { useAuth } from "./AuthGate";
 import { usePlanner } from "./PlannerProvider";
 import { useTrips } from "./TripProvider";
+import ThemeToggle from "./ThemeToggle";
 
 // Top-nav workflow modes. The home is "Board" (every place by stage);
 // "Compare" is a view toggle on the Board page, not a separate tab. The other
@@ -290,6 +291,11 @@ function AccountMenu({ onExport }) {
               <strong>{displayName}</strong>
               {email ? <span title={email}>{email}</span> : null}
             </div>
+          </div>
+          <div className="account-sep" role="separator" />
+          <div className="account-theme">
+            <span className="account-theme-label">Theme</span>
+            <ThemeToggle />
           </div>
           <div className="account-sep" role="separator" />
           <button type="button" role="menuitem" onClick={() => { setOpen(false); onExport(); }}>Download backup</button>
