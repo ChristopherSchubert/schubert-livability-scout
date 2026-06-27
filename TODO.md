@@ -9,7 +9,18 @@ with where we left off and the next move. (2026-06-03 sweep.)
 > tracked in [METRICS_COMPLETION.md](METRICS_COMPLETION.md). Cross-backlog
 > sequencing lives in [ROADMAP.md](ROADMAP.md).
 
-## 1. Missing city metrics — IN PROGRESS
+## 1. Missing city metrics — DONE (live ledger: METRICS_COMPLETION.md)
+
+**Resolved 2026-06-27.** Measurement coverage is effectively complete:
+**119/122 cities fully measured**, every US metric at 122/122 incl. the
+walking-core Google-Places scores, climate at 122/122. The only remaining
+gap is the 3-city Slovenia trio (Bled / Ljubljana / Piran) missing
+`median_price_usd` / `price_to_income_ratio` / `walk_transit_commute_pct` /
+`pre1940_pct` — all US-only registries with no pan-EU equivalent.
+**#104 closed 2026-06-27 as Option B (accept honest-null).** The live
+ledger is [METRICS_COMPLETION.md](METRICS_COMPLETION.md), not this section.
+
+The history below is the 2026-06-03 working notes that led to the close.
 
 **Where we left off (resumed 2026-06-03 ~18:00):** Local Overpass import was
 running; corpus had grown 69 → 78. Audited Supabase: climate axis populated
@@ -53,7 +64,9 @@ didn't answer.
 
 **Next move:** Chips stayed (you decided you liked them). `drive_hrs_from_PIT`
 landed as a top-line attribute (seed in `lib/planner-data.js`, rendered above
-the chips strip). Still open: intersection-angle entropy (needs osmnx).
+the chips strip). Still open: intersection-angle entropy — flagged
+`TODO(intersection-entropy)` in `lib/measurers/osm-context.js:29` for the
+grid-vs-organic chip; not a coverage gap, a refinement.
 
 ## 3. Board image collapse feedback — DONE
 
@@ -134,4 +147,5 @@ started:
   `editJournalEntry` / `removeJournalEntry`. Doc: features/journal.md. **Live in
   prod** — migration 0019 applied 2026-06-13, verified end-to-end in-browser.
 
-**Next move:** Visit Plan rebuild (the remaining feature thread).
+**Next move:** Section closed — both bullets above are ✅ shipped. No remaining
+feature thread from the original architecture audit.
