@@ -31,7 +31,8 @@ docs are worse than no feature docs.
 | Places overview (Board ⇄ Compare + shared filters + ViewToggle) | [candidate-funnel.md](candidate-funnel.md) | live; reframed 2026-06-22 (timing-first Compare view) |
 | Funnel board (5-stage kanban) | [candidate-funnel.md](candidate-funnel.md) | live |
 | Compare view (sortable table; learned-weights Fit, year sparkline, "Great in [month]") | [candidate-funnel.md](candidate-funnel.md) | live at `/ranking` |
-| Visit plan (per-city trip setup, days, checklists) | [visit-plan.md](visit-plan.md) | documented; redesign 2026-06-09 |
+| Visit plan (per-city trip setup, days, checklists) | [visit-plan.md](visit-plan.md) | documented; redesign 2026-06-09 — **slated for removal, see ▶ trip-composer.md** |
+| Trip Composer — Plan/Trip reconciliation (city = fact sheet · swim-lane = composer · /trips = detail) | [trip-composer.md](trip-composer.md) | **design spec (2026-06-28), not yet built** — phased P1 kill Plan tab → P2 swim-lane creates trips → P3 merge |
 | Mobile / responsive (phone parity + a11y) | [mobile.md](mobile.md) | in progress — Phase 0 landed 2026-06-09 |
 | Decide questionnaire (post-visit survey) | _todo_ | undocumented |
 | Baseline ratings (reference places) | _todo_ | undocumented |
