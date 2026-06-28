@@ -108,6 +108,43 @@ test("cityVisitToFeedCard: upcoming → countdown, contract-valid, deep-links to
   assert.match(c.metric, /\b44\b/); // 2026-06-22 → 2026-08-05 = 44 days
 });
 
+test("cityVisitToFeedCard: flags missing flight/lodging/car in the countdown metric", () => {
+  // No detail fields set on this fixture (matches Newport's actual state today)
+  const noDetails = cityVisitToFeedCard(newport, { now: NOW, baseUrl });
+  assert.match(noDetails.metric, /3 to plan/, "all three slots empty → '3 to plan'");
+
+  const partial = cityVisitToFeedCard(
+    { ...newport, flightDetails: "Delta DL 123", lodgingDetails: "" },
+    { now: NOW, baseUrl },
+  );
+  assert.match(partial.metric, /2 to plan/, "two slots empty → '2 to plan'");
+
+  const ready = cityVisitToFeedCard(
+    { ...newport, flightDetails: "Delta DL 123", lodgingDetails: "Hotel Viking", carDetails: "Hertz" },
+    { now: NOW, baseUrl },
+  );
+  assert.match(ready.metric, /\bready\b/, "all three filled → 'ready'");
+  assert.equal(ready.metric.includes("to plan"), false, "no 'to plan' when ready");
+
+  // Whitespace-only counts as empty (don't false-positive "ready")
+  const whitespace = cityVisitToFeedCard(
+    { ...newport, flightDetails: "  ", lodgingDetails: "Hotel Viking", carDetails: "Hertz" },
+    { now: NOW, baseUrl },
+  );
+  assert.match(whitespace.metric, /1 to plan/);
+});
+
+test("cityVisitToFeedCard: 'to plan' hint only on countdown — ongoing/undated metrics stay clean", () => {
+  // No detail fields, but trip is ongoing today — don't nag mid-trip.
+  const ongoingNow = cityVisitToFeedCard(
+    { ...newport, arriveDate: "2026-06-20", departDate: "2026-06-30" },
+    { now: NOW, baseUrl },
+  );
+  assert.equal(ongoingNow.kind, "status");
+  assert.equal(ongoingNow.metric, "on the trip");
+  assert.equal(ongoingNow.metric.includes("to plan"), false);
+});
+
 test("cityVisitToFeedCard: past → null (dropped); undated → status placeholder", () => {
   assert.equal(cityVisitToFeedCard(visitedPast, { now: NOW }), null);
   assert.equal(cityVisitToFeedCard(visitNoDates, { now: NOW }).kind, "status");
