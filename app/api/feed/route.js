@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { rowToTrip } from "../../../lib/trip.js";
-import { feedFromTrips } from "../../../lib/feed.js";
+import { rowToCity } from "../../../lib/city-row.js";
+import { feedFromTripsAndVisits } from "../../../lib/feed.js";
 import { verifyServiceToken } from "../../../lib/feed-token.js";
 
 // GET /api/feed — the family-hub feed endpoint (#93, epic #84).
@@ -37,17 +38,27 @@ export async function GET(request) {
   }
 
   const sb = createClient(url, key, { auth: { persistSession: false }, db: { schema: "travel" } });
-  const { data, error } = await sb
-    .from("trips")
-    .select("*")
-    .order("start_date", { ascending: true });
-  if (error) {
+  // Two sources of "this household has a trip planned":
+  //   • travel.trips — the multi-city Trip Planner.
+  //   • travel.cities with status='Scheduled' + arrive_date set — single-city
+  //     visit plans (Newport, RI Aug 5–8, Salem MA Oct 26–Nov 1, etc.). These
+  //     don't live in `trips`, so without this second query the hub never
+  //     learns about them.
+  const [tripsRes, citiesRes] = await Promise.all([
+    sb.from("trips").select("*").order("start_date", { ascending: true }),
+    sb.from("cities").select("*").eq("status", "Scheduled").not("arrive_date", "is", null).neq("arrive_date", ""),
+  ]);
+  if (tripsRes.error || citiesRes.error) {
     return NextResponse.json({ error: "feed query failed" }, { status: 502, headers: { "Cache-Control": "no-store" } });
   }
 
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || new URL(request.url).origin;
-  const trips = (data || []).map(rowToTrip);
-  const feed = feedFromTrips(trips, { now: new Date(), baseUrl });
+  const trips = (tripsRes.data || []).map(rowToTrip);
+  // rowToCity produces the cityItem shape that components use — `slug` is
+  // normally derived via citySlug(name). The feed deep-link wants the stored
+  // slug column directly, so attach it from the source row.
+  const visits = (citiesRes.data || []).map((r) => ({ ...rowToCity(r), slug: r.slug }));
+  const feed = feedFromTripsAndVisits(trips, visits, { now: new Date(), baseUrl });
 
   return NextResponse.json(feed, { headers: { "Cache-Control": "no-store" } });
 }

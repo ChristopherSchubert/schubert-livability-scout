@@ -7,7 +7,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import crypto from "node:crypto";
-import { tripToFeedCard, feedFromTrips } from "../lib/feed.js";
+import { tripToFeedCard, cityVisitToFeedCard, feedFromTrips, feedFromTripsAndVisits } from "../lib/feed.js";
 import { verifyServiceToken } from "../lib/feed-token.js";
 
 // Mirror of conformance/check-feed.mjs validateCard — keep the unit suite honest
@@ -79,6 +79,53 @@ test("never emits raw rows — no entries/legs arrays leak into the card", () =>
   assert.equal(json.includes("secret"), false);
   assert.equal(Array.isArray(c.entries), false);
   assert.equal(Array.isArray(c.legs), false);
+});
+
+// ── Single-city scheduled visits (the second feed source) ───────────────────
+const newport = { id: "ci-1", name: "Newport, RI", slug: "newport-ri",
+  stayZone: "Historic Hill / Thames Street", heartIntersection: "Thames St & Bowen's Wharf",
+  arriveDate: "2026-08-05", departDate: "2026-08-08" };
+const salemUpcoming = { id: "ci-2", name: "Salem, MA", slug: "salem-ma",
+  stayZone: "Downtown Salem", arriveDate: "2026-10-26", departDate: "2026-11-01" };
+const visitedPast = { id: "ci-3", name: "Allison Park, PA", slug: "allison-park-pa",
+  stayZone: "Allison Park", arriveDate: "2026-04-01", departDate: "2026-04-05" };
+const visitNoDates = { id: "ci-4", name: "Burlington, VT", slug: "burlington-vt", stayZone: "Church Street" };
+
+test("cityVisitToFeedCard: upcoming → countdown, contract-valid, deep-links to /cities", () => {
+  const c = cityVisitToFeedCard(newport, { now: NOW, memberId: MEMBER, baseUrl });
+  assertContractValid(c);
+  assert.equal(c.kind, "countdown");
+  assert.equal(c.key, "travel:visit:ci-1");
+  assert.equal(c.title, "Newport, RI");
+  assert.equal(c.body, "Thames St & Bowen's Wharf");
+  assert.equal(c.event_at, "2026-08-05T00:00:00Z");
+  assert.equal(c.expires_at, "2026-08-08T00:00:00Z");
+  assert.equal(c.deep_link, `${baseUrl}/cities/newport-ri`);
+  assert.equal(c.member_id, MEMBER);
+  assert.match(c.metric, /\b44\b/); // 2026-06-22 → 2026-08-05 = 44 days
+});
+
+test("cityVisitToFeedCard: past → summary, undated → status placeholder", () => {
+  assert.equal(cityVisitToFeedCard(visitedPast, { now: NOW }).kind, "summary");
+  assert.equal(cityVisitToFeedCard(visitNoDates, { now: NOW }).kind, "status");
+});
+
+test("cityVisitToFeedCard: keys never collide with trip keys (different prefix)", () => {
+  const visitCard = cityVisitToFeedCard({ ...newport, id: "ABC" }, { now: NOW, baseUrl });
+  const tripCard = tripToFeedCard({ ...upcoming, id: "ABC" }, { now: NOW, baseUrl });
+  assert.notEqual(visitCard.key, tripCard.key);
+  assert.equal(visitCard.key, "travel:visit:ABC");
+  assert.equal(tripCard.key, "travel:trip:ABC");
+});
+
+test("feedFromTripsAndVisits: merges both sources, all cards contract-valid", () => {
+  const out = feedFromTripsAndVisits([upcoming, ongoing], [newport, salemUpcoming], { now: NOW, baseUrl });
+  assert.equal(out.cards.length, 4);
+  out.cards.forEach(assertContractValid);
+  const keys = out.cards.map((c) => c.key);
+  assert.ok(keys.includes("travel:trip:t-up"));
+  assert.ok(keys.includes("travel:visit:ci-1")); // Newport
+  assert.equal(new Set(keys).size, 4, "keys unique across both sources");
 });
 
 // ── HS256 service-token verification ────────────────────────────────────────
