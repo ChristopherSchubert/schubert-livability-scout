@@ -51,10 +51,12 @@ test("upcoming trip → countdown card, contract-valid, dated + deep-linked", ()
   assert.match(c.body, /Ljubljana/); // summary, not raw entry rows
 });
 
-test("ongoing trip → status; past → summary; undated → status", () => {
+test("ongoing trip → status; undated → status; PAST → null (dropped from the hub feed)", () => {
   assert.equal(tripToFeedCard(ongoing, { now: NOW }).kind, "status");
-  assert.equal(tripToFeedCard(past, { now: NOW }).kind, "summary");
   assert.equal(tripToFeedCard(undated, { now: NOW }).kind, "status");
+  // Past trips don't surface on the hub — the family feed is "what's
+  // happening / coming up," not history. Visited/Assessed handle history.
+  assert.equal(tripToFeedCard(past, { now: NOW }), null);
 });
 
 test("member_id defaults to null (household-wide) and stays contract-valid", () => {
@@ -63,13 +65,14 @@ test("member_id defaults to null (household-wide) and stays contract-valid", () 
   assertContractValid(c);
 });
 
-test("feedFromTrips returns {cards} ~1 per trip, all contract-valid", () => {
+test("feedFromTrips returns {cards}, drops past trips, all contract-valid", () => {
   const out = feedFromTrips([upcoming, ongoing, past, undated], { now: NOW, baseUrl });
   assert.ok(Array.isArray(out.cards));
-  assert.equal(out.cards.length, 4);
+  assert.equal(out.cards.length, 3, "past trip filtered out");
   out.cards.forEach(assertContractValid);
   const keys = out.cards.map((c) => c.key);
-  assert.equal(new Set(keys).size, 4, "keys are unique per trip");
+  assert.equal(new Set(keys).size, 3, "keys unique per surviving trip");
+  assert.equal(keys.includes("travel:trip:t-pa"), false, "past trip key absent");
 });
 
 test("never emits raw rows — no entries/legs arrays leak into the card", () => {
@@ -105,8 +108,8 @@ test("cityVisitToFeedCard: upcoming → countdown, contract-valid, deep-links to
   assert.match(c.metric, /\b44\b/); // 2026-06-22 → 2026-08-05 = 44 days
 });
 
-test("cityVisitToFeedCard: past → summary, undated → status placeholder", () => {
-  assert.equal(cityVisitToFeedCard(visitedPast, { now: NOW }).kind, "summary");
+test("cityVisitToFeedCard: past → null (dropped); undated → status placeholder", () => {
+  assert.equal(cityVisitToFeedCard(visitedPast, { now: NOW }), null);
   assert.equal(cityVisitToFeedCard(visitNoDates, { now: NOW }).kind, "status");
 });
 
