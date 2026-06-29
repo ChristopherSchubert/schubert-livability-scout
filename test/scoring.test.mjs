@@ -130,3 +130,22 @@ test("cityStage: assessed/visited still beat trip membership (decision is final)
   assert.equal(cityStage({ decision: "Advance", inTrip: true }), "assessed");
   assert.equal(cityStage({ status: "Visited", inTrip: true }), "visited");
 });
+
+// ── cityStage: trip-deletion cascade (#109 invariant 1) ─────────────────────
+// PlannerProvider derives inTrip from the live trip list. When a trip is
+// removed (or its last leg drops), the city's inTrip flag flips false in the
+// next render, and cityStage falls through. This test models the boundary:
+// the same city, before and after a trip-removal, with no city-row mutation.
+test("cityStage: trip removal reverts a (formerly-Planned) city out of 'planned' (#109)", () => {
+  // Before: city is a trip leg → "planned"
+  const before = { id: "c1", name: "Newport, RI", inTrip: true };
+  assert.equal(cityStage(before), "planned");
+  // After: provider re-derived inTrip=false (trip deleted). City row was
+  // never written by Commit, so no legacy bridge → falls back to "backlog".
+  const afterClean = { id: "c1", name: "Newport, RI" };
+  assert.equal(cityStage(afterClean), "backlog");
+  // Edge: if the city happened to have a city-row arriveDate from earlier
+  // exploration (drag on the swim-lane before Commit), it shows "planning".
+  const afterExploring = { id: "c1", name: "Newport, RI", arriveDate: "2026-08-05" };
+  assert.equal(cityStage(afterExploring), "planning");
+});
