@@ -323,3 +323,5 @@ create policy "trip_entries insert own" on travel.trip_entries for insert to aut
 ## Follow-ups (tracked as GitHub issues)
 
 Child tickets of epic #84 — see the issue links added when filed.
+
+- **[#113](https://github.com/ChristopherSchubert/schubert-livability-scout/issues/113) — `GET /api/status` app-status contract.** ✅ Shipped 2026-06-29. Companion to `/api/feed`: same HS256 auth (shared `FEED_SERVICE_TOKEN_SIGNING_KEY`), same `travel`-schema service-role client, returns the hub's app-status contract (`{ app, level, headline, metrics, breakdown, deep_link, updated_at }`). `level`/`headline` derived from real trip + planning state — `attention` when a planned trip lacks a confirmed hotel or flight, `urgent` when departure is within 14 days with a critical gap, else `ok`. Pure shaping in `lib/app-status.js` (5 tests); the route is `app/api/status/route.js`. Verified live: 200 with a freshly-signed token, 401 without; live response surfaced Newport 2026 as "needs a hotel" (correct — its leg has no confirmed stay yet).
