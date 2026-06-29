@@ -83,17 +83,18 @@ axis dropped from vacation scoring (`8f59e5b`), and the prior batch
 
 ### Open queue
 **Trip Composer epic — P1/P2/P3 shipped (#107/#108/#109, 2026-06-29).** Remaining:
-- **#110** — deferred bucket: want-list, full Place/Leg recast, drop the inert
-  city-row trip columns, **and the pre-#108 legacy-bridge backfill** (cities
-  committed before #108 still read `planned` from the old city-row path until this
-  runs — load-bearing, not just nice-to-have).
+- **#112** — pre-#108 legacy-bridge backfill: migrate `status='Scheduled'` cities
+  onto real trips + remove the dual "Planned" path in `cityStage()`. *Highest
+  leverage* (collapses two sources of truth into one). Split out of #110.
 - **#111** — drag-off gesture + live merge-during-drag polish (the operation
   already ships via the ↩ button; this is the deferred drag affordance).
+- **#110** — remaining deferred bucket: want-list, full Place/Leg recast, drop the
+  inert city-row trip columns, dedicated split UI. Not-now by design.
 
 ### What's next
-Highest-leverage open item is the **#110 legacy-bridge backfill** (removes the
-dual "planned" code path); #111 is UX polish. Horizon items the owner has flagged
-as not-now:
+Sequence: **#112** first (removes the legacy "Planned" bridge while context is
+fresh) → **#111** UX polish → revisit **#110** once the model has miles on it.
+Horizon items the owner has flagged as not-now:
 - A future **livability-decision mode** (separate from this vacation app)
   would re-weight the off-season axis and re-introduce the Slovenia price
   question. Not in scope here.
