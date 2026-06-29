@@ -2,7 +2,7 @@
 
 **Maintained by:** the product-manager / steward role (read/plan; propose-only on
 issues — does not edit app code or close the writer's work).
-**Last synthesized:** 2026-06-24.
+**Last synthesized:** 2026-06-28.
 
 This is the durable backlog synthesis. The live queue is GitHub Issues
 (`gh issue list`); this doc is the *why and the sequence* behind it. When the
@@ -29,8 +29,17 @@ queue and this doc disagree, the queue is truth — re-synthesize here.
 - **Measurement coverage:** 119/122 fully measured; remaining gap is
   `median_price_usd` for the 3 Slovenia anchors. Owner accepted honest `null`
   as final (#104) — not a gap to chase.
-- **Open queue: EMPTY** as of 2026-06-27. No bugs, no audit drift, no in-flight
-  epic.
+- **Trip Composer epic queued (2026-06-28, #107–#110).** Reconciles the three
+  overlapping planning surfaces (per-city Plan tab, the `/planning/calendar`
+  swim-lane, and `/trips`) into one model: **city = fact sheet · swim-lane = trip
+  composer (WHEN) · `/trips` = detailed planner (HOW)**. Every planned city gets a
+  trip; "Planned" becomes derived from trip membership; adjacent stays can merge
+  into one multi-leg trip. Fixes the cardinality bug (one city ↔ many trips).
+  Design + rationale in [features/trip-composer.md](features/trip-composer.md);
+  shaped via a 4-persona design panel. Phased: **#107** P1 kill the Plan tab
+  (safe, independent) → **#108** P2 swim-lane creates trips → **#109** P3 merge +
+  integrity; **#110** holds the deferred want-list / Place·Leg recast / column
+  drop. Owner-approved 2026-06-28; writer to implement (P1 first).
 
 ### City counts — the 78 vs 122 reconciliation
 
@@ -69,10 +78,13 @@ axis dropped from vacation scoring (`8f59e5b`), and the prior batch
 (#75 mockup retirement / #85 / #86 / #82 / #79 / #96 / #97).
 
 ### Open queue
-**EMPTY** — first true zero-backlog state since the family-hub epic began.
+**Trip Composer epic — #107 (P1), #108 (P2), #109 (P3), #110 (deferred).** See
+the Current-state bullet above + [features/trip-composer.md](features/trip-composer.md).
+Sequence: #107 first (independent, no migration) → #108 → #109. Owner-approved
+2026-06-28.
 
 ### What's next
-No epic queued and no carryover. The horizon items the owner has flagged as
+Work the Trip Composer epic, P1 first. Horizon items the owner has flagged as
 not-now:
 - A future **livability-decision mode** (separate from this vacation app)
   would re-weight the off-season axis and re-introduce the Slovenia price

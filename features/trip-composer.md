@@ -187,12 +187,17 @@ the UI. All four reviewers hit facets of this:
 - Detail **Chapter V** vs. the Plan tab's `VisitWindowPanel` — how much already
   overlaps before relocating.
 
-## Follow-ups (to be tracked as GitHub issues)
+## Follow-ups (tracked as GitHub issues)
 
-- **Phase 1 — Remove the per-city Plan tab; fold "When to visit" into Detail;
+- **[#107](https://github.com/ChristopherSchubert/schubert-livability-scout/issues/107)
+  — Phase 1: Remove the per-city Plan tab; fold "When to visit" into Detail;
   retain city-row data.** Independently shippable. No migration.
-- **Phase 2 — Swim-lane Commit creates a trip; derive Planned from trip
-  membership.** The engine change; fixes the cardinality bug.
-- **Phase 3 — Merge adjacent stays + drag-off semantics + integrity invariants.**
-- **Deferred stub — Want-list + full Place/Leg recast.** Context lives in this
-  doc; revive when the need is felt.
+- **[#108](https://github.com/ChristopherSchubert/schubert-livability-scout/issues/108)
+  — Phase 2: Swim-lane Commit creates a trip; derive Planned from trip
+  membership.** The engine change; fixes the cardinality bug. After #107.
+- **[#109](https://github.com/ChristopherSchubert/schubert-livability-scout/issues/109)
+  — Phase 3: Merge adjacent stays + drag-off semantics + integrity invariants.**
+  After #108.
+- **[#110](https://github.com/ChristopherSchubert/schubert-livability-scout/issues/110)
+  — Deferred: want-list, full Place/Leg recast, column drop, split UI.** Context
+  lives in this doc; revive when the need is felt.
