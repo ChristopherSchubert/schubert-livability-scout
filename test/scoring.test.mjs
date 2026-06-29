@@ -115,12 +115,14 @@ test("cityStage: inTrip=true wins → 'planned' even with no city-row dates", ()
   assert.equal(cityStage({ id: "c1", status: "Shortlist", arriveDate: "2026-08-05", inTrip: true }), "planned");
 });
 
-test("cityStage: legacy bridge — status='Scheduled' + dates stays 'planned' without a trip", () => {
-  // Pre-#108 committed cities (Plan-tab-era writes) shouldn't regress just
-  // because they lack an inTrip flag. The legacy status+dates fallback keeps
-  // them showing as 'planned' until backfilled (#110).
-  const legacy = { id: "c2", status: "Scheduled", arriveDate: "2026-08-05", departDate: "2026-08-08" };
-  assert.equal(cityStage(legacy), "planned");
+test("cityStage: legacy bridge retired (#112) — status='Scheduled' + dates without a trip is 'planning', not 'planned'", () => {
+  // Pre-#108 status+dates bridge was deleted in #112 after the lone pre-bridge
+  // row (Newport, RI) was migrated to a real trip (see
+  // scripts/migrate-scheduled-cities-to-trips.mjs). "Planned" now derives ONLY
+  // from trip membership; a city carrying only the old city-row dates is being
+  // actively worked, not committed.
+  const stranded = { id: "c2", status: "Scheduled", arriveDate: "2026-08-05", departDate: "2026-08-08" };
+  assert.equal(cityStage(stranded), "planning");
 });
 
 test("cityStage: assessed/visited still beat trip membership (decision is final)", () => {

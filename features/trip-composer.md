@@ -1,6 +1,8 @@
 # Trip Composer — Plan/Trip reconciliation (design spec)
 
-**Status:** Phases 1 + 2 + 3 ✅ shipped 2026-06-29 (#107 + #108 + #109). Deferred work in #110.
+**Status:** Phases 1 + 2 + 3 ✅ shipped 2026-06-29 (#107 + #108 + #109). Legacy
+"Planned" bridge **retired 2026-06-29 (#112)** — `cityStage()` reads only from
+trip membership now. Remaining deferred work in #110 / #111.
 **Date:** 2026-06-28. **Owner decision:** Chris (session 2026-06-28).
 **Provenance:** Shaped through a 4-persona design review (an IA, a JTBD product
 strategist, an interaction designer, a first-principles designer) run as subagents
@@ -173,10 +175,14 @@ the UI. All four reviewers hit facets of this:
   legacy data). The swim-lane and `/trips` operate on the same trip record.
 - ✅ Legacy data read-compatibly: pre-#108 committed cities (e.g. Newport
   with `status='Scheduled' + arrive/depart_date`) still show as "Planned"
-  via the bridge in cityStage. **No migration in P2** — backfill deferred
-  to #110.
-- ✅ Tests: +4 cityStage tests locking the new contract (inTrip wins; legacy
-  bridge; assessed/visited still beat trip membership). 35 + 147 tests green.
+  via a temporary bridge in cityStage. **Retired in #112** — the lone
+  legacy row (Newport, RI) was migrated to a real trip
+  ("Newport 2026") by `scripts/migrate-scheduled-cities-to-trips.mjs`, and
+  the bridge branch is gone. `cityStage()` now derives "Planned" only from
+  `cityItem.inTrip`.
+- ✅ Tests: +4 cityStage tests locking the new contract (inTrip wins;
+  bridge contract — updated in #112 to assert it's retired;
+  assessed/visited still beat trip membership). 35 + 169 tests green.
 
 ### Phase 3 ✅ Shipped 2026-06-29 (#109)
 Three commits within the ticket:
