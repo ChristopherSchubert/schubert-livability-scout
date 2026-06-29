@@ -29,17 +29,21 @@ queue and this doc disagree, the queue is truth — re-synthesize here.
 - **Measurement coverage:** 119/122 fully measured; remaining gap is
   `median_price_usd` for the 3 Slovenia anchors. Owner accepted honest `null`
   as final (#104) — not a gap to chase.
-- **Trip Composer epic queued (2026-06-28, #107–#110).** Reconciles the three
-  overlapping planning surfaces (per-city Plan tab, the `/planning/calendar`
-  swim-lane, and `/trips`) into one model: **city = fact sheet · swim-lane = trip
-  composer (WHEN) · `/trips` = detailed planner (HOW)**. Every planned city gets a
-  trip; "Planned" becomes derived from trip membership; adjacent stays can merge
-  into one multi-leg trip. Fixes the cardinality bug (one city ↔ many trips).
-  Design + rationale in [features/trip-composer.md](features/trip-composer.md);
-  shaped via a 4-persona design panel. Phased: **#107** P1 kill the Plan tab
-  (safe, independent) → **#108** P2 swim-lane creates trips → **#109** P3 merge +
-  integrity; **#110** holds the deferred want-list / Place·Leg recast / column
-  drop. Owner-approved 2026-06-28; writer to implement (P1 first).
+- **Trip Composer epic — P1+P2+P3 SHIPPED 2026-06-29 (#107/#108/#109).**
+  Reconciled the three overlapping planning surfaces (per-city Plan tab, the
+  `/planning/calendar` swim-lane, and `/trips`) into one model: **city = fact
+  sheet · swim-lane = trip composer (WHEN) · `/trips` = detailed planner (HOW)**.
+  Per-city Plan tab removed (#107); swim-lane Commit now creates a trip and
+  "Planned" derives from trip membership, fixing the cardinality bug (#108);
+  adjacent stays merge into one multi-leg trip, plus the `archived_at`
+  archive-guard / deletion-cascade integrity invariants (#109). Design +
+  rationale in [features/trip-composer.md](features/trip-composer.md); shaped via
+  a 4-persona design panel. PM acceptance audit (2026-06-29): P1/P2 clean; P3
+  complete with two documented deferrals — the **drag-off gesture** (operation
+  ships via the ↩ button; gesture → **#111**) and the **stage-advance guard**
+  (intentionally deferred per spec). **Open:** **#110** (want-list / Place·Leg
+  recast / column-drop + the pre-#108 legacy-bridge backfill — load-bearing, not
+  optional), **#111** (drag-off gesture polish).
 
 ### City counts — the 78 vs 122 reconciliation
 
@@ -78,14 +82,18 @@ axis dropped from vacation scoring (`8f59e5b`), and the prior batch
 (#75 mockup retirement / #85 / #86 / #82 / #79 / #96 / #97).
 
 ### Open queue
-**Trip Composer epic — #107 (P1), #108 (P2), #109 (P3), #110 (deferred).** See
-the Current-state bullet above + [features/trip-composer.md](features/trip-composer.md).
-Sequence: #107 first (independent, no migration) → #108 → #109. Owner-approved
-2026-06-28.
+**Trip Composer epic — P1/P2/P3 shipped (#107/#108/#109, 2026-06-29).** Remaining:
+- **#110** — deferred bucket: want-list, full Place/Leg recast, drop the inert
+  city-row trip columns, **and the pre-#108 legacy-bridge backfill** (cities
+  committed before #108 still read `planned` from the old city-row path until this
+  runs — load-bearing, not just nice-to-have).
+- **#111** — drag-off gesture + live merge-during-drag polish (the operation
+  already ships via the ↩ button; this is the deferred drag affordance).
 
 ### What's next
-Work the Trip Composer epic, P1 first. Horizon items the owner has flagged as
-not-now:
+Highest-leverage open item is the **#110 legacy-bridge backfill** (removes the
+dual "planned" code path); #111 is UX polish. Horizon items the owner has flagged
+as not-now:
 - A future **livability-decision mode** (separate from this vacation app)
   would re-weight the off-season axis and re-introduce the Slovenia price
   question. Not in scope here.
