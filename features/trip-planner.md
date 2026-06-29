@@ -11,6 +11,17 @@
 > "trip-planner" name is a historical collision — they answer different
 > questions (*when to go* vs. *plan the trip you committed to*).
 
+> **Commit semantics (changed 2026-06-29, #108):** the ✓ Commit button now
+> creates a single-leg `trips` row (via `createTrip()`), not a write of
+> `arriveDate`/`departDate`/`status` onto the city row. "Planned" derives
+> from trip membership (`cityItem.inTrip` in `cityStage()`). The drag-bar
+> persist updates the trip leg in-place when the bar is trip-backed,
+> keeping `/planning/calendar` and `/trips` in sync on the same record.
+> Uncommit (↩) calls `removeTrip()`; legacy pre-#108 commits (city-row
+> `status='Scheduled'`+dates) still read as Planned via a bridge in
+> `cityStage` and uncommit by clearing `status`. See
+> [trip-composer.md](trip-composer.md) for the full reconciliation.
+
 A timeline planner for the **Visit** stage. Each candidate city is a
 horizontal **lane** spanning the year; behind the lane is that city's
 **visit-score** curve (weather vs. crowds), and on top sits a draggable

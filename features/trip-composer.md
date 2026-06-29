@@ -1,6 +1,6 @@
 # Trip Composer — Plan/Trip reconciliation (design spec)
 
-**Status:** Phase 1 ✅ shipped 2026-06-29 (#107). Phases 2/3 issued as #108/#109.
+**Status:** Phases 1 + 2 ✅ shipped 2026-06-29 (#107 + #108). Phase 3 issued as #109.
 **Date:** 2026-06-28. **Owner decision:** Chris (session 2026-06-28).
 **Provenance:** Shaped through a 4-persona design review (an IA, a JTBD product
 strategist, an interaction designer, a first-principles designer) run as subagents
@@ -152,12 +152,31 @@ the UI. All four reviewers hit facets of this:
 - ✅ Funnel transitions verified to still work — Board drag, swim-lane Commit,
   and Assess survey are unaffected.
 
-### Phase 2 — Swim-lane creates trips; Planned = has-a-trip (the engine change)
-- Swim-lane Commit creates/updates a **trip** (writes `trips`/`trip_entries`),
-  not city-row dates.
-- "Planned" derives from trip membership; stop hand-writing that status.
-- Wire `/planning/calendar` ↔ `/trips` so a composed trip is the same object the
-  detailed planner edits.
+### Phase 2 ✅ Shipped 2026-06-29 (#108)
+- ✅ Swim-lane ✓ Commit button now calls `createTrip()` with a single-city
+  leg (`name: "{City} {Year}"`, `legs: [{ cityId, name, arrive, depart }]`).
+  No `arriveDate`/`departDate`/`status` writes to the city row by Commit.
+- ✅ Uncommit (↩) removes the backing trip via `removeTrip(t.id)`; for
+  pre-#108 legacy committed cities (no trip backing them), it falls back to
+  clearing `status` on the city row.
+- ✅ "Planned" derives from trip membership in `cityStage()` (lib/stages.js):
+  `inTrip` flag wins over the legacy status/dates check. Only future/ongoing
+  trip legs count — past trips fall through (deriving Visited/Assessed from
+  past trips is deferred per below).
+- ✅ Layout: `TripProvider` moved OUTSIDE `PlannerProvider` so the planner
+  can `useTrips()` and augment every cityItem with `inTrip` before
+  consumers see it. Single source of truth — 11 cityStage call sites
+  trip-aware in one place, no caller refactor.
+- ✅ Swim-lane `committedLanes` reads dates from the trip leg (when
+  `c.inTrip`), keeping the bar in sync with `/trips`-side edits. The
+  drag-bar persist similarly writes back to the trip leg (or city row for
+  legacy data). The swim-lane and `/trips` operate on the same trip record.
+- ✅ Legacy data read-compatibly: pre-#108 committed cities (e.g. Newport
+  with `status='Scheduled' + arrive/depart_date`) still show as "Planned"
+  via the bridge in cityStage. **No migration in P2** — backfill deferred
+  to #110.
+- ✅ Tests: +4 cityStage tests locking the new contract (inTrip wins; legacy
+  bridge; assessed/visited still beat trip membership). 35 + 147 tests green.
 
 ### Phase 3 — Merge + drag-off + integrity rules
 - Merge affordance (trigger + mechanics above).

@@ -104,3 +104,29 @@ test("learnedAxisWeights: refuses to learn below the sample floor", () => {
 test("cityStage: a seeded starter city lands in 'planning'", () => {
   assert.equal(cityStage(starterCities[0]), "planning");
 });
+
+// ── cityStage: trip-membership derivation (#108) ────────────────────────────
+test("cityStage: inTrip=true wins → 'planned' even with no city-row dates", () => {
+  // The new path: PlannerProvider attaches `inTrip` when the city is a leg in
+  // any trip. cityStage reads it FIRST, before the legacy status/date fallback.
+  assert.equal(cityStage({ id: "c1", name: "Newport, RI", inTrip: true }), "planned");
+  // Even Shortlist+arriveDate (otherwise "planning") flips to "planned" if a
+  // trip backs the city — the trip is the source of truth for committed.
+  assert.equal(cityStage({ id: "c1", status: "Shortlist", arriveDate: "2026-08-05", inTrip: true }), "planned");
+});
+
+test("cityStage: legacy bridge — status='Scheduled' + dates stays 'planned' without a trip", () => {
+  // Pre-#108 committed cities (Plan-tab-era writes) shouldn't regress just
+  // because they lack an inTrip flag. The legacy status+dates fallback keeps
+  // them showing as 'planned' until backfilled (#110).
+  const legacy = { id: "c2", status: "Scheduled", arriveDate: "2026-08-05", departDate: "2026-08-08" };
+  assert.equal(cityStage(legacy), "planned");
+});
+
+test("cityStage: assessed/visited still beat trip membership (decision is final)", () => {
+  // An Assessed city that happens to also be in a trip is still Assessed —
+  // the decision/survey path runs first because that's lived-experience state,
+  // independent of whether a future trip is scheduled.
+  assert.equal(cityStage({ decision: "Advance", inTrip: true }), "assessed");
+  assert.equal(cityStage({ status: "Visited", inTrip: true }), "visited");
+});

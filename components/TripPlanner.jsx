@@ -24,6 +24,7 @@ import {
   useCityFilters,
 } from "./city-filters";
 import { resolveImage, usePlanner } from "./PlannerProvider";
+import { useTrips } from "./TripProvider";
 
 // ── geometry constants (mirror the locked mockup) ───────────────────────
 const WEEKS = 53;
@@ -120,9 +121,34 @@ function packFor(hi, rain) {
 
 export default function TripPlanner() {
   const { planner, updateCity, imageState, hydrated } = usePlanner();
+  // #108: swim-lane Commit now creates a trip instead of stamping
+  // arriveDate/departDate/status onto the city row. uncommit removes the trip.
+  const { trips, createTrip, removeTrip, updateTripFrame } = useTrips();
   const rootRef = useRef(null);
   const updateCityRef = useRef(updateCity);
   updateCityRef.current = updateCity;
+  // Refs for trip mutators so the imperative drag handlers (defined inside a
+  // useEffect closure further down) always see fresh callbacks.
+  const tripsRef = useRef(trips);
+  tripsRef.current = trips;
+  const updateTripFrameRef = useRef(updateTripFrame);
+  updateTripFrameRef.current = updateTripFrame;
+
+  // Find the trip backing a given city (so uncommit can remove the right one).
+  // A city should have at most one trip in the swim-lane model; if multiple
+  // trips contain it as a leg, prefer the one with the earliest start.
+  function tripForCity(cityId, tripsList = trips) {
+    return (tripsList || [])
+      .filter((t) => (t.legs || []).some((l) => l.cityId === cityId))
+      .sort((a, b) => (a.startDate || "9999").localeCompare(b.startDate || "9999"))[0] || null;
+  }
+
+  // Default trip name for single-city Commit — "[City] [Year]" per design spec.
+  function defaultTripName(cityItem, arrive) {
+    const place = (cityItem.name || "Trip").split(",")[0].trim();
+    const yr = arrive ? arrive.slice(0, 4) : new Date().getFullYear();
+    return `${place} ${yr}`;
+  }
 
   // Window: Monday on/before the 1st of the current month, 53 weeks forward.
   // Robust year-round (always ~12 months of future) and seasonal scores make
@@ -206,11 +232,21 @@ export default function TripPlanner() {
 
   const committedLanes = useMemo(() => {
     const arr = committed.map((c) => {
-      const arrive = fromYmd(c.arriveDate);
-      const depart = fromYmd(c.departDate);
+      // #108: trip-backed cities (c.inTrip) get their dates from the trip
+      // leg, not the city row (which is no longer written by Commit). Legacy
+      // committed cities (status='Scheduled' + city-row dates) fall back to
+      // the city-row dates so pre-#108 data still renders correctly.
+      let arriveYmd = c.arriveDate, departYmd = c.departDate, tripId = null;
+      if (c.inTrip) {
+        const t = tripForCity(c.id);
+        const leg = t?.legs?.find((l) => l.cityId === c.id);
+        if (leg) { arriveYmd = leg.arrive; departYmd = leg.depart; tripId = t.id; }
+      }
+      const arrive = fromYmd(arriveYmd);
+      const depart = fromYmd(departYmd);
       const start = arrive ? daysBetween(viewStart, arrive) : todayDay;
       const len = arrive && depart ? Math.max(1, daysBetween(arrive, depart) + 1) : DEFAULT_TRIP_LEN;
-      return { city: c, weeks: laneWeeks(c), start, len, row: 0 };
+      return { city: c, weeks: laneWeeks(c), start, len, row: 0, tripId };
     }).sort((a, b) => a.start - b.start);
     // greedy row assignment so overlapping trips stack instead of colliding
     const rowEnds = [];
@@ -221,7 +257,7 @@ export default function TripPlanner() {
       l.row = row;
     }
     return arr;
-  }, [committed, laneWeeks, viewStart, todayDay]);
+  }, [committed, laneWeeks, viewStart, todayDay, trips]);
   const committedRows = useMemo(
     () => committedLanes.reduce((m, l) => Math.max(m, l.row + 1), 1),
     [committedLanes],
@@ -818,6 +854,20 @@ export default function TripPlanner() {
       const start = +bar.dataset.start, len = +bar.dataset.len, id = bar.dataset.cityId;
       const arr = toYmd(addDays(viewStart, start));
       const dep = toYmd(addDays(viewStart, start + len - 1)); // inclusive last night
+      // #108: for trip-backed cities, the bar's dates ARE the trip leg's
+      // dates — write back to the trip, not the city row. Legacy committed
+      // cities (no trip) keep writing to the city row so pre-#108 bars stay
+      // draggable too.
+      const t = tripForCity(id, tripsRef.current);
+      if (t) {
+        const nextLegs = (t.legs || []).map((l) => l.cityId === id ? { ...l, arrive: arr, depart: dep } : l);
+        const patch = { legs: nextLegs };
+        // Keep the trip frame dates aligned with its sole leg for a
+        // single-city trip — multi-leg merge math is #109's problem.
+        if (nextLegs.length === 1) { patch.startDate = arr; patch.endDate = dep; }
+        updateTripFrameRef.current(t.id, patch);
+        return;
+      }
       updateCityRef.current(id, { arriveDate: arr, departDate: dep });
     }
     function panToDay(day) { S.panX = -(day * S.dayW) + vw() * 0.28; clampPan(); apply(); }
@@ -1138,7 +1188,15 @@ export default function TripPlanner() {
                         className="bcommit unlock"
                         title="Move back to planning"
                         onPointerDown={(e) => e.stopPropagation()}
-                        onClick={() => updateCity(l.city.id, { status: "" })}
+                        onClick={async () => {
+                          // #108: uncommit. New path: delete the trip that
+                          // backs this city; cityStage re-derives → no longer
+                          // "Planned". Legacy path: pre-#108 city had
+                          // status='Scheduled' written directly — clear it.
+                          const t = tripForCity(l.city.id);
+                          if (t) await removeTrip(t.id);
+                          else updateCity(l.city.id, { status: "" });
+                        }}
                       >↩</button>
                     </div>
                   );
@@ -1238,11 +1296,24 @@ export default function TripPlanner() {
                           className="bcommit"
                           title="Commit this trip"
                           onPointerDown={(e) => e.stopPropagation()}
-                          onClick={() => updateCity(l.city.id, {
-                            status: "Scheduled",
-                            arriveDate: toYmd(addDays(viewStart, l.start)),
-                            departDate: toYmd(addDays(viewStart, l.start + l.len - 1)),
-                          })}
+                          onClick={async () => {
+                            // #108: Commit creates a single-leg trip (the
+                            // cardinality fix lands here). No more
+                            // status/arriveDate/departDate writes to the city
+                            // row — Planned is derived from trip membership.
+                            const arr = toYmd(addDays(viewStart, l.start));
+                            const dep = toYmd(addDays(viewStart, l.start + l.len - 1));
+                            // If a trip already backs this city (re-commit on
+                            // an existing card), don't double-create — would
+                            // double-Plan it on the board.
+                            if (tripForCity(l.city.id)) return;
+                            await createTrip({
+                              name: defaultTripName(l.city, arr),
+                              startDate: arr,
+                              endDate: dep,
+                              legs: [{ cityId: l.city.id, name: l.city.name, arrive: arr, depart: dep }],
+                            });
+                          }}
                         >✓</button>
                       </div>
                     </div>

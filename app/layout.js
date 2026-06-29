@@ -55,11 +55,15 @@ export default async function RootLayout({ children }) {
       </head>
       <body>
         <AuthGate>
-          <PlannerProvider initialManifest={initialManifest}>
-            <TripProvider>
+          {/* #108: TripProvider OUTSIDE PlannerProvider so PlannerProvider can
+              useTrips() and augment cityItems with `inTrip` for cityStage's
+              new trip-membership derivation. TripProvider only depends on
+              useAuth(), so the swap is safe. */}
+          <TripProvider>
+            <PlannerProvider initialManifest={initialManifest}>
               {children}
-            </TripProvider>
-          </PlannerProvider>
+            </PlannerProvider>
+          </TripProvider>
         </AuthGate>
       </body>
     </html>

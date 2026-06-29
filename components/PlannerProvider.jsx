@@ -16,6 +16,7 @@ import {
   fetchMyWeights, upsertWeights,
 } from "../lib/db";
 import { useAuth } from "./AuthGate";
+import { useTrips } from "./TripProvider";
 
 const PlannerContext = createContext(null);
 
@@ -87,8 +88,45 @@ export function PlannerProvider({ children, initialManifest }) {
     }, 600);
   }
 
+  // #108: Augment cityItems with `inTrip` (city is a leg in any of the owner's
+  // trips). cityStage() reads this for the new "Planned" derivation. Trips
+  // come from TripProvider — the layout swap (TripProvider OUTSIDE this
+  // provider) lets us call useTrips() here. Memoized on the trip list +
+  // cities so unrelated re-renders don't rebuild.
+  const { trips } = useTrips();
+  const inTripCitySet = useMemo(() => {
+    // Only future/ongoing trips contribute to "Planned" — a past trip's
+    // legs aren't "still planned." Deriving Visited/Assessed from past trips
+    // is deferred per the trip-composer spec (P3/#110); for now, past-trip
+    // cities fall back through cityStage to their other state (typically
+    // Backlog) and the existing VisitReview survey still drives Visited.
+    // Uses leg-level dates so a single past leg of an otherwise-future trip
+    // also won't sneak in. Treats undated legs/trips as "future"
+    // (planning-in-progress), erring on the visible side.
+    const todayYmd = new Date().toISOString().slice(0, 10);
+    const s = new Set();
+    for (const t of trips || []) {
+      const tripEnd = t.endDate || null;
+      for (const l of (t.legs || [])) {
+        if (!l.cityId) continue;
+        const legEnd = l.depart || tripEnd || null;
+        // No end date at all → treat as planning-in-progress; include.
+        // Has an end date and it's before today → past; exclude.
+        if (legEnd && legEnd < todayYmd) continue;
+        s.add(l.cityId);
+      }
+    }
+    return s;
+  }, [trips]);
+  const cityItemsWithTrip = useMemo(() => {
+    if (inTripCitySet.size === 0) return planner.cities;
+    return planner.cities.map((c) => inTripCitySet.has(c.id) ? { ...c, inTrip: true } : c);
+  }, [planner.cities, inTripCitySet]);
+
   const value = useMemo(() => ({
-    planner,
+    // Replace planner.cities with the trip-augmented array — every consumer of
+    // usePlanner() gets trip-aware cityItems for free; no caller refactor.
+    planner: cityItemsWithTrip === planner.cities ? planner : { ...planner, cities: cityItemsWithTrip },
     hydrated,
     imageState,
     setImageState,
@@ -246,7 +284,7 @@ export function PlannerProvider({ children, initialManifest }) {
     exportPlanner() {
       return JSON.stringify(planner, null, 2);
     },
-  }), [planner, imageState, weights, references, saveState, hydrated, userId]);
+  }), [planner, cityItemsWithTrip, imageState, weights, references, saveState, hydrated, userId]);
 
   return <PlannerContext.Provider value={value}>{children}</PlannerContext.Provider>;
 }
