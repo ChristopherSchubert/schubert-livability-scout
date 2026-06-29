@@ -1,8 +1,9 @@
 # Trip Composer — Plan/Trip reconciliation (design spec)
 
 **Status:** Phases 1 + 2 + 3 ✅ shipped 2026-06-29 (#107 + #108 + #109). Legacy
-"Planned" bridge **retired 2026-06-29 (#112)** — `cityStage()` reads only from
-trip membership now. Remaining deferred work in #110 / #111.
+"Planned" bridge **retired 2026-06-29 (#112)**; **drag-off + live merge-during-drag
+gesture shipped same day (#111)**. The whole epic is closed. Only the
+explicit-deferred catch-all (#110) remains open as a context-holder.
 **Date:** 2026-06-28. **Owner decision:** Chris (session 2026-06-28).
 **Provenance:** Shaped through a 4-persona design review (an IA, a JTBD product
 strategist, an interaction designer, a first-principles designer) run as subagents
@@ -210,13 +211,23 @@ Three commits within the ticket:
   Ithaca → bar drops, trip name + Camden+Mystic survive, toast appears;
   click Undo → Ithaca restored.
 
-Deferred to a follow-on (still under #109's umbrella when needed): the
-**drag-off gesture** itself (drag a committed bar off-lane) and the
-**live merge-during-drag** affordance refresh. The rules + undo + the
-keyboard-accessible affordance (↩) are in; the drag interaction is a
-nicer UX gesture for the same operation. The scaffolding for the live
-overlay (`dragOverlay` state, `mergePairs` factoring it in) is in place
-so adding the gesture later doesn't churn the same code again.
+### Phase 3 follow-on ✅ Shipped 2026-06-29 (#111)
+The deferred drag interaction landed as the same-day polish:
+- ✅ **Drag-off gesture** — committed bars are draggable. Vertical drag past
+  60 px flags the bar (turns red, `.will-drop` class) and on pointerup
+  invokes `removeLegFromTrip()` with the same single-leg / multi-leg
+  rules as the ↩ button. No confirm modal — the 6-second undo toast is
+  the safety net. The ↩ button stays (keyboard path).
+- ✅ **Live merge-during-drag** — `onBarMove` updates the `dragOverlay`
+  state every pointer frame; `mergePairs` overlays it onto the dragged
+  bar's lane, so the ⇄ Merge button appears/disappears in real time as
+  the bar's edge approaches an adjacent trip's seam. The bar's JSX also
+  reads from `dragOverlay` so React re-render doesn't snap the bar back
+  during drag.
+- Verified live: drag Newport's committed bar 100 px down → red `will-drop`
+  state, release → trip deleted (DB: 0 Newport trips), toast `Trip
+  "Newport 2026" deleted · Undo` appears, click Undo → trip restored
+  (DB: 1 Newport trip, new id but same name + leg).
 
 ### Deferred (v2+, captured not lost)
 - **Want-list** (a trip-independent per-city "things to do" list that feeds a
@@ -260,8 +271,15 @@ so adding the gesture later doesn't churn the same code again.
   — Phase 2: Swim-lane Commit creates a trip; derive Planned from trip
   membership.** The engine change; fixes the cardinality bug. After #107.
 - **[#109](https://github.com/ChristopherSchubert/schubert-livability-scout/issues/109)
-  — Phase 3: Merge adjacent stays + drag-off semantics + integrity invariants.**
-  After #108.
+  — Phase 3: Merge adjacent stays + leg-removal rules + integrity invariants.**
+  After #108. ✅ Shipped 2026-06-29.
+- **[#111](https://github.com/ChristopherSchubert/schubert-livability-scout/issues/111)
+  — Drag-off gesture + live merge-during-drag.** Follow-on to #109's deferred
+  drag interaction; same-day polish. ✅ Shipped 2026-06-29.
+- **[#112](https://github.com/ChristopherSchubert/schubert-livability-scout/issues/112)
+  — Backfill pre-#108 'Scheduled' cities + retire the legacy "Planned"
+  bridge.** ✅ Shipped 2026-06-29. The dual-source-of-truth Phase 2 left
+  behind is gone.
 - **[#110](https://github.com/ChristopherSchubert/schubert-livability-scout/issues/110)
   — Deferred: want-list, full Place/Leg recast, column drop, split UI.** Context
   lives in this doc; revive when the need is felt.

@@ -193,9 +193,18 @@
 /* committed (planned) bar */
 .trip-pl-bar.is-planned {
   height: 42px; align-items: center; gap: 6px; padding: 3px 8px 3px 3px;
-  background: var(--accent); border-color: var(--accent); cursor: default;
+  background: var(--accent); border-color: var(--accent); cursor: grab; /* #111 */
   backdrop-filter: none; -webkit-backdrop-filter: none;
 }
+/* #111: committed bar dragged off-lane signals "release to remove" — turns
+   red, fades the contents, leaves the ↩ button readable as the alternative. */
+.trip-pl-bar.is-planned.will-drop {
+  background: var(--bad, #b54a3a); border-color: var(--bad, #b54a3a);
+  box-shadow: 0 3px 0 rgba(181,74,58,.45), 0 18px 30px -14px rgba(181,74,58,.55);
+  opacity: 0.92;
+}
+.trip-pl-bar.is-planned.will-drop .btext,
+.trip-pl-bar.is-planned.will-drop .trip-pl-thumb { opacity: 0.6; }
 .trip-pl-bar.is-planned .trip-pl-thumb {
   width: 34px; height: 34px; flex: 0 0 34px; background-size: cover; background-position: center;
   border-radius: 1px; border: 1px solid rgba(255,253,246,.5);

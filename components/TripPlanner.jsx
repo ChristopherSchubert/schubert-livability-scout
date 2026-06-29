@@ -149,6 +149,11 @@ export default function TripPlanner() {
   tripsRef.current = trips;
   const updateTripFrameRef = useRef(updateTripFrame);
   updateTripFrameRef.current = updateTripFrame;
+  // #111: refs for the leg-removal + undo helpers used by the imperative
+  // committed-bar drag handler (drag-off gesture). They re-render-stable
+  // through the long-lived useEffect closure below.
+  const removeLegFromTripRef = useRef(null);
+  const stashUndoRef = useRef(null);
 
   // Find the trip backing a given city (so uncommit can remove the right one).
   // A city should have at most one trip in the swim-lane model; if multiple
@@ -173,6 +178,7 @@ export default function TripPlanner() {
     setUndo({ ...snapshot, label, at: Date.now() });
     undoTimerRef.current = setTimeout(() => setUndo(null), 6000);
   }
+  stashUndoRef.current = stashUndo;
   async function undoLast() {
     const u = undo;
     if (!u) return;
@@ -231,6 +237,7 @@ export default function TripPlanner() {
     });
     return { kind: "dropLeg", before };
   }
+  removeLegFromTripRef.current = removeLegFromTrip;
 
   // #109: merge two adjacent committed trips into one multi-leg trip. Legs
   // concatenate in date order; the EARLIER trip absorbs (minimizes record
@@ -374,8 +381,9 @@ export default function TripPlanner() {
   }, [committed, laneWeeks, viewStart, todayDay, trips]);
   // #109: merge affordances — pairs of adjacent committed bars (same row,
   // gap ≤ ADJACENT_TRIP_GAP_DAYS, from DIFFERENT trips) get a "Merge" button
-  // rendered on the seam between them. Legacy bridge cities (no tripId) are
-  // excluded — merging needs a trip to absorb into; backfill is #110.
+  // rendered on the seam between them. The legacy bridge (no tripId) was
+  // retired in #112, but the `!a.tripId || !b.tripId` guard below stays as
+  // a defensive check — merging requires a trip to absorb into.
   const mergePairs = useMemo(() => {
     if (committedLanes.length < 2) return [];
     // #109: if a bar is mid-drag, overlay its proposed position so the merge
@@ -1129,12 +1137,28 @@ export default function TripPlanner() {
     });
 
     let drag = null;
+    // #111: vertical-displacement threshold (px) above which a committed bar
+    // is "off-lane" and drops its leg on pointerup. One bar height (~36) plus
+    // headroom — clearly intentional, not a casual jitter.
+    const OFF_LANE_PX = 60;
     const onBarDown = (e) => {
       const bar = e.currentTarget;
       if (e.target.closest(".bjump") || e.target.closest(".bcommit")) return;
       const h = e.target.closest(".bhandle");
       e.preventDefault(); e.stopPropagation();
-      drag = { bar, mode: h ? (h.classList.contains("l") ? "l" : "r") : "move", x: e.clientX, s: +bar.dataset.start, l: +bar.dataset.len };
+      const isPlanned = bar.classList.contains("is-planned");
+      drag = {
+        bar,
+        // committed bars have no resize handles — always move
+        mode: !isPlanned && h ? (h.classList.contains("l") ? "l" : "r") : "move",
+        x: e.clientX, y: e.clientY,
+        s: +bar.dataset.start, l: +bar.dataset.len,
+        isPlanned,
+        tripId: isPlanned ? (bar.dataset.tripId || null) : null,
+        cityId: bar.dataset.cityId,
+        cityName: bar.dataset.city,
+        willDrop: false,
+      };
       bar.classList.add("is-dragging");
       window.addEventListener("pointermove", onBarMove);
       window.addEventListener("pointerup", onBarUp);
@@ -1150,14 +1174,45 @@ export default function TripPlanner() {
       if (s < todayDay) { if (drag.mode === "l") l = drag.s + drag.l - todayDay; s = todayDay; }
       if (s + l > N) { if (drag.mode === "move") s = N - l; else l = N - s; }
       update(drag.bar, s, l);
+      // #111: committed-bar drag → live merge affordance + off-lane drop.
+      // Planning-bar drags don't touch dragOverlay (no trip yet to merge).
+      if (drag.isPlanned && drag.tripId) {
+        const dy = e.clientY - drag.y;
+        const willDrop = Math.abs(dy) > OFF_LANE_PX;
+        if (willDrop !== drag.willDrop) {
+          drag.willDrop = willDrop;
+          drag.bar.classList.toggle("will-drop", willDrop);
+        }
+        // Recompute mergePairs against the proposed position. Setting state on
+        // every pointermove is fine — React batches, dragOverlay's only
+        // consumer is the mergePairs memo + the bar's own JSX style (which
+        // matches the imperative update() above, so no visual jump).
+        setDragOverlay({ tripId: drag.tripId, start: s, len: l });
+      }
     };
-    const onBarUp = () => {
+    const onBarUp = async () => {
       if (!drag) return;
-      drag.bar.classList.remove("is-dragging");
-      persist(drag.bar);
+      const d = drag;
       drag = null;
+      d.bar.classList.remove("is-dragging", "will-drop");
       window.removeEventListener("pointermove", onBarMove);
       window.removeEventListener("pointerup", onBarUp);
+      setDragOverlay(null);
+      // #111: off-lane drop on a committed bar → leg removal (same rules as
+      // the ↩ unlock button: last leg deletes the trip; multi-leg drops just
+      // the leg). Undo toast for 6s. If just a re-position, fall through to
+      // the normal persist() path so the dates write back to the trip leg.
+      if (d.isPlanned && d.willDrop && d.tripId && d.cityId) {
+        const t = (tripsRef.current || []).find((x) => x.id === d.tripId);
+        const snap = await removeLegFromTripRef.current?.(d.tripId, d.cityId);
+        const short = (d.cityName || "").split(",")[0] || "leg";
+        const label = snap?.kind === "deleteTrip"
+          ? `Trip "${t?.name ?? short}" deleted`
+          : `Leg "${short}" removed`;
+        if (snap) stashUndoRef.current?.(snap, label);
+        return;
+      }
+      persist(d.bar);
     };
 
     const barHandlers = [];
@@ -1192,6 +1247,11 @@ export default function TripPlanner() {
       const ml = () => hidePop();
       bar.addEventListener("mousemove", mm);
       bar.addEventListener("mouseleave", ml);
+      // #111: committed bars are now draggable. Horizontal drag re-positions
+      // the trip's dates (persist() writes to the trip leg); vertical drag
+      // past OFF_LANE_PX flags the bar as a drop-off and removes the leg on
+      // pointerup (same rules + undo as the ↩ button).
+      bar.addEventListener("pointerdown", onBarDown);
       plannedHandlers.push([bar, mm, ml]);
     });
 
@@ -1223,7 +1283,7 @@ export default function TripPlanner() {
       chartHandlers.forEach(([el, mm, ml]) => { el.removeEventListener("mousemove", mm); el.removeEventListener("mouseleave", ml); });
       barHandlers.forEach(([el, mm, ml, db]) => { el.removeEventListener("pointerdown", onBarDown); el.removeEventListener("mousemove", mm); el.removeEventListener("mouseleave", ml); el.removeEventListener("dblclick", db); });
       jumpHandlers.forEach(([el, pd, mm, ml, ck]) => { el.removeEventListener("pointerdown", pd); el.removeEventListener("mousemove", mm); el.removeEventListener("mouseleave", ml); el.removeEventListener("click", ck); });
-      plannedHandlers.forEach(([el, mm, ml]) => { el.removeEventListener("mousemove", mm); el.removeEventListener("mouseleave", ml); });
+      plannedHandlers.forEach(([el, mm, ml]) => { el.removeEventListener("mousemove", mm); el.removeEventListener("mouseleave", ml); el.removeEventListener("pointerdown", onBarDown); });
       if (tFeels) tFeels.removeEventListener("change", onFeels);
       if (tCrowds) tCrowds.removeEventListener("change", onCrowds);
       if (thresh) thresh.removeEventListener("input", onThresh);
@@ -1315,16 +1375,25 @@ export default function TripPlanner() {
                 <div className="trip-pl-today" style={{ left: `calc(var(--day-w)*${todayDay})` }} />
                 {committedLanes.map((l) => {
                   const hero = heroFor(l.city);
+                  // #111: during a committed-bar drag, the dragOverlay carries
+                  // the proposed start/len so the merge affordance refreshes
+                  // live. The bar's render also reads from it so the JSX
+                  // position matches the imperative `update(bar, s, l)` mutation
+                  // and the bar doesn't snap back on re-render mid-drag.
+                  const overlay = dragOverlay && dragOverlay.tripId === l.tripId ? dragOverlay : null;
+                  const start = overlay ? overlay.start : l.start;
+                  const len = overlay ? overlay.len : l.len;
                   return (
                     <div
                       key={l.city.id}
                       className="trip-pl-bar is-planned"
                       data-city={l.city.name}
                       data-city-id={l.city.id}
-                      data-start={l.start}
-                      data-len={l.len}
+                      data-trip-id={l.tripId || ""}
+                      data-start={start}
+                      data-len={len}
                       data-weeks={l.weeks ? JSON.stringify(l.weeks) : ""}
-                      style={{ left: `calc(var(--day-w)*${l.start})`, width: `calc(var(--day-w)*${l.len})`, top: 6 + l.row * 48, transform: "none" }}
+                      style={{ left: `calc(var(--day-w)*${start})`, width: `calc(var(--day-w)*${len})`, top: 6 + l.row * 48, transform: "none" }}
                     >
                       <span className="trip-pl-thumb" style={hero ? { backgroundImage: `url(${hero})` } : undefined}>{hero ? "" : l.city.name.slice(0, 1)}</span>
                       <span className="btext">
@@ -1357,11 +1426,11 @@ export default function TripPlanner() {
                     </div>
                   );
                 })}
-                {/* #109 merge affordance — appears between adjacent committed
-                    bars (≤ ADJACENT_TRIP_GAP_DAYS, different trips). Click
-                    absorbs the later trip's legs into the earlier; later trip
-                    is deleted. Static for now; live-during-drag refinement
-                    lands as a follow-on commit in this ticket. */}
+                {/* #109 + #111 merge affordance — appears between adjacent
+                    committed bars (≤ ADJACENT_TRIP_GAP_DAYS, different trips).
+                    Click absorbs the later trip's legs into the earlier; later
+                    trip is deleted. Refreshes live during a bar drag (#111) via
+                    the dragOverlay feeding into the mergePairs memo. */}
                 {mergePairs.map(({ a, b, gap, row }) => {
                   const seamStart = a.start + a.len;
                   // Min width so the button is clickable even at gap=0 (back-to-back).
