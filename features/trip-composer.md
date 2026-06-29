@@ -1,6 +1,6 @@
 # Trip Composer — Plan/Trip reconciliation (design spec)
 
-**Status:** Phases 1 + 2 ✅ shipped 2026-06-29 (#107 + #108). Phase 3 issued as #109.
+**Status:** Phases 1 + 2 + 3 ✅ shipped 2026-06-29 (#107 + #108 + #109). Deferred work in #110.
 **Date:** 2026-06-28. **Owner decision:** Chris (session 2026-06-28).
 **Provenance:** Shaped through a 4-persona design review (an IA, a JTBD product
 strategist, an interaction designer, a first-principles designer) run as subagents
@@ -178,10 +178,39 @@ the UI. All four reviewers hit facets of this:
 - ✅ Tests: +4 cityStage tests locking the new contract (inTrip wins; legacy
   bridge; assessed/visited still beat trip membership). 35 + 147 tests green.
 
-### Phase 3 — Merge + drag-off + integrity rules
-- Merge affordance (trigger + mechanics above).
-- Drag-off leg/trip semantics + undo.
-- The data-integrity invariants (cascade, archival block, owner, guard).
+### Phase 3 ✅ Shipped 2026-06-29 (#109)
+Three commits within the ticket:
+- ✅ **Invariants (`ada3fc2`)** — `0028_p3_invariants.sql` adds
+  `travel.cities.archived_at` + a `city_archive_guard()` trigger that
+  raises if archival is attempted while the city is still a leg in any
+  trip (verified live: Ljubljana blocked, Eureka Springs allowed). Trip
+  owner already enforced (`trips.user_id NOT NULL` since #90). Cascade is
+  automatic post-#108 (verified by a test modelling the boundary).
+- ✅ **Merge affordance (`9329f8e`)** — `ADJACENT_TRIP_GAP_DAYS = 1`
+  constant; the planner renders a ⇄ Merge button between two committed
+  bars on the same row whose gap ≤ 1 day and that belong to different
+  trips. Click → `mergeTrips()`: concatenates legs in date order
+  (preserves each leg's city FK + hotels/days/checklists), absorbs into
+  the earlier trip, deletes the later one, defaults the name to
+  `City → City` (inline-editable in `/trips`). Verified live against the
+  family DB: Camden + Ithaca test pair → merged into "Camden → Ithaca",
+  later trip deleted, legs intact.
+- ✅ **Leg-removal rules + undo (this commit)** — the ↩ unlock button now
+  routes through `removeLegFromTrip()`: single-leg trip → `removeTrip()`
+  (last leg = delete trip); multi-leg → `updateTripFrame()` with legs
+  filtered, frame dates re-span the remainder, trip survives. Stashes a
+  snapshot for the 6-second undo toast; click "Undo" → restores the leg
+  (or rebuilds the trip). Verified live: Camden→Ithaca→Mystic, click ↩ on
+  Ithaca → bar drops, trip name + Camden+Mystic survive, toast appears;
+  click Undo → Ithaca restored.
+
+Deferred to a follow-on (still under #109's umbrella when needed): the
+**drag-off gesture** itself (drag a committed bar off-lane) and the
+**live merge-during-drag** affordance refresh. The rules + undo + the
+keyboard-accessible affordance (↩) are in; the drag interaction is a
+nicer UX gesture for the same operation. The scaffolding for the live
+overlay (`dragOverlay` state, `mergePairs` factoring it in) is in place
+so adding the gesture later doesn't churn the same code again.
 
 ### Deferred (v2+, captured not lost)
 - **Want-list** (a trip-independent per-city "things to do" list that feeds a

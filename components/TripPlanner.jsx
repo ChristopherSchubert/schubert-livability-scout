@@ -130,6 +130,16 @@ export default function TripPlanner() {
   // #108: swim-lane Commit now creates a trip instead of stamping
   // arriveDate/departDate/status onto the city row. uncommit removes the trip.
   const { trips, createTrip, removeTrip, updateTripFrame } = useTrips();
+  // #109: small undo state for leg-removals — a one-slot last-action stash.
+  // Auto-clears after 6 seconds (the toast's own timer); the inline "Undo"
+  // button calls `undoLast` to restore. Snapshot is the trip + legs at the
+  // moment of removal, so we can rebuild without re-deriving from city rows.
+  const [undo, setUndo] = useState(null);
+  const undoTimerRef = useRef(null);
+  // #109: live merge-during-drag — when a bar is mid-drag, this overlay
+  // replaces its lane.{start,len} in the mergePairs memo so the affordance
+  // appears/disappears as the user moves the edge. Cleared on pointerup.
+  const [dragOverlay, setDragOverlay] = useState(null); // { tripId, start, len } | null
   const rootRef = useRef(null);
   const updateCityRef = useRef(updateCity);
   updateCityRef.current = updateCity;
@@ -154,6 +164,72 @@ export default function TripPlanner() {
     const place = (cityItem.name || "Trip").split(",")[0].trim();
     const yr = arrive ? arrive.slice(0, 4) : new Date().getFullYear();
     return `${place} ${yr}`;
+  }
+
+  // #109: stash a leg-removal so the toast can restore it. One-slot last-action;
+  // a new removal supersedes the previous (the old toast disappears).
+  function stashUndo(snapshot, label) {
+    if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
+    setUndo({ ...snapshot, label, at: Date.now() });
+    undoTimerRef.current = setTimeout(() => setUndo(null), 6000);
+  }
+  async function undoLast() {
+    const u = undo;
+    if (!u) return;
+    setUndo(null);
+    if (undoTimerRef.current) { clearTimeout(undoTimerRef.current); undoTimerRef.current = null; }
+    if (u.kind === "deleteTrip") {
+      // Recreate from the snapshot. Note: id changes (Supabase generates a
+      // fresh one) — the previous id is gone. Acceptable: the cityItem
+      // re-binds via cityId in legs.
+      const t = u.before.trip;
+      await createTrip({
+        name: t.name,
+        startDate: t.startDate || null,
+        endDate: t.endDate || null,
+        legs: u.before.legs,
+        travelers: t.travelers || [],
+        glance: t.glance || {},
+      });
+    } else if (u.kind === "dropLeg") {
+      const t = u.before.trip;
+      const starts = u.before.legs.map((l) => l.arrive).filter(Boolean).sort();
+      const ends = u.before.legs.map((l) => l.depart).filter(Boolean).sort();
+      await updateTripFrameRef.current(t.id, {
+        legs: u.before.legs,
+        startDate: starts[0] || t.startDate || null,
+        endDate: ends[ends.length - 1] || t.endDate || null,
+      });
+    }
+  }
+
+  // #109: remove a city's leg from its backing trip. Single-leg trip → delete
+  // the whole trip (city reverts to pre-Planned). Multi-leg → drop just the
+  // leg, trip survives with the remaining legs in date order (frame
+  // start/end recompute to span what's left, name unchanged — user-edited).
+  // Returns a snapshot the caller can stash for undo. No-op for legacy
+  // bridge cities (no tripId — those uncommit by clearing city-row status,
+  // handled at the call site).
+  async function removeLegFromTrip(tripId, cityId) {
+    const all = tripsRef.current || [];
+    const t = all.find((x) => x.id === tripId);
+    if (!t) return null;
+    const before = { trip: t, legs: t.legs || [] }; // for undo
+    const remaining = (t.legs || []).filter((l) => l.cityId !== cityId);
+    if (remaining.length === 0) {
+      // Last leg → drop the entire trip.
+      await removeTrip(t.id);
+      return { kind: "deleteTrip", before };
+    }
+    // Multi-leg → keep the trip; legs filtered, frame dates re-span the rest.
+    const starts = remaining.map((l) => l.arrive).filter(Boolean).sort();
+    const ends = remaining.map((l) => l.depart).filter(Boolean).sort();
+    await updateTripFrameRef.current(t.id, {
+      legs: remaining,
+      startDate: starts[0] || t.startDate || null,
+      endDate: ends[ends.length - 1] || t.endDate || null,
+    });
+    return { kind: "dropLeg", before };
   }
 
   // #109: merge two adjacent committed trips into one multi-leg trip. Legs
@@ -302,8 +378,16 @@ export default function TripPlanner() {
   // excluded — merging needs a trip to absorb into; backfill is #110.
   const mergePairs = useMemo(() => {
     if (committedLanes.length < 2) return [];
+    // #109: if a bar is mid-drag, overlay its proposed position so the merge
+    // affordance refreshes live as the user drags an edge. dragOverlay is
+    // null outside drag; cleared on pointerup.
+    const overlaid = dragOverlay
+      ? committedLanes.map((l) => l.tripId === dragOverlay.tripId
+          ? { ...l, start: dragOverlay.start, len: dragOverlay.len }
+          : l)
+      : committedLanes;
     const byRow = new Map();
-    for (const l of committedLanes) {
+    for (const l of overlaid) {
       if (!byRow.has(l.row)) byRow.set(l.row, []);
       byRow.get(l.row).push(l);
     }
@@ -320,7 +404,7 @@ export default function TripPlanner() {
       }
     }
     return pairs;
-  }, [committedLanes]);
+  }, [committedLanes, dragOverlay]);
 
   const committedRows = useMemo(
     () => committedLanes.reduce((m, l) => Math.max(m, l.row + 1), 1),
@@ -1253,13 +1337,21 @@ export default function TripPlanner() {
                         title="Move back to planning"
                         onPointerDown={(e) => e.stopPropagation()}
                         onClick={async () => {
-                          // #108: uncommit. New path: delete the trip that
-                          // backs this city; cityStage re-derives → no longer
-                          // "Planned". Legacy path: pre-#108 city had
-                          // status='Scheduled' written directly — clear it.
+                          // #109: remove this city's leg. Last leg → trip
+                          // deleted; multi-leg → trip survives without it.
+                          // Stashes for the Undo toast. Legacy bridge cities
+                          // (pre-#108, no tripId) fall back to clearing
+                          // city-row status — they have no trip to undo from.
                           const t = tripForCity(l.city.id);
-                          if (t) await removeTrip(t.id);
-                          else updateCity(l.city.id, { status: "" });
+                          if (t) {
+                            const snap = await removeLegFromTrip(t.id, l.city.id);
+                            const label = snap?.kind === "deleteTrip"
+                              ? `Trip "${t.name}" deleted`
+                              : `Leg "${l.city.name.split(",")[0]}" removed`;
+                            if (snap) stashUndo(snap, label);
+                          } else {
+                            updateCity(l.city.id, { status: "" });
+                          }
                         }}
                       >↩</button>
                     </div>
@@ -1496,6 +1588,16 @@ export default function TripPlanner() {
         ) : null}
         {hoverCard && !ghost ? (
           <BacklogHoverCard row={hoverCard.row} rect={hoverCard.rect} hero={heroFor(hoverCard.row.cityItem)} />
+        ) : null}
+        {/* #109 undo toast — appears for ~6s after a leg removal so a stray
+            unlock click is recoverable. No confirm modal; this is the escape
+            hatch instead. Position absolute over the planner so it doesn't
+            shift layout when it appears. */}
+        {undo ? (
+          <div className="trip-pl-undo" role="status" aria-live="polite">
+            <span className="trip-pl-undo-msg">{undo.label}</span>
+            <button type="button" className="trip-pl-undo-btn" onClick={undoLast}>Undo</button>
+          </div>
         ) : null}
       </div>
       <CityFilterDrawer filters={backlogFilters} options={backlogOptions} />
