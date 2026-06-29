@@ -4,6 +4,7 @@
 // render an honest "pending" stub instead of a fabricated chart.
 
 import { Fragment } from "react";
+import { visitNowScore } from "../../lib/visit-window";
 
 const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 const MONTH_LONG = ["January","February","March","April","May","June","July","August","September","October","November","December"];
@@ -64,8 +65,11 @@ export default function ChapterWhen({ view, homebase }) {
     <section id="when" className="when" aria-label="When to visit">
       <div className="when-inner">
         <div className="when-head">
-          <h2>When to go</h2>
-          <p className="sub">Climate comfort{crowd ? " and tourist crowd" : ""} plotted across the calendar year. The best visit windows are months with high comfort{crowd ? " and low crowd" : ""}.</p>
+          <div>
+            <h2>When to go</h2>
+            <p className="sub">Climate comfort{crowd ? " and tourist crowd" : ""} plotted across the calendar year. The best visit windows are months with high comfort{crowd ? " and low crowd" : ""}.</p>
+          </div>
+          <VisitNowBadge view={view} nowIdx={nowIdx} />
         </div>
 
         <div className="climate">
@@ -157,6 +161,32 @@ function valueLabels(series, y, cls, dy, fmt) {
     <text key={i} className={cls} x={X(i)} y={y(v) + dy}>{fmt(v)}</text>
   ));
 }
+// "Visit now" — this month's visit score + a directional nudge. Ported from
+// the deleted VisitWindowPanel (#107) so the Plan-tab removal isn't a regression.
+// The Chapter V curve already shows where today sits on the comfort line; this
+// badge adds the numeric score and a "go before it gets worse" trend hint.
+function VisitNowBadge({ view, nowIdx }) {
+  const series = view.monthlyComfort;
+  if (!Array.isArray(series) || series[nowIdx] == null) return null;
+  // visitNowScore reads cityItem; we shaped `view` from a cityItem, so the
+  // same fields work. Pass through monthlyComfort + visitClimate so the lib
+  // function can do its 2-month look-ahead without re-deriving.
+  const now = visitNowScore({ visitClimate: view.visitClimate }, nowIdx);
+  if (now == null) return null;
+  const baseNow = series[nowIdx];
+  const trend = now - baseNow; // 0 = steady, +N = urgency boost (next months drop)
+  const dontMiss = baseNow >= 6 && trend >= 1;
+  return (
+    <div className={`visit-now-badge${dontMiss ? " urgent" : ""}`}>
+      <span className="visit-now-label">Visit now · {MONTHS[nowIdx]}</span>
+      <strong>{now.toFixed(1)}<small>/10</small></strong>
+      {trend >= 0.3 ? <span className="visit-now-trend">↓ trending down — don't miss it</span>
+        : trend <= -0.3 ? <span className="visit-now-trend rising">↑ improving — peak later</span>
+        : <span className="visit-now-trend steady">→ stable over the next 2 months</span>}
+    </div>
+  );
+}
+
 function Annotation({ idx, y, cls, label, sub }) {
   return (
     <>

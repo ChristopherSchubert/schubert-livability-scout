@@ -84,7 +84,7 @@ export default function VisitWorkspace() {
                 </div>
                 <div className="trip-meta">
                   <header className="trip-row-head">
-                    <Link className="trip-name" href={`/cities/${slug}/plan`}>{cityItem.name}</Link>
+                    <Link className="trip-name" href={`/cities/${slug}`}>{cityItem.name}</Link>
                     <span className="trip-score">{avg}</span>
                   </header>
                   <p className="trip-dates">{formatDateRange(arrive, depart) || cityItem.tripWeek || "Dates TBD"}</p>
@@ -96,8 +96,9 @@ export default function VisitWorkspace() {
                   </dl>
                 </div>
                 <div className="trip-actions">
-                  <Link className="button-link" href={`/cities/${slug}/plan`}>Open trip plan</Link>
-                  <Link className="ghost-link" href={`/cities/${slug}`}>Detail</Link>
+                  {/* #107: per-city Plan tab removed; the Detail page hosts
+                      "When to visit" now. /trips is the trip composer. */}
+                  <Link className="button-link" href={`/cities/${slug}`}>Open detail</Link>
                 </div>
               </li>
             );

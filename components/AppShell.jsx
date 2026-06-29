@@ -448,9 +448,12 @@ export function defaultTripNav(trip, active) {
 
 export function defaultCityNav(cityItem, activeMode) {
   const slug = citySlug(cityItem);
+  // The per-city "Plan" tab was removed in #107 (Trip Composer P1) — it stored
+  // trip data on the city row, which is a cardinality bug since a city can be
+  // in many trips. Trip composition now lives entirely in /planning/calendar +
+  // /trips; "When to visit" moved into the Detail page's Chapter V.
   return [
     { href: `/cities/${slug}`, label: "Detail", active: activeMode === "detail" },
-    { href: `/cities/${slug}/plan`, label: "Plan", active: activeMode === "plan" },
     // Image management needs local API keys (Google Places via the Keychain) and
     // is a measurement-time tool — surface it only on localhost/dev, never in
     // the deployed app. Same NODE_ENV gate as the dev sign-in button.

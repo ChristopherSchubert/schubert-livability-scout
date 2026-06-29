@@ -1,6 +1,6 @@
 # Trip Composer — Plan/Trip reconciliation (design spec)
 
-**Status:** Designed, not yet built. Near-term slice (Phase 1) ready to issue.
+**Status:** Phase 1 ✅ shipped 2026-06-29 (#107). Phases 2/3 issued as #108/#109.
 **Date:** 2026-06-28. **Owner decision:** Chris (session 2026-06-28).
 **Provenance:** Shaped through a 4-persona design review (an IA, a JTBD product
 strategist, an interaction designer, a first-principles designer) run as subagents
@@ -132,15 +132,25 @@ the UI. All four reviewers hit facets of this:
 
 ## Scope
 
-### Phase 1 — Kill the Plan tab (ships independently, safe, small)
-- Remove the per-city Plan tab (route `/cities/[slug]/plan` + nav link).
-- Move "When to visit" into the Detail page. *(Writer: Detail's magazine Chapter V
-  already renders a climate-comfort curve — check overlap, don't duplicate.)*
-- **Keep the city-row columns and their data.** No migration, no column drop.
-- Funnel keeps working — Board drag, swim-lane Commit, and Assess survey are
-  unaffected. **Verified:** killing the Plan tab does *not* sever any stage
-  transition; three other writers remain ([lib/stages.js](../lib/stages.js),
-  FunnelBoard, the swim-lane, VisitReview).
+### Phase 1 ✅ Shipped 2026-06-29 (#107)
+- ✅ Per-city Plan tab removed: `app/cities/[slug]/plan/page.js` deleted,
+  `defaultCityNav` no longer includes a Plan link, the legacy `/cities/[slug]/visit`
+  redirect now lands on Detail instead of Plan. `VisitPlanRoute.jsx` deleted;
+  `VisitPlan` + `VisitWindowPanel` removed from `PlannerShell.jsx` (along with
+  their now-unused imports — `MONTHS`, `cityVisitWindow`, `monthlyComfortScores`,
+  `visitNowScore`, `tripNights`). `VisitWorkspace`/`PlanningMobile` city links
+  re-pointed to `/cities/[slug]` (Detail).
+- ✅ "When to visit" reuse decided by inspection: Chapter V (`ChapterWhen`)
+  already renders the full climate curve, Prime/Off-season annotations,
+  climatology heatmap, and Extremes panel. The ONE thing the deleted
+  `VisitWindowPanel` carried that Chapter V didn't was the **Visit-now badge**
+  (this-month score + trend nudge: "↓ trending down — don't miss it"). That
+  single piece was ported into Chapter V as `<VisitNowBadge>` (same logic via
+  `visitNowScore`); no duplicated curve.
+- ✅ City-row columns kept intact (`arriveDate`, `departDate`, `flightDetails`,
+  `lodgingDetails`, `carDetails`, `days`, `checklists`, `status`). No migration.
+- ✅ Funnel transitions verified to still work — Board drag, swim-lane Commit,
+  and Assess survey are unaffected.
 
 ### Phase 2 — Swim-lane creates trips; Planned = has-a-trip (the engine change)
 - Swim-lane Commit creates/updates a **trip** (writes `trips`/`trip_entries`),

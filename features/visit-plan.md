@@ -1,4 +1,21 @@
-# Visit plan — per-city trip setup, itinerary, checklists
+# Visit plan — per-city trip setup, itinerary, checklists (RETIRED)
+
+> **Status: REMOVED 2026-06-29** (Trip Composer P1, [#107](https://github.com/ChristopherSchubert/issues/107)).
+> The per-city `/cities/[slug]/plan` route + the "PLAN" city-nav tab are gone.
+> Trip composition lives entirely in [trip-planner.md](trip-planner.md)
+> (`/planning/calendar`) and in the multi-city `/trips` route now. The
+> "When to visit" diagnostic moved into the Detail page (Chapter V renders
+> the climate curve + Prime/Off-season windows + a Visit-now badge with the
+> trend hint that the old panel surfaced). The city-row columns the form
+> wrote into (`arriveDate`, `departDate`, `flightDetails`, `lodgingDetails`,
+> `carDetails`, `days`, `checklists`, `status`) are **kept** — no migration —
+> for backwards-compat with Visited/Assessed and as raw material for the
+> future Place/Leg recast ([#110](https://github.com/ChristopherSchubert/issues/110)).
+> See [trip-composer.md](trip-composer.md) for the reconciliation design.
+
+The historical content below documents how the surface worked before removal.
+
+---
 
 The **Plan** tab on a city page (`/cities/[slug]/plan`). Where the swim-lane
 [trip planner](trip-planner.md) is the cross-city *when-to-go* view, this is

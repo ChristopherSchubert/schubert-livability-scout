@@ -248,7 +248,7 @@ function PlanCard({ city, overall, src, primary, primaryLabel, badge, committed 
   const slug = citySlug(city);
   return (
     <li>
-      <Link className={`plan-m-card${committed ? " is-committed" : ""}`} href={`/cities/${slug}/plan`}>
+      <Link className={`plan-m-card${committed ? " is-committed" : ""}`} href={`/cities/${slug}`}>
         {src ? (
           <img className="plan-m-thumb" src={src} alt="" loading="lazy" />
         ) : (
