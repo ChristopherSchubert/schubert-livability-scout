@@ -240,6 +240,23 @@
 .bcommit.unlock { background: var(--panel); color: var(--accent); top: -9px; right: -9px; opacity: 0.55; }
 .trip-pl-bar.is-planned:hover .bcommit.unlock { opacity: 1; }
 
+/* #109 merge affordance — sits between two adjacent committed bars (≤1-day
+   gap, different trips). Subtle by default; the planner stays calm when many
+   committed trips are visible. Click absorbs the later trip into the earlier
+   per the Trip Composer spec. */
+.trip-pl-merge {
+  display: inline-flex; align-items: center; justify-content: center;
+  font-family: var(--font-ui); font-size: 0.6rem; font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  background: var(--accent-soft); color: var(--accent);
+  border: 1px dashed var(--accent); border-radius: 4px;
+  cursor: pointer; padding: 0; line-height: 1; opacity: 0.7;
+  transition: opacity 0.14s, background 0.14s;
+  overflow: hidden; white-space: nowrap;
+}
+.trip-pl-merge:hover { opacity: 1; background: var(--accent); color: var(--on-accent); }
+.trip-pl-merge:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
 /* planning section controls */
 .plan-ctl { margin-left: auto; display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
 .sortctl { display: inline-flex; align-items: center; gap: 0; }

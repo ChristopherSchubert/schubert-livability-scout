@@ -35,6 +35,12 @@ const MAX_DAY_W = 44;
 const DEFAULT_TH = 65;
 const DEFAULT_TRIP_LEN = 7; // nights for a fresh box
 
+// #109: adjacency threshold for the merge affordance. Two committed bars whose
+// gap is ≤ this many calendar days are "adjacent enough to be one trip"; a
+// gap of 2+ days implies going home in between, so no merge is offered. Per
+// design spec — single named constant so the rule stays legible.
+const ADJACENT_TRIP_GAP_DAYS = 1;
+
 const MONTHS_LONG = [
   "January","February","March","April","May","June",
   "July","August","September","October","November","December",
@@ -150,6 +156,38 @@ export default function TripPlanner() {
     return `${place} ${yr}`;
   }
 
+  // #109: merge two adjacent committed trips into one multi-leg trip. Legs
+  // concatenate in date order; the EARLIER trip absorbs (minimizes record
+  // churn — its id, owner, and any non-leg fields persist). The later trip is
+  // deleted. Default name = first-stop → last-stop in date order (e.g.
+  // "Asheville → Brevard"). Merge is associative and repeatable.
+  async function mergeTrips(earlierId, laterId) {
+    if (!earlierId || !laterId || earlierId === laterId) return;
+    const all = tripsRef.current || [];
+    const earlier = all.find((t) => t.id === earlierId);
+    const later = all.find((t) => t.id === laterId);
+    if (!earlier || !later) return;
+    // Concatenate in date order — each leg keeps its city FK + hotels/days/
+    // checklists untouched. Sort uses arrive date; legs without an arrive
+    // float to the end (shouldn't happen for committed bars but defensive).
+    const combinedLegs = [...(earlier.legs || []), ...(later.legs || [])]
+      .sort((a, b) => (a.arrive || "9999").localeCompare(b.arrive || "9999"));
+    // Frame dates span the full set; name reads as the journey across cities.
+    const starts = combinedLegs.map((l) => l.arrive).filter(Boolean).sort();
+    const ends = combinedLegs.map((l) => l.depart).filter(Boolean).sort();
+    const startDate = starts[0] || earlier.startDate || null;
+    const endDate = ends[ends.length - 1] || later.endDate || null;
+    const placeOf = (l) => (l.name || "").split(",")[0].trim() || "Trip";
+    const defaultName = combinedLegs.map(placeOf).join(" → ");
+    await updateTripFrameRef.current(earlier.id, {
+      name: defaultName,
+      startDate,
+      endDate,
+      legs: combinedLegs,
+    });
+    await removeTrip(later.id);
+  }
+
   // Window: Monday on/before the 1st of the current month, 53 weeks forward.
   // Robust year-round (always ~12 months of future) and seasonal scores make
   // the exact year matter only for week→month alignment.
@@ -258,6 +296,32 @@ export default function TripPlanner() {
     }
     return arr;
   }, [committed, laneWeeks, viewStart, todayDay, trips]);
+  // #109: merge affordances — pairs of adjacent committed bars (same row,
+  // gap ≤ ADJACENT_TRIP_GAP_DAYS, from DIFFERENT trips) get a "Merge" button
+  // rendered on the seam between them. Legacy bridge cities (no tripId) are
+  // excluded — merging needs a trip to absorb into; backfill is #110.
+  const mergePairs = useMemo(() => {
+    if (committedLanes.length < 2) return [];
+    const byRow = new Map();
+    for (const l of committedLanes) {
+      if (!byRow.has(l.row)) byRow.set(l.row, []);
+      byRow.get(l.row).push(l);
+    }
+    const pairs = [];
+    for (const [row, lanes] of byRow) {
+      const sorted = lanes.slice().sort((a, b) => a.start - b.start);
+      for (let i = 0; i + 1 < sorted.length; i++) {
+        const a = sorted[i], b = sorted[i + 1];
+        if (!a.tripId || !b.tripId) continue;          // legacy bridge — skip
+        if (a.tripId === b.tripId) continue;           // already same trip — skip
+        const gap = b.start - (a.start + a.len);
+        if (gap < 0 || gap > ADJACENT_TRIP_GAP_DAYS) continue;
+        pairs.push({ a, b, gap, row });
+      }
+    }
+    return pairs;
+  }, [committedLanes]);
+
   const committedRows = useMemo(
     () => committedLanes.reduce((m, l) => Math.max(m, l.row + 1), 1),
     [committedLanes],
@@ -1199,6 +1263,34 @@ export default function TripPlanner() {
                         }}
                       >↩</button>
                     </div>
+                  );
+                })}
+                {/* #109 merge affordance — appears between adjacent committed
+                    bars (≤ ADJACENT_TRIP_GAP_DAYS, different trips). Click
+                    absorbs the later trip's legs into the earlier; later trip
+                    is deleted. Static for now; live-during-drag refinement
+                    lands as a follow-on commit in this ticket. */}
+                {mergePairs.map(({ a, b, gap, row }) => {
+                  const seamStart = a.start + a.len;
+                  // Min width so the button is clickable even at gap=0 (back-to-back).
+                  const w = Math.max(gap, 1);
+                  return (
+                    <button
+                      key={`merge-${a.tripId}-${b.tripId}`}
+                      type="button"
+                      className="trip-pl-merge"
+                      title={`Merge ${a.city.name.split(",")[0]} + ${b.city.name.split(",")[0]} into one trip`}
+                      style={{
+                        position: "absolute",
+                        left: `calc(var(--day-w)*${seamStart})`,
+                        width: `calc(var(--day-w)*${w})`,
+                        top: 6 + row * 48,
+                        height: 36,
+                        zIndex: 5,
+                      }}
+                      onPointerDown={(e) => e.stopPropagation()}
+                      onClick={() => mergeTrips(a.tripId, b.tripId)}
+                    >⇄ Merge</button>
                   );
                 })}
                 {hydrated && committedLanes.length === 0 ? <div className="trip-pl-empty-inline">Commit a planning trip (✓) to lock it in here.</div> : null}
